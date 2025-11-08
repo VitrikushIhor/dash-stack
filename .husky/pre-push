@@ -1,0 +1,3 @@
+# Run type checking before push
+npm run type-check
+

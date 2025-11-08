@@ -1,0 +1,3 @@
+# Optional: Add commitlint here if needed
+# npx --no -- commitlint --edit "$1"
+
