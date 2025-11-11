@@ -12,7 +12,7 @@ interface AvatarUploadProps {
   maxSize?: number
   className?: string
   disabled?: boolean
-  defaultPreview?: string // для існуючого avatar з сервера
+  defaultPreview?: string // for existing avatar from server
 }
 
 export function AvatarUpload({
