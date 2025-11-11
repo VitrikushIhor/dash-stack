@@ -18,7 +18,7 @@ export const useMemberStore = create<MemberState>()(
 
         addMember: (member) =>
           set((state) => ({
-            members: [...state.members, { ...member, id: crypto.randomUUID() }],
+            members: [...state.members, member],
           })),
 
         updateMember: (id, updatedMember) =>
