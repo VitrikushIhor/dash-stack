@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { ALL } from 'dns'
 import { User, X } from 'lucide-react'
 import {
   ACCEPTED_IMAGE_TYPES,
