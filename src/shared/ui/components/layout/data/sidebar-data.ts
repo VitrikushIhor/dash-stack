@@ -1,22 +1,13 @@
 import {
-  Construction,
   LayoutDashboard,
   Monitor,
-  Bug,
-  FileX,
-  HelpCircle,
-  Lock,
   Bell,
   Palette,
-  ServerOff,
   Settings,
   Wrench,
   UserCog,
-  UserX,
   ShieldCheck,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
+  UsersRound,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -26,23 +17,7 @@ export const sidebarData: SidebarData = {
     email: 'user@gmail.com',
     avatar: '/avatars/shadcn.jpg',
   },
-  teams: [
-    {
-      name: 'Dash Stack',
-      logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-  ],
+
   navGroups: [
     {
       title: 'General',
@@ -52,8 +27,14 @@ export const sidebarData: SidebarData = {
           url: '/',
           icon: LayoutDashboard,
         },
+        {
+          title: 'Team',
+          url: '/team',
+          icon: UsersRound,
+        },
       ],
     },
+
     {
       title: 'Pages',
       items: [
@@ -66,10 +47,6 @@ export const sidebarData: SidebarData = {
               url: '/sign-in',
             },
             {
-              title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
-            },
-            {
               title: 'Sign Up',
               url: '/sign-up',
             },
@@ -80,37 +57,6 @@ export const sidebarData: SidebarData = {
             {
               title: 'OTP',
               url: '/otp',
-            },
-          ],
-        },
-        {
-          title: 'Errors',
-          icon: Bug,
-          items: [
-            {
-              title: 'Unauthorized',
-              url: '/errors/unauthorized',
-              icon: Lock,
-            },
-            {
-              title: 'Forbidden',
-              url: '/errors/forbidden',
-              icon: UserX,
-            },
-            {
-              title: 'Not Found',
-              url: '/errors/not-found',
-              icon: FileX,
-            },
-            {
-              title: 'Internal Server Error',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
-            },
-            {
-              title: 'Maintenance Error',
-              url: '/errors/maintenance-error',
-              icon: Construction,
             },
           ],
         },
@@ -149,11 +95,6 @@ export const sidebarData: SidebarData = {
               icon: Monitor,
             },
           ],
-        },
-        {
-          title: 'Help Center',
-          url: '/help-center',
-          icon: HelpCircle,
         },
       ],
     },

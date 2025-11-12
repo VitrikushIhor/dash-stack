@@ -85,3 +85,12 @@
     height: 0;
   }
 }
+@theme {
+  --container-7xl: 80rem; /* 1280px */
+  
+  /* Custom more then  7xl */
+  --container-8xl: 88rem; /* 1408px */
+  --container-9xl: 96rem; /* 1536px */
+  --container-10xl: 104rem; /* 1664px */
+  --container-11xl: 112rem; /* 1792px */
+}
