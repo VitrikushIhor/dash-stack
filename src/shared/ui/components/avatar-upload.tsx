@@ -1,7 +1,12 @@
 'use client'
 
 import * as React from 'react'
+import { ALL } from 'dns'
 import { User, X } from 'lucide-react'
+import {
+  ACCEPTED_IMAGE_TYPES,
+  MAX_FILE_SIZE_2_MB,
+} from '@/shared/constants/constants'
 import { cn } from '@/shared/lib/utils'
 import { Button } from './ui/button'
 
@@ -12,14 +17,14 @@ interface AvatarUploadProps {
   maxSize?: number
   className?: string
   disabled?: boolean
-  defaultPreview?: string // для існуючого avatar з сервера
+  defaultPreview?: string
 }
 
 export function AvatarUpload({
   value,
   onValueChange,
   onFileReject,
-  maxSize = 2 * 1024 * 1024,
+  maxSize = MAX_FILE_SIZE_2_MB,
   className,
   disabled = false,
   defaultPreview,
@@ -45,13 +50,11 @@ export function AvatarUpload({
   const validateAndSetFile = (file: File | null) => {
     if (!file) return
 
-    // Валідація типу (як в diceui)
     if (!file.type.startsWith('image/')) {
       onFileReject?.(file, 'File must be an image')
       return
     }
 
-    // Валідація розміру (як в diceui)
     if (file.size > maxSize) {
       onFileReject?.(
         file,
@@ -83,7 +86,6 @@ export function AvatarUpload({
     }
   }
 
-  // Drag and drop (в стилі diceui)
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     if (!disabled) {
@@ -153,7 +155,7 @@ export function AvatarUpload({
         <input
           ref={inputRef}
           type='file'
-          accept='image/png,image/jpeg,image/jpg'
+          accept={ACCEPTED_IMAGE_TYPES.join(',')}
           onChange={handleFileChange}
           disabled={disabled}
           className='sr-only'

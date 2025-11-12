@@ -1,14 +1,15 @@
 import { z } from 'zod'
+import {
+  ACCEPTED_IMAGE_TYPES,
+  MAX_FILE_SIZE_2_MB,
+} from '@/shared/constants/constants'
 import { TEAM_ROLES, USER_GENDER } from '@/entities/team'
-
-const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png']
 
 export const memberFormSchema = z.object({
   avatar: z
     .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, {
-      message: `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+    .refine((file) => file.size <= MAX_FILE_SIZE_2_MB, {
+      message: `File size must be less than ${MAX_FILE_SIZE_2_MB / 1024 / 1024}MB`,
     })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
       message: 'Only .jpg, .jpeg, and .png formats are supported',

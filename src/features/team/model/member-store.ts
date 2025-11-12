@@ -18,7 +18,7 @@ export const useMemberStore = create<MemberState>()(
 
         addMember: (member) =>
           set((state) => ({
-            members: [...state.members, { ...member, id: crypto.randomUUID() }],
+            members: [...state.members, member],
           })),
 
         updateMember: (id, updatedMember) =>
@@ -41,6 +41,6 @@ export const useMemberStore = create<MemberState>()(
         partialize: (state) => ({ members: state.members }),
       }
     ),
-    { name: 'MemberStore' } // Optional: name for devtools
+    { name: 'MemberStore' }
   )
 )

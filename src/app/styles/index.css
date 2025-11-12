@@ -86,10 +86,9 @@
   }
 }
 @theme {
-  /* Стандартний 7xl */
   --container-7xl: 80rem; /* 1280px */
   
-  /* Кастомні розміри більше 7xl */
+  /* Custom more then  7xl */
   --container-8xl: 88rem; /* 1408px */
   --container-9xl: 96rem; /* 1536px */
   --container-10xl: 104rem; /* 1664px */
