@@ -8,6 +8,7 @@ import {
   UserCog,
   ShieldCheck,
   UsersRound,
+  ClipboardList,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -31,6 +32,11 @@ export const sidebarData: SidebarData = {
           title: 'Team',
           url: '/team',
           icon: UsersRound,
+        },
+        {
+          title: 'Todo',
+          url: '/todo',
+          icon: ClipboardList,
         },
       ],
     },

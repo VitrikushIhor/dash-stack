@@ -67,3 +67,21 @@ export const fileToBase64 = (file: File): Promise<string> => {
     reader.onerror = (error) => reject(error)
   })
 }
+
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2)
+}
+
+export function stringToColor(str: string): string {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const hue = hash % 360
+  return `hsl(${hue}, 65%, 50%)`
+}
