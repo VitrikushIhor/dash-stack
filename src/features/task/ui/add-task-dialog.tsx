@@ -49,33 +49,40 @@ import {
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
+import { TaskStatusEnum } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
-import { useMemberStore, TeamMemberPicker } from '@/features/team'
 import {
   TodoChecklist,
   useChecklistTodoActions,
+  useTaskStore,
   useTodoChecklists,
-} from '@/features/todo'
+} from '@/features/task'
+import { useMemberStore, TeamMemberPicker } from '@/features/team'
 
-const todoFormSchema = z.object({
+// Rename all todo references to task
+const taskFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   deadline: z.date().optional(),
 })
 
-type TodoFormValues = z.infer<typeof todoFormSchema>
+type TaskFormValues = z.infer<typeof taskFormSchema>
 
-interface AddTodoDialogProps {
+interface AddTaskDialogProps {
   trigger?: React.ReactNode
+  status?: TaskStatusEnum
 }
 
-export function AddTodoDialog({ trigger }: AddTodoDialogProps) {
+export function AddTaskDialog({
+  trigger,
+  status = TaskStatusEnum.PLANNED,
+}: AddTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([])
   const [selectedLabels, setSelectedLabels] = useState<Label[]>([])
   const checklists = useTodoChecklists()
   const { addChecklist } = useChecklistTodoActions()
-
+  const { addTask } = useTaskStore()
   const [files, setFiles] = useState<File[]>([])
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
@@ -117,31 +124,34 @@ export function AddTodoDialog({ trigger }: AddTodoDialogProps) {
     })
   }, [])
 
-  const form = useForm<TodoFormValues>({
-    resolver: zodResolver(todoFormSchema),
+  const form = useForm<TaskFormValues>({
+    resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: '',
       description: '',
+      deadline: undefined,
     },
   })
 
-  const handleSubmit = async (values: TodoFormValues) => {
+  const handleSubmit = async (values: TaskFormValues) => {
     const attachment = files.length
       ? await Promise.all(files.map((file) => fileToBase64(file)))
       : []
     // TODO: Implement actual submission logic
-    // eslint-disable-next-line no-console
-    console.log({
+
+    addTask({
       ...values,
+      id: crypto.randomUUID(),
+      status: status,
       assignedMembers: selectedMembers,
-      selectedLabels,
+      assignedLabels: selectedLabels,
       checklists,
       attachment,
     })
-    // setOpen(false)
-    // form.reset()
-    // setSelectedMembers([])
-    // setSelectedLabels([])
+    setOpen(false)
+    form.reset()
+    setSelectedMembers([])
+    setSelectedLabels([])
     // deleteChecklist()
   }
 

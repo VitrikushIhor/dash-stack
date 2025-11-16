@@ -17,7 +17,7 @@ import {
   useChecklistTodoActions,
 } from '../model/checklist-todo-context'
 
-interface TaskItemProps {
+interface TodoItemProps {
   taskId: string
   checklistId: string
   isEditing: boolean
@@ -27,7 +27,7 @@ interface TaskItemProps {
   onCancelEdit: () => void
 }
 
-export const TaskItem = memo(function TaskItem({
+export const TodoItem = memo(function TodoItem({
   taskId,
   checklistId,
   isEditing,
@@ -35,7 +35,7 @@ export const TaskItem = memo(function TaskItem({
   onEditTitleChange,
   onStartEdit,
   onCancelEdit,
-}: TaskItemProps) {
+}: TodoItemProps) {
   const checklist = useChecklist(checklistId)
   const task = checklist?.tasks.find((t) => t.id === taskId)
   const { toggleTask, deleteTask, updateTask } = useChecklistTodoActions()

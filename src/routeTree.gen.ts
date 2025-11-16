@@ -21,8 +21,8 @@ import { Route as authSignInRouteImport } from './app/routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './app/routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './app/routes/(auth)/forgot-password'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/routes/_authenticated/settings/route'
-import { Route as AuthenticatedTodoIndexRouteImport } from './app/routes/_authenticated/todo/index'
 import { Route as AuthenticatedTeamIndexRouteImport } from './app/routes/_authenticated/team/index'
+import { Route as AuthenticatedTaskIndexRouteImport } from './app/routes/_authenticated/task/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './app/routes/_authenticated/settings/index'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './app/routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './app/routes/_authenticated/settings/display'
@@ -90,14 +90,14 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedTodoIndexRoute = AuthenticatedTodoIndexRouteImport.update({
-  id: '/todo/',
-  path: '/todo/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
   id: '/team/',
   path: '/team/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTaskIndexRoute = AuthenticatedTaskIndexRouteImport.update({
+  id: '/task/',
+  path: '/task/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsIndexRoute =
@@ -155,8 +155,8 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/task': typeof AuthenticatedTaskIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
-  '/todo': typeof AuthenticatedTodoIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -175,8 +175,8 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/task': typeof AuthenticatedTaskIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
-  '/todo': typeof AuthenticatedTodoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,8 +198,8 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/task/': typeof AuthenticatedTaskIndexRoute
   '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
-  '/_authenticated/todo/': typeof AuthenticatedTodoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,8 +221,8 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings/'
+    | '/task'
     | '/team'
-    | '/todo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -241,8 +241,8 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings'
+    | '/task'
     | '/team'
-    | '/todo'
   id:
     | '__root__'
     | '/_authenticated'
@@ -263,8 +263,8 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/settings/'
+    | '/_authenticated/task/'
     | '/_authenticated/team/'
-    | '/_authenticated/todo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -366,18 +366,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/todo/': {
-      id: '/_authenticated/todo/'
-      path: '/todo'
-      fullPath: '/todo'
-      preLoaderRoute: typeof AuthenticatedTodoIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/team/': {
       id: '/_authenticated/team/'
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof AuthenticatedTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/task/': {
+      id: '/_authenticated/task/'
+      path: '/task'
+      fullPath: '/task'
+      preLoaderRoute: typeof AuthenticatedTaskIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings/': {
@@ -452,16 +452,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedTaskIndexRoute: typeof AuthenticatedTaskIndexRoute
   AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
-  AuthenticatedTodoIndexRoute: typeof AuthenticatedTodoIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedTaskIndexRoute: AuthenticatedTaskIndexRoute,
   AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
-  AuthenticatedTodoIndexRoute: AuthenticatedTodoIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -5,6 +5,8 @@ export {
   useChecklistTodoActions,
   useChecklist,
 } from './model/checklist-todo-context'
+export { useTaskStore } from './model/task-store'
+
 export type {
   CheckListTodoTask,
   TodoChecklistType,
@@ -14,4 +16,5 @@ export type {
 } from './model/types'
 
 export { TodoChecklist } from './ui/todo-checklist'
-export { AddTodoDialog } from './ui/add-todo-dialog'
+export { AddTaskDialog } from './ui/add-task-dialog'
+export { TaskCard } from './ui/task-card'

@@ -63,15 +63,7 @@ export const TeamMemberPicker = memo(function TeamMemberPicker({
       ) : (
         <div>
           {selectedMembers.length > 0 && (
-            <AvatarGroup
-              members={selectedMembers.map((m) => ({
-                id: m.id,
-                name: m.first_name + m.last_name,
-                avatar: m.avatar,
-              }))}
-              max={4}
-              size='md'
-            />
+            <AvatarGroup members={selectedMembers} max={4} size='md' />
           )}
         </div>
       )}

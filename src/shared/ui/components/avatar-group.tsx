@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { cn, getInitials, stringToColor } from '@/shared/lib/utils'
+import { cn, stringToColor } from '@/shared/lib/utils'
 import {
   Avatar,
   AvatarFallback,
@@ -11,19 +11,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
+import { type TeamMember } from '@/entities/team'
 
 interface AvatarGroupProps {
-  members: Array<{
-    id: string
-    name: string
-    avatar?: string
-  }>
+  members: TeamMember[]
   max?: number
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'm' | 'sm' | 'md' | 'lg'
   className?: string
 }
 
 const sizeClasses = {
+  m: 'h-6 w-6  text-xs',
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
   lg: 'h-12 w-12 text-base',
@@ -38,6 +36,9 @@ export const AvatarGroup = memo(function AvatarGroup({
   const visibleMembers = members.slice(0, max)
   const remainingCount = Math.max(0, members.length - max)
 
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName} ${lastName}`
+  }
   return (
     <TooltipProvider>
       <div className={cn('flex -space-x-2', className)}>
@@ -52,17 +53,22 @@ export const AvatarGroup = memo(function AvatarGroup({
                 style={{
                   backgroundColor: member.avatar
                     ? undefined
-                    : stringToColor(member.name),
+                    : stringToColor(
+                        getInitials(member.first_name, member.last_name)
+                      ),
                 }}
               >
-                <AvatarImage src={member.avatar} alt={member.name} />
+                <AvatarImage
+                  src={member.avatar}
+                  alt={`${member.first_name} $me`}
+                />
                 <AvatarFallback className='text-white'>
-                  {getInitials(member.name)}
+                  {getInitials(member.first_name, member.last_name)}
                 </AvatarFallback>
               </Avatar>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{member.name}</p>
+              <p>{getInitials(member.first_name, member.last_name)}</p>
             </TooltipContent>
           </Tooltip>
         ))}

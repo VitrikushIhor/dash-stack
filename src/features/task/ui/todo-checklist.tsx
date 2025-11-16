@@ -14,7 +14,7 @@ import {
   useChecklist,
   useChecklistTodoActions,
 } from '../model/checklist-todo-context'
-import { TaskItem } from './task-item'
+import { TodoItem } from './todo-item'
 
 interface TodoChecklistProps {
   checklistId: string
@@ -190,7 +190,7 @@ export const TodoChecklist = memo(function TodoChecklist({
           )}
 
           {checklist.tasks.map((task) => (
-            <TaskItem
+            <TodoItem
               key={task.id}
               taskId={task.id}
               checklistId={checklistId}

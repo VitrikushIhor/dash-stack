@@ -1,6 +1,12 @@
 import { type Label } from '@/shared/ui/components/label/types.label'
 import { type TeamMember } from '@/entities/team'
 
+export enum TaskStatusEnum {
+  PLANNED = 'PLANNED',
+  UPCOMING = 'UPCOMING',
+  COMPLETED = 'COMPLETED',
+}
+
 export interface TodoTask {
   id: string
   title: string
@@ -13,21 +19,14 @@ export interface TodoChecklist {
   tasks: TodoTask[]
 }
 
-export interface TodoActivity {
-  id: string
-  user: string
-  action: string
-  timestamp: string
-  details?: string
-}
-
-export interface Todo {
+export interface Task {
   id: string
   title: string
-  description: string
-  members: TeamMember[]
-  dueDate: Date
-  labels: Label[]
-  checklists: TodoChecklist[]
-  activities: TodoActivity[]
+  status: TaskStatusEnum
+  description?: string
+  assignedMembers?: TeamMember[]
+  deadline?: Date
+  assignedLabels?: Label[]
+  checklists?: TodoChecklist[]
+  attachment?: string[]
 }
