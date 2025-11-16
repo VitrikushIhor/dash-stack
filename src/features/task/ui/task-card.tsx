@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { format } from 'date-fns'
 import {
   Calendar,
@@ -8,12 +9,22 @@ import {
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { AvatarGroup } from '@/shared/ui/components/avatar-group'
+import { ConfirmDialog } from '@/shared/ui/components/confirm-dialog'
 import { LabelBadge } from '@/shared/ui/components/label/label-badge'
 import { Badge } from '@/shared/ui/components/ui/badge'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/shared/ui/components/ui/card'
 import { Checkbox } from '@/shared/ui/components/ui/checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task, TaskStatusEnum } from '@/entities/task'
+import { useTaskStore } from '@/features/task/model/task-store'
 
 interface TaskCardProps {
   task: Task
@@ -28,6 +39,9 @@ export const TaskCard = ({
   onTaskClick,
   className,
 }: TaskCardProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const deleteTask = useTaskStore((state) => state.deleteTask)
+
   const {
     id,
     title,
@@ -56,6 +70,11 @@ export const TaskCard = ({
 
   const handleCardClick = () => {
     onTaskClick?.(id)
+  }
+
+  const handleDelete = () => {
+    deleteTask(id)
+    setIsDeleteDialogOpen(false)
   }
 
   const date = deadline ? format(deadline, 'dd.MM.yyyy') : undefined
@@ -160,20 +179,75 @@ export const TaskCard = ({
               )}
 
               {/* More Options */}
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  // Handle more options
-                }}
-              >
-                <MoreVertical className='h-4 w-4' />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-8 w-8'
+                    onClick={(e) => {
+                      e.stopPropagation()
+                    }}
+                    onPointerDown={(e) => {
+                      e.stopPropagation()
+                    }}
+                  >
+                    <MoreVertical className='h-4 w-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align='end'
+                  onPointerDown={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // Handle edit
+                    }}
+                    onPointerDown={(e) => {
+                      e.stopPropagation()
+                    }}
+                  >
+                    Edit task
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className='text-destructive'
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setIsDeleteDialogOpen(true)
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onPointerDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                  >
+                    Delete task
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardContent>
+
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title='Delete task'
+          desc={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+          confirmText='Delete'
+          cancelBtnText='Cancel'
+          destructive
+          handleConfirm={handleDelete}
+        />
       </Card>
     )
   }
@@ -204,18 +278,69 @@ export const TaskCard = ({
               ))}
             </div>
           )}
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-6 w-6'
-            onClick={(e) => {
-              e.stopPropagation()
-              // Handle more options
-            }}
-          >
-            <MoreHorizontal className='h-4 w-4' />
-          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='ml-auto h-8 w-8'
+                aria-label='Actions with tasks'
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align='end'
+              onPointerDown={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                }}
+                // onClick={startEditingName}
+              >
+                Edit task
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='text-destructive'
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setIsDeleteDialogOpen(true)
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onPointerDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              >
+                Delete task
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title='Delete task'
+          desc={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+          confirmText='Delete'
+          cancelBtnText='Cancel'
+          destructive
+          handleConfirm={handleDelete}
+        />
 
         <h3
           className={cn(

@@ -84,7 +84,6 @@ export function AddTaskDialog({
   const { addChecklist } = useChecklistTodoActions()
   const { addTask } = useTaskStore()
   const [files, setFiles] = useState<File[]>([])
-
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
     async (files, { onProgress, onSuccess, onError }) => {
       try {

@@ -37,10 +37,12 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
     isLoading,
     disabled = false,
     handleConfirm,
+    open,
+    onOpenChange,
     ...actions
   } = props
   return (
-    <AlertDialog {...actions}>
+    <AlertDialog open={open} onOpenChange={onOpenChange} {...actions}>
       <AlertDialogContent className={cn(className && className)}>
         <AlertDialogHeader className='text-start'>
           <AlertDialogTitle>{title}</AlertDialogTitle>
