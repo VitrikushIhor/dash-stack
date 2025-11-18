@@ -14,7 +14,7 @@ import { groupTasksByStatus } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
 
-export function KanbanTaskBoard() {
+export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
   const tasks = useTaskStore((state) => state.tasks)
 
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -76,45 +76,109 @@ export function KanbanTaskBoard() {
 
   return (
     <>
-      <Kanban
-        value={columns}
-        onValueChange={handleValueChange}
-        getItemValue={(item) => item.id}
-      >
-        <KanbanBoard className='grid auto-rows-fr grid-cols-3'>
-          {Object.entries(columns).map(([columnValue, tasks]) => (
-            <KanbanTaskColum
-              key={columnValue}
-              value={columnValue}
-              tasks={tasks}
-              onEdit={openEditDialog}
-            />
-          ))}
-        </KanbanBoard>
-        <KanbanOverlay>
-          {({ value, variant }) => {
-            if (variant === 'column') {
-              const tasks = columns[value] ?? []
+      {viewMode === 'kanban' && (
+        <Kanban
+          value={columns}
+          onValueChange={handleValueChange}
+          getItemValue={(item) => item.id}
+          orientation='horizontal'
+        >
+          <KanbanBoard className='grid auto-rows-fr grid-cols-3'>
+            {Object.entries(columns).map(([columnValue, tasks]) => (
+              <KanbanTaskColum
+                key={columnValue}
+                value={columnValue}
+                tasks={tasks}
+                onEdit={openEditDialog}
+                viewMode='kanban'
+              />
+            ))}
+          </KanbanBoard>
+          <KanbanOverlay>
+            {({ value, variant }) => {
+              if (variant === 'column') {
+                const tasks = columns[value] ?? []
+
+                return (
+                  <KanbanTaskColum
+                    value={value}
+                    tasks={tasks}
+                    onEdit={openEditDialog}
+                    viewMode='kanban'
+                  />
+                )
+              }
+
+              const task = Object.values(columns)
+                .flat()
+                .find((task) => task.id === value)
+
+              if (!task) return null
 
               return (
-                <KanbanTaskColum
-                  value={value}
-                  tasks={tasks}
+                <KanbanTaskCard
+                  task={task}
                   onEdit={openEditDialog}
+                  viewMode='kanban'
                 />
               )
-            }
+            }}
+          </KanbanOverlay>
+        </Kanban>
+      )}
 
-            const task = Object.values(columns)
-              .flat()
-              .find((task) => task.id === value)
+      {viewMode === 'list' && (
+        <Kanban
+          value={columns}
+          onValueChange={handleValueChange}
+          getItemValue={(item) => item.id}
+          orientation='vertical'
+        >
+          {/* <KanbanBoard className='h-[calc(100vh-200px)] overflow-x-auto'> */}
+          <KanbanBoard className=''>
+            {Object.entries(columns).map(([columnValue, tasks]) => (
+              <KanbanTaskColum
+                key={columnValue}
+                value={columnValue}
+                tasks={tasks}
+                onEdit={openEditDialog}
+                viewMode='list'
+              />
+            ))}
+          </KanbanBoard>
 
-            if (!task) return null
+          <KanbanOverlay>
+            {({ value, variant }) => {
+              if (variant === 'column') {
+                const tasks = columns[value] ?? []
 
-            return <KanbanTaskCard task={task} onEdit={openEditDialog} />
-          }}
-        </KanbanOverlay>
-      </Kanban>
+                return (
+                  <KanbanTaskColum
+                    value={value}
+                    tasks={tasks}
+                    onEdit={openEditDialog}
+                    viewMode='list'
+                  />
+                )
+              }
+
+              const task = Object.values(columns)
+                .flat()
+                .find((task) => task.id === value)
+
+              if (!task) return null
+
+              return (
+                <KanbanTaskCard
+                  task={task}
+                  onEdit={openEditDialog}
+                  viewMode='list'
+                />
+              )
+            }}
+          </KanbanOverlay>
+        </Kanban>
+      )}
 
       {editingTask && (
         <EditTaskDialog

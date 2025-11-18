@@ -54,28 +54,12 @@ export function TaskPage() {
 
           {/* Main Content */}
           <div className='flex-1 overflow-hidden'>
-            {viewMode === 'kanban' ? <KanbanTaskBoard /> : null}
+            {viewMode === 'kanban' || viewMode === 'list' ? (
+              <KanbanTaskBoard viewMode={viewMode} />
+            ) : null}
           </div>
         </ChecklistTodoProvider>
       </Main>
     </>
   )
 }
-
-// // List View
-// export const TaskList = () => {
-//   const tasks = useTaskStore((state) => state.tasks)
-
-//   return (
-//     <div className='space-y-2'>
-//       {tasks.map((task) => (
-//         <TaskCard
-//           key={task.id}
-//           task={task}
-//           variant='list'
-//           onTaskClick={(id) => console.log('Clicked:', id)}
-//         />
-//       ))}
-//     </div>
-//   )
-// }

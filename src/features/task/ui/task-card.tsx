@@ -25,10 +25,11 @@ import {
 } from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task, TaskStatusEnum } from '@/entities/task'
 import { useTaskStore } from '@/features/task/model/task-store'
+import { TASK_STATUS_COLORS } from '../model/consts'
 
 interface TaskCardProps {
   task: Task
-  variant?: 'kanban' | 'list'
+  viewMode?: 'kanban' | 'list'
   onEdit?: (task: Task) => void
   onTaskClick?: (taskId: string) => void
   className?: string
@@ -36,7 +37,7 @@ interface TaskCardProps {
 
 export const TaskCard = ({
   task,
-  variant = 'kanban',
+  viewMode = 'kanban',
   onTaskClick,
   onEdit,
   className,
@@ -79,30 +80,20 @@ export const TaskCard = ({
     setIsDeleteDialogOpen(false)
   }
 
-  // const handleEdit = (e: React.MouseEvent,task:) => {
-  //   e.preventDefault()
-  //   e.stopPropagation()
-  //   onEdit?.(task)
-  // }
-
   const date = deadline ? format(deadline, 'dd.MM.yyyy') : undefined
 
   const isCompleted = status === TaskStatusEnum.COMPLETED
-  const isPlanned = status === TaskStatusEnum.PLANNED
-  const isUpcoming = status === TaskStatusEnum.UPCOMING
 
-  if (variant === 'list') {
+  if (viewMode === 'list') {
     return (
       <>
         <Card
           className={cn(
             'w-full cursor-pointer transition-all hover:shadow-md',
             'border-l-4 p-1',
-            isCompleted && 'border-l-green-500',
-            isUpcoming && 'border-l-blue-500',
-            isPlanned && 'border-l-gray-400',
             className
           )}
+          style={{ borderLeftColor: TASK_STATUS_COLORS[status] }}
           onClick={handleCardClick}
         >
           <CardContent>

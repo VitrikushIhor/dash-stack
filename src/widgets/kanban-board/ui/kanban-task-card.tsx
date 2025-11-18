@@ -6,12 +6,14 @@ interface BoardCardProps
   extends Omit<React.ComponentProps<typeof KanbanItem>, 'value'> {
   task: Task
   onEdit?: (task: Task) => void
+  viewMode: 'kanban' | 'list'
 }
 
 export const KanbanTaskCard = ({
   task,
   onTaskClick,
   onEdit,
+  viewMode,
   ...props
 }: BoardCardProps & { onTaskClick?: (taskId: string) => void }) => {
   const handleCardClick = () => {
@@ -51,7 +53,7 @@ export const KanbanTaskCard = ({
       >
         <TaskCard
           task={task}
-          variant='kanban'
+          viewMode={viewMode}
           onEdit={onEdit}
           onTaskClick={onTaskClick}
         />
