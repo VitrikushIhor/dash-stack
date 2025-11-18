@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { format } from 'date-fns'
 import { DialogDescription } from '@radix-ui/react-dialog'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
@@ -69,8 +69,6 @@ interface AddTaskDialogProps {
 export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
   const availableMembers = useMemberStore((state) => state.members)
 
-  const [files, setFiles] = useState<File[]>([])
-
   const {
     checklists,
     addChecklist,
@@ -80,6 +78,8 @@ export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
     setSelectedLabels,
     setSelectedMembers,
     handleSubmit,
+    setFiles,
+    files,
   } = useTaskForm(task)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(

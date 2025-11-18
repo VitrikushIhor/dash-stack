@@ -80,7 +80,7 @@ export function AddTaskDialog({
     setSelectedLabels,
     setSelectedMembers,
     handleSubmit,
-  } = useTaskForm()
+  } = useTaskForm(undefined, status)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
     async (files, { onProgress, onSuccess, onError }) => {

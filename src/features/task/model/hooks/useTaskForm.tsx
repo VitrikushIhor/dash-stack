@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fileToBase64 } from '@/shared/lib/utils'
 import { type Label } from '@/shared/ui/components/label/types.label'
-import { type Task } from '@/entities/task'
+import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
 import { useTaskStore } from '@/features/task'
 import {
@@ -13,7 +13,7 @@ import {
 } from '../checklist-todo-context'
 import { taskFormSchema, type TaskFormValues } from '../create-task-schema'
 
-export function useTaskForm(task?: Task) {
+export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
   const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([])
   const [selectedLabels, setSelectedLabels] = useState<Label[]>([])
   const [files, setFiles] = useState<File[]>([])
@@ -27,7 +27,7 @@ export function useTaskForm(task?: Task) {
     defaultValues: {
       title: '',
       description: '',
-      status: undefined,
+      status: initialStatus ?? TaskStatusEnum.PLANNED,
       deadline: undefined,
     },
   })
@@ -38,19 +38,23 @@ export function useTaskForm(task?: Task) {
         title: task.title || '',
         description: task.description || '',
         deadline: task.deadline ? new Date(task.deadline) : undefined,
-        status: task.status || undefined,
+        status: task.status ?? TaskStatusEnum.PLANNED,
       })
+
+      const fetchFiles = async () => {
+        const loadedFiles = await loadFiles(task)
+        setFiles(loadedFiles)
+      }
+      fetchFiles()
+
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedMembers(task.assignedMembers || [])
       setSelectedLabels(task.assignedLabels || [])
       setChecklists(task.checklists || [])
-      setFiles([])
     }
   }, [task, form, setChecklists])
 
   const handleSubmit = async (values: TaskFormValues) => {
-    if (!task) return
-
     const attachment = files.length
       ? await Promise.all(files.map((file) => fileToBase64(file)))
       : []
@@ -113,4 +117,21 @@ export function useTaskForm(task?: Task) {
     handleSubmit,
     resetForm,
   }
+}
+
+async function loadFiles(task: Task) {
+  if (task?.attachment && task?.attachment?.length > 0) {
+    // example: task.attachments = ['https://.../file1.png', 'https://.../file2.pdf']
+    return await Promise.all(
+      task.attachment.map((url) => urlToFile(url, url.split('/').pop()!))
+    )
+  } else {
+    return []
+  }
+}
+async function urlToFile(url: string, filename: string) {
+  const res = await fetch(url)
+  const blob = await res.blob()
+  const file = new File([blob], filename, { type: blob.type })
+  return file
 }
