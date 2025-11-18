@@ -8,29 +8,13 @@ import { NavUser } from '@/shared/ui/components/layout/nav-user'
 import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
-import { type TaskStatusEnum } from '@/entities/task'
-import {
-  ChecklistTodoProvider,
-  AddTaskDialog,
-  useTaskStore,
-} from '@/features/task'
+import { ChecklistTodoProvider, AddTaskDialog } from '@/features/task'
 import { KanbanTaskBoard } from '@/widgets/kanban-board'
 
 type ViewMode = 'kanban' | 'list'
 
 export function TaskPage() {
-  const tasks = useTaskStore((state) => state.tasks)
-  const updateTask = useTaskStore((state) => state.updateTask)
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
-
-  const handleTaskClick = (_taskId: string) => {
-    // Open task modal/drawer
-    // TODO: Implement task detail modal/drawer
-  }
-
-  const handleTaskMove = (taskId: string, newStatus: TaskStatusEnum) => {
-    updateTask(taskId, { status: newStatus })
-  }
 
   return (
     <>

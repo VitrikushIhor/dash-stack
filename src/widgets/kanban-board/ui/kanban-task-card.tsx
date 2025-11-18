@@ -5,11 +5,13 @@ import { TaskCard } from '@/features/task'
 interface BoardCardProps
   extends Omit<React.ComponentProps<typeof KanbanItem>, 'value'> {
   task: Task
+  onEdit?: (task: Task) => void
 }
 
 export const KanbanTaskCard = ({
   task,
   onTaskClick,
+  onEdit,
   ...props
 }: BoardCardProps & { onTaskClick?: (taskId: string) => void }) => {
   const handleCardClick = () => {
@@ -25,7 +27,6 @@ export const KanbanTaskCard = ({
 
   const handlePointerDown = (event: React.PointerEvent) => {
     const target = event.target as HTMLElement
-    // Перевіряємо, чи клік був на інтерактивному елементі (button, dropdown, etc.)
     if (
       target.closest('button') ||
       target.closest('[role="menuitem"]') ||
@@ -51,7 +52,7 @@ export const KanbanTaskCard = ({
         <TaskCard
           task={task}
           variant='kanban'
-          // Only pass handler if provided
+          onEdit={onEdit}
           onTaskClick={onTaskClick}
         />
       </div>

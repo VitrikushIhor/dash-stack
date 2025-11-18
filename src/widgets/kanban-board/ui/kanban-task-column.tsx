@@ -14,9 +14,15 @@ import { KanbanTaskCard } from './kanban-task-card'
 interface TaskColumnProps
   extends Omit<React.ComponentProps<typeof KanbanColumn>, 'children'> {
   tasks: Task[]
+  onEdit?: (task: Task) => void
 }
 
-export function KanbanTaskColum({ value, tasks, ...props }: TaskColumnProps) {
+export function KanbanTaskColum({
+  value,
+  tasks,
+  onEdit,
+  ...props
+}: TaskColumnProps) {
   const isCompleted = value === TaskStatusEnum.COMPLETED
 
   return (
@@ -69,7 +75,12 @@ export function KanbanTaskColum({ value, tasks, ...props }: TaskColumnProps) {
             </div>
           ) : (
             tasks.map((task) => (
-              <KanbanTaskCard key={task.id} task={task} asHandle />
+              <KanbanTaskCard
+                key={task.id}
+                task={task}
+                asHandle
+                onEdit={onEdit}
+              />
             ))
           )}
         </div>

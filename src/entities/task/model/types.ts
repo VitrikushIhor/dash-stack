@@ -25,7 +25,7 @@ export interface Task {
   status: TaskStatusEnum
   description?: string
   assignedMembers?: TeamMember[]
-  deadline?: Date
+  deadline?: string
   assignedLabels?: Label[]
   checklists?: TodoChecklist[]
   attachment?: string[]

@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { format } from 'date-fns'
+import { DialogDescription } from '@radix-ui/react-dialog'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/shared/lib/utils'
@@ -26,7 +27,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
 import {
   Form,
@@ -54,21 +54,21 @@ import {
 } from '@/shared/ui/components/ui/select'
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
-import { TaskStatusEnum } from '@/entities/task'
+import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { useMemberStore, TeamMemberPicker } from '@/features/team'
 import { type TaskFormValues } from '../model/create-task-schema'
 
 interface AddTaskDialogProps {
-  trigger?: React.ReactNode
   status?: TaskStatusEnum
+  task: Task
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
-export function AddTaskDialog({
-  trigger,
-  status = TaskStatusEnum.PLANNED,
-}: AddTaskDialogProps) {
-  const [open, setOpen] = useState(false)
+export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
+  const availableMembers = useMemberStore((state) => state.members)
+
   const [files, setFiles] = useState<File[]>([])
 
   const {
@@ -80,7 +80,7 @@ export function AddTaskDialog({
     setSelectedLabels,
     setSelectedMembers,
     handleSubmit,
-  } = useTaskForm()
+  } = useTaskForm(task)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
     async (files, { onProgress, onSuccess, onError }) => {
@@ -125,25 +125,16 @@ export function AddTaskDialog({
     const res = await handleSubmit(values)
     if (res?.success) {
       setOpen(false)
-      toast.success('Task create successfully')
+      toast.success('Task updated successfully')
     }
   }
 
-  const membersNew = useMemberStore((state) => state.members)
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button>
-            <Plus className='mr-2 h-4 w-4' />
-            Add Task
-          </Button>
-        )}
-      </DialogTrigger>
       <DialogContent className='max-h-[90vh] max-w-3xl'>
         <DialogHeader>
-          <DialogTitle>Add New Task</DialogTitle>
+          <DialogTitle>Edit Task </DialogTitle>
+          <DialogDescription>Your are editing: {task.title}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className='h-[calc(90vh-120px)] pr-4'>
@@ -182,7 +173,6 @@ export function AddTaskDialog({
                   </FormItem>
                 )}
               />
-
               <Separator />
 
               <FormField
@@ -193,7 +183,7 @@ export function AddTaskDialog({
                     <FormLabel>Status</FormLabel>
                     <FormControl>
                       <Select
-                        defaultValue={status ?? undefined}
+                        defaultValue={task.status ?? undefined}
                         value={field.value ?? undefined}
                         onValueChange={field.onChange}
                       >
@@ -224,7 +214,7 @@ export function AddTaskDialog({
               <div className='space-y-2'>
                 <TeamMemberPicker
                   selectedMembers={selectedMembers}
-                  availableMembers={membersNew}
+                  availableMembers={availableMembers}
                   onMembersChange={setSelectedMembers}
                   maxMembers={3}
                   label='Assigned Members'

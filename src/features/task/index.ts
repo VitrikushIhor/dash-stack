@@ -20,3 +20,5 @@ export { AddTaskDialog } from './ui/add-task-dialog'
 export { TaskCard } from './ui/task-card'
 
 export { TASK_COLUMN_TITLES, TASK_STATUS_COLORS } from './model/consts'
+
+export { useTaskForm } from './model/hooks/useTaskForm'

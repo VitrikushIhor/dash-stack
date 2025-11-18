@@ -128,6 +128,7 @@ export function ChecklistTodoProvider({
       updateTask,
       toggleTask,
       deleteTask,
+      setChecklists,
     }),
     [
       checklists,
@@ -138,6 +139,7 @@ export function ChecklistTodoProvider({
       updateTask,
       toggleTask,
       deleteTask,
+      setChecklists,
     ]
   )
 
@@ -153,7 +155,9 @@ export function useCheckListTodoContext() {
   const context = useContext(ChecklistTodoContext)
 
   if (!context) {
-    throw new Error('useTodoContext must be used within TodoProvider')
+    throw new Error(
+      'useCheckListTodoContext must be used within ChecklistTodoProvider'
+    )
   }
 
   return context
@@ -175,6 +179,7 @@ export function useChecklistTodoActions() {
     updateTask,
     toggleTask,
     deleteTask,
+    setChecklists,
   } = useCheckListTodoContext()
 
   return useMemo(
@@ -186,6 +191,7 @@ export function useChecklistTodoActions() {
       updateTask,
       toggleTask,
       deleteTask,
+      setChecklists,
     }),
     [
       addChecklist,
@@ -195,6 +201,7 @@ export function useChecklistTodoActions() {
       updateTask,
       toggleTask,
       deleteTask,
+      setChecklists,
     ]
   )
 }

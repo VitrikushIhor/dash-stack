@@ -22,6 +22,7 @@ export interface CheckListTodoActions {
   updateTask: (checklistId: string, taskId: string, newTitle: string) => void
   toggleTask: (checklistId: string, taskId: string) => void
   deleteTask: (checklistId: string, taskId: string) => void
+  setChecklists: (checklists: TodoChecklistType[]) => void
 }
 
 export type ChecklistTodoStore = CheckListTodoState & CheckListTodoActions
