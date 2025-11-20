@@ -1,4 +1,4 @@
-import { ChevronDown, GripVertical, Plus } from 'lucide-react'
+import { GripVertical, Plus } from 'lucide-react'
 import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui/components/kanban'
 import {
   Accordion,
@@ -9,12 +9,8 @@ import {
 import { Button } from '@/shared/ui/components/ui/button'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import {
-  AddTaskDialog,
-  ChecklistTodoProvider,
-  TASK_COLUMN_TITLES,
-  TASK_STATUS_COLORS,
-} from '@/features/task'
+import { AddTaskDialog, ChecklistTodoProvider } from '@/features/task'
+import { STATUS_CONFIG } from '@/features/task/model/config/task-status-config'
 import { KanbanTaskCard } from './kanban-task-card'
 
 interface TaskColumnProps
@@ -55,12 +51,12 @@ export function KanbanTaskColum({
                       className='h-2 w-2 rounded-full'
                       style={{
                         backgroundColor:
-                          TASK_STATUS_COLORS[value as TaskStatusEnum],
+                          STATUS_CONFIG[value as TaskStatusEnum].color,
                       }}
                     />
                     <div className='flex items-center gap-2'>
                       <h2 className='text-base font-semibold'>
-                        {TASK_COLUMN_TITLES[value as TaskStatusEnum]}
+                        {STATUS_CONFIG[value as TaskStatusEnum].label}
                       </h2>
                     </div>
                     <span className='text-muted-foreground text-sm'>
@@ -127,11 +123,11 @@ export function KanbanTaskColum({
             <div
               className='h-2 w-2 rounded-full'
               style={{
-                backgroundColor: TASK_STATUS_COLORS[value as TaskStatusEnum],
+                backgroundColor: STATUS_CONFIG[value as TaskStatusEnum].color,
               }}
             />
             <h2 className='text-base font-semibold'>
-              {TASK_COLUMN_TITLES[value as TaskStatusEnum]}
+              {STATUS_CONFIG[value as TaskStatusEnum].label}
             </h2>
             <span className='text-muted-foreground text-sm'>
               {isCompleted

@@ -25,7 +25,7 @@ import {
 } from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task, TaskStatusEnum } from '@/entities/task'
 import { useTaskStore } from '@/features/task/model/task-store'
-import { TASK_STATUS_COLORS } from '../model/consts'
+import { STATUS_CONFIG } from '../model/config/task-status-config'
 
 interface TaskCardProps {
   task: Task
@@ -93,7 +93,7 @@ export const TaskCard = ({
             'border-l-4 p-1',
             className
           )}
-          style={{ borderLeftColor: TASK_STATUS_COLORS[status] }}
+          style={{ borderLeftColor: STATUS_CONFIG[status].color }}
           onClick={handleCardClick}
         >
           <CardContent>

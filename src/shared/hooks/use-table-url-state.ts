@@ -45,6 +45,20 @@ type UseTableUrlStateParams = {
         serialize?: (value: unknown) => unknown
         deserialize?: (value: unknown) => unknown
       }
+    | {
+        columnId: string
+        searchKey: string
+        type: 'date'
+        serialize?: (value: unknown) => string | undefined
+        deserialize?: (value: unknown) => string
+      }
+    | {
+        columnId: string
+        searchKey: string
+        type: 'dateRange'
+        serialize?: (value: unknown) => string[] | undefined
+        deserialize?: (value: unknown) => string[]
+      }
   >
 }
 
@@ -91,13 +105,13 @@ export function useTableUrlState(
     for (const cfg of columnFiltersCfg) {
       const raw = (search as SearchRecord)[cfg.searchKey]
       const deserialize = cfg.deserialize ?? ((v: unknown) => v)
-      if (cfg.type === 'string') {
+
+      if (cfg.type === 'string' || cfg.type === 'date') {
         const value = (deserialize(raw) as string) ?? ''
         if (typeof value === 'string' && value.trim() !== '') {
           collected.push({ id: cfg.columnId, value })
         }
-      } else {
-        // default to array type
+      } else if (cfg.type === 'array' || cfg.type === 'dateRange') {
         const value = (deserialize(raw) as unknown[]) ?? []
         if (Array.isArray(value) && value.length > 0) {
           collected.push({ id: cfg.columnId, value })
@@ -168,12 +182,13 @@ export function useTableUrlState(
     for (const cfg of columnFiltersCfg) {
       const found = next.find((f) => f.id === cfg.columnId)
       const serialize = cfg.serialize ?? ((v: unknown) => v)
-      if (cfg.type === 'string') {
+
+      if (cfg.type === 'string' || cfg.type === 'date') {
         const value =
           typeof found?.value === 'string' ? (found.value as string) : ''
         patch[cfg.searchKey] =
           value.trim() !== '' ? serialize(value) : undefined
-      } else {
+      } else if (cfg.type === 'array' || cfg.type === 'dateRange') {
         const value = Array.isArray(found?.value)
           ? (found!.value as unknown[])
           : []

@@ -2,6 +2,8 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { type Table } from '@tanstack/react-table'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Input } from '@/shared/ui/components/ui/input'
+import { DataTableDateFilter } from './date-filter'
+import { DataTableDateRangeFilter } from './date-range-filter'
 import { DataTableFacetedFilter } from './faceted-filter'
 import { DataTableViewOptions } from './view-options'
 
@@ -18,6 +20,11 @@ type DataTableToolbarProps<TData> = {
       icon?: React.ComponentType<{ className?: string }>
     }[]
   }[]
+  dateFilters?: {
+    columnId: string
+    title: string
+    type: 'single' | 'range'
+  }[]
 }
 
 export function DataTableToolbar<TData>({
@@ -25,6 +32,7 @@ export function DataTableToolbar<TData>({
   searchPlaceholder = 'Filter...',
   searchKey,
   filters = [],
+  dateFilters = [],
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter
@@ -63,6 +71,32 @@ export function DataTableToolbar<TData>({
                 options={filter.options}
               />
             )
+          })}
+        </div>
+        <div className='flex gap-x-2'>
+          {dateFilters.map((filter) => {
+            const column = table.getColumn(filter.columnId)
+            if (!column) return null
+
+            if (filter.type === 'single') {
+              return (
+                <DataTableDateFilter
+                  column={column}
+                  title={filter.title}
+                  key={filter.columnId}
+                />
+              )
+            }
+
+            if (filter.type === 'range') {
+              return (
+                <DataTableDateRangeFilter
+                  column={column}
+                  title={filter.title}
+                  key={filter.columnId}
+                />
+              )
+            }
           })}
         </div>
         {isFiltered && (

@@ -8,13 +8,19 @@ import { NavUser } from '@/shared/ui/components/layout/nav-user'
 import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
-import { ChecklistTodoProvider, AddTaskDialog } from '@/features/task'
+import {
+  ChecklistTodoProvider,
+  AddTaskDialog,
+  useTaskStore,
+} from '@/features/task'
 import { KanbanTaskBoard } from '@/widgets/kanban-board'
+import { TasksTable } from '@/widgets/tasks-table/ui/tasks-table'
 
 type ViewMode = 'kanban' | 'list'
 
 export function TaskPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
+  const tasks = useTaskStore((state) => state.tasks)
 
   return (
     <>
@@ -44,6 +50,10 @@ export function TaskPage() {
                     <List className='h-4 w-4' />
                     List
                   </TabsTrigger>
+                  <TabsTrigger value='table' className='gap-2'>
+                    <List className='h-4 w-4' />
+                    Table
+                  </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -56,7 +66,9 @@ export function TaskPage() {
           <div className='flex-1 overflow-hidden'>
             {viewMode === 'kanban' || viewMode === 'list' ? (
               <KanbanTaskBoard viewMode={viewMode} />
-            ) : null}
+            ) : (
+              <TasksTable data={tasks} />
+            )}
           </div>
         </ChecklistTodoProvider>
       </Main>
