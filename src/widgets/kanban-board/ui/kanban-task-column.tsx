@@ -9,8 +9,7 @@ import {
 import { Button } from '@/shared/ui/components/ui/button'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import { AddTaskDialog, ChecklistTodoProvider } from '@/features/task'
-import { STATUS_CONFIG } from '@/features/task/model/config/task-status-config'
+import { AddTaskDialog, ChecklistTodoProvider, STATUS_CONFIG } from '@/features/task'
 import { KanbanTaskCard } from './kanban-task-card'
 
 interface TaskColumnProps

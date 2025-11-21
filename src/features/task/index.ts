@@ -17,6 +17,9 @@ export type {
 
 export { TodoChecklist } from './ui/todo-checklist'
 export { AddTaskDialog } from './ui/add-task-dialog'
+export { EditTaskDialog } from './ui/edit-task-dialog'
 export { TaskCard } from './ui/task-card'
+export { TaskStatusBadge } from './ui/task-status-badge'
 
 export { useTaskForm } from './model/hooks/useTaskForm'
+export { STATUS_CONFIG } from './model/config/task-status-config'

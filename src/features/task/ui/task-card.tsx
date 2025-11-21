@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import { useTaskStore } from '@/features/task/model/task-store'
+import { useTaskStore } from '../model/task-store'
 import { STATUS_CONFIG } from '../model/config/task-status-config'
 
 interface TaskCardProps {

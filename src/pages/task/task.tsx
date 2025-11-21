@@ -14,7 +14,7 @@ import {
   useTaskStore,
 } from '@/features/task'
 import { KanbanTaskBoard } from '@/widgets/kanban-board'
-import { TasksTable } from '@/widgets/tasks-table/ui/tasks-table'
+import { TasksTable } from '@/widgets/tasks-table'
 
 type ViewMode = 'kanban' | 'list'
 

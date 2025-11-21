@@ -7,8 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { AuthLayout } from '@/features/auth/ui/auth-layout'
-import { UserAuthForm } from '@/features/auth/ui/user-auth-form'
+import { AuthLayout, UserAuthFormAlt as UserAuthForm } from '@/features/auth'
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })

@@ -12,7 +12,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-} from '../ui/table'
+} from '@/shared/ui/components/ui/table'
 import { DataTablePagination } from './pagination'
 
 interface DataTableProps<TData> extends React.ComponentProps<'div'> {

@@ -1,9 +1,8 @@
-import { getRouteApi } from '@tanstack/react-router'
 import { cn } from '@/shared/lib/utils'
 import { DataTable } from '@/shared/ui/components/data-table/data-table'
 import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
 import { type Task } from '@/entities/task'
-import { useTasksTable } from '@/features/task/model/hooks/useTasksTable'
+import { useTasksTable } from '../model/use-tasks-table'
 
 type DataTableProps = {
   data: Task[]

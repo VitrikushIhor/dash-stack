@@ -18,8 +18,8 @@ import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
-import { tasksColumns } from '@/widgets/tasks-table/ui/tasks-columns'
-import { STATUS_CONFIG } from '../config/task-status-config'
+import { tasksColumns } from '../ui/tasks-columns'
+import { STATUS_CONFIG } from './task-status-config'
 
 interface UseTasksTableProps {
   data: Task[]
@@ -144,3 +144,4 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     filterOptions,
   }
 }
+

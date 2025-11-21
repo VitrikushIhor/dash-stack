@@ -10,7 +10,7 @@ import { type Label } from '@/shared/ui/components/label/types.label'
 import { Checkbox } from '@/shared/ui/components/ui/checkbox'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
-import { TaskStatusBadge } from '@/features/task/ui/task-status-badge'
+import { TaskStatusBadge } from '@/features/task'
 
 export const tasksColumns: ColumnDef<Task>[] = [
   {

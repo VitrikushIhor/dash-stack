@@ -8,8 +8,7 @@ import {
   KanbanOverlay,
 } from '@/shared/ui/components/kanban'
 import { type Task, type TaskStatusEnum } from '@/entities/task'
-import { useTaskStore } from '@/features/task'
-import { EditTaskDialog } from '@/features/task/ui/edit-task-dialog'
+import { useTaskStore, EditTaskDialog } from '@/features/task'
 import { groupTasksByStatus } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
