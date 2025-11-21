@@ -8,7 +8,7 @@ import { NavUser } from '@/shared/ui/components/layout/nav-user'
 import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Separator } from '@/shared/ui/components/ui/separator'
-import { SidebarNav } from './ui/sidebar-nav'
+import { SidebarNav } from '@/shared/ui/components/sidebar-nav'
 
 const sidebarNavItems = [
   {

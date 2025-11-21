@@ -20,3 +20,4 @@ export function ContentSection({ title, desc, children }: ContentSectionProps) {
     </div>
   )
 }
+
