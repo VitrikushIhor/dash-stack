@@ -11,6 +11,7 @@ import { Checkbox } from '@/shared/ui/components/ui/checkbox'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
 import { TaskStatusBadge } from '@/features/task'
+import { TaskTableRowActions } from './task-table-row-actions'
 
 export const tasksColumns: ColumnDef<Task>[] = [
   {
@@ -299,6 +300,6 @@ export const tasksColumns: ColumnDef<Task>[] = [
 
   {
     id: 'actions',
-    // cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <TaskTableRowActions row={row} />,
   },
 ]

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutGrid, List } from 'lucide-react'
+import { LayoutGrid, List, Plus } from 'lucide-react'
 import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
 import { sidebarData } from '@/shared/ui/components/layout/data/sidebar-data'
 import { Header } from '@/shared/ui/components/layout/header'
@@ -7,11 +7,13 @@ import { Main } from '@/shared/ui/components/layout/main'
 import { NavUser } from '@/shared/ui/components/layout/nav-user'
 import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
+import { Button } from '@/shared/ui/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
 import {
   ChecklistTodoProvider,
-  AddTaskDialog,
   useTaskStore,
+  useTasks,
+  TasksDialogs,
 } from '@/features/task'
 import { KanbanTaskBoard } from '@/widgets/kanban-board'
 import { TasksTable } from '@/widgets/tasks-table'
@@ -21,6 +23,7 @@ type ViewMode = 'kanban' | 'list'
 export function TaskPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
   const tasks = useTaskStore((state) => state.tasks)
+  const { setOpen } = useTasks()
 
   return (
     <>
@@ -58,7 +61,10 @@ export function TaskPage() {
               </Tabs>
             </div>
             <div className='flex items-center space-x-2'>
-              <AddTaskDialog />
+              <Button onClick={() => setOpen('create')}>
+                <Plus className='mr-2 h-4 w-4' />
+                Add Task
+              </Button>
             </div>
           </div>
 
@@ -72,6 +78,7 @@ export function TaskPage() {
           </div>
         </ChecklistTodoProvider>
       </Main>
+      <TasksDialogs />
     </>
   )
 }

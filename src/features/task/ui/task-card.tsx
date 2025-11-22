@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { format } from 'date-fns'
 import {
   Calendar,
@@ -9,7 +8,6 @@ import {
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { AvatarGroup } from '@/shared/ui/components/avatar-group'
-import { ConfirmDialog } from '@/shared/ui/components/confirm-dialog'
 import { LabelBadge } from '@/shared/ui/components/label/label-badge'
 import { Badge } from '@/shared/ui/components/ui/badge'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -24,14 +22,14 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import { useTaskStore } from '../model/task-store'
-import { STATUS_CONFIG } from '../model/config/task-status-config'
+import { STATUS_CONFIG } from '../model/types/task-status-config'
 
 interface TaskCardProps {
   task: Task
   viewMode?: 'kanban' | 'list'
   onEdit?: (task: Task) => void
-  onTaskClick?: (taskId: string) => void
+  onDelete?: (task: Task) => void
+  onTaskClick?: () => void
   className?: string
 }
 
@@ -40,13 +38,10 @@ export const TaskCard = ({
   viewMode = 'kanban',
   onTaskClick,
   onEdit,
+  onDelete,
   className,
 }: TaskCardProps) => {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const deleteTask = useTaskStore((state) => state.deleteTask)
-
   const {
-    id,
     title,
     status,
     assignedMembers = [],
@@ -72,12 +67,7 @@ export const TaskCard = ({
     status !== TaskStatusEnum.COMPLETED
 
   const handleCardClick = () => {
-    onTaskClick?.(id)
-  }
-
-  const handleDelete = () => {
-    deleteTask(id)
-    setIsDeleteDialogOpen(false)
+    onTaskClick?.()
   }
 
   const date = deadline ? format(deadline, 'dd.MM.yyyy') : undefined
@@ -216,7 +206,7 @@ export const TaskCard = ({
                       className='text-destructive'
                       onSelect={(e) => {
                         e.preventDefault()
-                        setIsDeleteDialogOpen(true)
+                        onDelete?.(task)
                       }}
                     >
                       Delete task
@@ -227,17 +217,6 @@ export const TaskCard = ({
             </div>
           </CardContent>
         </Card>
-
-        <ConfirmDialog
-          open={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
-          title='Delete task'
-          desc={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
-          confirmText='Delete'
-          cancelBtnText='Cancel'
-          destructive
-          handleConfirm={handleDelete}
-        />
       </>
     )
   }
@@ -309,7 +288,7 @@ export const TaskCard = ({
                   className='text-destructive'
                   onSelect={(e) => {
                     e.preventDefault()
-                    setIsDeleteDialogOpen(true)
+                    onDelete?.(task)
                   }}
                 >
                   Delete task
@@ -376,17 +355,6 @@ export const TaskCard = ({
           </div>
         </CardContent>
       </Card>
-
-      <ConfirmDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title='Delete task'
-        desc={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
-        confirmText='Delete'
-        cancelBtnText='Cancel'
-        destructive
-        handleConfirm={handleDelete}
-      />
     </>
   )
 }

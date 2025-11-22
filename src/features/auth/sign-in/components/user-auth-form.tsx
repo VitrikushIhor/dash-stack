@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-import { useAuthStore } from '../../model/auth-store'
+import { useAuthStore } from '@/features/auth'
 
 const formSchema = z.object({
   email: z.email({

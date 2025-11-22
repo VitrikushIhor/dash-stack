@@ -57,16 +57,20 @@ import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { useMemberStore, TeamMemberPicker } from '@/features/team'
-import { type TaskFormValues } from '../model/create-task-schema'
+import { type TaskFormValues } from '../model/schema/create-task-schema'
 
 interface AddTaskDialogProps {
   status?: TaskStatusEnum
   task: Task
   open: boolean
-  setOpen: (open: boolean) => void
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
+export function EditTaskDialog({
+  task,
+  open,
+  onOpenChange,
+}: AddTaskDialogProps) {
   const availableMembers = useMemberStore((state) => state.members)
 
   const {
@@ -124,13 +128,13 @@ export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
   const onSubmit = async (values: TaskFormValues) => {
     const res = await handleSubmit(values)
     if (res?.success) {
-      setOpen(false)
+      onOpenChange(false)
       toast.success('Task updated successfully')
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] max-w-3xl'>
         <DialogHeader>
           <DialogTitle>Edit Task </DialogTitle>
@@ -368,11 +372,11 @@ export function EditTaskDialog({ task, open, setOpen }: AddTaskDialogProps) {
                 <Button
                   type='button'
                   variant='outline'
-                  onClick={() => setOpen(false)}
+                  onClick={() => onOpenChange(false)}
                 >
                   Cancel
                 </Button>
-                <Button type='submit'>Create</Button>
+                <Button type='submit'>Edit</Button>
               </div>
             </form>
           </Form>

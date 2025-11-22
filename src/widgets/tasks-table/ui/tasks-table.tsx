@@ -3,6 +3,7 @@ import { DataTable } from '@/shared/ui/components/data-table/data-table'
 import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
 import { type Task } from '@/entities/task'
 import { useTasksTable } from '../model/use-tasks-table'
+import { TaskTableBulkActions } from './task-table-bulk-actions'
 
 type DataTableProps = {
   data: Task[]
@@ -47,6 +48,7 @@ export function TasksTable({ data }: DataTableProps) {
         ]}
       />
       <DataTable table={table} />
+      <TaskTableBulkActions table={table} />
     </div>
   )
 }

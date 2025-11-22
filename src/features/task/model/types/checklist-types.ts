@@ -1,14 +1,6 @@
-export interface CheckListTodoTask {
-  id: string
-  title: string
-  completed: boolean
-}
+import { type TodoChecklistType } from '@/entities/task'
 
-export interface TodoChecklistType {
-  id: string
-  name: string
-  tasks: CheckListTodoTask[]
-}
+export type { TodoChecklistType }
 
 export interface CheckListTodoState {
   checklists: TodoChecklistType[]

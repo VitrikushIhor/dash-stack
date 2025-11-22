@@ -13,7 +13,7 @@ import { Input } from '@/shared/ui/components/ui/input'
 import {
   useChecklist,
   useChecklistTodoActions,
-} from '../model/checklist-todo-context'
+} from '../model/store/checklist-todo-context'
 import { TodoItem } from './todo-item'
 
 interface TodoChecklistProps {

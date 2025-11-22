@@ -4,6 +4,7 @@ import { TaskStatusEnum } from '@/entities/task'
 export const STATUS_CONFIG = {
   [TaskStatusEnum.PLANNED]: {
     label: 'Planned',
+    value: TaskStatusEnum.PLANNED,
     variant: 'secondary' as const,
     icon: Calendar,
     color: '#B1AB1D',
@@ -12,6 +13,7 @@ export const STATUS_CONFIG = {
   },
   [TaskStatusEnum.UPCOMING]: {
     label: 'Upcoming',
+    value: TaskStatusEnum.UPCOMING,
     variant: 'default' as const,
     icon: Clock,
     color: '#5A8FF5',
@@ -20,6 +22,7 @@ export const STATUS_CONFIG = {
   },
   [TaskStatusEnum.COMPLETED]: {
     label: 'Completed',
+    value: TaskStatusEnum.COMPLETED,
     variant: 'outline' as const,
     icon: CheckCircle2,
     color: '#39C682',
@@ -27,4 +30,3 @@ export const STATUS_CONFIG = {
       'bg-green-50 text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
   },
 } as const
-

@@ -15,7 +15,7 @@ import { Label } from '@/shared/ui/components/ui/label'
 import {
   useChecklist,
   useChecklistTodoActions,
-} from '../model/checklist-todo-context'
+} from '../model/store/checklist-todo-context'
 
 interface TodoItemProps {
   taskId: string

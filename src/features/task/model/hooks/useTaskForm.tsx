@@ -8,10 +8,13 @@ import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
 import { useTaskStore } from '@/features/task'
 import {
+  taskFormSchema,
+  type TaskFormValues,
+} from '../schema/create-task-schema'
+import {
   useChecklistTodoActions,
   useTodoChecklists,
-} from '../checklist-todo-context'
-import { taskFormSchema, type TaskFormValues } from '../create-task-schema'
+} from '../store/checklist-todo-context'
 
 export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
   const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([])
@@ -51,8 +54,15 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
       setSelectedMembers(task.assignedMembers || [])
       setSelectedLabels(task.assignedLabels || [])
       setChecklists(task.checklists || [])
+    } else if (initialStatus !== undefined) {
+      // Update form status when initialStatus changes (for new tasks)
+      form.setValue('status', initialStatus)
+      setFiles([])
+      setSelectedMembers([])
+      setSelectedLabels([])
+      setChecklists([])
     }
-  }, [task, form, setChecklists])
+  }, [task, initialStatus, form, setChecklists])
 
   const handleSubmit = async (values: TaskFormValues) => {
     const attachment = files.length
@@ -96,6 +106,7 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
     setSelectedMembers([])
     setSelectedLabels([])
     setChecklists([])
+    setFiles([])
   }, [form, setChecklists])
 
   return {

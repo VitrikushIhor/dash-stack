@@ -6,7 +6,10 @@ import {
   useMemo,
   type ReactNode,
 } from 'react'
-import { type ChecklistTodoStore, type TodoChecklistType } from './types'
+import {
+  type ChecklistTodoStore,
+  type TodoChecklistType,
+} from '../types/checklist-types'
 
 const ChecklistTodoContext = createContext<ChecklistTodoStore | null>(null)
 

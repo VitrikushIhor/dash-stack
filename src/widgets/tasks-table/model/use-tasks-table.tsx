@@ -18,8 +18,8 @@ import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { type TeamMember } from '@/entities/team'
+import { STATUS_CONFIG } from '@/features/task'
 import { tasksColumns } from '../ui/tasks-columns'
-import { STATUS_CONFIG } from './task-status-config'
 
 interface UseTasksTableProps {
   data: Task[]
@@ -67,6 +67,7 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     ],
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns: tasksColumns,
@@ -144,4 +145,3 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     filterOptions,
   }
 }
-

@@ -7,16 +7,16 @@ export enum TaskStatusEnum {
   COMPLETED = 'COMPLETED',
 }
 
-export interface TodoTask {
+export interface CheckListTodoTask {
   id: string
   title: string
   completed: boolean
 }
 
-export interface TodoChecklist {
+export interface TodoChecklistType {
   id: string
   name: string
-  tasks: TodoTask[]
+  tasks: CheckListTodoTask[]
 }
 
 export interface Task {
@@ -27,6 +27,6 @@ export interface Task {
   assignedMembers?: TeamMember[]
   deadline?: string
   assignedLabels?: Label[]
-  checklists?: TodoChecklist[]
+  checklists?: TodoChecklistType[]
   attachment?: string[]
 }

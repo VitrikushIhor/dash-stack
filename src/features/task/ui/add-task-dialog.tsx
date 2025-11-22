@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { format } from 'date-fns'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,7 +26,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
 import {
   Form,
@@ -57,20 +56,19 @@ import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum } from '@/entities/task'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { useMemberStore, TeamMemberPicker } from '@/features/team'
-import { type TaskFormValues } from '../model/create-task-schema'
+import { type TaskFormValues } from '../model/schema/create-task-schema'
 
 interface AddTaskDialogProps {
-  trigger?: React.ReactNode
   status?: TaskStatusEnum
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function AddTaskDialog({
-  trigger,
-  status = TaskStatusEnum.PLANNED,
+  status,
+  open,
+  onOpenChange,
 }: AddTaskDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [files, setFiles] = useState<File[]>([])
-
   const {
     checklists,
     addChecklist,
@@ -80,6 +78,8 @@ export function AddTaskDialog({
     setSelectedLabels,
     setSelectedMembers,
     handleSubmit,
+    files,
+    setFiles,
   } = useTaskForm(undefined, status)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
@@ -124,7 +124,7 @@ export function AddTaskDialog({
   const onSubmit = async (values: TaskFormValues) => {
     const res = await handleSubmit(values)
     if (res?.success) {
-      setOpen(false)
+      onOpenChange(false)
       toast.success('Task create successfully')
     }
   }
@@ -132,15 +132,7 @@ export function AddTaskDialog({
   const membersNew = useMemberStore((state) => state.members)
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button>
-            <Plus className='mr-2 h-4 w-4' />
-            Add Task
-          </Button>
-        )}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(open) => onOpenChange(open)}>
       <DialogContent className='max-h-[90vh] max-w-3xl'>
         <DialogHeader>
           <DialogTitle>Add New Task</DialogTitle>
@@ -378,7 +370,7 @@ export function AddTaskDialog({
                 <Button
                   type='button'
                   variant='outline'
-                  onClick={() => setOpen(false)}
+                  onClick={() => onOpenChange(false)}
                 >
                   Cancel
                 </Button>

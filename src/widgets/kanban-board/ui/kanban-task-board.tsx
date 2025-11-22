@@ -1,28 +1,20 @@
 'use client'
 
 import * as React from 'react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import {
   Kanban,
   KanbanBoard,
   KanbanOverlay,
 } from '@/shared/ui/components/kanban'
 import { type Task, type TaskStatusEnum } from '@/entities/task'
-import { useTaskStore, EditTaskDialog } from '@/features/task'
+import { useTaskStore } from '@/features/task'
 import { groupTasksByStatus } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
 
 export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
   const tasks = useTaskStore((state) => state.tasks)
-
-  const [editingTask, setEditingTask] = useState<Task | null>(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-
-  const openEditDialog = (task: Task) => {
-    setEditingTask(task)
-    setIsEditDialogOpen(true)
-  }
 
   const groupedTask = React.useMemo(() => groupTasksByStatus(tasks), [tasks])
 
@@ -88,7 +80,6 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
                 key={columnValue}
                 value={columnValue}
                 tasks={tasks}
-                onEdit={openEditDialog}
                 viewMode='kanban'
               />
             ))}
@@ -102,7 +93,6 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
                   <KanbanTaskColum
                     value={value}
                     tasks={tasks}
-                    onEdit={openEditDialog}
                     viewMode='kanban'
                   />
                 )
@@ -114,13 +104,7 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
 
               if (!task) return null
 
-              return (
-                <KanbanTaskCard
-                  task={task}
-                  onEdit={openEditDialog}
-                  viewMode='kanban'
-                />
-              )
+              return <KanbanTaskCard task={task} viewMode='kanban' />
             }}
           </KanbanOverlay>
         </Kanban>
@@ -140,7 +124,6 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
                 key={columnValue}
                 value={columnValue}
                 tasks={tasks}
-                onEdit={openEditDialog}
                 viewMode='list'
               />
             ))}
@@ -155,7 +138,6 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
                   <KanbanTaskColum
                     value={value}
                     tasks={tasks}
-                    onEdit={openEditDialog}
                     viewMode='list'
                   />
                 )
@@ -167,24 +149,10 @@ export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
 
               if (!task) return null
 
-              return (
-                <KanbanTaskCard
-                  task={task}
-                  onEdit={openEditDialog}
-                  viewMode='list'
-                />
-              )
+              return <KanbanTaskCard task={task} viewMode='list' />
             }}
           </KanbanOverlay>
         </Kanban>
-      )}
-
-      {editingTask && (
-        <EditTaskDialog
-          open={isEditDialogOpen}
-          setOpen={setIsEditDialogOpen}
-          task={editingTask}
-        />
       )}
     </>
   )

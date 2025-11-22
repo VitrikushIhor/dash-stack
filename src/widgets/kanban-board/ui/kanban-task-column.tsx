@@ -9,24 +9,33 @@ import {
 import { Button } from '@/shared/ui/components/ui/button'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import { AddTaskDialog, ChecklistTodoProvider, STATUS_CONFIG } from '@/features/task'
+import { STATUS_CONFIG, useTasks } from '@/features/task'
 import { KanbanTaskCard } from './kanban-task-card'
 
 interface TaskColumnProps
   extends Omit<React.ComponentProps<typeof KanbanColumn>, 'children'> {
   tasks: Task[]
-  onEdit?: (task: Task) => void
   viewMode: 'kanban' | 'list'
 }
 
 export function KanbanTaskColum({
   value,
   tasks,
-  onEdit,
   viewMode = 'kanban',
   ...props
 }: TaskColumnProps) {
   const isCompleted = value === TaskStatusEnum.COMPLETED
+  const { setOpen, setStatus, setCurrentRow } = useTasks()
+
+  const openEditDialog = (task: Task) => {
+    setCurrentRow(task)
+    setOpen('update')
+  }
+
+  const openDeleteDialog = (task: Task) => {
+    setCurrentRow(task)
+    setOpen('delete')
+  }
 
   if (viewMode === 'list') {
     return (
@@ -69,21 +78,18 @@ export function KanbanTaskColum({
             </AccordionTrigger>
 
             <AccordionContent className='flex flex-col gap-3'>
-              <ChecklistTodoProvider>
-                <AddTaskDialog
-                  status={value as TaskStatusEnum}
-                  trigger={
-                    <Button
-                      variant={'secondary'}
-                      size={'sm'}
-                      className='w-full'
-                    >
-                      <Plus className='mr-2 h-4 w-4' />
-                      Create Task
-                    </Button>
-                  }
-                />
-              </ChecklistTodoProvider>
+              <Button
+                variant={'secondary'}
+                size={'sm'}
+                className='w-full'
+                onClick={() => {
+                  setStatus(value as TaskStatusEnum)
+                  setOpen('create')
+                }}
+              >
+                <Plus className='mr-2 h-4 w-4' />
+                Create Task
+              </Button>
               <ScrollArea className='flex-1'>
                 <div className='space-y-3'>
                   {tasks.length === 0 ? (
@@ -96,8 +102,9 @@ export function KanbanTaskColum({
                         key={task.id}
                         task={task}
                         asHandle
-                        onEdit={onEdit}
+                        onEdit={openEditDialog}
                         viewMode={viewMode}
+                        onDelete={openDeleteDialog}
                       />
                     ))
                   )}
@@ -140,17 +147,18 @@ export function KanbanTaskColum({
             </Button>
           </KanbanColumnHandle>
         </div>
-        <ChecklistTodoProvider>
-          <AddTaskDialog
-            status={value as TaskStatusEnum}
-            trigger={
-              <Button variant={'secondary'} size={'sm'} className='w-full'>
-                <Plus className='mr-2 h-4 w-4' />
-                Create Task
-              </Button>
-            }
-          />
-        </ChecklistTodoProvider>
+        <Button
+          variant={'secondary'}
+          size={'sm'}
+          className='w-full'
+          onClick={() => {
+            setStatus(value as TaskStatusEnum)
+            setOpen('create')
+          }}
+        >
+          <Plus className='mr-2 h-4 w-4' />
+          Create Task
+        </Button>
       </div>
       <ScrollArea className='flex-1'>
         <div className='space-y-3'>
@@ -164,7 +172,8 @@ export function KanbanTaskColum({
                 key={task.id}
                 task={task}
                 asHandle
-                onEdit={onEdit}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
                 viewMode={viewMode}
               />
             ))
