@@ -740,6 +740,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
         dataTransfer.items.add(file)
       }
 
+      // eslint-disable-next-line react-hooks/immutability
       inputElement.files = dataTransfer.files
       inputElement.dispatchEvent(new Event('change', { bubbles: true }))
     },
@@ -779,6 +780,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
         dataTransfer.items.add(file)
       }
 
+      // eslint-disable-next-line react-hooks/immutability
       inputElement.files = dataTransfer.files
       inputElement.dispatchEvent(new Event('change', { bubbles: true }))
     },
@@ -1429,6 +1431,7 @@ export {
   FileUploadItemDelete as ItemDelete,
   FileUploadClear as Clear,
   //
+  // eslint-disable-next-line react-refresh/only-export-components
   useStore as useFileUpload,
   //
   type FileUploadRootProps as FileUploadProps,

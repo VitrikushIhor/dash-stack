@@ -1,7 +1,7 @@
 import { KanbanItem } from '@/shared/ui/components/kanban'
 import { type Task } from '@/entities/task'
 import { TaskCard } from '@/features/task'
-import { KanbanViewMode } from '../model/types/kanban-types'
+import { type KanbanViewMode } from '@/widgets/kanban-board'
 
 interface BoardCardProps
   extends Omit<React.ComponentProps<typeof KanbanItem>, 'value'> {

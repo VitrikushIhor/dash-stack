@@ -19,23 +19,22 @@ export function KanbanTaskBoard({
   viewMode: KanbanViewMode
   tasks: Task[]
 }) {
-
   const groupedTask = useMemo(() => groupTasksByStatus(tasks), [tasks])
 
-  const [columns, setColumns] =
-    useState<Record<string, Task[]>>(groupedTask)
+  const [columns, setColumns] = useState<Record<string, Task[]>>(groupedTask)
   const prevColumnsRef = useRef<Record<string, Task[]>>(groupedTask)
 
   useEffect(() => {
     if (prevColumnsRef.current !== groupedTask) {
       prevColumnsRef.current = groupedTask
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setColumns(groupedTask)
     }
   }, [groupedTask])
 
   const updateTask = useTaskStore((state) => state.updateTask)
 
-  const handleTaskMove =  useCallback(
+  const handleTaskMove = useCallback(
     (taskId: string, newStatus: TaskStatusEnum) => {
       updateTask(taskId, { status: newStatus })
     },
