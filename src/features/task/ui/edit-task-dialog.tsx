@@ -138,7 +138,7 @@ export function EditTaskDialog({
       <DialogContent className='max-h-[90vh] max-w-3xl'>
         <DialogHeader>
           <DialogTitle>Edit Task </DialogTitle>
-          <DialogDescription>Your are editing: {task.title}</DialogDescription>
+          <DialogDescription>You are editing: {task.title}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className='h-[calc(90vh-120px)] pr-4'>
