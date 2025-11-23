@@ -65,7 +65,7 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
   }, [task, initialStatus, form, setChecklists])
 
   const handleSubmit = async (values: TaskFormValues) => {
-    const attachment = files.length
+    const attachments = files.length
       ? await Promise.all(files.map((file) => fileToBase64(file)))
       : []
 
@@ -80,7 +80,7 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
         assignedMembers: selectedMembers,
         assignedLabels: selectedLabels,
         checklists,
-        attachment,
+        attachments,
       })
     } else {
       addTask({
@@ -89,7 +89,7 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
         assignedMembers: selectedMembers,
         assignedLabels: selectedLabels,
         checklists,
-        attachment,
+        attachments,
         deadline: values.deadline
           ? format(values.deadline, 'dd MMM yyyy')
           : undefined,
@@ -131,11 +131,12 @@ export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
 }
 
 async function loadFiles(task: Task) {
-  if (task?.attachment && task?.attachment?.length > 0) {
+  if (task?.attachments && task?.attachments?.length > 0) {
     // example: task.attachments = ['https://.../file1.png', 'https://.../file2.pdf']
-    return await Promise.all(
-      task.attachment.map((url) => urlToFile(url, url.split('/').pop()!))
+    const existingFiles = await Promise.all(
+      task.attachments.map((url) => urlToFile(url, url.split('/').pop()!))
     )
+    return existingFiles
   } else {
     return []
   }

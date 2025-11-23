@@ -1,16 +1,14 @@
 import { cn } from '@/shared/lib/utils'
 import { DataTable } from '@/shared/ui/components/data-table/data-table'
-import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
+import { type Table } from '@tanstack/react-table'
 import { type Task } from '@/entities/task'
-import { useTasksTable } from '../model/use-tasks-table'
 import { TaskTableBulkActions } from './task-table-bulk-actions'
 
 type DataTableProps = {
-  data: Task[]
+  table: Table<Task>
 }
 
-export function TasksTable({ data }: DataTableProps) {
-  const { table, filterOptions } = useTasksTable({ data })
+export function TasksTable({ table }: DataTableProps) {
 
   return (
     <div
@@ -19,35 +17,8 @@ export function TasksTable({ data }: DataTableProps) {
         'flex flex-1 flex-col gap-4'
       )}
     >
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter by title or desc...'
-        filters={[
-          {
-            columnId: 'status',
-            title: 'Status',
-            options: filterOptions.statuses,
-          },
-          {
-            columnId: 'assignedLabels',
-            title: 'Label',
-            options: filterOptions.labels,
-          },
-          {
-            columnId: 'assignedMembers',
-            title: 'Members',
-            options: filterOptions.members,
-          },
-        ]}
-        dateFilters={[
-          {
-            columnId: 'deadline',
-            title: 'Deadline',
-            type: 'range',
-          },
-        ]}
-      />
       <DataTable table={table} />
+    
       <TaskTableBulkActions table={table} />
     </div>
   )

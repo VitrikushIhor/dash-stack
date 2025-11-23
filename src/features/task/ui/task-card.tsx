@@ -48,7 +48,7 @@ export const TaskCard = ({
     deadline,
     assignedLabels = [],
     checklists = [],
-    attachment = [],
+    attachments = [],
   } = task
 
   const totalTasks = checklists.reduce(
@@ -139,10 +139,10 @@ export const TaskCard = ({
                 )}
 
                 {/* Attachments Count */}
-                {attachment.length > 0 && (
+                {attachments.length > 0 && (
                   <div className='text-muted-foreground flex items-center gap-1.5 text-xs'>
-                    <Paperclip className='h-4 w-4' />
-                    <span>{attachment.length}</span>
+                    <Paperclip className='h-3 w-3' />
+                    <span>{attachments.length}</span>
                   </div>
                 )}
 
@@ -339,10 +339,10 @@ export const TaskCard = ({
           <div className='flex items-center justify-between gap-2'>
             {/* Right Side */}
             {/* Attachments */}
-            {attachment.length > 0 && (
+            {attachments.length > 0 && (
               <div className='text-muted-foreground flex items-center gap-1 text-xs'>
-                <Paperclip className='h-4 w-4' />
-                <span>{attachment.length}</span>
+                <Paperclip className='h-3 w-3' />
+                <span>{attachments.length}</span>
               </div>
             )}
 

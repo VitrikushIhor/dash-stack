@@ -13,8 +13,13 @@ import { groupTasksByStatus } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
 
-export function KanbanTaskBoard({ viewMode }: { viewMode: 'kanban' | 'list' }) {
-  const tasks = useTaskStore((state) => state.tasks)
+export function KanbanTaskBoard({
+  viewMode,
+  tasks,
+}: {
+  viewMode: 'kanban' | 'list'
+  tasks: Task[]
+}) {
 
   const groupedTask = React.useMemo(() => groupTasksByStatus(tasks), [tasks])
 

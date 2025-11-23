@@ -16,7 +16,8 @@ import {
   TasksDialogs,
 } from '@/features/task'
 import { KanbanTaskBoard } from '@/widgets/kanban-board'
-import { TasksTable } from '@/widgets/tasks-table'
+import { TasksTable, useTasksTable } from '@/widgets/tasks-table'
+import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
 
 type ViewMode = 'kanban' | 'list'
 
@@ -24,6 +25,9 @@ export function TaskPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
   const tasks = useTaskStore((state) => state.tasks)
   const { setOpen } = useTasks()
+  const { table, filterOptions } = useTasksTable({ data: tasks })
+
+  const filteredTasks = table.getFilteredRowModel().rows.map((row) => row.original)
 
   return (
     <>
@@ -68,12 +72,42 @@ export function TaskPage() {
             </div>
           </div>
 
+          <DataTableToolbar
+            table={table}
+            searchPlaceholder='Filter by title or desc...'
+            filters={[
+              {
+                columnId: 'status',
+                title: 'Status',
+                options: filterOptions.statuses,
+              },
+              {
+                columnId: 'assignedLabels',
+                title: 'Label',
+                options: filterOptions.labels,
+              },
+              {
+                columnId: 'assignedMembers',
+                title: 'Members',
+                options: filterOptions.members,
+              },
+            ]}
+            dateFilters={[
+              {
+                columnId: 'deadline',
+                title: 'Deadline',
+                type: 'range',
+              },
+            ]}
+            hideTableViewOptions={viewMode === 'kanban'}
+          />
+
           {/* Main Content */}
           <div className='flex-1 overflow-hidden'>
             {viewMode === 'kanban' || viewMode === 'list' ? (
-              <KanbanTaskBoard viewMode={viewMode} />
+              <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
             ) : (
-              <TasksTable data={tasks} />
+              <TasksTable table={table} />
             )}
           </div>
         </ChecklistTodoProvider>

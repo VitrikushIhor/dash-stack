@@ -25,6 +25,7 @@ type DataTableToolbarProps<TData> = {
     title: string
     type: 'single' | 'range'
   }[]
+  hideTableViewOptions?: boolean
 }
 
 export function DataTableToolbar<TData>({
@@ -33,6 +34,7 @@ export function DataTableToolbar<TData>({
   searchKey,
   filters = [],
   dateFilters = [],
+  hideTableViewOptions = false,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter
@@ -113,7 +115,7 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      {!hideTableViewOptions && <DataTableViewOptions table={table} />}
     </div>
   )
 }

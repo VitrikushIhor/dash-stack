@@ -174,19 +174,19 @@ export const tasksColumns: ColumnDef<Task>[] = [
   },
 
   {
-    accessorKey: 'attachment',
+    accessorKey: 'attachments',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Attachments' />
     ),
     cell: ({ row }) => {
-      const attachment = row.original.attachment ?? []
-      if (attachment.length === 0) {
+      const attachments = row.original.attachments ?? []
+      if (attachments.length === 0) {
         return (
           <div className='flex w-[100px] items-center gap-2'>
             <span
               className='text-muted-foreground flex items-center gap-2 text-sm'
               tabIndex={0}
-              aria-label='No attachment'
+              aria-label='No attachments'
               role='note'
             >
               <Paperclip className='h-4 w-4' aria-hidden='true' />
@@ -198,7 +198,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <Paperclip className='h-4 w-4' aria-hidden='true' />
-          <span>{attachment.length}</span>
+          <span>{attachments.length}</span>
         </div>
       )
     },

@@ -28,5 +28,5 @@ export interface Task {
   deadline?: string
   assignedLabels?: Label[]
   checklists?: TodoChecklistType[]
-  attachment?: string[]
+  attachments?: string[]
 }
