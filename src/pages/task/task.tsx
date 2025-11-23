@@ -10,19 +10,17 @@ import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
 import {
-  ChecklistTodoProvider,
   useTaskStore,
   useTasks,
   TasksDialogs,
 } from '@/features/task'
-import { KanbanTaskBoard } from '@/widgets/kanban-board'
+import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
 import { TasksTable, useTasksTable } from '@/widgets/tasks-table'
 import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
 
-type ViewMode = 'kanban' | 'list'
 
 export function TaskPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('kanban')
+  const [viewMode, setViewMode] = useState<KanbanViewMode>(KanbanViewMode.Kanban)
   const tasks = useTaskStore((state) => state.tasks)
   const { setOpen } = useTasks()
   const { table, filterOptions } = useTasksTable({ data: tasks })
@@ -39,25 +37,24 @@ export function TaskPage() {
           <NavUser user={sidebarData.user} />
         </div>
       </Header>
-      <Main>
-        <ChecklistTodoProvider>
-          <div className='mb-2 flex items-center justify-between space-y-2'>
-            <div className='flex gap-8'>
+      <Main className='flex flex-col gap-4'>
+          <div className='flex items-center gap-2 flex-wrap justify-between'>
+            <div className='flex gap-8 flex-wrap'>
               <h1 className='text-2xl font-bold tracking-tight'>Tasks</h1>
               <Tabs
                 value={viewMode}
-                onValueChange={(v) => setViewMode(v as ViewMode)}
+                onValueChange={(v) => setViewMode(v as KanbanViewMode)}
               >
                 <TabsList>
-                  <TabsTrigger value='kanban' className='gap-2'>
+                  <TabsTrigger value={KanbanViewMode.Kanban} className='gap-2'>
                     <LayoutGrid className='h-4 w-4' />
                     Kanban
                   </TabsTrigger>
-                  <TabsTrigger value='list' className='gap-2'>
+                  <TabsTrigger value={KanbanViewMode.List} className='gap-2'>
                     <List className='h-4 w-4' />
                     List
                   </TabsTrigger>
-                  <TabsTrigger value='table' className='gap-2'>
+                  <TabsTrigger value={KanbanViewMode.Table} className='gap-2'>
                     <List className='h-4 w-4' />
                     Table
                   </TabsTrigger>
@@ -73,6 +70,7 @@ export function TaskPage() {
           </div>
 
           <DataTableToolbar
+            filterVariant={viewMode !== KanbanViewMode.Table ? 'compact' : 'default'}
             table={table}
             searchPlaceholder='Filter by title or desc...'
             filters={[
@@ -99,18 +97,17 @@ export function TaskPage() {
                 type: 'range',
               },
             ]}
-            hideTableViewOptions={viewMode === 'kanban'}
+            hideTableViewOptions={viewMode !== KanbanViewMode.Table}
           />
 
           {/* Main Content */}
           <div className='flex-1 overflow-hidden'>
-            {viewMode === 'kanban' || viewMode === 'list' ? (
-              <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
-            ) : (
+            {viewMode === KanbanViewMode.Table ? (
               <TasksTable table={table} />
+            ) : (
+              <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
             )}
           </div>
-        </ChecklistTodoProvider>
       </Main>
       <TasksDialogs />
     </>

@@ -1,7 +1,6 @@
 'use client'
 
-import * as React from 'react'
-import { useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Kanban,
   KanbanBoard,
@@ -9,7 +8,7 @@ import {
 } from '@/shared/ui/components/kanban'
 import { type Task, type TaskStatusEnum } from '@/entities/task'
 import { useTaskStore } from '@/features/task'
-import { groupTasksByStatus } from '@/widgets/kanban-board'
+import { groupTasksByStatus, KanbanViewMode } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
 
@@ -17,17 +16,17 @@ export function KanbanTaskBoard({
   viewMode,
   tasks,
 }: {
-  viewMode: 'kanban' | 'list'
+  viewMode: KanbanViewMode
   tasks: Task[]
 }) {
 
-  const groupedTask = React.useMemo(() => groupTasksByStatus(tasks), [tasks])
+  const groupedTask = useMemo(() => groupTasksByStatus(tasks), [tasks])
 
   const [columns, setColumns] =
-    React.useState<Record<string, Task[]>>(groupedTask)
+    useState<Record<string, Task[]>>(groupedTask)
   const prevColumnsRef = useRef<Record<string, Task[]>>(groupedTask)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (prevColumnsRef.current !== groupedTask) {
       prevColumnsRef.current = groupedTask
       setColumns(groupedTask)
@@ -36,14 +35,14 @@ export function KanbanTaskBoard({
 
   const updateTask = useTaskStore((state) => state.updateTask)
 
-  const handleTaskMove = React.useCallback(
+  const handleTaskMove =  useCallback(
     (taskId: string, newStatus: TaskStatusEnum) => {
       updateTask(taskId, { status: newStatus })
     },
     [updateTask]
   )
 
-  const handleValueChange = React.useCallback(
+  const handleValueChange = useCallback(
     (newColumns: Record<string, Task[]>) => {
       const prevColumns = prevColumnsRef.current
 
@@ -72,7 +71,7 @@ export function KanbanTaskBoard({
 
   return (
     <>
-      {viewMode === 'kanban' && (
+      {viewMode === KanbanViewMode.Kanban && (
         <Kanban
           value={columns}
           onValueChange={handleValueChange}
@@ -85,7 +84,7 @@ export function KanbanTaskBoard({
                 key={columnValue}
                 value={columnValue}
                 tasks={tasks}
-                viewMode='kanban'
+                viewMode={viewMode}
               />
             ))}
           </KanbanBoard>
@@ -98,7 +97,7 @@ export function KanbanTaskBoard({
                   <KanbanTaskColum
                     value={value}
                     tasks={tasks}
-                    viewMode='kanban'
+                    viewMode={viewMode}
                   />
                 )
               }
@@ -109,13 +108,13 @@ export function KanbanTaskBoard({
 
               if (!task) return null
 
-              return <KanbanTaskCard task={task} viewMode='kanban' />
+              return <KanbanTaskCard task={task} viewMode={viewMode} />
             }}
           </KanbanOverlay>
         </Kanban>
       )}
 
-      {viewMode === 'list' && (
+      {viewMode === KanbanViewMode.List && (
         <Kanban
           value={columns}
           onValueChange={handleValueChange}
@@ -129,7 +128,7 @@ export function KanbanTaskBoard({
                 key={columnValue}
                 value={columnValue}
                 tasks={tasks}
-                viewMode='list'
+                viewMode={viewMode}
               />
             ))}
           </KanbanBoard>
@@ -143,7 +142,7 @@ export function KanbanTaskBoard({
                   <KanbanTaskColum
                     value={value}
                     tasks={tasks}
-                    viewMode='list'
+                    viewMode={viewMode}
                   />
                 )
               }
@@ -154,7 +153,7 @@ export function KanbanTaskBoard({
 
               if (!task) return null
 
-              return <KanbanTaskCard task={task} viewMode='list' />
+              return <KanbanTaskCard task={task} viewMode={viewMode} />
             }}
           </KanbanOverlay>
         </Kanban>

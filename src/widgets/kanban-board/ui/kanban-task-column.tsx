@@ -11,17 +11,18 @@ import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
 import { type Task, TaskStatusEnum } from '@/entities/task'
 import { STATUS_CONFIG, useTasks } from '@/features/task'
 import { KanbanTaskCard } from './kanban-task-card'
+import { KanbanViewMode } from '../model/types/kanban-types'
 
 interface TaskColumnProps
   extends Omit<React.ComponentProps<typeof KanbanColumn>, 'children'> {
   tasks: Task[]
-  viewMode: 'kanban' | 'list'
+  viewMode: KanbanViewMode
 }
 
 export function KanbanTaskColum({
   value,
   tasks,
-  viewMode = 'kanban',
+  viewMode = KanbanViewMode.Kanban,
   ...props
 }: TaskColumnProps) {
   const isCompleted = value === TaskStatusEnum.COMPLETED
@@ -37,7 +38,7 @@ export function KanbanTaskColum({
     setOpen('delete')
   }
 
-  if (viewMode === 'list') {
+  if (viewMode ===  KanbanViewMode.List) {
     return (
       <KanbanColumn
         value={value}

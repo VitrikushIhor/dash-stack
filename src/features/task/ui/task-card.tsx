@@ -26,7 +26,7 @@ import { STATUS_CONFIG } from '../model/types/task-status-config'
 
 interface TaskCardProps {
   task: Task
-  viewMode?: 'kanban' | 'list'
+  viewMode?: 'kanban' | 'list' | 'table'
   onEdit?: (task: Task) => void
   onDelete?: (task: Task) => void
   onTaskClick?: () => void
