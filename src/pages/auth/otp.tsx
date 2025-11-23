@@ -7,8 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { AuthLayout } from '@/features/auth/ui/auth-layout'
-import { OtpForm } from '@/features/auth/ui/otp-form'
+import { AuthLayout, OtpForm } from '@/features/auth'
 
 export function Otp() {
   return (

@@ -22,6 +22,7 @@ import { Route as authOtpRouteImport } from './app/routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './app/routes/(auth)/forgot-password'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/routes/_authenticated/settings/route'
 import { Route as AuthenticatedTeamIndexRouteImport } from './app/routes/_authenticated/team/index'
+import { Route as AuthenticatedTaskIndexRouteImport } from './app/routes/_authenticated/task/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './app/routes/_authenticated/settings/index'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './app/routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './app/routes/_authenticated/settings/display'
@@ -94,6 +95,11 @@ const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
   path: '/team/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTaskIndexRoute = AuthenticatedTaskIndexRouteImport.update({
+  id: '/task/',
+  path: '/task/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/task': typeof AuthenticatedTaskIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
 }
 export interface FileRoutesByTo {
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/task': typeof AuthenticatedTaskIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
 }
 export interface FileRoutesById {
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/task/': typeof AuthenticatedTaskIndexRoute
   '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
 }
 export interface FileRouteTypes {
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings/'
+    | '/task'
     | '/team'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings'
+    | '/task'
     | '/team'
   id:
     | '__root__'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/settings/'
+    | '/_authenticated/task/'
     | '/_authenticated/team/'
   fileRoutesById: FileRoutesById
 }
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/task/': {
+      id: '/_authenticated/task/'
+      path: '/task'
+      fullPath: '/task'
+      preLoaderRoute: typeof AuthenticatedTaskIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
@@ -433,6 +452,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedTaskIndexRoute: typeof AuthenticatedTaskIndexRoute
   AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
 }
 
@@ -440,6 +460,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedTaskIndexRoute: AuthenticatedTaskIndexRoute,
   AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
 }
 

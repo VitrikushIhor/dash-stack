@@ -1,5 +1,4 @@
-import { type TeamMember } from '@/entities/team'
-import { TeamMemberCard } from './team-member-card'
+import { type TeamMember, TeamMemberCard } from '@/entities/team'
 
 interface TeamGridProps {
   members: TeamMember[]
