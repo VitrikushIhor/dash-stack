@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   UsersRound,
   ClipboardList,
+  Calendar,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -37,6 +38,11 @@ export const sidebarData: SidebarData = {
           title: 'Tasks',
           url: '/task',
           icon: ClipboardList,
+        },
+        {
+          title: 'Calendar',
+          url: '/calendar',
+          icon: Calendar,
         },
       ],
     },
