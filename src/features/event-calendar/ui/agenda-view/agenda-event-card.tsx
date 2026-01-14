@@ -1,14 +1,13 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
+import { parseDeadline } from "../../model/helpers";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Clock, Text, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 
-import { useCalendar } from "@/features/event-calendar/model/contexts/calendar-context";
-
+import { useCalendar } from "../../model/contexts/calendar-context";
 import { EventDetailsDialog } from "../event-details-dialog";
-
-import type { IEvent } from "@/features/event-calendar/model/interfaces";
+import type { Task } from "../../model/interfaces";
 
 const agendaEventCardVariants = cva(
   "flex select-none items-center justify-between gap-3 rounded-md border p-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -41,18 +40,15 @@ const agendaEventCardVariants = cva(
 );
 
 interface IProps {
-  event: IEvent;
-  eventCurrentDay?: number;
-  eventTotalDays?: number;
+  event: Task;
 }
 
-export function AgendaEventCard({ event, eventCurrentDay, eventTotalDays }: IProps) {
+export function AgendaEventCard({ event }: IProps) {
   const { badgeVariant } = useCalendar();
 
-  const startDate = parseISO(event.startDate);
-  const endDate = parseISO(event.endDate);
-
-  const color = (badgeVariant === "dot" ? `${event.color}-dot` : event.color) as VariantProps<typeof agendaEventCardVariants>["color"];
+  // Default color since Task doesn't have it
+  const eventColor = "blue"; 
+  const color = (badgeVariant === "dot" ? `${eventColor}-dot` : eventColor) as VariantProps<typeof agendaEventCardVariants>["color"];
 
   const agendaEventCardClasses = agendaEventCardVariants({ color });
 
@@ -75,31 +71,29 @@ export function AgendaEventCard({ event, eventCurrentDay, eventTotalDays }: IPro
             )}
 
             <p className="font-medium">
-              {eventCurrentDay && eventTotalDays && (
-                <span className="mr-1 text-xs">
-                  Day {eventCurrentDay} of {eventTotalDays} •{" "}
-                </span>
-              )}
               {event.title}
             </p>
           </div>
 
-          <div className="mt-1 flex items-center gap-1">
-            <User className="size-3 shrink-0" />
-            <p className="text-xs text-foreground">{event.user.name}</p>
-          </div>
+          {event.assignedMembers && event.assignedMembers.length > 0 && (
+             <div className="mt-1 flex flex-col gap-1">
+                {event.assignedMembers.map(member => (
+                    <div key={member.id} className="flex items-center gap-1 text-xs text-foreground">
+                        <User className="size-3 shrink-0" />
+                        <span>{member.first_name} {member.last_name}</span>
+                    </div>
+                ))}
+            </div>
+          )}
 
-          <div className="flex items-center gap-1">
-            <Clock className="size-3 shrink-0" />
-            <p className="text-xs text-foreground">
-              {format(startDate, "h:mm a")} - {format(endDate, "h:mm a")}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Text className="size-3 shrink-0" />
-            <p className="text-xs text-foreground">{event.description}</p>
-          </div>
+          {event.deadline && (
+              <div className="flex items-center gap-1">
+                <Calendar className="size-3 shrink-0" />
+                <p className="text-xs text-foreground">
+                  {(() => { const d = parseDeadline(event.deadline); return d ? format(d, "MMM d, yyyy") : event.deadline; })()}
+                </p>
+              </div>
+          )}
         </div>
       </div>
     </EventDetailsDialog>

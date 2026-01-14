@@ -1,11 +1,11 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import { type IEvent } from "../../model/interfaces";
+import { type Task } from "../../model/interfaces";
 import { cn } from "@/shared/lib/utils";
 
 interface DraggableEventProps {
-  event: IEvent;
+  event: Task;
   children: React.ReactNode;
 }
 

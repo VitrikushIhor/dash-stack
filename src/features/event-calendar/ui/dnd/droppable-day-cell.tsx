@@ -11,7 +11,9 @@ interface DroppableDayCellProps {
 
 export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
   const { isOver, setNodeRef } = useDroppable({
-    id: `day-${cell.date.toISOString()}`,
+    id: cell.date && !isNaN(cell.date.getTime()) 
+      ? `day-${cell.date.toISOString()}` 
+      : `day-${cell.day}-${cell.currentMonth}`,
     data: {
       type: "day",
       date: cell.date,

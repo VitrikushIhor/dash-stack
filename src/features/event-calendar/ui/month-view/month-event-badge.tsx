@@ -1,9 +1,8 @@
-import { endOfDay, format, isSameDay, parseISO, startOfDay } from "date-fns";
-
-
+import { isSameDay, startOfDay } from "date-fns";
+import { parseDeadline } from "../../model/helpers";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { type IEvent } from "../../model/interfaces";
+import { type Task } from "../../model/interfaces";
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { cn } from "@/shared/lib/utils";
 import { EventDetailsDialog } from "../event-details-dialog";
@@ -46,7 +45,7 @@ const eventBadgeVariants = cva(
 );
 
 interface IProps extends Omit<VariantProps<typeof eventBadgeVariants>, "color" | "multiDayPosition"> {
-  event: IEvent;
+  event: Task;
   cellDate: Date;
   eventCurrentDay?: number;
   eventTotalDays?: number;
@@ -57,10 +56,16 @@ interface IProps extends Omit<VariantProps<typeof eventBadgeVariants>, "color" |
 export function MonthEventBadge({ event, cellDate, eventCurrentDay, eventTotalDays, className, position: propPosition }: IProps) {
   const { badgeVariant } = useCalendar();
 
-  const itemStart = startOfDay(parseISO(event.startDate));
-  const itemEnd = endOfDay(parseISO(event.endDate));
+  if (!event.deadline) return null;
 
-  if (cellDate < itemStart || cellDate > itemEnd) return null;
+  const deadlineDate = parseDeadline(event.deadline);
+  if (!deadlineDate) return null;
+  const itemStart = startOfDay(deadlineDate);
+  const itemEnd = itemStart; // Tasks are point in time
+  const normalizedCellDate = startOfDay(cellDate);
+
+  // Use isSameDay for proper date comparison
+  if (!isSameDay(normalizedCellDate, itemStart)) return null;
 
   let position: "first" | "middle" | "last" | "none" | undefined;
 
@@ -80,7 +85,9 @@ export function MonthEventBadge({ event, cellDate, eventCurrentDay, eventTotalDa
 
   const renderBadgeText = ["first", "none"].includes(position);
 
-  const color = (badgeVariant === "dot" ? `${event.color}-dot` : event.color) as VariantProps<typeof eventBadgeVariants>["color"];
+  // TODO: Map Status to color?
+  const eventColor = "blue"; // Default
+  const color = (badgeVariant === "dot" ? `${eventColor}-dot` : eventColor) as VariantProps<typeof eventBadgeVariants>["color"];
 
   const eventBadgeClasses = cn(eventBadgeVariants({ color, multiDayPosition: position, className }));
 
@@ -113,8 +120,7 @@ export function MonthEventBadge({ event, cellDate, eventCurrentDay, eventTotalDa
               </p>
             )}
           </div>
-
-          {renderBadgeText && <span>{format(new Date(event.startDate), "h:mm a")}</span>}
+          {/* Time removed */}
         </div>
       </EventDetailsDialog>
     </DraggableEvent>

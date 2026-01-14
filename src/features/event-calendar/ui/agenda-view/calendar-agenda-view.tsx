@@ -1,28 +1,29 @@
 import { useMemo } from "react";
 import { CalendarX2 } from "lucide-react";
-import { parseISO, format, endOfDay, startOfDay, isSameMonth } from "date-fns";
+import { format, startOfDay, isSameMonth } from "date-fns";
+import { parseDeadline } from "../../model/helpers";
 
-import { useCalendar } from "@/features/event-calendar/model/contexts/calendar-context";
-
+import { useCalendar } from "../../model/contexts/calendar-context";
 import { ScrollArea } from "@/shared/ui/components/ui/scroll-area";
 import { AgendaDayGroup } from "./agenda-day-group";
-
-import type { IEvent } from "@/features/event-calendar/model/interfaces";
+import type { Task } from "../../model/interfaces";
 
 interface IProps {
-  singleDayEvents: IEvent[];
-  multiDayEvents: IEvent[];
+  singleDayEvents: Task[];
+  multiDayEvents: Task[];
 }
 
 export function CalendarAgendaView({ singleDayEvents, multiDayEvents }: IProps) {
   const { selectedDate } = useCalendar();
 
   const eventsByDay = useMemo(() => {
-    const allDates = new Map<string, { date: Date; events: IEvent[]; multiDayEvents: IEvent[] }>();
+    const allDates = new Map<string, { date: Date; events: Task[]; multiDayEvents: Task[] }>();
+    const allEvents = [...singleDayEvents, ...multiDayEvents];
 
-    singleDayEvents.forEach(event => {
-      const eventDate = parseISO(event.startDate);
-      if (!isSameMonth(eventDate, selectedDate)) return;
+    allEvents.forEach(event => {
+      if (!event.deadline) return;
+      const eventDate = parseDeadline(event.deadline);
+      if (!eventDate || !isSameMonth(eventDate, selectedDate)) return;
 
       const dateKey = format(eventDate, "yyyy-MM-dd");
 
@@ -33,31 +34,10 @@ export function CalendarAgendaView({ singleDayEvents, multiDayEvents }: IProps) 
       allDates.get(dateKey)?.events.push(event);
     });
 
-    multiDayEvents.forEach(event => {
-      const eventStart = parseISO(event.startDate);
-      const eventEnd = parseISO(event.endDate);
-
-      let currentDate = startOfDay(eventStart);
-      const lastDate = endOfDay(eventEnd);
-
-      while (currentDate <= lastDate) {
-        if (isSameMonth(currentDate, selectedDate)) {
-          const dateKey = format(currentDate, "yyyy-MM-dd");
-
-          if (!allDates.has(dateKey)) {
-            allDates.set(dateKey, { date: new Date(currentDate), events: [], multiDayEvents: [] });
-          }
-
-          allDates.get(dateKey)?.multiDayEvents.push(event);
-        }
-        currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-      }
-    });
-
     return Array.from(allDates.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [singleDayEvents, multiDayEvents, selectedDate]);
 
-  const hasAnyEvents = singleDayEvents.length > 0 || multiDayEvents.length > 0;
+  const hasAnyEvents = eventsByDay.length > 0;
 
   return (
     <div className="h-[800px]">

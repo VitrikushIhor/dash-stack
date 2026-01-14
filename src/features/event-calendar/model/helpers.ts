@@ -14,19 +14,75 @@ import {
   endOfWeek,
   format,
   parseISO,
-  differenceInMinutes,
+  parse,
   eachDayOfInterval,
   startOfDay,
-  differenceInDays,
   endOfYear,
   startOfYear,
   subYears,
   addYears,
   isSameYear,
-  isWithinInterval,
+  isValid,
 } from "date-fns";
-import { type TVisibleHours, type TWorkingHours, type TCalendarView } from "./types";
-import { type ICalendarCell, type IEvent } from "./interfaces";
+import { type TCalendarView } from "./types";
+import { type ICalendarCell, type Task } from "./interfaces";
+
+// Helper function to parse deadline string in various formats
+export function parseDeadline(deadline: string): Date | null {
+  if (!deadline) return null;
+
+  // Try ISO format first (e.g., "2026-01-08")
+  try {
+    const isoDate = parseISO(deadline);
+    if (isValid(isoDate)) {
+      return isoDate;
+    }
+  } catch {
+    // Continue to try other formats
+  }
+
+  // Try format "dd MMM yyyy" (e.g., "08 Jan 2026")
+  try {
+    const parsedDate = parse(deadline, "dd MMM yyyy", new Date());
+    if (isValid(parsedDate)) {
+      return parsedDate;
+    }
+  } catch {
+    // Continue to try other formats
+  }
+
+  // Try format "d MMM yyyy" (e.g., "8 Jan 2026")
+  try {
+    const parsedDate = parse(deadline, "d MMM yyyy", new Date());
+    if (isValid(parsedDate)) {
+      return parsedDate;
+    }
+  } catch {
+    // Continue to try other formats
+  }
+
+  // Try format "MMM d, yyyy" (e.g., "Jan 8, 2026")
+  try {
+    const parsedDate = parse(deadline, "MMM d, yyyy", new Date());
+    if (isValid(parsedDate)) {
+      return parsedDate;
+    }
+  } catch {
+    // Continue to try other formats
+  }
+
+  // Try native Date parsing as last resort
+  try {
+    const nativeDate = new Date(deadline);
+    if (isValid(nativeDate)) {
+      return nativeDate;
+    }
+  } catch {
+    // All parsing attempts failed
+  }
+
+  return null;
+}
 
 
 // ================ Header helper functions ================ //
@@ -74,7 +130,7 @@ export function navigateDate(date: Date, view: TCalendarView, direction: "previo
   return operations[view](date, 1);
 }
 
-export function getEventsCount(events: IEvent[], date: Date, view: TCalendarView): number {
+export function getEventsCount(events: Task[], date: Date, view: TCalendarView): number {
   const compareFns = {
     agenda: isSameMonth,
     year: isSameYear,
@@ -83,88 +139,33 @@ export function getEventsCount(events: IEvent[], date: Date, view: TCalendarView
     month: isSameMonth,
   };
 
-  return events.filter(event => compareFns[view](new Date(event.startDate), date)).length;
+  return events.filter(event => {
+    if (!event.deadline) return false;
+    const eventDate = parseDeadline(event.deadline);
+    return eventDate && compareFns[view](eventDate, date);
+  }).length;
 }
 
 // ================ Week and day view helper functions ================ //
 
-export function getCurrentEvents(events: IEvent[]) {
+export function getCurrentEvents(events: Task[]) {
   const now = new Date();
-  return events.filter(event => isWithinInterval(now, { start: parseISO(event.startDate), end: parseISO(event.endDate) })) || null;
+  return events.filter(event => {
+    if (!event.deadline) return false;
+    const eventDate = parseDeadline(event.deadline);
+    return eventDate && isSameDay(eventDate, now);
+  }) || null;
 }
 
-export function groupEvents(dayEvents: IEvent[]) {
-  const sortedEvents = dayEvents.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
-  const groups: IEvent[][] = [];
-
-  for (const event of sortedEvents) {
-    const eventStart = parseISO(event.startDate);
-
-    let placed = false;
-    for (const group of groups) {
-      const lastEventInGroup = group[group.length - 1];
-      const lastEventEnd = parseISO(lastEventInGroup.endDate);
-
-      if (eventStart >= lastEventEnd) {
-        group.push(event);
-        placed = true;
-        break;
-      }
-    }
-
-    if (!placed) groups.push([event]);
-  }
-
-  return groups;
+export function groupEvents(dayEvents: Task[]) {
+    // Basic grouping, just returning explicit array wrapper if needed for compatibility,
+    // or we can remove if components don't use it.
+    // CalendarWeekView no longer uses it. CalendarDayView no longer uses it.
+    // So we can remove it?
+    // Keeping it for now as safe measure or simple passthrough if referenced.
+  return [dayEvents];
 }
 
-export function getEventBlockStyle(event: IEvent, day: Date, groupIndex: number, groupSize: number, visibleHoursRange?: { from: number; to: number }) {
-  const startDate = parseISO(event.startDate);
-  const dayStart = new Date(day.setHours(0, 0, 0, 0));
-  const eventStart = startDate < dayStart ? dayStart : startDate;
-  const startMinutes = differenceInMinutes(eventStart, dayStart);
-
-  let top;
-
-  if (visibleHoursRange) {
-    const visibleStartMinutes = visibleHoursRange.from * 60;
-    const visibleEndMinutes = visibleHoursRange.to * 60;
-    const visibleRangeMinutes = visibleEndMinutes - visibleStartMinutes;
-    top = ((startMinutes - visibleStartMinutes) / visibleRangeMinutes) * 100;
-  } else {
-    top = (startMinutes / 1440) * 100;
-  }
-
-  const width = 100 / groupSize;
-  const left = groupIndex * width;
-
-  return { top: `${top}%`, width: `${width}%`, left: `${left}%` };
-}
-
-export function isWorkingHour(day: Date, hour: number, workingHours: TWorkingHours) {
-  const dayIndex = day.getDay() as keyof typeof workingHours;
-  const dayHours = workingHours[dayIndex];
-  return hour >= dayHours.from && hour < dayHours.to;
-}
-
-export function getVisibleHours(visibleHours: TVisibleHours, singleDayEvents: IEvent[]) {
-  let earliestEventHour = visibleHours.from;
-  let latestEventHour = visibleHours.to;
-
-  singleDayEvents.forEach(event => {
-    const startHour = parseISO(event.startDate).getHours();
-    const endTime = parseISO(event.endDate);
-    const endHour = endTime.getHours() + (endTime.getMinutes() > 0 ? 1 : 0);
-    if (startHour < earliestEventHour) earliestEventHour = startHour;
-    if (endHour > latestEventHour) latestEventHour = endHour;
-  });
-
-  latestEventHour = Math.min(latestEventHour, 24);
-
-  const hours = Array.from({ length: latestEventHour - earliestEventHour }, (_, i) => i + earliestEventHour);
-
-  return { hours, earliestEventHour, latestEventHour };
-}
 
 // ================ Month view helper functions ================ //
 
@@ -201,76 +202,104 @@ export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
   return [...prevMonthCells, ...currentMonthCells, ...nextMonthCells];
 }
 
-export function calculateMonthEventPositions(multiDayEvents: IEvent[], singleDayEvents: IEvent[], selectedDate: Date) {
+export function calculateMonthEventPositions(multiDayEvents: Task[], singleDayEvents: Task[], selectedDate: Date) {
+  // Assuming tasks are single day (deadline).
+
+  // Validate selectedDate
+  if (!selectedDate || isNaN(selectedDate.getTime())) {
+    return {};
+  }
+
   const monthStart = startOfMonth(selectedDate);
   const monthEnd = endOfMonth(selectedDate);
 
   const eventPositions: { [key: string]: number } = {};
   const occupiedPositions: { [key: string]: boolean[] } = {};
 
+  // Initialize occupied positions for all days in the month
   eachDayOfInterval({ start: monthStart, end: monthEnd }).forEach(day => {
-    occupiedPositions[day.toISOString()] = [false, false, false];
+    if (!day || isNaN(day.getTime())) return;
+    const normalizedDay = startOfDay(day);
+    if (isNaN(normalizedDay.getTime())) return;
+    try {
+      const dayKey = normalizedDay.toISOString();
+      occupiedPositions[dayKey] = [false, false, false];
+    } catch (error) {
+      // Skip invalid dates
+      console.warn('Invalid date in calculateMonthEventPositions:', day);
+    }
   });
 
-  const sortedEvents = [
-    ...multiDayEvents.sort((a, b) => {
-      const aDuration = differenceInDays(parseISO(a.endDate), parseISO(a.startDate));
-      const bDuration = differenceInDays(parseISO(b.endDate), parseISO(b.startDate));
-      return bDuration - aDuration || parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime();
-    }),
-    ...singleDayEvents.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()),
-  ];
+  // Treat all tasks as single day events for now
+  const allEvents = [...multiDayEvents, ...singleDayEvents].filter(e => e.deadline);
 
-  sortedEvents.forEach(event => {
-    const eventStart = parseISO(event.startDate);
-    const eventEnd = parseISO(event.endDate);
-    const eventDays = eachDayOfInterval({
-      start: eventStart < monthStart ? monthStart : eventStart,
-      end: eventEnd > monthEnd ? monthEnd : eventEnd,
+  const sortedEvents = allEvents
+    .map(event => {
+      if (!event.deadline) return null;
+      const eventDate = parseDeadline(event.deadline);
+      if (!eventDate || isNaN(eventDate.getTime())) return null;
+      return { event, eventDate };
+    })
+    .filter((item): item is { event: Task; eventDate: Date } => item !== null)
+    .sort((a, b) => {
+      // Sort by deadline
+      return a.eventDate.getTime() - b.eventDate.getTime();
     });
 
-    let position = -1;
+  sortedEvents.forEach(({ event, eventDate }) => {
+    const normalizedEventDate = startOfDay(eventDate);
+    
+    // Validate normalized date
+    if (isNaN(normalizedEventDate.getTime())) return;
+    
+    // Check if event is in this month view
+    if (normalizedEventDate < monthStart || normalizedEventDate > monthEnd) return;
 
-    for (let i = 0; i < 3; i++) {
-      if (
-        eventDays.every(day => {
-          const dayPositions = occupiedPositions[startOfDay(day).toISOString()];
-          return dayPositions && !dayPositions[i];
-        })
-      ) {
-        position = i;
-        break;
+    try {
+      const dayKey = normalizedEventDate.toISOString();
+      if (!occupiedPositions[dayKey]) {
+        // Initialize if somehow missing
+        occupiedPositions[dayKey] = [false, false, false];
       }
-    }
 
-    if (position !== -1) {
-      eventDays.forEach(day => {
-        const dayKey = startOfDay(day).toISOString();
+      let position = -1;
+
+      // Find first empty slot (limit 3)
+      for (let i = 0; i < 3; i++) {
+        if (!occupiedPositions[dayKey][i]) {
+          position = i;
+          break;
+        }
+      }
+
+      if (position !== -1) {
         occupiedPositions[dayKey][position] = true;
-      });
-      eventPositions[event.id] = position;
+        eventPositions[event.id] = position;
+      }
+    } catch (error) {
+      // Skip invalid dates
+      console.warn('Invalid date for event:', event.id, event.deadline);
     }
   });
 
   return eventPositions;
 }
 
-export function getMonthCellEvents(date: Date, events: IEvent[], eventPositions: Record<string, number>) {
+export function getMonthCellEvents(date: Date, events: Task[], eventPositions: Record<string, number>) {
   const eventsForDate = events.filter(event => {
-    const eventStart = parseISO(event.startDate);
-    const eventEnd = parseISO(event.endDate);
-    return (date >= eventStart && date <= eventEnd) || isSameDay(date, eventStart) || isSameDay(date, eventEnd);
+    if (!event.deadline) return false;
+    const eventDate = parseDeadline(event.deadline);
+    return eventDate && isSameDay(date, eventDate);
   });
 
   return eventsForDate
     .map(event => ({
       ...event,
       position: eventPositions[event.id] ?? -1,
-      isMultiDay: event.startDate !== event.endDate,
+      isMultiDay: false, 
     }))
     .sort((a, b) => {
-      if (a.isMultiDay && !b.isMultiDay) return -1;
-      if (!a.isMultiDay && b.isMultiDay) return 1;
-      return a.position - b.position;
+      // Sort by position? or just keep order
+      return (a.position - b.position);
     });
 }
