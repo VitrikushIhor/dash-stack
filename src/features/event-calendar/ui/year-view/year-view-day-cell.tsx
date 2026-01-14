@@ -1,12 +1,12 @@
 import { isToday } from "date-fns";
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { cn } from "@/shared/lib/utils";
-import type { IEvent } from "../../model/interfaces";
+import type { Task } from "../../model/interfaces";
 
 interface IProps {
   day: number;
   date: Date;
-  events: IEvent[];
+  events: Task[];
 }
 
 export function YearViewDayCell({ day, date, events }: IProps) {
@@ -43,13 +43,8 @@ export function YearViewDayCell({ day, date, events }: IProps) {
                 key={event.id}
                 className={cn(
                   "size-1.5 rounded-full",
-                  event.color === "blue" && "bg-blue-600",
-                  event.color === "green" && "bg-green-600",
-                  event.color === "red" && "bg-red-600",
-                  event.color === "yellow" && "bg-yellow-600",
-                  event.color === "purple" && "bg-purple-600",
-                  event.color === "orange" && "bg-orange-600",
-                  event.color === "gray" && "bg-neutral-600"
+                  // simplified handling since all are blue for now
+                  "bg-blue-600"
                 )}
               />
             ))
@@ -58,12 +53,7 @@ export function YearViewDayCell({ day, date, events }: IProps) {
               <div
                 className={cn(
                   "size-1.5 rounded-full",
-                  events[0].color === "blue" && "bg-blue-600",
-                  events[0].color === "green" && "bg-green-600",
-                  events[0].color === "red" && "bg-red-600",
-                  events[0].color === "yellow" && "bg-yellow-600",
-                  events[0].color === "purple" && "bg-purple-600",
-                  events[0].color === "orange" && "bg-orange-600"
+                  "bg-blue-600"
                 )}
               />
               <span className="text-[7px] text-muted-foreground">+{eventCount - 1}</span>

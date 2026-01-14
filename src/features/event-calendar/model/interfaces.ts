@@ -1,20 +1,7 @@
-import { type TEventColor } from "./types";
+import { type Task } from "@/entities/task";
+import { type TeamMember } from "@/entities/team";
 
-export interface IUser {
-  id: string;
-  name: string;
-  picturePath: string | null;
-}
-
-export interface IEvent {
-  id: number;
-  startDate: string;
-  endDate: string;
-  title: string;
-  color: TEventColor;
-  description: string;
-  user: IUser;
-}
+export type { Task, TeamMember };
 
 export interface ICalendarCell {
   day: number;

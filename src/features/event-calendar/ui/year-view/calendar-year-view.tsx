@@ -3,10 +3,10 @@ import { addMonths, startOfYear } from "date-fns";
 
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { YearViewMonth } from "./year-view-month";
-import type { IEvent } from "../../model/interfaces";
+import type { Task } from "../../model/interfaces";
 
 interface IProps {
-  allEvents: IEvent[];
+  allEvents: Task[];
 }
 
 export function CalendarYearView({ allEvents }: IProps) {

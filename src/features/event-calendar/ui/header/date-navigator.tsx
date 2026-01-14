@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { formatDate } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type TCalendarView } from "../../model/types";
-import { type IEvent } from "../../model/interfaces";
+import { type Task } from "../../model/interfaces";
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { getEventsCount, navigateDate, rangeText } from "../../model/helpers";
 import { Button } from "@/shared/ui/components/ui/button";
@@ -12,7 +12,7 @@ import { Badge } from "@/shared/ui/components/ui/badge";
 
 interface IProps {
   view: TCalendarView;
-  events: IEvent[];
+  events: Task[];
 }
 
 export function DateNavigator({ view, events }: IProps) {

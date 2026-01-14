@@ -1,12 +1,13 @@
 import { useMemo } from "react";
-import { format, isSameDay, parseISO, getDaysInMonth, startOfMonth } from "date-fns";
+import { format, isSameDay, getDaysInMonth, startOfMonth } from "date-fns";
+import { parseDeadline } from "../../model/helpers";
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { YearViewDayCell } from "./year-view-day-cell";
-import type { IEvent } from "../../model/interfaces";
+import type { Task } from "../../model/interfaces";
 
 interface IProps {
   month: Date;
-  events: IEvent[];
+  events: Task[];
 }
 
 export function YearViewMonth({ month, events }: IProps) {
@@ -55,7 +56,11 @@ export function YearViewMonth({ month, events }: IProps) {
             if (day === null) return <div key={`blank-${index}`} className="h-10" />;
 
             const date = new Date(month.getFullYear(), month.getMonth(), day);
-            const dayEvents = events.filter(event => isSameDay(parseISO(event.startDate), date) || isSameDay(parseISO(event.endDate), date));
+            const dayEvents = events.filter(event => {
+              if (!event.deadline) return false;
+              const eventDate = parseDeadline(event.deadline);
+              return eventDate && isSameDay(eventDate, date);
+            });
 
             return <YearViewDayCell key={`day-${day}`} day={day} date={date} events={dayEvents} />;
           })}

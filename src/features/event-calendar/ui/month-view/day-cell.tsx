@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { type ICalendarCell, type IEvent } from "../../model/interfaces";
+import { type ICalendarCell, type Task } from "../../model/interfaces";
+import { type TEventColor } from "../../model/types";
 import { useNavigate } from "@tanstack/react-router";
 import { useCalendar } from "../../model/contexts/calendar-context";
 import { getMonthCellEvents } from "../../model/helpers";
@@ -11,7 +12,7 @@ import { DroppableDayCell } from "../dnd/droppable-day-cell";
 
 interface IProps {
   cell: ICalendarCell;
-  events: IEvent[];
+  events: Task[];
   eventPositions: Record<string, number>;
 }
 
@@ -50,12 +51,13 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
           {[0, 1, 2].map(position => {
             const event = cellEvents.find(e => e.position === position);
             const eventKey = event ? `event-${event.id}-${position}` : `empty-${position}`;
+            const eventColor: TEventColor = "blue"; 
 
             return (
               <div key={eventKey} className="lg:flex-1">
                 {event && (
                   <>
-                    <EventBullet className="lg:hidden" color={event.color} />
+                    <EventBullet className="lg:hidden" color={eventColor} />
                     <MonthEventBadge className="hidden lg:flex" event={event} cellDate={startOfDay(date)} />
                   </>
                 )}
