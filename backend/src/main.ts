@@ -26,11 +26,11 @@ async function bootstrap() {
   // Validation
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // Увімкнути трансформацію
+      transform: true, // Enable transformation
       transformOptions: {
-        enableImplicitConversion: true, // Автоматична конверсія типів
+        enableImplicitConversion: true, // Enable automatic type conversion
       },
-      whitelist: true, // Видалити властивості, яких немає в DTO
+      whitelist: true, // Remove properties that are not in the DTO
       forbidNonWhitelisted: false,
     }),
   );
