@@ -7,43 +7,36 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
+build
 *.local
-
-.env
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 # Environment variables
 .env
 .env.local
 .env.*.local
 
-# Build outputs
-dist
-dist-ssr
-build
-
 # Testing
 coverage
 .nyc_output
 
-# IDE
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea
-.cursor
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 *.swp
 *.swo
 *~
@@ -52,6 +45,7 @@ coverage
 .DS_Store
 Thumbs.db
 
+# Project specific
 .github/copilot-instructions.md
 .cursor
 .agent

@@ -6,10 +6,45 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  NODE_VERSION: '20'
+
 jobs:
-  lint-and-type-check:
-    name: Lint and Type Check
+  # ============================================
+  # DETECT CHANGES
+  # ============================================
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      root: ${{ steps.filter.outputs.root }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+            root:
+              - 'package.json'
+              - 'package-lock.json'
+
+  # ============================================
+  # LINT AND TYPE CHECK - FRONTEND
+  # ============================================
+  lint-frontend:
+    name: Lint (frontend)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.root == 'true' }}
 
     steps:
       - name: Checkout code
@@ -18,24 +53,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint -w frontend
 
       - name: Run TypeScript type check
-        run: npm run type-check
+        run: npm run type-check -w frontend
 
       - name: Check code formatting
-        run: npm run format:check
+        run: npm run format:check -w frontend
 
-  build:
-    name: Build
+  # ============================================
+  # LINT - BACKEND
+  # ============================================
+  lint-backend:
+    name: Lint (backend)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
 
     steps:
       - name: Checkout code
@@ -44,25 +84,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Run ESLint
+        run: npm run lint -w backend
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          retention-days: 7
-
-  security-audit:
-    name: Security Audit
+  # ============================================
+  # BUILD - FRONTEND
+  # ============================================
+  build-frontend:
+    name: Build (frontend)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.root == 'true' }}
 
     steps:
       - name: Checkout code
@@ -71,7 +109,100 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build -w frontend
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  # ============================================
+  # BUILD - BACKEND
+  # ============================================
+  build-backend:
+    name: Build (backend)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build -w backend
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
+          retention-days: 7
+
+  # ============================================
+  # TESTS - BACKEND
+  # ============================================
+  test-backend:
+    name: Tests (backend)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test -w backend
+
+      - name: Run e2e tests
+        run: npm run test:e2e -w backend
+        continue-on-error: true
+
+  # ============================================
+  # SECURITY AUDIT
+  # ============================================
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -81,3 +212,83 @@ jobs:
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
+  # ============================================
+  # TESTS - FRONTEND
+  # ============================================
+  test-frontend:
+    name: Tests (frontend)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test -w frontend
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -w frontend
+        continue-on-error: true
+
+  # ============================================
+  # DOCKER BUILD - FRONTEND
+  # ============================================
+  docker-frontend:
+    name: Docker Build (frontend)
+    runs-on: ubuntu-latest
+    needs: [changes, lint-frontend, build-frontend, test-frontend]
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: dash-stack-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # DOCKER BUILD - BACKEND
+  # ============================================
+  docker-backend:
+    name: Docker Build (backend)
+    runs-on: ubuntu-latest
+    needs: [changes, lint-backend, build-backend, test-backend]
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: dash-stack-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

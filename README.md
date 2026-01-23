@@ -1,172 +1,286 @@
-# Dash Stack Frontend
+# 🚀 Dash Stack
 
-Production-ready React application built with modern technologies and Feature-Sliced Design architecture.
+Modern full-stack monorepo with React frontend and NestJS backend.
 
-## 🚀 Tech Stack
+![CI](https://github.com/VitrikushIhor/dash-stack/actions/workflows/ci.yml/badge.svg)
 
-- **Framework**: React 19 + TypeScript
-- **Routing**: TanStack Router
-- **State Management**: Zustand
-- **Data Fetching**: TanStack Query
-- **Styling**: TailwindCSS
-- **Forms**: React Hook Form + Zod
-- **UI Components**: Radix UI + Shadcn/ui
-- **Build Tool**: Vite
-- **Architecture**: Feature-Sliced Design (FSD)
+> 🇺🇦 [Українська версія](README.ua.md)
+
+## 📦 Tech Stack
+
+### Frontend
+- **React 19** + TypeScript
+- **Vite** - fast build tool
+- **TanStack Router** - type-safe routing
+- **TanStack Query** - data fetching
+- **Tailwind CSS 4** - styling
+- **Radix UI** - accessible components
+- **Vitest** - unit testing
+
+### Backend
+- **NestJS** - Node.js framework
+- **Prisma** - ORM
+- **PostgreSQL** - database
+- **Passport.js** - authentication
+- **Swagger** - API documentation
+- **Jest** - testing
+
+### DevOps
+- **Docker & Docker Compose** - containerization
+- **GitHub Actions** - CI/CD
+- **Husky** - git hooks
+- **npm Workspaces** - monorepo management
+
+---
+
+## 🛠 Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+- Docker & Docker Compose (for database)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/VitrikushIhor/dash-stack.git
+cd dash-stack
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file as needed.
+
+### 4. Start the database
+
+```bash
+npm run docker:dev
+```
+
+Or just PostgreSQL:
+
+```bash
+docker-compose -f docker-compose.dev.yml up postgres -d
+```
+
+### 5. Run database migrations
+
+```bash
+cd backend
+npx prisma migrate dev
+cd ..
+```
+
+### 6. Start development servers
+
+```bash
+# In separate terminals:
+npm run dev:frontend  # http://localhost:3000
+npm run dev:backend   # http://localhost:8000
+```
+
+---
+
+## 📜 Available Commands
+
+### Development
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev:frontend` | Start frontend dev server |
+| `npm run dev:backend` | Start backend dev server |
+
+### Testing
+
+| Command | Description |
+|---------|-------------|
+| `npm run test -w frontend` | Run frontend tests |
+| `npm run test:watch -w frontend` | Frontend tests in watch mode |
+| `npm run test:coverage -w frontend` | Frontend tests with coverage |
+| `npm run test -w backend` | Run backend tests |
+| `npm run test:e2e -w backend` | Backend e2e tests |
+
+### Linting & Formatting
+
+| Command | Description |
+|---------|-------------|
+| `npm run lint` | Lint both projects |
+| `npm run lint:frontend` | Lint frontend |
+| `npm run lint:backend` | Lint backend |
+| `npm run format:frontend` | Format frontend |
+| `npm run format:backend` | Format backend |
+
+### Build
+
+| Command | Description |
+|---------|-------------|
+| `npm run build:frontend` | Production build frontend |
+| `npm run build:backend` | Production build backend |
+
+### Docker
+
+| Command | Description |
+|---------|-------------|
+| `npm run docker:up` | Start production containers |
+| `npm run docker:up:build` | Rebuild and start |
+| `npm run docker:down` | Stop containers |
+| `npm run docker:dev` | Start dev containers with hot-reload |
+| `npm run docker:dev:build` | Rebuild and start dev |
+| `npm run docker:logs` | View logs |
+| `npm run docker:ps` | Container status |
+
+---
+
+## 🐳 Docker
+
+### Development (with hot-reload)
+
+```bash
+npm run docker:dev:build
+```
+
+Services:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+- PostgreSQL: localhost:5432
+
+### Production
+
+```bash
+npm run docker:up:build
+```
+
+Services:
+- Frontend: http://localhost:80
+- Backend: http://localhost:8000
+- PostgreSQL: localhost:5432
+
+---
 
 ## 📁 Project Structure
 
 ```
-src/
-├── app/          # App shell (providers, routing, init, styles)
-├── pages/        # Route-level compositions
-├── widgets/      # Page fragments composed from features/entities
-├── features/     # User-visible interactions (use cases)
-├── entities/     # Business entities
-└── shared/       # UI kit, libs, utils, config
+dash-stack/
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # GitHub Actions CI
+├── .husky/                  # Git hooks
+├── frontend/                # React application
+│   ├── src/
+│   │   ├── app/            # App-level config, routes
+│   │   ├── entities/       # Business entities
+│   │   ├── features/       # Feature modules
+│   │   ├── pages/          # Page components
+│   │   ├── shared/         # Shared UI, utils, hooks
+│   │   ├── widgets/        # Complex UI blocks
+│   │   └── test/           # Test utilities
+│   ├── package.json
+│   └── vite.config.ts
+├── backend/                 # NestJS API
+│   ├── src/
+│   ├── prisma/             # Database schema & migrations
+│   ├── test/               # E2E tests
+│   └── package.json
+├── docker-compose.yml       # Production Docker
+├── docker-compose.dev.yml   # Development Docker
+├── package.json            # Root package.json (workspaces)
+└── README.md
 ```
 
-## 🛠️ Getting Started
+---
 
-### Prerequisites
+## 🔐 API Documentation
 
-- Node.js 18+
-- npm or yarn
+Swagger UI is available at:
 
-### Installation
+```
+http://localhost:8000/api
+```
+
+---
+
+## 🧪 Testing
+
+### Frontend (Vitest)
 
 ```bash
-# Install dependencies
-npm install
+# Run tests
+npm run test -w frontend
 
-# Copy environment variables
-cp .env.example .env
+# Watch mode
+npm run test:watch -w frontend
 
-# Start development server
-npm run dev
+# Coverage report
+npm run test:coverage -w frontend
 ```
 
-The application will be available at `http://localhost:3000`
-
-## 📜 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint errors automatically
-- `npm run type-check` - Run TypeScript type checking
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
-- `npm run knip` - Find unused files and dependencies
-- `npm run audit` - Check for security vulnerabilities
-
-## 🏗️ Build for Production
+### Backend (Jest)
 
 ```bash
-# Build the application
-npm run build
+# Unit tests
+npm run test -w backend
 
-# Preview the production build
-npm run preview
+# E2E tests
+npm run test:e2e -w backend
+
+# Coverage
+npm run test:cov -w backend
 ```
 
-## 🔒 Environment Variables
+---
 
-Create a `.env` file in the root directory based on `.env.example`:
+## 🔄 CI/CD
 
-```env
-VITE_API_URL=your_api_url
-VITE_APP_NAME=Your App Name
-```
+GitHub Actions automatically runs:
 
-## 🧪 Code Quality
+1. **Lint & Type Check** - ESLint, TypeScript
+2. **Build** - Production builds
+3. **Tests** - Unit and E2E tests
+4. **Security Audit** - npm audit
+5. **Docker Build** - Verify Docker images
 
-This project uses:
+CI only runs for changed parts of the project (paths filter).
 
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **TypeScript** for type safety
-- **Husky** for Git hooks
-- **lint-staged** for pre-commit checks
+---
 
-### Pre-commit Hooks
+## 📝 Git Workflow
 
-Before each commit, the following checks run automatically:
+### Commit Hooks (Husky)
 
-- ESLint fixes
-- Prettier formatting
-- Type checking (on push)
+- **pre-commit**: lint-staged (ESLint + Prettier)
 
-## 🏛️ Architecture (Feature-Sliced Design)
+### Branches
 
-This project follows [Feature-Sliced Design](https://feature-sliced.design/) principles:
+- `main` - production
+- `develop` - development
+- `feature/*` - new features
+- `fix/*` - bug fixes
 
-- **app/** - Application initialization, providers, routing
-- **pages/** - Route-level page compositions
-- **widgets/** - Complex UI compositions
-- **features/** - User interactions (use cases)
-- **entities/** - Business entities
-- **shared/** - Reusable UI components, utilities, configs
+---
 
-### Import Rules
+## 🤝 Contributing
 
-- Layers can only import from lower layers
-- No circular dependencies
-- Use barrel exports (index.ts) for public API
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📦 Dependencies
+---
 
-### Production
+## 👤 Author
 
-- React 19
-- TanStack Router, Query, Table
-- Zustand
-- React Hook Form
-- Zod
-- TailwindCSS
-- Radix UI
+**Vitrikush Ihor**
 
-### Development
-
-- TypeScript
-- ESLint
-- Prettier
-- Husky
-- Vite
-
-## 🔐 Security
-
-- Regular security audits: `npm run audit`
-- Environment variables for sensitive data
-- No secrets in version control
-
-## 🚢 Deployment
-
-### Build
-
-```bash
-npm run build
-```
-
-The production build will be in the `dist/` directory.
-
-### Environment Setup
-
-Ensure all environment variables are set in your deployment platform.
-
-## 📝 Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Ensure all checks pass (`npm run lint`, `npm run type-check`)
-4. Commit your changes (pre-commit hooks will run automatically)
-5. Push and create a Pull Request
-
-## 📄 License
-
-[Your License Here]
-
-## 👥 Team
-
-[Your Team Info Here]
+- GitHub: [@VitrikushIhor](https://github.com/VitrikushIhor)
