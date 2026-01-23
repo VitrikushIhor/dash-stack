@@ -1,0 +1,71 @@
+services:
+  # ============================================
+  # DATABASE
+  # ============================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: dash-stack-db-dev
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-prisma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-topsecret}
+      POSTGRES_DB: ${POSTGRES_DB:-blog}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-prisma} -d ${POSTGRES_DB:-blog}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # BACKEND (NestJS) - Development with hot-reload
+  # ============================================
+  backend:
+    container_name: dash-stack-backend-dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - '${BACKEND_PORT:-8000}:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      PORT: 8000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-blog}?schema=${DB_SCHEMA:-blog}&sslmode=disable
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-nestjsPrismaAccessSecret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-nestjsPrismaRefreshSecret}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-15m}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      ENABLE_LOGS: true
+
+  # ============================================
+  # FRONTEND (Vite) - Development with hot-reload
+  # ============================================
+  frontend:
+    container_name: dash-stack-frontend-dev
+    image: node:20-alpine
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - '${FRONTEND_PORT:-3000}:3000'
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: http://localhost:${BACKEND_PORT:-8000}
+
+volumes:
+  postgres_data_dev:
+    name: dash-stack-db-data-dev
