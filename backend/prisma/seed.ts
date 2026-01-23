@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
-config(); // Завантажує змінні з .env файлу
+config(); // Loads environment variables from .env file
 
 const prisma = new PrismaClient();
 
