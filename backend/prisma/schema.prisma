@@ -1,28 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
 }
 
-generator client {
-  provider = "prisma-client-js"
-  // previewFeatures = []
-}
-
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
+// ============================================
+// AUTH MODELS
+// ============================================
 
 model User {
-  id        String   @id @default(cuid())
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String? // null якщо OAuth-only користувач
+  emailVerified DateTime?
+  firstName     String?
+  lastName      String?
+  avatar        String?
+
+  // OAuth providers
+  accounts      Account[]
+  refreshTokens RefreshToken[]
+
+  // App relations
+  memberships   Membership[]
+  assignedTasks Task[]       @relation("TaskAssignee")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email     String   @unique
-  password  String
-  firstname String?
-  lastname  String?
-  role      Role
 }
 
-enum Role {
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String // "google", "github", "credentials"
+  providerAccountId String
+  accessToken       String? @db.Text
+  refreshToken      String? @db.Text
+  expiresAt         Int?
+  tokenType         String?
+  scope             String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  type      TokenType
+  expires   DateTime
+  createdAt DateTime  @default(now())
+
+  @@unique([email, token])
+  @@index([email])
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String? // browser/device info
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ============================================
+// ORGANIZATION & MEMBERSHIP
+// ============================================
+
+model Organization {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  logo        String?
+  stripeId    String? // для payments
+
+  memberships    Membership[]
+  projects       Project[]
+  calendarEvents CalendarEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Membership {
+  id       String        @id @default(cuid())
+  userId   String
+  orgId    String
+  role     OrgRole       @default(MEMBER)
+  position TeamPosition?
+  joinedAt DateTime      @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@index([userId])
+  @@index([orgId])
+}
+
+enum OrgRole {
+  OWNER
   ADMIN
-  USER
+  MEMBER
+  GUEST
+}
+
+enum TeamPosition {
+  PRODUCT_MANAGER
+  LEAD_DEVELOPER
+  FRONTEND_DEVELOPER
+  BACKEND_DEVELOPER
+  UI_UX_DESIGNER
+  QA_ENGINEER
+  DEVOPS_ENGINEER
+}
+
+// ============================================
+// PROJECTS & TASKS
+// ============================================
+
+model Project {
+  id          String  @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  color       String? // для UI (hex колір)
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  tasks        Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
+  assigneeId  String?
+  dueDate     DateTime?
+
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee       User?           @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  calendarEvents CalendarEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([status])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// ============================================
+// CALENDAR
+// ============================================
+
+model CalendarEvent {
+  id     String    @id @default(cuid())
+  orgId  String
+  taskId String?
+  title  String
+  start  DateTime
+  end    DateTime?
+  type   EventType @default(TASK)
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  task         Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([taskId])
+  @@index([start])
+}
+
+enum EventType {
+  TASK
+  MEETING
+  DEADLINE
+  REMINDER
 }
