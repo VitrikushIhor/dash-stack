@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { EmailModule } from './email/email.module';
 import config from './common/configs/config';
 
 @Module({
@@ -19,9 +20,26 @@ import config from './common/configs/config';
     PrismaModule.forRootAsync({
       isGlobal: true,
       useFactory: (configService: ConfigService) => {
-        const pool = new Pool({
-          connectionString: configService.get('DATABASE_URL'),
-        });
+        const connectionString = configService.get('DATABASE_URL');
+        const poolConfig: any = { connectionString };
+
+        // Parse schema from URL and set it as search_path in Pool options
+        try {
+          if (connectionString) {
+            const url = new URL(connectionString);
+            const schema = url.searchParams.get('schema');
+            if (schema) {
+              poolConfig.options = `-c search_path=${schema}`;
+              console.log(
+                `[AppModule] Configured Postgres search_path to: ${schema}`,
+              );
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to parse DATABASE_URL configuration', e);
+        }
+
+        const pool = new Pool(poolConfig);
         const adapter = new PrismaPg(pool);
 
         return {
@@ -69,6 +87,7 @@ import config from './common/configs/config';
     AuthModule,
     UsersModule,
     HealthModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [

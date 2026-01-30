@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { sleep, cn } from '@/shared/lib/utils'
+import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/components/ui/button'
 import {
   Form,
@@ -16,40 +13,47 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-
-const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
-})
+import { useForgotPassword } from '../api'
+import {
+  forgotPasswordDefaultValues,
+  forgotPasswordSchema,
+  type TForgotPasswordSchema,
+} from '../model/schema/forgot-password.schema'
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
+  const forgotPasswordMutation = useForgotPassword()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { email: '' },
+  const form = useForm<TForgotPasswordSchema>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: forgotPasswordDefaultValues,
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
+  function onSubmit(data: TForgotPasswordSchema) {
+    forgotPasswordMutation.mutate(data.email)
+  }
 
-    toast.promise(sleep(2000), {
-      loading: 'Sending email...',
-      success: () => {
-        setIsLoading(false)
-        form.reset()
-        navigate({ to: '/otp' })
-        return `Email sent to ${data.email}`
-      },
-      error: 'Error',
-    })
+  if (forgotPasswordMutation.isSuccess || forgotPasswordMutation.isError) {
+    return (
+      <div className='space-y-4 text-center'>
+        <div className='text-4xl'>📧</div>
+        <h3 className='text-lg font-semibold'>Check your email</h3>
+        <p className='text-muted-foreground text-sm'>
+          If an account exists with that email, we've sent a password reset
+          link.
+        </p>
+        <Button
+          variant='outline'
+          className='mt-4'
+          onClick={() => navigate({ to: '/sign-in' })}
+        >
+          Back to Sign In
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -72,9 +76,13 @@ export function ForgotPasswordForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={isLoading}>
+        <Button className='mt-2' disabled={forgotPasswordMutation.isPending}>
           Continue
-          {isLoading ? <Loader2 className='animate-spin' /> : <ArrowRight />}
+          {forgotPasswordMutation.isPending ? (
+            <Loader2 className='animate-spin' />
+          ) : (
+            <ArrowRight />
+          )}
         </Button>
       </form>
     </Form>

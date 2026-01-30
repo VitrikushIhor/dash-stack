@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Github, Linkedin, Loader2, UserPlus } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Github, Linkedin, Loader2, LogIn } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { PasswordInput } from '@/shared/ui/components/password-input'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -13,35 +14,34 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-import { useSignup } from '../api'
+import { useLogin } from '../api'
 import {
-  signupSchema,
-  type TSignupSchema,
-  singUpDefaultValues,
-} from '../model/schema/singup.schema'
+  signInDefaultValues,
+  signInSchema,
+  type TSignInSchema,
+} from '../model/schema/sing-in.schema'
 
-export function SignUpForm({
+interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
+  redirectTo?: string
+}
+
+export function SignInForm({
   className,
-  onSuccess,
+  redirectTo,
   ...props
-}: React.HTMLAttributes<HTMLFormElement> & { onSuccess?: () => void }) {
-  const signupMutation = useSignup()
+}: SignInFormProps) {
+  const loginMutation = useLogin({ redirectTo })
 
-  const form = useForm<TSignupSchema>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: singUpDefaultValues,
+  const form = useForm<TSignInSchema>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: signInDefaultValues,
   })
 
-  function onSubmit(data: TSignupSchema) {
-    signupMutation.mutate(
-      {
-        email: data.email,
-        password: data.password,
-      },
-      {
-        onSuccess: () => onSuccess?.(),
-      }
-    )
+  function onSubmit(data: TSignInSchema) {
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+    })
   }
 
   return (
@@ -68,37 +68,29 @@ export function SignUpForm({
           control={form.control}
           name='password'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className='relative'>
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
               <FormMessage />
+              <Link
+                to='/forgot-password'
+                className='text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75'
+              >
+                Forgot password?
+              </Link>
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='confirmPassword'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={signupMutation.isPending}>
-          {signupMutation.isPending ? (
+        <Button className='mt-2' disabled={loginMutation.isPending}>
+          {loginMutation.isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
-            <UserPlus className='h-4 w-4' />
+            <LogIn />
           )}
-          Create Account
+          Sign in
         </Button>
-
         <div className='relative my-2'>
           <div className='absolute inset-0 flex items-center'>
             <span className='w-full border-t' />
@@ -115,7 +107,7 @@ export function SignUpForm({
             variant='outline'
             className='w-full'
             type='button'
-            disabled={signupMutation.isPending}
+            disabled={loginMutation.isPending}
           >
             <Github className='h-4 w-4' />
             GitHub
@@ -124,7 +116,7 @@ export function SignUpForm({
             variant='outline'
             className='w-full'
             type='button'
-            disabled={signupMutation.isPending}
+            disabled={loginMutation.isPending}
           >
             <Linkedin className='h-4 w-4' /> Linkedin
           </Button>
