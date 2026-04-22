@@ -7,15 +7,19 @@ services:
     container_name: dash-stack-db-dev
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-prisma}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-topsecret}
-      POSTGRES_DB: ${POSTGRES_DB:-blog}
+      POSTGRES_DB: ${POSTGRES_DB:-test}
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-prisma} -d ${POSTGRES_DB:-blog}']
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-prisma} -d ${POSTGRES_DB:-test}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +34,7 @@ services:
       dockerfile: Dockerfile.dev
     restart: unless-stopped
     ports:
-      - '${BACKEND_PORT:-8000}:8000'
+      - "${BACKEND_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,12 +43,17 @@ services:
       - /app/node_modules
     environment:
       PORT: 8000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-blog}?schema=${DB_SCHEMA:-blog}&sslmode=disable
+      DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-test}?schema=${DB_SCHEMA:-public}&sslmode=disable
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-nestjsPrismaAccessSecret}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-nestjsPrismaRefreshSecret}
       JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-15m}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       ENABLE_LOGS: true
 
   # ============================================
@@ -56,7 +65,7 @@ services:
     working_dir: /app
     restart: unless-stopped
     ports:
-      - '${FRONTEND_PORT:-3000}:3000'
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       - backend
     volumes:

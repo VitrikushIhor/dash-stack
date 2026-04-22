@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
-import { sidebarData } from '@/shared/ui/components/layout/data/sidebar-data'
-import { Header } from '@/shared/ui/components/layout/header'
-import { Main } from '@/shared/ui/components/layout/main'
-import { NavUser } from '@/shared/ui/components/layout/nav-user'
 import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Button } from '@/shared/ui/components/ui/button'
 import { useMemberStore, AddMemberDialog, TeamGrid } from '@/features/team'
+import { sidebarData } from '@/widgets/layout/ui/data/sidebar-data'
+import { Header } from '@/widgets/layout/ui/header'
+import { Main } from '@/widgets/layout/ui/main'
+import { NavUser } from '@/widgets/layout/ui/nav-user'
 
 export function TeamPage() {
   const [isMember, setIsMember] = useState<boolean>(false)

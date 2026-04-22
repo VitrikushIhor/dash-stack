@@ -23,6 +23,13 @@ const config: Config = {
     refreshIn: process.env.JWT_REFRESH_EXPIRATION || '7d',
     bcryptSaltOrRound: 10,
   },
+  email: {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    user: process.env.SMTP_USER || 'your_email@gmail.com',
+    pass: process.env.SMTP_PASS || 'app_password',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  },
 };
 
 export default (): Config => config;

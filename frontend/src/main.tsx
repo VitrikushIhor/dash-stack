@@ -9,6 +9,7 @@ import {
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 // Generated Routes
 import { routeTree } from '@/routeTree.gen'
+import { Auth0Provider } from '@auth0/auth0-react'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/lib/handle-server-error'
 import { useAuthStore } from '@/features/auth'
@@ -17,6 +18,10 @@ import { FontProvider } from '@/app/context/font-provider'
 import { ThemeProvider } from '@/app/context/theme-provider'
 // Styles
 import '@/app/styles/index.css'
+
+// Auth0 configuration
+const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
+const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,7 +58,7 @@ const queryClient = new QueryClient({
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           toast.error('Session expired!')
-          useAuthStore.getState().auth.reset()
+          useAuthStore.getState().logout()
           const redirect = `${router.history.location.href}`
           router.navigate({ to: '/sign-in', search: { redirect } })
         }
@@ -93,15 +98,23 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <FontProvider>
-            <DirectionProvider>
-              <RouterProvider router={router} />
-            </DirectionProvider>
-          </FontProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <Auth0Provider
+        domain={auth0Domain}
+        clientId={auth0ClientId}
+        authorizationParams={{
+          redirect_uri: `${window.location.origin}/oauth/callback`,
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <FontProvider>
+              <DirectionProvider>
+                <RouterProvider router={router} />
+              </DirectionProvider>
+            </FontProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </Auth0Provider>
     </StrictMode>
   )
 }

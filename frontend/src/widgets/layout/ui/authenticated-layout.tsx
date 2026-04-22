@@ -1,12 +1,12 @@
 import { Outlet } from '@tanstack/react-router'
 import { getCookie } from '@/shared/lib/cookies'
 import { cn } from '@/shared/lib/utils'
-import { AppSidebar } from '@/shared/ui/components/layout/app-sidebar'
 import { SkipToMain } from '@/shared/ui/components/skip-to-main'
 import {
   SidebarInset,
   SidebarProvider,
 } from '@/shared/ui/components/ui/sidebar'
+import { AppSidebar } from '@/widgets/layout/ui/app-sidebar'
 import { LayoutProvider } from '@/app/context/layout-provider'
 import { SearchProvider } from '@/app/context/search-provider'
 

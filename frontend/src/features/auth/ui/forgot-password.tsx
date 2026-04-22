@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { AuthLayout } from '../ui/auth-layout'
-import { ForgotPasswordForm } from '../ui/forgot-password-form'
+import { AuthLayout } from './auth-layout'
+import { ForgotPasswordForm } from './forgot-password-form'
 
 export function ForgotPassword() {
   return (

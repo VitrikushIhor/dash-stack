@@ -1,8 +1,6 @@
-import { useState } from 'react'
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Github, Linkedin } from 'lucide-react'
+import { Loader2, UserPlus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { PasswordInput } from '@/shared/ui/components/password-input'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -15,47 +13,36 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-
-const formSchema = z
-  .object({
-    email: z.email({
-      error: (iss) =>
-        iss.input === '' ? 'Please enter your email' : undefined,
-    }),
-    password: z
-      .string()
-      .min(1, 'Please enter your password')
-      .min(7, 'Password must be at least 7 characters long'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ['confirmPassword'],
-  })
+import { useSignup } from '../api'
+import {
+  signUpDefaultValues,
+  signUpSchema,
+  type TSignUpSchema,
+} from '../model/schema/sing-up.schema'
+import { OAuthButtons } from './oauth-buttons'
 
 export function SignUpForm({
   className,
+  onSuccess,
   ...props
-}: React.HTMLAttributes<HTMLFormElement>) {
-  const [isLoading, setIsLoading] = useState(false)
+}: React.HTMLAttributes<HTMLFormElement> & { onSuccess?: () => void }) {
+  const signupMutation = useSignup()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
+  const form = useForm<TSignUpSchema>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: signUpDefaultValues,
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+  function onSubmit(data: TSignUpSchema) {
+    signupMutation.mutate(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onSuccess: () => onSuccess?.(),
+      }
+    )
   }
 
   return (
@@ -104,7 +91,12 @@ export function SignUpForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={isLoading}>
+        <Button className='mt-2' disabled={signupMutation.isPending}>
+          {signupMutation.isPending ? (
+            <Loader2 className='animate-spin' />
+          ) : (
+            <UserPlus className='h-4 w-4' />
+          )}
           Create Account
         </Button>
 
@@ -119,25 +111,7 @@ export function SignUpForm({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-2'>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={isLoading}
-          >
-            <Github className='h-4 w-4' />
-            GitHub
-          </Button>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={isLoading}
-          >
-            <Linkedin className='h-4 w-4' /> Linkedin
-          </Button>
-        </div>
+        <OAuthButtons disabled={signupMutation.isPending} />
       </form>
     </Form>
   )

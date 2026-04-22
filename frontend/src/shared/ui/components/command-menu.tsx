@@ -1,9 +1,9 @@
 import React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
+import { sidebarData } from '@/widgets/layout/ui/data/sidebar-data'
 import { useSearch } from '@/app/context/search-provider'
 import { useTheme } from '@/app/context/theme-provider'
-import { sidebarData } from './layout/data/sidebar-data'
 import {
   CommandDialog,
   CommandEmpty,
@@ -53,7 +53,7 @@ export function CommandMenu() {
                     </CommandItem>
                   )
 
-                return navItem.items?.map((subItem, i) => (
+                return navItem.items?.map((subItem, i: number) => (
                   <CommandItem
                     key={`${navItem.title}-${subItem.url}-${i}`}
                     value={`${navItem.title}-${subItem.url}`}

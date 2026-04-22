@@ -8,7 +8,6 @@ import {
   Sparkles,
 } from 'lucide-react'
 import useDialogState from '@/shared/hooks/use-dialog-state'
-import { SignOutDialog } from '@/shared/ui/components/sign-out-dialog'
 import {
   Avatar,
   AvatarFallback,
@@ -29,6 +28,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/components/ui/sidebar'
+import { SignOutDialog } from '@/features/auth'
 
 type NavUserProps = {
   user: {
