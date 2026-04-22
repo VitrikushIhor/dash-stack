@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { Github, Linkedin, Loader2, LogIn } from 'lucide-react'
+import { Loader2, LogIn } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { PasswordInput } from '@/shared/ui/components/password-input'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -20,6 +20,7 @@ import {
   signInSchema,
   type TSignInSchema,
 } from '../model/schema/sing-in.schema'
+import { OAuthButtons } from './oauth-buttons'
 
 interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
@@ -102,25 +103,7 @@ export function SignInForm({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-2'>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={loginMutation.isPending}
-          >
-            <Github className='h-4 w-4' />
-            GitHub
-          </Button>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={loginMutation.isPending}
-          >
-            <Linkedin className='h-4 w-4' /> Linkedin
-          </Button>
-        </div>
+        <OAuthButtons disabled={loginMutation.isPending} />
       </form>
     </Form>
   )

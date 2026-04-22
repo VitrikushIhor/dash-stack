@@ -1,3 +1,4 @@
+import type { Task } from '@/entities/task/model/types'
 import {
   CalendarAgendaView,
   CalendarDayView,
@@ -5,8 +6,8 @@ import {
   CalendarWeekView,
   CalendarYearView,
   useCalendar,
-  type Task,
 } from '@/features/event-calendar'
+import { type IEvent } from '@/features/event-calendar/model/interfaces'
 
 interface CalendarViewProps {
   events: Task[]
@@ -21,9 +22,28 @@ export function CalendarView({ events }: CalendarViewProps) {
     return event.assignedMembers?.some((member) => member.id === selectedUserId)
   })
 
+  const mappedEvents: IEvent[] = filteredEvents.map((task, index) => {
+    const user = task.assignedMembers?.[0]
+    return {
+      id: parseInt(task.id) || index,
+      startDate: task.deadline || new Date().toISOString(),
+      endDate: task.deadline || new Date().toISOString(),
+      title: task.title,
+      color: 'blue',
+      description: task.description || '',
+      user: user
+        ? {
+            id: user.id,
+            name: `${user.first_name} ${user.last_name}`,
+            picturePath: user.avatar,
+          }
+        : { id: 'unknown', name: 'Unassigned', picturePath: null },
+    }
+  })
+
   // Tasks only have deadline, so all are single-day events
-  const singleDayEvents = filteredEvents
-  const multiDayEvents: Task[] = []
+  const singleDayEvents = mappedEvents
+  const multiDayEvents: IEvent[] = []
 
   return (
     <div className='bg-card rounded-xl border p-4 shadow-sm'>
@@ -45,7 +65,7 @@ export function CalendarView({ events }: CalendarViewProps) {
           multiDayEvents={multiDayEvents}
         />
       )}
-      {view === 'year' && <CalendarYearView allEvents={filteredEvents} />}
+      {view === 'year' && <CalendarYearView allEvents={mappedEvents} />}
       {view === 'agenda' && (
         <CalendarAgendaView
           multiDayEvents={multiDayEvents}

@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Github, Linkedin, Loader2, UserPlus } from 'lucide-react'
+import { Loader2, UserPlus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { PasswordInput } from '@/shared/ui/components/password-input'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -15,10 +15,11 @@ import {
 import { Input } from '@/shared/ui/components/ui/input'
 import { useSignup } from '../api'
 import {
-  signupSchema,
-  type TSignupSchema,
-  singUpDefaultValues,
-} from '../model/schema/singup.schema'
+  signUpDefaultValues,
+  signUpSchema,
+  type TSignUpSchema,
+} from '../model/schema/sing-up.schema'
+import { OAuthButtons } from './oauth-buttons'
 
 export function SignUpForm({
   className,
@@ -27,12 +28,12 @@ export function SignUpForm({
 }: React.HTMLAttributes<HTMLFormElement> & { onSuccess?: () => void }) {
   const signupMutation = useSignup()
 
-  const form = useForm<TSignupSchema>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: singUpDefaultValues,
+  const form = useForm<TSignUpSchema>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: signUpDefaultValues,
   })
 
-  function onSubmit(data: TSignupSchema) {
+  function onSubmit(data: TSignUpSchema) {
     signupMutation.mutate(
       {
         email: data.email,
@@ -110,25 +111,7 @@ export function SignUpForm({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-2'>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={signupMutation.isPending}
-          >
-            <Github className='h-4 w-4' />
-            GitHub
-          </Button>
-          <Button
-            variant='outline'
-            className='w-full'
-            type='button'
-            disabled={signupMutation.isPending}
-          >
-            <Linkedin className='h-4 w-4' /> Linkedin
-          </Button>
-        </div>
+        <OAuthButtons disabled={signupMutation.isPending} />
       </form>
     </Form>
   )

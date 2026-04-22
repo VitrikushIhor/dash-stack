@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export const signupSchema = z
+export const signUpSchema = z
   .object({
     email: z.email({
       error: (iss) =>
@@ -17,10 +17,10 @@ export const signupSchema = z
     path: ['confirmPassword'],
   })
 
-export const singUpDefaultValues = {
+export const signUpDefaultValues = {
   email: '',
   password: '',
   confirmPassword: '',
 }
 
-export type TSignupSchema = z.infer<typeof signupSchema>
+export type TSignUpSchema = z.infer<typeof signUpSchema>

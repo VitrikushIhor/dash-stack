@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './app/routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './app/routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './app/routes/_authenticated/index'
+import { Route as OauthCallbackRouteImport } from './app/routes/oauth/callback'
 import { Route as AuthenticatedCalendarRouteImport } from './app/routes/_authenticated/calendar'
 import { Route as errors503RouteImport } from './app/routes/(errors)/503'
 import { Route as errors500RouteImport } from './app/routes/(errors)/500'
@@ -21,7 +22,6 @@ import { Route as authVerifyEmailRouteImport } from './app/routes/(auth)/verify-
 import { Route as authSignUpRouteImport } from './app/routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './app/routes/(auth)/sign-in'
 import { Route as authResetPasswordRouteImport } from './app/routes/(auth)/reset-password'
-import { Route as authOtpRouteImport } from './app/routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './app/routes/(auth)/forgot-password'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/routes/_authenticated/settings/route'
 import { Route as AuthenticatedTeamIndexRouteImport } from './app/routes/_authenticated/team/index'
@@ -41,6 +41,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   id: '/calendar',
@@ -90,11 +95,6 @@ const authSignInRoute = authSignInRouteImport.update({
 const authResetPasswordRoute = authResetPasswordRouteImport.update({
   id: '/(auth)/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const authOtpRoute = authOtpRouteImport.update({
-  id: '/(auth)/otp',
-  path: '/otp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
@@ -159,7 +159,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
-  '/otp': typeof authOtpRoute
   '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
@@ -170,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -181,7 +181,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
-  '/otp': typeof authOtpRoute
   '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
@@ -192,6 +191,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -207,7 +207,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
-  '/(auth)/otp': typeof authOtpRoute
   '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
@@ -218,6 +217,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -234,7 +234,6 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/forgot-password'
-    | '/otp'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -245,6 +244,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
+    | '/oauth/callback'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -256,7 +256,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
-    | '/otp'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -267,6 +266,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
+    | '/oauth/callback'
     | '/'
     | '/errors/$error'
     | '/settings/account'
@@ -281,7 +281,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/settings'
     | '/(auth)/forgot-password'
-    | '/(auth)/otp'
     | '/(auth)/reset-password'
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
@@ -292,6 +291,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/calendar'
+    | '/oauth/callback'
     | '/_authenticated/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
@@ -306,7 +306,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
-  authOtpRoute: typeof authOtpRoute
   authResetPasswordRoute: typeof authResetPasswordRoute
   authSignInRoute: typeof authSignInRoute
   authSignUpRoute: typeof authSignUpRoute
@@ -316,6 +315,7 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
+  OauthCallbackRoute: typeof OauthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -333,6 +333,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/calendar': {
       id: '/_authenticated/calendar'
@@ -402,13 +409,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof authResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)/otp': {
-      id: '/(auth)/otp'
-      path: '/otp'
-      fullPath: '/otp'
-      preLoaderRoute: typeof authOtpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/forgot-password': {
@@ -531,7 +531,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
-  authOtpRoute: authOtpRoute,
   authResetPasswordRoute: authResetPasswordRoute,
   authSignInRoute: authSignInRoute,
   authSignUpRoute: authSignUpRoute,
@@ -541,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
+  OauthCallbackRoute: OauthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

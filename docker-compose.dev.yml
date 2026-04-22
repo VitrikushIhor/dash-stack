@@ -43,7 +43,7 @@ services:
       - /app/node_modules
     environment:
       PORT: 8000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-test}?schema=${DB_SCHEMA:-blog}&sslmode=disable
+      DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-test}?schema=${DB_SCHEMA:-public}&sslmode=disable
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-nestjsPrismaAccessSecret}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-nestjsPrismaRefreshSecret}
       JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-15m}

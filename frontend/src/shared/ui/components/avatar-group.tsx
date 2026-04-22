@@ -11,10 +11,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
-import { type TeamMember } from '@/entities/team'
 
 interface AvatarGroupProps {
-  members: TeamMember[]
+  members: Array<{
+    id: string
+    avatar?: string
+    first_name: string
+    last_name: string
+  }>
   max?: number
   size?: 'm' | 'sm' | 'md' | 'lg'
   className?: string
