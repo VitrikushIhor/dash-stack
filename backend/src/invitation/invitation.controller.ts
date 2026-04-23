@@ -3,8 +3,8 @@ import {
   Get,
   Post,
   Delete,
-  Body,
   Param,
+  Body,
   UseGuards,
 } from '@nestjs/common';
 import { InvitationService } from './services/invitation.service';
@@ -17,11 +17,11 @@ import {
 import { OrgRole, User } from '@prisma/client';
 import { UserEntity } from '../common/decorators/user.decorator';
 
-@Controller()
+@Controller('organizations/:orgId/invitations')
 export class InvitationController {
   constructor(private readonly invitationService: InvitationService) {}
 
-  @Post('organizations/:orgId/invitations')
+  @Post()
   @UseGuards(JwtAuthGuard, MembershipRoleGuard)
   @RequireOrgRole(OrgRole.ADMIN)
   sendInvite(
@@ -32,23 +32,17 @@ export class InvitationController {
     return this.invitationService.sendInvite(orgId, user.id, dto);
   }
 
-  @Get('organizations/:orgId/invitations')
+  @Get()
   @UseGuards(JwtAuthGuard, MembershipRoleGuard)
   @RequireOrgRole(OrgRole.ADMIN)
   listPending(@Param('orgId') orgId: string) {
     return this.invitationService.listPending(orgId);
   }
 
-  @Delete('organizations/:orgId/invitations/:id')
+  @Delete(':id')
   @UseGuards(JwtAuthGuard, MembershipRoleGuard)
   @RequireOrgRole(OrgRole.ADMIN)
   revokeInvite(@Param('orgId') orgId: string, @Param('id') id: string) {
     return this.invitationService.revokeInvite(id, orgId);
-  }
-
-  @Post('invitations/:token/accept')
-  @UseGuards(JwtAuthGuard)
-  acceptInvite(@Param('token') token: string, @UserEntity() user: User) {
-    return this.invitationService.acceptInvite(token, user.id);
   }
 }

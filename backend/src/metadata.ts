@@ -143,9 +143,12 @@ export default async () => {
               sendInvite: {},
               listPending: {},
               revokeInvite: {},
-              acceptInvite: {},
             },
           },
+        ],
+        [
+          import('./invitation/invitation-accept.controller'),
+          { InvitationAcceptController: { acceptInvite: {} } },
         ],
       ],
     },

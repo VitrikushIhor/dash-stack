@@ -16,6 +16,17 @@ export class InvitationRepository {
     });
   }
 
+  async findPendingByEmailAndOrg(email: string, orgId: string) {
+    return this.prisma.invitation.findFirst({
+      where: {
+        email,
+        orgId,
+        acceptedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+    });
+  }
+
   async findOrgById(id: string) {
     return this.prisma.organization.findUnique({
       where: { id },
@@ -48,6 +59,18 @@ export class InvitationRepository {
     role: OrgRole,
   ) {
     return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.membership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      });
+
+      if (existing) {
+        await tx.invitation.update({
+          where: { id: invitationId },
+          data: { acceptedAt: new Date() },
+        });
+        return existing;
+      }
+
       const membership = await tx.membership.create({
         data: {
           userId,

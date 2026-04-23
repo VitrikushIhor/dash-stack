@@ -26,6 +26,12 @@ export class OrganizationRepository {
           },
         },
       },
+      include: {
+        memberships: {
+          where: { userId },
+          select: { role: true, id: true },
+        },
+      },
     });
   }
 

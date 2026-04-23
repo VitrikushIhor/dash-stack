@@ -28,6 +28,14 @@ export class InvitationService {
       );
     }
 
+    const pendingInvite = await this.repository.findPendingByEmailAndOrg(
+      email,
+      orgId,
+    );
+    if (pendingInvite) {
+      throw new ConflictException('Invitation already sent to this email');
+    }
+
     const org = await this.repository.findOrgById(orgId);
     if (!org) {
       throw new NotFoundException('Organization not found');
