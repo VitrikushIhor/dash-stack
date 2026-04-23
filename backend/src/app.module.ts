@@ -14,9 +14,7 @@ import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { OrganizationModule } from './organization/organization.module';
 import { InvitationModule } from './invitation/invitation.module';
-import { MembershipMiddleware } from './common/middleware/membership.middleware';
 import config from './common/configs/config';
-import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -104,8 +102,4 @@ import { NestModule, MiddlewareConsumer } from '@nestjs/common';
     },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(MembershipMiddleware).forRoutes('organizations/:orgId*');
-  }
-}
+export class AppModule {}

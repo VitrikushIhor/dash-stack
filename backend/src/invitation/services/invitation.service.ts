@@ -57,11 +57,17 @@ export class InvitationService {
     return invitation;
   }
 
-  async acceptInvite(token: string, userId: string) {
+  async acceptInvite(token: string, userId: string, userEmail: string) {
     const invitation = await this.repository.findByToken(token);
 
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
+    }
+
+    if (invitation.email !== userEmail) {
+      throw new BadRequestException(
+        'This invitation was sent to a different email address',
+      );
     }
 
     if (invitation.acceptedAt) {

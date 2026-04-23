@@ -8,11 +8,13 @@ export class OrganizationService {
   constructor(private readonly repository: OrganizationRepository) {}
 
   async create(userId: string, dto: CreateOrganizationDto) {
-    return this.repository.create(userId, dto);
+    const org = await this.repository.create(userId, dto);
+    return this.mapOrganization(org);
   }
 
   async findAllForUser(userId: string) {
-    return this.repository.findAllForUser(userId);
+    const orgs = await this.repository.findAllForUser(userId);
+    return orgs.map((org) => this.mapOrganization(org));
   }
 
   async findById(orgId: string) {
@@ -20,14 +22,30 @@ export class OrganizationService {
     if (!org) {
       throw new NotFoundException(`Organization with ID ${orgId} not found`);
     }
-    return org;
+    return this.mapOrganization(org);
   }
 
   async update(orgId: string, dto: UpdateOrganizationDto) {
-    return this.repository.update(orgId, dto);
+    const org = await this.repository.update(orgId, dto);
+    return this.mapOrganization(org);
   }
 
   async delete(orgId: string) {
     return this.repository.delete(orgId);
+  }
+
+  private mapOrganization(org: any) {
+    if (!org) return null;
+    const { _count, ...rest } = org;
+    return {
+      ...rest,
+      stats: _count
+        ? {
+            members: _count.memberships,
+            projects: _count.projects,
+            events: _count.calendarEvents,
+          }
+        : undefined,
+    };
   }
 }

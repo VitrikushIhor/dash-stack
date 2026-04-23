@@ -30,6 +30,11 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
+          title: 'Organizations',
+          url: '/organizations',
+          icon: UsersRound,
+        },
+        {
           title: 'Team',
           url: '/team',
           icon: UsersRound,

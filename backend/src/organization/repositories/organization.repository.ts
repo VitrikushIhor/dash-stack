@@ -49,6 +49,7 @@ export class OrganizationRepository {
           select: {
             projects: true,
             memberships: true,
+            calendarEvents: true,
           },
         },
       },
@@ -59,6 +60,13 @@ export class OrganizationRepository {
     return this.prisma.organization.findUnique({
       where: { id },
       include: {
+        _count: {
+          select: {
+            memberships: true,
+            projects: true,
+            calendarEvents: true,
+          },
+        },
         memberships: {
           include: {
             user: {

@@ -11,6 +11,6 @@ export class InvitationAcceptController {
   @Post(':token/accept')
   @UseGuards(JwtAuthGuard)
   acceptInvite(@Param('token') token: string, @UserEntity() user: User) {
-    return this.invitationService.acceptInvite(token, user.id);
+    return this.invitationService.acceptInvite(token, user.id, user.email);
   }
 }
