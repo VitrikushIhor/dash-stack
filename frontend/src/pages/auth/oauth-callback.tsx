@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Loader2 } from 'lucide-react'
-import { authApi } from '@/shared/api'
+import { authApi, clearTokens } from '@/shared/api'
 import { authKeys } from '@/features/auth'
 
 export function OAuthCallback() {
@@ -19,6 +19,8 @@ export function OAuthCallback() {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('Auth0 error:', error)
+        clearTokens()
+        queryClient.removeQueries({ queryKey: authKeys.user })
         navigate({ to: '/sign-in', replace: true })
         return
       }
@@ -39,6 +41,8 @@ export function OAuthCallback() {
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error('Failed to exchange token:', err)
+          clearTokens()
+          queryClient.removeQueries({ queryKey: authKeys.user })
           navigate({ to: '/sign-in', replace: true })
         }
       } else if (!isLoading && !isAuthenticated) {
