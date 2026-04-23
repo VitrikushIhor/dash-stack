@@ -95,6 +95,7 @@ model Organization {
   memberships    Membership[]
   projects       Project[]
   calendarEvents CalendarEvent[]
+  invitations    Invitation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -114,6 +115,25 @@ model Membership {
   @@unique([userId, orgId])
   @@index([userId])
   @@index([orgId])
+}
+
+model Invitation {
+  id         String    @id @default(cuid())
+  email      String
+  orgId      String
+  role       OrgRole   @default(MEMBER)
+  token      String    @unique @default(cuid())
+  expiresAt  DateTime
+  invitedBy  String
+  acceptedAt DateTime?
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([orgId])
+  @@index([token])
 }
 
 enum OrgRole {

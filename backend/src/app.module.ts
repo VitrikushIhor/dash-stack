@@ -12,7 +12,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
+import { OrganizationModule } from './organization/organization.module';
+import { InvitationModule } from './invitation/invitation.module';
+import { MembershipMiddleware } from './common/middleware/membership.middleware';
 import config from './common/configs/config';
+import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -88,6 +92,8 @@ import config from './common/configs/config';
     UsersModule,
     HealthModule,
     EmailModule,
+    OrganizationModule,
+    InvitationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -98,4 +104,8 @@ import config from './common/configs/config';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MembershipMiddleware).forRoutes('organizations/:orgId*');
+  }
+}

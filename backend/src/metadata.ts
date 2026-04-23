@@ -1,5 +1,153 @@
 /* eslint-disable */
 export default async () => {
-    const t = {};
-    return { "@nestjs/swagger/plugin": { "models": [[import("./auth/dto/verify-email.dto"), { "VerifyEmailDto": { token: { required: true, type: () => String } } }], [import("./auth/dto/forgot-password.dto"), { "ForgotPasswordDto": { email: { required: true, type: () => String, format: "email" } } }], [import("./auth/dto/reset-password.dto"), { "ResetPasswordDto": { token: { required: true, type: () => String }, password: { required: true, type: () => String, minLength: 8 } } }], [import("./auth/dto/logout.dto"), { "LogoutDto": { refreshToken: { required: true, type: () => String } } }], [import("./auth/dto/oauth-exchange.dto"), { "OAuthExchangeDto": { token: { required: true, type: () => String } } }], [import("./common/pagination/pagination.dto"), { "PaginationDto": { page: { required: false, type: () => Number, default: 1, minimum: 1 }, perPage: { required: false, type: () => Number, default: 10, minimum: 1, maximum: 100 } } }]], "controllers": [[import("./app.controller"), { "AppController": { "getHello": { type: String }, "helloWorld": { type: String } } }], [import("./health/health.controller"), { "HealthController": { "check": { type: Object } } }], [import("./auth/auth.controller"), { "AuthController": { "signup": {}, "verifyEmail": { type: Object }, "login": { type: Object }, "refreshToken": {}, "logout": {}, "logoutAll": {}, "forgotPassword": {}, "resetPassword": {}, "me": { type: Object }, "oauthExchange": { type: Object } } }]] } };
+  const t = {};
+  return {
+    '@nestjs/swagger/plugin': {
+      models: [
+        [
+          import('./auth/dto/verify-email.dto'),
+          { VerifyEmailDto: { token: { required: true, type: () => String } } },
+        ],
+        [
+          import('./auth/dto/forgot-password.dto'),
+          {
+            ForgotPasswordDto: {
+              email: { required: true, type: () => String, format: 'email' },
+            },
+          },
+        ],
+        [
+          import('./auth/dto/reset-password.dto'),
+          {
+            ResetPasswordDto: {
+              token: { required: true, type: () => String },
+              password: { required: true, type: () => String, minLength: 8 },
+            },
+          },
+        ],
+        [
+          import('./auth/dto/logout.dto'),
+          {
+            LogoutDto: { refreshToken: { required: true, type: () => String } },
+          },
+        ],
+        [
+          import('./auth/dto/oauth-exchange.dto'),
+          {
+            OAuthExchangeDto: { token: { required: true, type: () => String } },
+          },
+        ],
+        [
+          import('./organization/dto/create-organization.dto'),
+          {
+            CreateOrganizationDto: {
+              name: {
+                required: true,
+                type: () => String,
+                minLength: 2,
+                maxLength: 50,
+              },
+              description: {
+                required: false,
+                type: () => String,
+                maxLength: 200,
+              },
+            },
+          },
+        ],
+        [
+          import('./organization/dto/update-organization.dto'),
+          {
+            UpdateOrganizationDto: {
+              logo: { required: false, type: () => String, format: 'uri' },
+            },
+          },
+        ],
+        [
+          import('./invitation/dto/create-invitation.dto'),
+          {
+            CreateInvitationDto: {
+              email: { required: true, type: () => String, format: 'email' },
+              role: { required: true, type: () => Object },
+            },
+          },
+        ],
+        [
+          import('./common/pagination/pagination.dto'),
+          {
+            PaginationDto: {
+              page: {
+                required: false,
+                type: () => Number,
+                default: 1,
+                minimum: 1,
+              },
+              perPage: {
+                required: false,
+                type: () => Number,
+                default: 10,
+                minimum: 1,
+                maximum: 100,
+              },
+            },
+          },
+        ],
+      ],
+      controllers: [
+        [
+          import('./app.controller'),
+          {
+            AppController: {
+              getHello: { type: String },
+              helloWorld: { type: String },
+            },
+          },
+        ],
+        [
+          import('./health/health.controller'),
+          { HealthController: { check: { type: Object } } },
+        ],
+        [
+          import('./auth/auth.controller'),
+          {
+            AuthController: {
+              signup: {},
+              verifyEmail: { type: Object },
+              login: { type: Object },
+              refreshToken: {},
+              logout: {},
+              logoutAll: {},
+              forgotPassword: {},
+              resetPassword: {},
+              me: { type: Object },
+              oauthExchange: { type: Object },
+            },
+          },
+        ],
+        [
+          import('./organization/organization.controller'),
+          {
+            OrganizationController: {
+              create: {},
+              findAllForUser: { type: [Object] },
+              findById: { type: Object },
+              update: {},
+              delete: {},
+            },
+          },
+        ],
+        [
+          import('./invitation/invitation.controller'),
+          {
+            InvitationController: {
+              sendInvite: {},
+              listPending: {},
+              revokeInvite: {},
+              acceptInvite: {},
+            },
+          },
+        ],
+      ],
+    },
+  };
 };
