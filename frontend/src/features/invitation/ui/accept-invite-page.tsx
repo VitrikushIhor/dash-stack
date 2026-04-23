@@ -13,6 +13,8 @@ interface AcceptInvitePageProps {
   token: string
 }
 
+const REDIRECT_DELAY = 2000
+
 export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
   const { mutate: acceptInvite, isPending, isError, error } = useAcceptInvite()
   const navigate = useNavigate()
@@ -24,7 +26,7 @@ export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
           // Redirect to organizations list after success
           setTimeout(() => {
             navigate({ to: '/organizations' })
-          }, 2000)
+          }, REDIRECT_DELAY)
         },
       })
     }

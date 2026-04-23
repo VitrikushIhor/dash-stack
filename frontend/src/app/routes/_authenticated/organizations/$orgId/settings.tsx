@@ -24,8 +24,10 @@ function OrganizationSettingsPage() {
   const { orgId } = useParams({
     from: '/_authenticated/organizations/$orgId/settings',
   })
-  const { data: organization, isLoading: isOrgLoading } =
-    useGetOrganization(orgId)
+  const { data: organization, isLoading: isOrgLoading } = useGetOrganization(
+    orgId,
+    { staleTime: Infinity }
+  )
   const {
     canManage,
     isOwner,

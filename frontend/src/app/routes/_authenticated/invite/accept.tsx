@@ -6,7 +6,7 @@ const acceptInviteSearchSchema = z.object({
   token: z.string().optional(),
 })
 
-export const Route = createFileRoute('/invite/accept')({
+export const Route = createFileRoute('/_authenticated/invite/accept')({
   validateSearch: (search) => acceptInviteSearchSchema.parse(search),
   component: AcceptInviteRoute,
 })

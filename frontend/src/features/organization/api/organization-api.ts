@@ -16,5 +16,6 @@ export const organizationApi = {
   update: ({ orgId, dto }: { orgId: string; dto: UpdateOrganizationDto }) =>
     api.patch<Organization>(`/organizations/${orgId}`, dto),
 
-  delete: (orgId: string) => api.delete(`/organizations/${orgId}`),
+  delete: (orgId: string) =>
+    api.delete<{ message: string }>(`/organizations/${orgId}`),
 }

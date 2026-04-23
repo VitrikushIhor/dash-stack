@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './app/routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './app/routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './app/routes/_authenticated/index'
 import { Route as OauthCallbackRouteImport } from './app/routes/oauth/callback'
-import { Route as InviteAcceptRouteImport } from './app/routes/invite/accept'
 import { Route as AuthenticatedCalendarRouteImport } from './app/routes/_authenticated/calendar'
 import { Route as errors503RouteImport } from './app/routes/(errors)/503'
 import { Route as errors500RouteImport } from './app/routes/(errors)/500'
@@ -33,6 +32,7 @@ import { Route as AuthenticatedSettingsNotificationsRouteImport } from './app/ro
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './app/routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './app/routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/routes/_authenticated/settings/account'
+import { Route as AuthenticatedInviteAcceptRouteImport } from './app/routes/_authenticated/invite/accept'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './app/routes/_authenticated/errors/$error'
 import { Route as AuthenticatedOrganizationsOrgIdRouteRouteImport } from './app/routes/_authenticated/organizations/$orgId/route'
 import { Route as AuthenticatedOrganizationsOrgIdIndexRouteImport } from './app/routes/_authenticated/organizations/$orgId/index'
@@ -51,11 +51,6 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
   id: '/oauth/callback',
   path: '/oauth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InviteAcceptRoute = InviteAcceptRouteImport.update({
-  id: '/invite/accept',
-  path: '/invite/accept',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -165,6 +160,12 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedInviteAcceptRoute =
+  AuthenticatedInviteAcceptRouteImport.update({
+    id: '/invite/accept',
+    path: '/invite/accept',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -210,10 +211,10 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
-  '/invite/accept': typeof InviteAcceptRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -238,10 +239,10 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
-  '/invite/accept': typeof InviteAcceptRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -269,11 +270,11 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
-  '/invite/accept': typeof InviteAcceptRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -302,10 +303,10 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
-    | '/invite/accept'
     | '/oauth/callback'
     | '/organizations/$orgId'
     | '/errors/$error'
+    | '/invite/accept'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -330,10 +331,10 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
-    | '/invite/accept'
     | '/oauth/callback'
     | '/'
     | '/errors/$error'
+    | '/invite/accept'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -360,11 +361,11 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/calendar'
-    | '/invite/accept'
     | '/oauth/callback'
     | '/_authenticated/'
     | '/_authenticated/organizations/$orgId'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/invite/accept'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
@@ -390,7 +391,6 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
-  InviteAcceptRoute: typeof InviteAcceptRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
 }
 
@@ -415,13 +415,6 @@ declare module '@tanstack/react-router' {
       path: '/oauth/callback'
       fullPath: '/oauth/callback'
       preLoaderRoute: typeof OauthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/invite/accept': {
-      id: '/invite/accept'
-      path: '/invite/accept'
-      fullPath: '/invite/accept'
-      preLoaderRoute: typeof InviteAcceptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/calendar': {
@@ -564,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/invite/accept': {
+      id: '/_authenticated/invite/accept'
+      path: '/invite/accept'
+      fullPath: '/invite/accept'
+      preLoaderRoute: typeof AuthenticatedInviteAcceptRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -652,6 +652,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedOrganizationsOrgIdRouteRoute: typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedInviteAcceptRoute: typeof AuthenticatedInviteAcceptRoute
   AuthenticatedOrganizationsIndexRoute: typeof AuthenticatedOrganizationsIndexRoute
   AuthenticatedTaskIndexRoute: typeof AuthenticatedTaskIndexRoute
   AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
@@ -664,6 +665,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrganizationsOrgIdRouteRoute:
     AuthenticatedOrganizationsOrgIdRouteRouteWithChildren,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedInviteAcceptRoute: AuthenticatedInviteAcceptRoute,
   AuthenticatedOrganizationsIndexRoute: AuthenticatedOrganizationsIndexRoute,
   AuthenticatedTaskIndexRoute: AuthenticatedTaskIndexRoute,
   AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
@@ -684,7 +686,6 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
-  InviteAcceptRoute: InviteAcceptRoute,
   OauthCallbackRoute: OauthCallbackRoute,
 }
 export const routeTree = rootRouteImport

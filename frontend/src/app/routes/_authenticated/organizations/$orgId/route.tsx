@@ -29,7 +29,9 @@ export const Route = createFileRoute('/_authenticated/organizations/$orgId')({
 
 function OrganizationLayout() {
   const { orgId } = useParams({ from: '/_authenticated/organizations/$orgId' })
-  const { data: organization, isLoading } = useGetOrganization(orgId)
+  const { data: organization, isLoading } = useGetOrganization(orgId, {
+    staleTime: Infinity,
+  })
 
   if (isLoading) {
     return (
@@ -82,7 +84,11 @@ function OrganizationLayout() {
       <Main>
         <div className='mb-8 flex items-center gap-4'>
           {organization.logo ? (
-            <img src={organization.logo} className='h-12 w-12 rounded-xl' />
+            <img
+              src={organization.logo}
+              alt={organization.name}
+              className='h-12 w-12 rounded-xl object-cover'
+            />
           ) : (
             <div className='bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl text-xl font-bold'>
               {organization.name.charAt(0).toUpperCase()}

@@ -1,4 +1,6 @@
+import { QUERY_KEYS } from '@/shared/api/query-keys'
+
 export const invitationKeys = {
-  all: ['invitations'] as const,
+  all: [QUERY_KEYS.INVITATIONS] as const,
   orgList: (orgId: string) => [...invitationKeys.all, 'org', orgId] as const,
 }

@@ -1,9 +1,6 @@
-export enum OrgRole {
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
-  GUEST = 'GUEST',
-}
+import { OrgRole } from '@/shared/model/types/org-role'
+
+export { OrgRole }
 
 export type TeamPosition =
   | 'PRODUCT_MANAGER'
