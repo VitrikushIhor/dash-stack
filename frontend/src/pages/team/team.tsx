@@ -4,7 +4,6 @@ import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Button } from '@/shared/ui/components/ui/button'
 import { useMemberStore, AddMemberDialog, TeamGrid } from '@/features/team'
-import { sidebarData } from '@/widgets/layout/ui/data/sidebar-data'
 import { Header } from '@/widgets/layout/ui/header'
 import { Main } from '@/widgets/layout/ui/main'
 import { NavUser } from '@/widgets/layout/ui/nav-user'
@@ -20,7 +19,7 @@ export function TeamPage() {
         <div className='ms-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <ConfigDrawer />
-          <NavUser user={sidebarData.user} />
+          <NavUser />
         </div>
       </Header>
 

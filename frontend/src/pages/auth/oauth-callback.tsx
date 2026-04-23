@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Loader2 } from 'lucide-react'
-import { setTokens } from '@/shared/api'
+import { authApi } from '@/shared/api'
 import { authKeys } from '@/features/auth'
 
 export function OAuthCallback() {
@@ -26,19 +26,19 @@ export function OAuthCallback() {
       if (isAuthenticated && user) {
         try {
           // Get Auth0 access token
-          const accessToken = await getAccessTokenSilently()
+          const auth0Token = await getAccessTokenSilently()
 
-          // Store token (no refresh token from Auth0 SPA SDK)
-          setTokens(accessToken, '')
+          // Exchange Auth0 token for our own JWT via backend
+          await authApi.oauthExchange(auth0Token)
 
-          // Invalidate user query
+          // Invalidate user query to fetch fresh user data
           await queryClient.invalidateQueries({ queryKey: authKeys.user })
 
           // Redirect to dashboard
           navigate({ to: '/', replace: true })
         } catch (err) {
           // eslint-disable-next-line no-console
-          console.error('Failed to get token:', err)
+          console.error('Failed to exchange token:', err)
           navigate({ to: '/sign-in', replace: true })
         }
       } else if (!isLoading && !isAuthenticated) {
