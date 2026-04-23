@@ -7,7 +7,6 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react'
-import useDialogState from '@/shared/hooks/use-dialog-state'
 import {
   Avatar,
   AvatarFallback,
@@ -28,101 +27,120 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/components/ui/sidebar'
-import { SignOutDialog } from '@/features/auth'
+import { useCurrentUser, useLogout } from '@/features/auth'
 
-type NavUserProps = {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
+function getUserInitials(
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string
+) {
+  if (firstName && lastName)
+    return `${firstName[0]}${lastName[0]}`.toUpperCase()
+  if (firstName) return firstName.slice(0, 2).toUpperCase()
+  if (email) return email.slice(0, 2).toUpperCase()
+  return 'U'
 }
 
-export function NavUser({ user }: NavUserProps) {
+export function NavUser() {
   const { isMobile } = useSidebar()
-  const [open, setOpen] = useDialogState()
+  const { data: user } = useCurrentUser()
+  const logoutMutation = useLogout()
+
+  const displayName =
+    user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user?.firstName || user?.email || 'User'
+
+  const initials = getUserInitials(user?.firstName, user?.lastName, user?.email)
 
   return (
-    <>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
-              >
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size='lg'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+            >
+              <Avatar className='h-8 w-8 rounded-lg'>
+                <AvatarImage
+                  src={user?.avatar ?? undefined}
+                  alt={displayName}
+                />
+                <AvatarFallback className='rounded-lg'>
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className='grid flex-1 text-start text-sm leading-tight'>
+                <span className='truncate font-semibold'>{displayName}</span>
+                <span className='truncate text-xs'>{user?.email}</span>
+              </div>
+              <ChevronsUpDown className='ms-auto size-4' />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
+            side={isMobile ? 'bottom' : 'right'}
+            align='end'
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className='p-0 font-normal'>
+              <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+                  <AvatarImage
+                    src={user?.avatar ?? undefined}
+                    alt={displayName}
+                  />
+                  <AvatarFallback className='rounded-lg'>
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-start text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
+                  <span className='truncate font-semibold'>{displayName}</span>
+                  <span className='truncate text-xs'>{user?.email}</span>
                 </div>
-                <ChevronsUpDown className='ms-auto size-4' />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
-              side={isMobile ? 'bottom' : 'right'}
-              align='end'
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className='p-0 font-normal'>
-                <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
-                  <Avatar className='h-8 w-8 rounded-lg'>
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
-                  </Avatar>
-                  <div className='grid flex-1 text-start text-sm leading-tight'>
-                    <span className='truncate font-semibold'>{user.name}</span>
-                    <span className='truncate text-xs'>{user.email}</span>
-                  </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Sparkles />
-                  Upgrade to Pro
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link to='/settings/account'>
-                    <BadgeCheck />
-                    Account
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to='/settings'>
-                    <CreditCard />
-                    Billing
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to='/settings/notifications'>
-                    <Bell />
-                    Notifications
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => setOpen(true)}
-              >
-                <LogOut />
-                Sign out
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Sparkles />
+                Upgrade to Pro
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
-
-      <SignOutDialog open={!!open} onOpenChange={setOpen} />
-    </>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link to='/settings/account'>
+                  <BadgeCheck />
+                  Account
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to='/settings'>
+                  <CreditCard />
+                  Billing
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to='/settings/notifications'>
+                  <Bell />
+                  Notifications
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant='destructive'
+              disabled={logoutMutation.isPending}
+              onClick={() => logoutMutation.mutate()}
+            >
+              <LogOut />
+              {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   )
 }

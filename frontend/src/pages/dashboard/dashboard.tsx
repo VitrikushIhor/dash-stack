@@ -15,7 +15,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/ui/components/ui/tabs'
-import { sidebarData } from '@/widgets/layout/ui/data/sidebar-data'
 import { Header } from '@/widgets/layout/ui/header'
 import { Main } from '@/widgets/layout/ui/main'
 import { NavUser } from '@/widgets/layout/ui/nav-user'
@@ -32,7 +31,7 @@ export function Dashboard() {
         <div className='ms-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <ConfigDrawer />
-          <NavUser user={sidebarData.user} />
+          <NavUser />
         </div>
       </Header>
 

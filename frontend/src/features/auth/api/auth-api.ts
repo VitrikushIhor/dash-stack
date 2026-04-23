@@ -70,6 +70,12 @@ export const authApi = {
     })
   },
 
+  oauthExchange: async (token: string): Promise<AuthTokens> => {
+    const data = await api.post<AuthTokens>('/auth/oauth/exchange', { token })
+    setTokens(data.accessToken, data.refreshToken)
+    return data
+  },
+
   getMe: (): Promise<User> => {
     return api.get<User>('/auth/me')
   },

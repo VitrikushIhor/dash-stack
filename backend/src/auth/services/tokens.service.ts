@@ -3,16 +3,18 @@ import { randomUUID } from 'crypto';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 import { Token } from '../models/token.model';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'nestjs-prisma';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
+import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class TokensService {
   constructor(
-    private configService: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenRepo: RefreshTokenRepository,
+    private readonly userRepo: UserRepository,
   ) {}
 
   public async generateTokens(
@@ -27,10 +29,7 @@ export class TokensService {
       ipAddress,
     );
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return { accessToken, refreshToken };
   }
 
   public generateAccessToken(userId: string): string {
@@ -44,19 +43,14 @@ export class TokensService {
   ): Promise<string> {
     const securityConfig = this.configService.get<SecurityConfig>('security');
     const token = randomUUID();
+    const expiresMs = this.parseExpiration(securityConfig.refreshIn);
 
-    // Parse refresh expiration (e.g., "7d" -> 7 days)
-    const expiresIn = securityConfig.refreshIn;
-    const expiresMs = this.parseExpiration(expiresIn);
-
-    await this.prisma.refreshToken.create({
-      data: {
-        userId,
-        token,
-        expiresAt: new Date(Date.now() + expiresMs),
-        userAgent,
-        ipAddress,
-      },
+    await this.refreshTokenRepo.create({
+      userId,
+      token,
+      expiresAt: new Date(Date.now() + expiresMs),
+      userAgent,
+      ipAddress,
     });
 
     return token;
@@ -67,7 +61,7 @@ export class TokensService {
     if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
       return null;
     }
-    return this.prisma.user.findUnique({ where: { id: decoded.userId } });
+    return this.userRepo.findById(decoded.userId);
   }
 
   private parseExpiration(expiration: string): number {

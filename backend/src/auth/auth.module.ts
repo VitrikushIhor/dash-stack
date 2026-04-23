@@ -10,6 +10,11 @@ import { SecurityConfig } from '../common/configs/config.interface';
 import { EmailModule } from '../email/email.module';
 import { PasswordService } from './services/password.service';
 import { TokensService } from './services/tokens.service';
+import { OAuthService } from './services/oauth.service';
+import { UserRepository } from './repositories/user.repository';
+import { AccountRepository } from './repositories/account.repository';
+import { VerificationTokenRepository } from './repositories/verification-token.repository';
+import { RefreshTokenRepository } from './repositories/refresh-token.repository';
 
 @Module({
   imports: [
@@ -30,11 +35,18 @@ import { TokensService } from './services/tokens.service';
   ],
   controllers: [AuthController],
   providers: [
+    // Services
     AuthService,
     JwtStrategy,
     JwtAuthGuard,
     PasswordService,
     TokensService,
+    OAuthService,
+    // Repositories
+    UserRepository,
+    AccountRepository,
+    VerificationTokenRepository,
+    RefreshTokenRepository,
   ],
   exports: [JwtAuthGuard, AuthService],
 })
