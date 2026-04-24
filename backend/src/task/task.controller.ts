@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { TaskService } from './services/task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -48,7 +49,8 @@ export class TaskController {
   @ApiQuery({ name: 'assigneeId', type: String, required: false })
   findAll(
     @Param('orgId') orgId: string,
-    @Query('status') status?: TaskStatus,
+    @Query('status', new ParseEnumPipe(TaskStatus, { optional: true }))
+    status?: TaskStatus,
     @Query('assigneeId') assigneeId?: string,
   ) {
     return this.taskService.findAll(orgId, { status, assigneeId });
