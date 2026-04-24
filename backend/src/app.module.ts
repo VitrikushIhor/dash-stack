@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { OrganizationModule } from './organization/organization.module';
 import { InvitationModule } from './invitation/invitation.module';
+import { TaskModule } from './task/task.module';
 import config from './common/configs/config';
 
 @Module({
@@ -92,6 +93,7 @@ import config from './common/configs/config';
     EmailModule,
     OrganizationModule,
     InvitationModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [
