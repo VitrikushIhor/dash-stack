@@ -4,7 +4,7 @@ import { organizationKeys } from '../organization-query-keys'
 
 export const useGetMembers = (orgId: string) => {
   return useQuery({
-    queryKey: organizationKeys.membersList(orgId),
+    queryKey: organizationKeys.members(orgId),
     queryFn: () => organizationApi.getMembers(orgId),
     enabled: !!orgId,
   })

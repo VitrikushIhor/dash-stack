@@ -8,7 +8,7 @@ export const useGetMember = (orgId: string, userId: string) => {
 
   // get shallow data from list cache if available
   const cachedMembers = queryClient.getQueryData<Membership[]>(
-    organizationKeys.membersList(orgId)
+    organizationKeys.members(orgId)
   )
   const initialData = cachedMembers?.find(
     (m) => m.userId === userId || m.user?.id === userId
