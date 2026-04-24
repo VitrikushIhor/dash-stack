@@ -7,6 +7,8 @@ export const organizationKeys = {
   detail: (id: string) => [...organizationKeys.details(), id] as const,
   members: (orgId: string) =>
     [...organizationKeys.detail(orgId), 'members'] as const,
+  membersList: (orgId: string) =>
+    [...organizationKeys.details(), orgId, 'members'] as const,
   member: (orgId: string, userId: string) =>
     [...organizationKeys.members(orgId), userId] as const,
 }

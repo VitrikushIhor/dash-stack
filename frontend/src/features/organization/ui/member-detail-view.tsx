@@ -20,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { Separator } from '@/shared/ui/components/ui/separator'
 import { type Membership } from '../model/types/organization.types'
 
 interface MemberDetailViewProps {
@@ -114,15 +113,6 @@ export const MemberDetailView = ({
                   {user.id}
                 </p>
               </div>
-            </div>
-
-            <Separator />
-
-            <div className='bg-muted/50 rounded-lg p-4'>
-              <p className='text-muted-foreground text-xs'>
-                Account created on{' '}
-                {new Date(membership.joinedAt).toLocaleDateString()}
-              </p>
             </div>
           </CardContent>
         </Card>

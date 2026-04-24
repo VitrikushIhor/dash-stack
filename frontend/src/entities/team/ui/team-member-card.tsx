@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Mail } from 'lucide-react'
 import { getInitials } from '@/shared/lib/utils'
+import { type Membership } from '@/shared/model/types/membership'
 import {
   formatPosition,
   getMemberDisplayName,
@@ -11,7 +12,6 @@ import {
   AvatarImage,
 } from '@/shared/ui/components/ui/avatar'
 import { Card, CardContent } from '@/shared/ui/components/ui/card'
-import { type Membership } from '@/features/organization/model/types/organization.types'
 
 interface TeamMemberCardProps {
   membership: Membership
