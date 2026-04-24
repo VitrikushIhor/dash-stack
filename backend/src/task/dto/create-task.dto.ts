@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
@@ -6,6 +6,8 @@ import {
   IsDateString,
   IsArray,
   ValidateNested,
+  IsNotEmpty,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TaskStatus } from '@prisma/client';
@@ -13,22 +15,31 @@ import { TaskStatus } from '@prisma/client';
 export class CreateTaskLabelDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   color: string;
 }
 
 export class CreateChecklistItemDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   title: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  completed?: boolean;
 }
 
 export class CreateChecklistDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty({ type: [CreateChecklistItemDto] })
@@ -41,43 +52,44 @@ export class CreateChecklistDto {
 export class CreateTaskDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ enum: TaskStatus, required: false })
+  @ApiPropertyOptional({ enum: TaskStatus })
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   deadline?: string;
 
-  @ApiProperty({ required: false, type: [String] })
+  @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   attachments?: string[];
 
-  @ApiProperty({ required: false, type: [String] })
+  @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   assigneeIds?: string[]; // These are Membership IDs
 
-  @ApiProperty({ type: [CreateTaskLabelDto], required: false })
+  @ApiPropertyOptional({ type: [CreateTaskLabelDto] })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateTaskLabelDto)
   labels?: CreateTaskLabelDto[];
 
-  @ApiProperty({ type: [CreateChecklistDto], required: false })
+  @ApiPropertyOptional({ type: [CreateChecklistDto] })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })

@@ -1,13 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { TaskRepository } from '../repositories/task.repository';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
+import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TaskService {
   constructor(private readonly repository: TaskRepository) {}
 
   async create(organizationId: string, dto: CreateTaskDto) {
+    if (dto.assigneeIds?.length) {
+      const isValid = await this.repository.validateMemberships(
+        organizationId,
+        dto.assigneeIds,
+      );
+      if (!isValid) {
+        throw new BadRequestException(
+          'One or more assigneeIds do not belong to this organization',
+        );
+      }
+    }
+
     return this.repository.create({
       ...dto,
       organizationId,
@@ -15,8 +32,11 @@ export class TaskService {
     });
   }
 
-  async findAll(organizationId: string) {
-    return this.repository.findAll(organizationId);
+  async findAll(
+    organizationId: string,
+    filters: { status?: TaskStatus; assigneeId?: string } = {},
+  ) {
+    return this.repository.findAll(organizationId, filters);
   }
 
   async findById(id: string, organizationId: string) {
@@ -28,22 +48,35 @@ export class TaskService {
   }
 
   async update(id: string, organizationId: string, dto: UpdateTaskDto) {
-    try {
-      return await this.repository.update(id, organizationId, {
-        ...dto,
-        deadline: dto.deadline ? new Date(dto.deadline) : undefined,
-      });
-    } catch (e) {
+    const task = await this.repository.findById(id, organizationId);
+    if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+
+    if (dto.assigneeIds?.length) {
+      const isValid = await this.repository.validateMemberships(
+        organizationId,
+        dto.assigneeIds,
+      );
+      if (!isValid) {
+        throw new BadRequestException(
+          'One or more assigneeIds do not belong to this organization',
+        );
+      }
+    }
+
+    return this.repository.update(id, organizationId, {
+      ...dto,
+      deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+    });
   }
 
   async delete(id: string, organizationId: string) {
-    try {
-      await this.repository.delete(id, organizationId);
-      return { message: 'Task deleted successfully' };
-    } catch (e) {
+    const task = await this.repository.findById(id, organizationId);
+    if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+
+    await this.repository.delete(id, organizationId);
   }
 }

@@ -6,7 +6,10 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { TaskService } from './services/task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -16,8 +19,13 @@ import {
   MembershipRoleGuard,
   RequireOrgRole,
 } from '../common/guards/membership-role.guard';
-import { OrgRole } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { OrgRole, TaskStatus } from '@prisma/client';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -36,8 +44,14 @@ export class TaskController {
   @Get()
   @RequireOrgRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'List all tasks for an organization' })
-  findAll(@Param('orgId') orgId: string) {
-    return this.taskService.findAll(orgId);
+  @ApiQuery({ name: 'status', enum: TaskStatus, required: false })
+  @ApiQuery({ name: 'assigneeId', type: String, required: false })
+  findAll(
+    @Param('orgId') orgId: string,
+    @Query('status') status?: TaskStatus,
+    @Query('assigneeId') assigneeId?: string,
+  ) {
+    return this.taskService.findAll(orgId, { status, assigneeId });
   }
 
   @Get(':id')
@@ -60,8 +74,9 @@ export class TaskController {
 
   @Delete(':id')
   @RequireOrgRole(OrgRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a task' })
-  delete(@Param('orgId') orgId: string, @Param('id') id: string) {
-    return this.taskService.delete(id, orgId);
+  async delete(@Param('orgId') orgId: string, @Param('id') id: string) {
+    await this.taskService.delete(id, orgId);
   }
 }

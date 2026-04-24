@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateTaskData, UpdateTaskData } from '../interfaces/task.interface';
+import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TaskRepository {
@@ -55,9 +56,17 @@ export class TaskRepository {
     });
   }
 
-  async findAll(organizationId: string) {
+  async findAll(
+    organizationId: string,
+    filters: { status?: TaskStatus; assigneeId?: string } = {},
+  ) {
+    const { status, assigneeId } = filters;
     return this.prisma.task.findMany({
-      where: { organizationId },
+      where: {
+        organizationId,
+        status,
+        assignees: assigneeId ? { some: { id: assigneeId } } : undefined,
+      },
       include: {
         assignees: {
           include: {
@@ -71,13 +80,13 @@ export class TaskRepository {
           },
         },
         labels: true,
-        _count: {
-          select: {
-            checklists: true,
+        checklists: {
+          include: {
+            items: true,
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
     });
   }
 
@@ -108,7 +117,7 @@ export class TaskRepository {
   }
 
   async update(id: string, organizationId: string, data: UpdateTaskData) {
-    const { assigneeIds, ...rest } = data;
+    const { assigneeIds, labels, checklists, ...rest } = data;
 
     return this.prisma.task.update({
       where: { id, organizationId },
@@ -117,6 +126,23 @@ export class TaskRepository {
         assignees: assigneeIds
           ? {
               set: assigneeIds.map((id) => ({ id })),
+            }
+          : undefined,
+        labels: labels
+          ? {
+              deleteMany: {},
+              create: labels,
+            }
+          : undefined,
+        checklists: checklists
+          ? {
+              deleteMany: {},
+              create: checklists.map((cl) => ({
+                name: cl.name,
+                items: {
+                  create: cl.items,
+                },
+              })),
             }
           : undefined,
       },
@@ -146,5 +172,15 @@ export class TaskRepository {
     return this.prisma.task.delete({
       where: { id, organizationId },
     });
+  }
+
+  async validateMemberships(organizationId: string, membershipIds: string[]) {
+    const count = await this.prisma.membership.count({
+      where: {
+        orgId: organizationId,
+        id: { in: membershipIds },
+      },
+    });
+    return count === membershipIds.length;
   }
 }

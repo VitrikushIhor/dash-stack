@@ -11,7 +11,7 @@ export interface CreateTaskData {
   labels?: Array<{ name: string; color: string }>;
   checklists?: Array<{
     name: string;
-    items: Array<{ title: string }>;
+    items: Array<{ title: string; completed?: boolean }>;
   }>;
 }
 
@@ -22,4 +22,9 @@ export interface UpdateTaskData {
   deadline?: Date;
   attachments?: string[];
   assigneeIds?: string[];
+  labels?: Array<{ name: string; color: string }>;
+  checklists?: Array<{
+    name: string;
+    items: Array<{ title: string; completed?: boolean }>;
+  }>;
 }
