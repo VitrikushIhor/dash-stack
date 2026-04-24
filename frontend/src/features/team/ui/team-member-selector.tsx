@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, memo } from 'react'
 import { Plus, X, UserPlus } from 'lucide-react'
 import { cn, getInitials, stringToColor } from '@/shared/lib/utils'
+import { type Membership } from '@/shared/model/types/membership'
 import {
   Avatar,
   AvatarFallback,
@@ -26,12 +27,11 @@ import {
   DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { type TeamMember } from '@/entities/team'
 
 interface TeamMemberSelectorProps {
-  selectedMembers: TeamMember[]
-  availableMembers: TeamMember[]
-  onMembersChange: (members: TeamMember[]) => void
+  selectedMembers: Membership[]
+  availableMembers: Membership[]
+  onMembersChange: (members: Membership[]) => void
   maxMembers?: number
   title?: string
   description?: string
@@ -59,8 +59,10 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
     return availableMembers.filter(
       (member) =>
         !selectedIds.has(member.id) &&
-        (member.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          member.email.toLowerCase().includes(searchQuery.toLowerCase()))
+        ((member.user?.firstName || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+          member.user?.email.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   }, [availableMembers, selectedIds, searchQuery])
 
@@ -70,7 +72,7 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
   }, [selectedMembers.length, maxMembers])
 
   const handleAddMember = useCallback(
-    (member: TeamMember) => {
+    (member: Membership) => {
       if (!canAddMore) return
       onMembersChange([...selectedMembers, member])
       setSearchQuery('')
@@ -142,25 +144,25 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
                           <Avatar
                             className='h-8 w-8'
                             style={{
-                              backgroundColor: member.avatar
-                                ? undefined
-                                : stringToColor(member.first_name),
+                              backgroundColor: stringToColor(
+                                member.user?.firstName || 'User'
+                              ),
                             }}
                           >
                             <AvatarImage
-                              src={member.avatar}
-                              alt={member.first_name}
+                              src={member.user?.avatar}
+                              alt={member.user?.firstName}
                             />
                             <AvatarFallback className='text-xs text-white'>
-                              {getInitials(member.first_name)}
+                              {getInitials(member.user?.firstName || 'User')}
                             </AvatarFallback>
                           </Avatar>
                           <div className='min-w-0 flex-1'>
                             <p className='truncate text-sm font-medium'>
-                              {member.first_name}
+                              {member.user?.firstName || 'User'}
                             </p>
                             <p className='text-muted-foreground truncate text-xs'>
-                              {member.email}
+                              {member.user?.email}
                             </p>
                           </div>
                           {member.position && (
@@ -203,22 +205,25 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
                 <Avatar
                   className='h-10 w-10'
                   style={{
-                    backgroundColor: member.avatar
-                      ? undefined
-                      : stringToColor(member.first_name),
+                    backgroundColor: stringToColor(
+                      member.user?.firstName || 'User'
+                    ),
                   }}
                 >
-                  <AvatarImage src={member.avatar} alt={member.first_name} />
+                  <AvatarImage
+                    src={member.user?.avatar}
+                    alt={member.user?.firstName}
+                  />
                   <AvatarFallback className='text-white'>
-                    {getInitials(member.first_name)}
+                    {getInitials(member.user?.firstName || 'User')}
                   </AvatarFallback>
                 </Avatar>
                 <div className='min-w-0 flex-1'>
                   <p className='truncate text-sm font-medium'>
-                    {member.first_name}
+                    {member.user?.firstName || 'User'}
                   </p>
                   <p className='text-muted-foreground truncate text-xs'>
-                    {member.email}
+                    {member.user?.email}
                   </p>
                 </div>
                 {member.position && (
@@ -233,7 +238,7 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
                 size='icon'
                 className='h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100'
                 onClick={() => handleRemoveMember(member.id)}
-                aria-label={`Remove ${member.first_name}`}
+                aria-label={`Remove ${member.user?.firstName}`}
               >
                 <X className='h-4 w-4' />
               </Button>

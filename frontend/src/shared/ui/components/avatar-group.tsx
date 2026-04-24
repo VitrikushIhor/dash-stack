@@ -15,9 +15,13 @@ import {
 interface AvatarGroupProps {
   members: Array<{
     id: string
-    avatar?: string
-    first_name: string
-    last_name: string
+    avatar?: string | null
+    first_name?: string
+    last_name?: string
+    user?: {
+      firstName?: string
+      avatar?: string | null
+    }
   }>
   max?: number
   size?: 'm' | 'sm' | 'md' | 'lg'
@@ -40,42 +44,47 @@ export const AvatarGroup = memo(function AvatarGroup({
   const visibleMembers = members.slice(0, max)
   const remainingCount = Math.max(0, members.length - max)
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName} ${lastName}`
+  const getName = (member: (typeof members)[0]) => {
+    if (member.user?.firstName) return member.user.firstName
+    if (member.first_name)
+      return `${member.first_name} ${member.last_name || ''}`
+    return 'User'
   }
+
+  const getAvatar = (member: (typeof members)[0]) => {
+    return member.user?.avatar || member.avatar
+  }
+
   return (
     <TooltipProvider>
       <div className={cn('flex -space-x-2', className)}>
-        {visibleMembers.map((member) => (
-          <Tooltip key={member.id}>
-            <TooltipTrigger asChild>
-              <Avatar
-                className={cn(
-                  sizeClasses[size],
-                  'border-background ring-background border-2 ring-2 transition-transform hover:z-10 hover:scale-110'
-                )}
-                style={{
-                  backgroundColor: member.avatar
-                    ? undefined
-                    : stringToColor(
-                        getInitials(member.first_name, member.last_name)
-                      ),
-                }}
-              >
-                <AvatarImage
-                  src={member.avatar}
-                  alt={`${member.first_name} $me`}
-                />
-                <AvatarFallback className='text-white'>
-                  {getInitials(member.first_name, member.last_name)}
-                </AvatarFallback>
-              </Avatar>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{getInitials(member.first_name, member.last_name)}</p>
-            </TooltipContent>
-          </Tooltip>
-        ))}
+        {visibleMembers.map((member) => {
+          const name = getName(member)
+          const avatar = getAvatar(member)
+          return (
+            <Tooltip key={member.id}>
+              <TooltipTrigger asChild>
+                <Avatar
+                  className={cn(
+                    sizeClasses[size],
+                    'border-background ring-background border-2 ring-2 transition-transform hover:z-10 hover:scale-110'
+                  )}
+                  style={{
+                    backgroundColor: avatar ? undefined : stringToColor(name),
+                  }}
+                >
+                  <AvatarImage src={avatar || undefined} alt={`${name}`} />
+                  <AvatarFallback className='text-white'>
+                    {name[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{name}</p>
+              </TooltipContent>
+            </Tooltip>
+          )
+        })}
 
         {remainingCount > 0 && (
           <Tooltip>

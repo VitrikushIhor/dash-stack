@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Calendar, ListTodo, Paperclip, Tag, Users } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { type Membership } from '@/shared/model/types/membership'
 import { AvatarGroup } from '@/shared/ui/components/avatar-group'
 import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
 import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
@@ -9,7 +10,6 @@ import { LabelBadge } from '@/shared/ui/components/label/label-badge'
 import { type Label } from '@/shared/ui/components/label/types.label'
 import { Checkbox } from '@/shared/ui/components/ui/checkbox'
 import { TaskStatusEnum, type Task } from '@/entities/task'
-import { type TeamMember } from '@/entities/team'
 import { TaskStatusBadge } from '@/features/task'
 import { TaskTableRowActions } from './task-table-row-actions'
 
@@ -161,7 +161,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
       )
     },
     filterFn: (row, id, value) => {
-      const assignedMembers = row.getValue(id) as TeamMember[] | undefined
+      const assignedMembers = row.getValue(id) as Membership[] | undefined
 
       if (!assignedMembers || assignedMembers.length === 0) {
         return false

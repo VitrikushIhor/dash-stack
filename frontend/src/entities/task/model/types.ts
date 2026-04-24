@@ -1,5 +1,5 @@
+import { type Membership } from '@/shared/model/types/membership'
 import { type Label } from '@/shared/ui/components/label/types.label'
-import { type TeamMember } from '@/entities/team'
 
 export enum TaskStatusEnum {
   PLANNED = 'PLANNED',
@@ -24,7 +24,7 @@ export interface Task {
   title: string
   status: TaskStatusEnum
   description?: string
-  assignedMembers?: TeamMember[]
+  assignedMembers?: Membership[]
   deadline?: string
   assignedLabels?: Label[]
   checklists?: TodoChecklistType[]

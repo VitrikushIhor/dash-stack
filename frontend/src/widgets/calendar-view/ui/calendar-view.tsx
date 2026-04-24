@@ -34,8 +34,8 @@ export function CalendarView({ events }: CalendarViewProps) {
       user: user
         ? {
             id: user.id,
-            name: `${user.first_name} ${user.last_name}`,
-            picturePath: user.avatar,
+            name: user.user?.firstName || 'User',
+            picturePath: user.user?.avatar || null,
           }
         : { id: 'unknown', name: 'Unassigned', picturePath: null },
     }
