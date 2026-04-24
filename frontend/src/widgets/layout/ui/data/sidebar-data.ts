@@ -35,11 +35,6 @@ export const sidebarData: SidebarData = {
           icon: UsersRound,
         },
         {
-          title: 'Team',
-          url: '/team',
-          icon: UsersRound,
-        },
-        {
           title: 'Tasks',
           url: '/task',
           icon: ClipboardList,

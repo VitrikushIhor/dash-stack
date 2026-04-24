@@ -13,11 +13,11 @@ import {
   type RowSelectionState,
 } from '@tanstack/react-table'
 import { useTableUrlState } from '@/shared/hooks/use-table-url-state'
+import { type Membership } from '@/shared/model/types/membership'
 import { dateFilterFn } from '@/shared/ui/components/data-table/date-filter'
 import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
 import { TaskStatusEnum, type Task } from '@/entities/task'
-import { type TeamMember } from '@/entities/team'
 import { STATUS_CONFIG } from '@/features/task'
 import { tasksColumns } from '../ui/tasks-columns'
 
@@ -123,7 +123,7 @@ export function useTasksTable({ data }: UseTasksTableProps) {
       value: l.name,
     }))
 
-    const uniqueMembers = new Map<string, TeamMember>()
+    const uniqueMembers = new Map<string, Membership>()
     data.forEach((task) => {
       task.assignedMembers?.forEach((member) => {
         if (!uniqueMembers.has(member.id)) {
@@ -133,7 +133,7 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     })
 
     const members = Array.from(uniqueMembers.values()).map((member) => ({
-      label: `${member.first_name} ${member.last_name}`,
+      label: member.user?.firstName || 'User',
       value: member.id,
     }))
 

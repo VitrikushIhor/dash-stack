@@ -1,5 +1,6 @@
 import { useState, memo } from 'react'
 import { Plus, Users } from 'lucide-react'
+import { type Membership } from '@/shared/model/types/membership'
 import { AvatarGroup } from '@/shared/ui/components/avatar-group'
 import { Button } from '@/shared/ui/components/ui/button'
 import {
@@ -7,13 +8,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/ui/components/ui/popover'
-import { type TeamMember } from '@/entities/team'
 import { TeamMemberSelector } from './team-member-selector'
 
 interface TeamMemberPickerProps {
-  selectedMembers: TeamMember[]
-  availableMembers: TeamMember[]
-  onMembersChange: (members: TeamMember[]) => void
+  selectedMembers: Membership[]
+  availableMembers: Membership[]
+  onMembersChange: (members: Membership[]) => void
   maxMembers?: number
   label?: string
 }

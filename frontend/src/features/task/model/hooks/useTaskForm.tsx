@@ -3,9 +3,9 @@ import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fileToBase64 } from '@/shared/lib/utils'
+import { type Membership } from '@/shared/model/types/membership'
 import { type Label } from '@/shared/ui/components/label/types.label'
 import { TaskStatusEnum, type Task } from '@/entities/task'
-import { type TeamMember } from '@/entities/team'
 import { useTaskStore } from '@/features/task'
 import {
   taskFormSchema,
@@ -17,7 +17,7 @@ import {
 } from '../store/checklist-todo-context'
 
 export function useTaskForm(task?: Task, initialStatus?: TaskStatusEnum) {
-  const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([])
+  const [selectedMembers, setSelectedMembers] = useState<Membership[]>([])
   const [selectedLabels, setSelectedLabels] = useState<Label[]>([])
   const [files, setFiles] = useState<File[]>([])
 

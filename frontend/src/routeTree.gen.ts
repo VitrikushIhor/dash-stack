@@ -24,7 +24,6 @@ import { Route as authSignInRouteImport } from './app/routes/(auth)/sign-in'
 import { Route as authResetPasswordRouteImport } from './app/routes/(auth)/reset-password'
 import { Route as authForgotPasswordRouteImport } from './app/routes/(auth)/forgot-password'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './app/routes/_authenticated/settings/route'
-import { Route as AuthenticatedTeamIndexRouteImport } from './app/routes/_authenticated/team/index'
 import { Route as AuthenticatedTaskIndexRouteImport } from './app/routes/_authenticated/task/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './app/routes/_authenticated/settings/index'
 import { Route as AuthenticatedOrganizationsIndexRouteImport } from './app/routes/_authenticated/organizations/index'
@@ -37,7 +36,8 @@ import { Route as AuthenticatedErrorsErrorRouteImport } from './app/routes/_auth
 import { Route as AuthenticatedOrganizationsOrgIdRouteRouteImport } from './app/routes/_authenticated/organizations/$orgId/route'
 import { Route as AuthenticatedOrganizationsOrgIdIndexRouteImport } from './app/routes/_authenticated/organizations/$orgId/index'
 import { Route as AuthenticatedOrganizationsOrgIdSettingsRouteImport } from './app/routes/_authenticated/organizations/$orgId/settings'
-import { Route as AuthenticatedOrganizationsOrgIdMembersRouteImport } from './app/routes/_authenticated/organizations/$orgId/members'
+import { Route as AuthenticatedOrganizationsOrgIdMembersIndexRouteImport } from './app/routes/_authenticated/organizations/$orgId/members/index'
+import { Route as AuthenticatedOrganizationsOrgIdMembersUserIdRouteImport } from './app/routes/_authenticated/organizations/$orgId/members/$userId'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -114,11 +114,6 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
-  id: '/team/',
-  path: '/team/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedTaskIndexRoute = AuthenticatedTaskIndexRouteImport.update({
   id: '/task/',
   path: '/task/',
@@ -190,10 +185,16 @@ const AuthenticatedOrganizationsOrgIdSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
   } as any)
-const AuthenticatedOrganizationsOrgIdMembersRoute =
-  AuthenticatedOrganizationsOrgIdMembersRouteImport.update({
-    id: '/members',
-    path: '/members',
+const AuthenticatedOrganizationsOrgIdMembersIndexRoute =
+  AuthenticatedOrganizationsOrgIdMembersIndexRouteImport.update({
+    id: '/members/',
+    path: '/members/',
+    getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
+  } as any)
+const AuthenticatedOrganizationsOrgIdMembersUserIdRoute =
+  AuthenticatedOrganizationsOrgIdMembersUserIdRouteImport.update({
+    id: '/members/$userId',
+    path: '/members/$userId',
     getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
   } as any)
 
@@ -222,10 +223,10 @@ export interface FileRoutesByFullPath {
   '/organizations/': typeof AuthenticatedOrganizationsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/task/': typeof AuthenticatedTaskIndexRoute
-  '/team/': typeof AuthenticatedTeamIndexRoute
-  '/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
   '/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
   '/organizations/$orgId/': typeof AuthenticatedOrganizationsOrgIdIndexRoute
+  '/organizations/$orgId/members/$userId': typeof AuthenticatedOrganizationsOrgIdMembersUserIdRoute
+  '/organizations/$orgId/members/': typeof AuthenticatedOrganizationsOrgIdMembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -250,10 +251,10 @@ export interface FileRoutesByTo {
   '/organizations': typeof AuthenticatedOrganizationsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/task': typeof AuthenticatedTaskIndexRoute
-  '/team': typeof AuthenticatedTeamIndexRoute
-  '/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
   '/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
   '/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdIndexRoute
+  '/organizations/$orgId/members/$userId': typeof AuthenticatedOrganizationsOrgIdMembersUserIdRoute
+  '/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -282,10 +283,10 @@ export interface FileRoutesById {
   '/_authenticated/organizations/': typeof AuthenticatedOrganizationsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/task/': typeof AuthenticatedTaskIndexRoute
-  '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
-  '/_authenticated/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
   '/_authenticated/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
   '/_authenticated/organizations/$orgId/': typeof AuthenticatedOrganizationsOrgIdIndexRoute
+  '/_authenticated/organizations/$orgId/members/$userId': typeof AuthenticatedOrganizationsOrgIdMembersUserIdRoute
+  '/_authenticated/organizations/$orgId/members/': typeof AuthenticatedOrganizationsOrgIdMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -314,10 +315,10 @@ export interface FileRouteTypes {
     | '/organizations/'
     | '/settings/'
     | '/task/'
-    | '/team/'
-    | '/organizations/$orgId/members'
     | '/organizations/$orgId/settings'
     | '/organizations/$orgId/'
+    | '/organizations/$orgId/members/$userId'
+    | '/organizations/$orgId/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -342,10 +343,10 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/settings'
     | '/task'
-    | '/team'
-    | '/organizations/$orgId/members'
     | '/organizations/$orgId/settings'
     | '/organizations/$orgId'
+    | '/organizations/$orgId/members/$userId'
+    | '/organizations/$orgId/members'
   id:
     | '__root__'
     | '/_authenticated'
@@ -373,10 +374,10 @@ export interface FileRouteTypes {
     | '/_authenticated/organizations/'
     | '/_authenticated/settings/'
     | '/_authenticated/task/'
-    | '/_authenticated/team/'
-    | '/_authenticated/organizations/$orgId/members'
     | '/_authenticated/organizations/$orgId/settings'
     | '/_authenticated/organizations/$orgId/'
+    | '/_authenticated/organizations/$orgId/members/$userId'
+    | '/_authenticated/organizations/$orgId/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -501,13 +502,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/team/': {
-      id: '/_authenticated/team/'
-      path: '/team'
-      fullPath: '/team/'
-      preLoaderRoute: typeof AuthenticatedTeamIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/task/': {
       id: '/_authenticated/task/'
       path: '/task'
@@ -592,11 +586,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdSettingsRouteImport
       parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
     }
-    '/_authenticated/organizations/$orgId/members': {
-      id: '/_authenticated/organizations/$orgId/members'
+    '/_authenticated/organizations/$orgId/members/': {
+      id: '/_authenticated/organizations/$orgId/members/'
       path: '/members'
-      fullPath: '/organizations/$orgId/members'
-      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdMembersRouteImport
+      fullPath: '/organizations/$orgId/members/'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdMembersIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
+    }
+    '/_authenticated/organizations/$orgId/members/$userId': {
+      id: '/_authenticated/organizations/$orgId/members/$userId'
+      path: '/members/$userId'
+      fullPath: '/organizations/$orgId/members/$userId'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdMembersUserIdRouteImport
       parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
     }
   }
@@ -626,19 +627,22 @@ const AuthenticatedSettingsRouteRouteWithChildren =
   )
 
 interface AuthenticatedOrganizationsOrgIdRouteRouteChildren {
-  AuthenticatedOrganizationsOrgIdMembersRoute: typeof AuthenticatedOrganizationsOrgIdMembersRoute
   AuthenticatedOrganizationsOrgIdSettingsRoute: typeof AuthenticatedOrganizationsOrgIdSettingsRoute
   AuthenticatedOrganizationsOrgIdIndexRoute: typeof AuthenticatedOrganizationsOrgIdIndexRoute
+  AuthenticatedOrganizationsOrgIdMembersUserIdRoute: typeof AuthenticatedOrganizationsOrgIdMembersUserIdRoute
+  AuthenticatedOrganizationsOrgIdMembersIndexRoute: typeof AuthenticatedOrganizationsOrgIdMembersIndexRoute
 }
 
 const AuthenticatedOrganizationsOrgIdRouteRouteChildren: AuthenticatedOrganizationsOrgIdRouteRouteChildren =
   {
-    AuthenticatedOrganizationsOrgIdMembersRoute:
-      AuthenticatedOrganizationsOrgIdMembersRoute,
     AuthenticatedOrganizationsOrgIdSettingsRoute:
       AuthenticatedOrganizationsOrgIdSettingsRoute,
     AuthenticatedOrganizationsOrgIdIndexRoute:
       AuthenticatedOrganizationsOrgIdIndexRoute,
+    AuthenticatedOrganizationsOrgIdMembersUserIdRoute:
+      AuthenticatedOrganizationsOrgIdMembersUserIdRoute,
+    AuthenticatedOrganizationsOrgIdMembersIndexRoute:
+      AuthenticatedOrganizationsOrgIdMembersIndexRoute,
   }
 
 const AuthenticatedOrganizationsOrgIdRouteRouteWithChildren =
@@ -655,7 +659,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInviteAcceptRoute: typeof AuthenticatedInviteAcceptRoute
   AuthenticatedOrganizationsIndexRoute: typeof AuthenticatedOrganizationsIndexRoute
   AuthenticatedTaskIndexRoute: typeof AuthenticatedTaskIndexRoute
-  AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -668,7 +671,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInviteAcceptRoute: AuthenticatedInviteAcceptRoute,
   AuthenticatedOrganizationsIndexRoute: AuthenticatedOrganizationsIndexRoute,
   AuthenticatedTaskIndexRoute: AuthenticatedTaskIndexRoute,
-  AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
