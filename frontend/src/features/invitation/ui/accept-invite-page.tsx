@@ -20,15 +20,23 @@ export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
     if (token) {
       acceptInvite(token, {
         onSuccess: () => {
           // Redirect to organizations list after success
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             navigate({ to: '/organizations' })
           }, REDIRECT_DELAY)
         },
       })
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
     }
   }, [token, acceptInvite, navigate])
 

@@ -1,4 +1,9 @@
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import { Loader2 } from 'lucide-react'
 import { DataTable } from '@/shared/ui/components/data-table'
 import { useListInvitations } from '../api/hooks/use-list-invitations'
@@ -22,6 +27,8 @@ export const InvitationsTable = ({ orgId }: InvitationsTableProps) => {
     data: invitations ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
   if (isLoading) {

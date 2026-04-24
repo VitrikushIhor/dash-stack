@@ -51,7 +51,8 @@ export class OrganizationController {
   @Delete(':orgId')
   @UseGuards(MembershipRoleGuard)
   @RequireOrgRole(OrgRole.OWNER)
-  delete(@Param('orgId') orgId: string) {
-    return this.organizationService.delete(orgId);
+  async delete(@Param('orgId') orgId: string) {
+    await this.organizationService.delete(orgId);
+    return { message: 'Organization deleted successfully' };
   }
 }

@@ -16,7 +16,8 @@ export class InvitationService {
   ) {}
 
   async sendInvite(orgId: string, invitedBy: string, dto: CreateInvitationDto) {
-    const { email, role } = dto;
+    const email = dto.email.toLowerCase().trim();
+    const { role } = dto;
 
     const existingMember = await this.repository.findByEmailAndOrg(
       email,
@@ -64,7 +65,9 @@ export class InvitationService {
       throw new NotFoundException('Invitation not found');
     }
 
-    if (invitation.email !== userEmail) {
+    if (
+      invitation.email.toLowerCase().trim() !== userEmail.toLowerCase().trim()
+    ) {
       throw new BadRequestException(
         'This invitation was sent to a different email address',
       );

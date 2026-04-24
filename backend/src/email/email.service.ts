@@ -75,6 +75,7 @@ export class EmailService {
     orgName: string,
   ): Promise<void> {
     const acceptUrl = `${this.emailConfig.frontendUrl}/invite/accept?token=${token}`;
+    const escapedOrgName = this.escapeHtml(orgName);
 
     try {
       await this.transporter.sendMail({
@@ -83,7 +84,7 @@ export class EmailService {
         subject: `You're invited to join ${orgName}`,
         html: `
           <h2>Organization Invitation</h2>
-          <p>You've been invited to join <strong>${orgName}</strong> on Dash Stack.</p>
+          <p>You've been invited to join <strong>${escapedOrgName}</strong> on Dash Stack.</p>
           <p>Click the link below to accept the invitation:</p>
           <a href="${acceptUrl}" style="display:inline-block;padding:12px 24px;background:#4F46E5;color:white;text-decoration:none;border-radius:8px;">Accept Invitation</a>
           <p style="margin-top:16px;color:#666;">Or copy this link: ${acceptUrl}</p>
@@ -94,5 +95,14 @@ export class EmailService {
       console.error('Email send error:', error);
       throw new InternalServerErrorException('Failed to send invitation email');
     }
+  }
+
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 }
