@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/components/ui/select'
-import type { TeamMember } from '@/entities/team'
 import { useCalendar } from '../../model/contexts/calendar-context'
 
 export function UserSelect() {
@@ -28,15 +27,12 @@ export function UserSelect() {
           <div className='flex items-center gap-1'>
             <AvatarGroup
               max={2}
-              members={users.map(
-                (user) =>
-                  ({
-                    id: user.id,
-                    first_name: user.name,
-                    last_name: user.name,
-                    avatar: user.picturePath,
-                  }) as TeamMember
-              )}
+              members={users.map((user) => ({
+                id: user.id,
+                first_name: user.name,
+                last_name: user.name,
+                avatar: user.picturePath,
+              }))}
               size='m'
             ></AvatarGroup>
             All

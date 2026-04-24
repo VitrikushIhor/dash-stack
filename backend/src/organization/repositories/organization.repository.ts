@@ -96,6 +96,41 @@ export class OrganizationRepository {
     });
   }
 
+  findMembers(orgId: string) {
+    return this.prisma.membership.findMany({
+      where: { orgId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+  }
+
+  findMember(orgId: string, userId: string) {
+    return this.prisma.membership.findFirst({
+      where: {
+        orgId,
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+  }
+
   async generateUniqueSlug(name: string): Promise<string> {
     const slug = name
       .toLowerCase()

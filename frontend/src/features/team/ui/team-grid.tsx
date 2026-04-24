@@ -1,12 +1,13 @@
-import { type TeamMember, TeamMemberCard } from '@/entities/team'
+import { TeamMemberCard } from '@/entities/team'
+import { type Membership } from '@/features/organization/model/types/organization.types'
 
 interface TeamGridProps {
-  members: TeamMember[]
-  onEmailClick?: (email: string) => void
+  memberships: Membership[]
+  orgId: string
 }
 
-export const TeamGrid = ({ members, onEmailClick }: TeamGridProps) => {
-  if (!members || members.length === 0) {
+export const TeamGrid = ({ memberships, orgId }: TeamGridProps) => {
+  if (!memberships || memberships.length === 0) {
     return (
       <div
         className='text-muted-foreground flex w-full flex-col items-center justify-center py-8'
@@ -24,11 +25,11 @@ export const TeamGrid = ({ members, onEmailClick }: TeamGridProps) => {
       tabIndex={0}
       aria-label='Team members grid'
     >
-      {members.map((member) => (
+      {memberships.map((membership) => (
         <TeamMemberCard
-          key={member.id}
-          member={member}
-          onEmailClick={onEmailClick}
+          key={membership.id}
+          membership={membership}
+          orgId={orgId}
         />
       ))}
     </div>

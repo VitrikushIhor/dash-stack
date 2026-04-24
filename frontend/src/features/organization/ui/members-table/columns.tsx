@@ -1,5 +1,11 @@
 import { format } from 'date-fns'
+import { Link } from '@tanstack/react-router'
 import { type ColumnDef } from '@tanstack/react-table'
+import { getInitials } from '@/shared/lib/utils'
+import {
+  getMemberDisplayName,
+  getRoleVariant,
+} from '@/shared/model/utils/membership'
 import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
 import {
   Avatar,
@@ -7,7 +13,10 @@ import {
   AvatarImage,
 } from '@/shared/ui/components/ui/avatar'
 import { Badge } from '@/shared/ui/components/ui/badge'
-import { type Membership, OrgRole } from '../../model/types/organization.types'
+import {
+  type Membership,
+  type OrgRole,
+} from '../../model/types/organization.types'
 
 export const columns: ColumnDef<Membership>[] = [
   {
@@ -16,20 +25,28 @@ export const columns: ColumnDef<Membership>[] = [
       <DataTableColumnHeader column={column} title='Member' />
     ),
     cell: ({ row }) => {
-      const user = row.original.user
+      const { user, orgId } = row.original
+      const userId = user?.id
+
+      if (!userId) return null
+
       return (
-        <div className='flex items-center gap-3'>
+        <Link
+          to='/organizations/$orgId/members/$userId'
+          params={{ orgId: orgId || '', userId }}
+          className='flex items-center gap-3 hover:underline'
+        >
           <Avatar className='h-8 w-8'>
             <AvatarImage src={user.avatar} />
             <AvatarFallback>
-              {user.firstName?.[0] || user.email[0].toUpperCase()}
+              {getInitials(getMemberDisplayName(user))}
             </AvatarFallback>
           </Avatar>
           <div className='flex flex-col'>
-            <span className='font-medium'>{user.firstName || 'User'}</span>
+            <span className='font-medium'>{getMemberDisplayName(user)}</span>
             <span className='text-muted-foreground text-xs'>{user.email}</span>
           </div>
-        </div>
+        </Link>
       )
     },
   },
@@ -40,11 +57,7 @@ export const columns: ColumnDef<Membership>[] = [
     ),
     cell: ({ row }) => {
       const role = row.getValue('role') as OrgRole
-      return (
-        <Badge variant={role === OrgRole.OWNER ? 'default' : 'secondary'}>
-          {role}
-        </Badge>
-      )
+      return <Badge variant={getRoleVariant(role)}>{role}</Badge>
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
