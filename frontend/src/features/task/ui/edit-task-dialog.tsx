@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { format } from 'date-fns'
 import { DialogDescription } from '@radix-ui/react-dialog'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/shared/lib/utils'
+import { type Membership } from '@/shared/model/types/membership'
 import {
   FileUpload,
   FileUploadDropzone,
@@ -55,8 +56,9 @@ import {
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum, type Task } from '@/entities/task'
+import { useGetOrganizations } from '@/features/organization'
 import { TodoChecklist, useTaskForm } from '@/features/task'
-import { useMemberStore, TeamMemberPicker } from '@/features/team'
+import { TeamMemberPicker } from '@/features/team'
 import { type TaskFormValues } from '../model/schema/create-task-schema'
 
 interface AddTaskDialogProps {
@@ -71,7 +73,17 @@ export function EditTaskDialog({
   open,
   onOpenChange,
 }: AddTaskDialogProps) {
-  const availableMembers = useMemberStore((state) => state.members)
+  const { data: organizations } = useGetOrganizations()
+  const availableMembers = useMemo(() => {
+    if (!organizations) return []
+    const membersMap = new Map<string, Membership>()
+    organizations.forEach((org) => {
+      org.memberships?.forEach((m) => {
+        membersMap.set(m.userId, m)
+      })
+    })
+    return Array.from(membersMap.values())
+  }, [organizations])
 
   const {
     checklists,

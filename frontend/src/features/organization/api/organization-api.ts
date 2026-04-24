@@ -1,4 +1,5 @@
 import { api } from '@/shared/api/api-client'
+import { type Membership } from '@/shared/model/types/membership'
 import {
   type Organization,
   type CreateOrganizationDto,
@@ -18,4 +19,10 @@ export const organizationApi = {
 
   delete: (orgId: string) =>
     api.delete<{ message: string }>(`/organizations/${orgId}`),
+
+  getMembers: (orgId: string) =>
+    api.get<Membership[]>(`/organizations/${orgId}/members`),
+
+  getMember: ({ orgId, userId }: { orgId: string; userId: string }) =>
+    api.get<Membership>(`/organizations/${orgId}/members/${userId}`),
 }

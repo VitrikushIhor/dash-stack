@@ -34,6 +34,20 @@ export class OrganizationService {
     return this.repository.delete(orgId);
   }
 
+  async findMembers(orgId: string) {
+    return this.repository.findMembers(orgId);
+  }
+
+  async findMember(orgId: string, userId: string) {
+    const membership = await this.repository.findMember(orgId, userId);
+    if (!membership) {
+      throw new NotFoundException(
+        `Member with user ID ${userId} not found in organization ${orgId}`,
+      );
+    }
+    return membership;
+  }
+
   private mapOrganization(org: any) {
     if (!org) return null;
     const { _count, ...rest } = org;

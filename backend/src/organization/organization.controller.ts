@@ -55,4 +55,18 @@ export class OrganizationController {
     await this.organizationService.delete(orgId);
     return { message: 'Organization deleted successfully' };
   }
+
+  @Get(':orgId/members')
+  @UseGuards(MembershipRoleGuard)
+  @RequireOrgRole(OrgRole.GUEST)
+  findMembers(@Param('orgId') orgId: string) {
+    return this.organizationService.findMembers(orgId);
+  }
+
+  @Get(':orgId/members/:userId')
+  @UseGuards(MembershipRoleGuard)
+  @RequireOrgRole(OrgRole.GUEST)
+  findMember(@Param('orgId') orgId: string, @Param('userId') userId: string) {
+    return this.organizationService.findMember(orgId, userId);
+  }
 }
