@@ -27,11 +27,17 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './app/routes/_au
 import { Route as AuthenticatedTeamIndexRouteImport } from './app/routes/_authenticated/team/index'
 import { Route as AuthenticatedTaskIndexRouteImport } from './app/routes/_authenticated/task/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './app/routes/_authenticated/settings/index'
+import { Route as AuthenticatedOrganizationsIndexRouteImport } from './app/routes/_authenticated/organizations/index'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './app/routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './app/routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './app/routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './app/routes/_authenticated/settings/account'
+import { Route as AuthenticatedInviteAcceptRouteImport } from './app/routes/_authenticated/invite/accept'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './app/routes/_authenticated/errors/$error'
+import { Route as AuthenticatedOrganizationsOrgIdRouteRouteImport } from './app/routes/_authenticated/organizations/$orgId/route'
+import { Route as AuthenticatedOrganizationsOrgIdIndexRouteImport } from './app/routes/_authenticated/organizations/$orgId/index'
+import { Route as AuthenticatedOrganizationsOrgIdSettingsRouteImport } from './app/routes/_authenticated/organizations/$orgId/settings'
+import { Route as AuthenticatedOrganizationsOrgIdMembersRouteImport } from './app/routes/_authenticated/organizations/$orgId/members'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -124,6 +130,12 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedOrganizationsIndexRoute =
+  AuthenticatedOrganizationsIndexRouteImport.update({
+    id: '/organizations/',
+    path: '/organizations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -148,11 +160,41 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedInviteAcceptRoute =
+  AuthenticatedInviteAcceptRouteImport.update({
+    id: '/invite/accept',
+    path: '/invite/accept',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOrganizationsOrgIdRouteRoute =
+  AuthenticatedOrganizationsOrgIdRouteRouteImport.update({
+    id: '/organizations/$orgId',
+    path: '/organizations/$orgId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOrganizationsOrgIdIndexRoute =
+  AuthenticatedOrganizationsOrgIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
+  } as any)
+const AuthenticatedOrganizationsOrgIdSettingsRoute =
+  AuthenticatedOrganizationsOrgIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
+  } as any)
+const AuthenticatedOrganizationsOrgIdMembersRoute =
+  AuthenticatedOrganizationsOrgIdMembersRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => AuthenticatedOrganizationsOrgIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -170,14 +212,20 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
   '/oauth/callback': typeof OauthCallbackRoute
+  '/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/organizations/': typeof AuthenticatedOrganizationsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/task/': typeof AuthenticatedTaskIndexRoute
   '/team/': typeof AuthenticatedTeamIndexRoute
+  '/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
+  '/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
+  '/organizations/$orgId/': typeof AuthenticatedOrganizationsOrgIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -194,13 +242,18 @@ export interface FileRoutesByTo {
   '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/organizations': typeof AuthenticatedOrganizationsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/task': typeof AuthenticatedTaskIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
+  '/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
+  '/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
+  '/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -219,14 +272,20 @@ export interface FileRoutesById {
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/organizations/': typeof AuthenticatedOrganizationsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/task/': typeof AuthenticatedTaskIndexRoute
   '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
+  '/_authenticated/organizations/$orgId/members': typeof AuthenticatedOrganizationsOrgIdMembersRoute
+  '/_authenticated/organizations/$orgId/settings': typeof AuthenticatedOrganizationsOrgIdSettingsRoute
+  '/_authenticated/organizations/$orgId/': typeof AuthenticatedOrganizationsOrgIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -245,14 +304,20 @@ export interface FileRouteTypes {
     | '/503'
     | '/calendar'
     | '/oauth/callback'
+    | '/organizations/$orgId'
     | '/errors/$error'
+    | '/invite/accept'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/organizations/'
     | '/settings/'
     | '/task/'
     | '/team/'
+    | '/organizations/$orgId/members'
+    | '/organizations/$orgId/settings'
+    | '/organizations/$orgId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -269,13 +334,18 @@ export interface FileRouteTypes {
     | '/oauth/callback'
     | '/'
     | '/errors/$error'
+    | '/invite/accept'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/organizations'
     | '/settings'
     | '/task'
     | '/team'
+    | '/organizations/$orgId/members'
+    | '/organizations/$orgId/settings'
+    | '/organizations/$orgId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -293,14 +363,20 @@ export interface FileRouteTypes {
     | '/_authenticated/calendar'
     | '/oauth/callback'
     | '/_authenticated/'
+    | '/_authenticated/organizations/$orgId'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/invite/accept'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/organizations/'
     | '/_authenticated/settings/'
     | '/_authenticated/task/'
     | '/_authenticated/team/'
+    | '/_authenticated/organizations/$orgId/members'
+    | '/_authenticated/organizations/$orgId/settings'
+    | '/_authenticated/organizations/$orgId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -446,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/organizations/': {
+      id: '/_authenticated/organizations/'
+      path: '/organizations'
+      fullPath: '/organizations/'
+      preLoaderRoute: typeof AuthenticatedOrganizationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -474,12 +557,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/invite/accept': {
+      id: '/_authenticated/invite/accept'
+      path: '/invite/accept'
+      fullPath: '/invite/accept'
+      preLoaderRoute: typeof AuthenticatedInviteAcceptRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
       fullPath: '/errors/$error'
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/organizations/$orgId': {
+      id: '/_authenticated/organizations/$orgId'
+      path: '/organizations/$orgId'
+      fullPath: '/organizations/$orgId'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/organizations/$orgId/': {
+      id: '/_authenticated/organizations/$orgId/'
+      path: '/'
+      fullPath: '/organizations/$orgId/'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
+    }
+    '/_authenticated/organizations/$orgId/settings': {
+      id: '/_authenticated/organizations/$orgId/settings'
+      path: '/settings'
+      fullPath: '/organizations/$orgId/settings'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdSettingsRouteImport
+      parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
+    }
+    '/_authenticated/organizations/$orgId/members': {
+      id: '/_authenticated/organizations/$orgId/members'
+      path: '/members'
+      fullPath: '/organizations/$orgId/members'
+      preLoaderRoute: typeof AuthenticatedOrganizationsOrgIdMembersRouteImport
+      parentRoute: typeof AuthenticatedOrganizationsOrgIdRouteRoute
     }
   }
 }
@@ -507,11 +625,35 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedOrganizationsOrgIdRouteRouteChildren {
+  AuthenticatedOrganizationsOrgIdMembersRoute: typeof AuthenticatedOrganizationsOrgIdMembersRoute
+  AuthenticatedOrganizationsOrgIdSettingsRoute: typeof AuthenticatedOrganizationsOrgIdSettingsRoute
+  AuthenticatedOrganizationsOrgIdIndexRoute: typeof AuthenticatedOrganizationsOrgIdIndexRoute
+}
+
+const AuthenticatedOrganizationsOrgIdRouteRouteChildren: AuthenticatedOrganizationsOrgIdRouteRouteChildren =
+  {
+    AuthenticatedOrganizationsOrgIdMembersRoute:
+      AuthenticatedOrganizationsOrgIdMembersRoute,
+    AuthenticatedOrganizationsOrgIdSettingsRoute:
+      AuthenticatedOrganizationsOrgIdSettingsRoute,
+    AuthenticatedOrganizationsOrgIdIndexRoute:
+      AuthenticatedOrganizationsOrgIdIndexRoute,
+  }
+
+const AuthenticatedOrganizationsOrgIdRouteRouteWithChildren =
+  AuthenticatedOrganizationsOrgIdRouteRoute._addFileChildren(
+    AuthenticatedOrganizationsOrgIdRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedOrganizationsOrgIdRouteRoute: typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedInviteAcceptRoute: typeof AuthenticatedInviteAcceptRoute
+  AuthenticatedOrganizationsIndexRoute: typeof AuthenticatedOrganizationsIndexRoute
   AuthenticatedTaskIndexRoute: typeof AuthenticatedTaskIndexRoute
   AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
 }
@@ -520,7 +662,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedOrganizationsOrgIdRouteRoute:
+    AuthenticatedOrganizationsOrgIdRouteRouteWithChildren,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedInviteAcceptRoute: AuthenticatedInviteAcceptRoute,
+  AuthenticatedOrganizationsIndexRoute: AuthenticatedOrganizationsIndexRoute,
   AuthenticatedTaskIndexRoute: AuthenticatedTaskIndexRoute,
   AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
 }
