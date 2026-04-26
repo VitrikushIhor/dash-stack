@@ -181,10 +181,8 @@ export const api = {
     options?: Omit<RequestOptions, 'method' | 'body'>
   ) => apiClient<T>(endpoint, { ...options, method: ApiMethod.PATCH, body }),
 
-  delete: <T>(
-    endpoint: string,
-    options?: Omit<RequestOptions, 'method' | 'body'>
-  ) => apiClient<T>(endpoint, { ...options, method: ApiMethod.DELETE }),
+  delete: <T>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
+    apiClient<T>(endpoint, { ...options, method: ApiMethod.DELETE }),
 }
 
 export default api

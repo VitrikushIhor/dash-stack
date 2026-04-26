@@ -54,5 +54,5 @@ export const taskApi = {
     }),
 
   bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
-    api.delete<void>(`/organizations/${orgId}/tasks/bulk`, { data: { ids } }),
+    api.delete<void>(`/organizations/${orgId}/tasks/bulk`, { body: { ids } }),
 }
