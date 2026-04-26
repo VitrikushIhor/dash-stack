@@ -25,7 +25,7 @@ interface TaskCardProps {
   className?: string
 }
 
-const TaskCardList = memo(
+export const TaskCardList = memo(
   ({ task, onTaskClick, onEdit, onDelete, className }: TaskCardProps) => {
     const { totalItems, completedItems } = calculateTaskProgress(task)
     const overdue = isTaskOverdue(task)
@@ -125,7 +125,7 @@ const TaskCardList = memo(
   }
 )
 
-const TaskCardKanban = memo(
+export const TaskCardKanban = memo(
   ({ task, onTaskClick, onEdit, onDelete, className }: TaskCardProps) => {
     const { totalItems, completedItems } = calculateTaskProgress(task)
     const overdue = isTaskOverdue(task)

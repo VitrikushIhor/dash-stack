@@ -35,3 +35,20 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }))
+
+// Polyfill crypto.randomUUID for JSDOM
+Object.defineProperty(global, 'crypto', {
+  value: {
+    randomUUID: () =>
+      Math.random().toString(36).substring(2) + Date.now().toString(36),
+  },
+})
+
+// Polyfill fetch
+global.fetch = vi.fn().mockImplementation(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+    blob: () => Promise.resolve(new Blob()),
+  })
+)
