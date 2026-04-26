@@ -1,4 +1,4 @@
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from '../enums/task-status.enum';
 
 export interface CreateTaskData {
   title: string;

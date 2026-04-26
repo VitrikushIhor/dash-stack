@@ -10,7 +10,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from '../enums/task-status.enum';
 
 export class CreateTaskLabelDto {
   @ApiProperty()
@@ -60,7 +60,10 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ enum: TaskStatus })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Task status (PLANNED, UPCOMING, COMPLETED)',
+  })
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;

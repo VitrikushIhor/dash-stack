@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateTaskData, UpdateTaskData } from '../interfaces/task.interface';
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from '../enums/task-status.enum';
 
 @Injectable()
 export class TaskRepository {
@@ -58,14 +58,52 @@ export class TaskRepository {
 
   async findAll(
     organizationId: string,
-    filters: { status?: TaskStatus; assigneeId?: string } = {},
+    filters: {
+      search?: string;
+      status?: TaskStatus[];
+      assigneeIds?: string[];
+      labelNames?: string[];
+      deadlineFrom?: string;
+      deadlineTo?: string;
+    } = {},
   ) {
-    const { status, assigneeId } = filters;
+    const {
+      search,
+      status,
+      assigneeIds,
+      labelNames,
+      deadlineFrom,
+      deadlineTo,
+    } = filters;
+
     return this.prisma.task.findMany({
       where: {
         organizationId,
-        status,
-        assignees: assigneeId ? { some: { id: assigneeId } } : undefined,
+        AND: [
+          search
+            ? {
+                OR: [
+                  { title: { contains: search, mode: 'insensitive' } },
+                  { description: { contains: search, mode: 'insensitive' } },
+                ],
+              }
+            : {},
+          status?.length ? { status: { in: status } } : {},
+          assigneeIds?.length
+            ? { assignees: { some: { id: { in: assigneeIds } } } }
+            : {},
+          labelNames?.length
+            ? { labels: { some: { name: { in: labelNames } } } }
+            : {},
+          deadlineFrom || deadlineTo
+            ? {
+                deadline: {
+                  gte: deadlineFrom ? new Date(deadlineFrom) : undefined,
+                  lte: deadlineTo ? new Date(deadlineTo) : undefined,
+                },
+              }
+            : {},
+        ],
       },
       include: {
         assignees: {
@@ -171,6 +209,37 @@ export class TaskRepository {
   async delete(id: string, organizationId: string) {
     return this.prisma.task.delete({
       where: { id, organizationId },
+    });
+  }
+
+  async updateMany(
+    organizationId: string,
+    ids: string[],
+    data: UpdateTaskData,
+  ) {
+    const { assigneeIds, labels, checklists, ...rest } = data;
+
+    // For bulk update, we only support simple fields (status, deadline, etc.)
+    // Complex fields like assignees/labels are usually not updated in bulk via simple Patch
+    // but we can add support if needed. For now, let's keep it simple.
+
+    return this.prisma.task.updateMany({
+      where: {
+        id: { in: ids },
+        organizationId,
+      },
+      data: {
+        ...rest,
+      },
+    });
+  }
+
+  async deleteMany(organizationId: string, ids: string[]) {
+    return this.prisma.task.deleteMany({
+      where: {
+        id: { in: ids },
+        organizationId,
+      },
     });
   }
 

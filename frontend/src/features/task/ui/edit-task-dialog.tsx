@@ -56,12 +56,12 @@ import {
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum, type Task } from '@/entities/task'
-import { useGetOrganizations } from '@/features/organization'
+import { useGetOrganizations, useOrgStore } from '@/features/organization'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { TeamMemberPicker } from '@/features/team'
 import { type TaskFormValues } from '../model/schema/create-task-schema'
 
-interface AddTaskDialogProps {
+interface EditTaskDialogProps {
   status?: TaskStatusEnum
   task: Task
   open: boolean
@@ -72,7 +72,8 @@ export function EditTaskDialog({
   task,
   open,
   onOpenChange,
-}: AddTaskDialogProps) {
+}: EditTaskDialogProps) {
+  const { activeOrgId } = useOrgStore()
   const { data: organizations } = useGetOrganizations()
   const availableMembers = useMemo(() => {
     if (!organizations) return []
@@ -96,7 +97,7 @@ export function EditTaskDialog({
     handleSubmit,
     setFiles,
     files,
-  } = useTaskForm(task)
+  } = useTaskForm(activeOrgId || '', task)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
     async (files, { onProgress, onSuccess, onError }) => {
@@ -124,8 +125,7 @@ export function EditTaskDialog({
         })
         await Promise.all(uploadPromises)
       } catch (_error) {
-        // This handles any error that might occur outside the individual upload processes
-        // You should handle this gracefully in production
+        // Error handling
       }
     },
     []

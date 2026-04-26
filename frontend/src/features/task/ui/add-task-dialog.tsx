@@ -55,7 +55,7 @@ import {
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum } from '@/entities/task'
-import { useGetOrganizations } from '@/features/organization'
+import { useGetOrganizations, useOrgStore } from '@/features/organization'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { TeamMemberPicker } from '@/features/team'
 import { type TaskFormValues } from '../model/schema/create-task-schema'
@@ -71,6 +71,7 @@ export function AddTaskDialog({
   open,
   onOpenChange,
 }: AddTaskDialogProps) {
+  const { activeOrgId } = useOrgStore()
   const {
     checklists,
     addChecklist,
@@ -82,7 +83,7 @@ export function AddTaskDialog({
     handleSubmit,
     files,
     setFiles,
-  } = useTaskForm(undefined, status)
+  } = useTaskForm(activeOrgId || '', undefined, status)
 
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
     async (files, { onProgress, onSuccess, onError }) => {
@@ -110,8 +111,7 @@ export function AddTaskDialog({
         })
         await Promise.all(uploadPromises)
       } catch (_error) {
-        // This handles any error that might occur outside the individual upload processes
-        // You should handle this gracefully in production
+        // Error handling
       }
     },
     []

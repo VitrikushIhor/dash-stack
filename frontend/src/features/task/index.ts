@@ -8,7 +8,12 @@ export {
 export { useTaskStore } from './model/store/task-store'
 export { TasksProvider, useTasks } from './model/store/tasks-provider'
 
-export type { TodoChecklistType } from '@/entities/task'
+export type {
+  Checklist,
+  ChecklistItem,
+  TaskLabel,
+  TaskAssignee,
+} from '@/entities/task'
 export type {
   CheckListTodoState,
   CheckListTodoActions,
@@ -22,5 +27,16 @@ export { TaskCard } from './ui/task-card'
 export { TaskStatusBadge } from './ui/task-status-badge'
 export { TasksDialogs } from './ui/tasks-dialogs'
 
-export { useTaskForm } from './model/hooks/useTaskForm'
+export { useTaskForm } from './model/forms/use-task-form'
+export { useTasksQuery, useTaskQuery } from './model/queries'
+export {
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+  useBulkUpdateTasks,
+  useBulkDeleteTasks,
+} from './model/mutations'
+
 export { STATUS_CONFIG } from './model/types/task-status-config'
+export { taskApi } from './model/api/task-api'
+export type { TaskFilters } from './model/api/task-api'

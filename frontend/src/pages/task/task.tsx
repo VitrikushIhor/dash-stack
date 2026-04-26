@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { getRouteApi } from '@tanstack/react-router'
 import { LayoutGrid, List, Plus } from 'lucide-react'
 import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
 import { DataTableToolbar } from '@/shared/ui/components/data-table/toolbar'
@@ -6,7 +7,8 @@ import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
-import { useTaskStore, useTasks, TasksDialogs } from '@/features/task'
+import { useOrgStore } from '@/features/organization'
+import { useTasks, TasksDialogs, useTasksQuery } from '@/features/task'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
 import { Header } from '@/widgets/layout/ui/header'
 import { Main } from '@/widgets/layout/ui/main'
@@ -17,9 +19,34 @@ export function TaskPage() {
   const [viewMode, setViewMode] = useState<KanbanViewMode>(
     KanbanViewMode.Kanban
   )
-  const tasks = useTaskStore((state) => state.tasks)
+
+  const { activeOrgId } = useOrgStore()
+  const route = getRouteApi('/_authenticated/task/')
+  const search = route.useSearch()
+
+  const filters = useMemo(
+    () => ({
+      search: search.filter,
+      status: search.status,
+      assigneeIds: search.members,
+      labelNames: search.labels,
+      deadlineFrom: search.deadline?.[0]
+        ? new Date(Number(search.deadline[0])).toISOString()
+        : undefined,
+      deadlineTo: search.deadline?.[1]
+        ? new Date(Number(search.deadline[1])).toISOString()
+        : undefined,
+    }),
+    [search]
+  )
+
+  const { data: tasks } = useTasksQuery(activeOrgId || '', filters)
+
   const { setOpen } = useTasks()
-  const { table, filterOptions } = useTasksTable({ data: tasks })
+  const { table, filterOptions } = useTasksTable({
+    orgId: activeOrgId || '',
+    data: tasks || [],
+  })
 
   const filteredTasks = table
     .getFilteredRowModel()
@@ -80,12 +107,12 @@ export function TaskPage() {
               options: filterOptions.statuses,
             },
             {
-              columnId: 'assignedLabels',
+              columnId: 'labels',
               title: 'Label',
               options: filterOptions.labels,
             },
             {
-              columnId: 'assignedMembers',
+              columnId: 'assignees',
               title: 'Members',
               options: filterOptions.members,
             },

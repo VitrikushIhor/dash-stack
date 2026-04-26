@@ -1,46 +1,37 @@
 import { create } from 'zustand'
-import { persist, devtools, createJSONStorage } from 'zustand/middleware'
-import { type Task } from '@/entities/task'
+import { devtools } from 'zustand/middleware'
+import { type TaskStatusEnum } from '@/entities/task'
 
-interface TaskState {
-  tasks: Task[]
-  addTask: (task: Task) => void
-  updateTask: (id: string, task: Partial<Task>) => void
-  deleteTask: (id: string) => void
-  clearTasks: () => void
+interface TaskFilters {
+  status?: TaskStatusEnum
+  assigneeId?: string
 }
 
-export const useTaskStore = create<TaskState>()(
+interface TaskUiState {
+  selectedTaskId: string | null
+  isDrawerOpen: boolean
+  activeFilters: TaskFilters
+  setSelectedTaskId: (id: string | null) => void
+  setIsDrawerOpen: (isOpen: boolean) => void
+  setActiveFilters: (filters: TaskFilters) => void
+  resetFilters: () => void
+}
+
+export const useTaskStore = create<TaskUiState>()(
   devtools(
-    persist(
-      (set) => ({
-        tasks: [],
+    (set) => ({
+      selectedTaskId: null,
+      isDrawerOpen: false,
+      activeFilters: {},
 
-        addTask: (task) =>
-          set((state) => ({
-            tasks: [...state.tasks, task],
-          })),
-
-        updateTask: (id, updatedTask) =>
-          set((state) => ({
-            tasks: state.tasks.map((t) =>
-              t.id === id ? { ...t, ...updatedTask } : t
-            ),
-          })),
-
-        deleteTask: (id) =>
-          set((state) => ({
-            tasks: state.tasks.filter((t) => t.id !== id),
-          })),
-
-        clearTasks: () => set({ tasks: [] }),
-      }),
-      {
-        name: 'task-storage',
-        storage: createJSONStorage(() => localStorage),
-        partialize: (state) => ({ tasks: state.tasks }),
-      }
-    ),
+      setSelectedTaskId: (id) => set({ selectedTaskId: id }),
+      setIsDrawerOpen: (isOpen) => set({ isDrawerOpen: isOpen }),
+      setActiveFilters: (filters) =>
+        set((state) => ({
+          activeFilters: { ...state.activeFilters, ...filters },
+        })),
+      resetFilters: () => set({ activeFilters: {} }),
+    }),
     { name: 'TaskStore' }
   )
 )

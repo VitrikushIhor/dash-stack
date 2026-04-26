@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
+import { useOrgStore } from '../model/store/organization-store'
 import { type Organization } from '../model/types/organization.types'
 
 interface OrganizationCardProps {
@@ -13,10 +14,13 @@ interface OrganizationCardProps {
 }
 
 export const OrganizationCard = ({ organization }: OrganizationCardProps) => {
+  const { setActiveOrgId } = useOrgStore()
+
   return (
     <Link
       to='/organizations/$orgId'
       params={{ orgId: organization.id }}
+      onClick={() => setActiveOrgId(organization.id)}
       className='block transition-transform hover:scale-[1.02]'
     >
       <Card className='hover:border-primary/50 h-full cursor-pointer'>

@@ -1,15 +1,18 @@
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/shared/ui/components/confirm-dialog'
+import { useOrgStore } from '@/features/organization'
 import {
   AddTaskDialog,
   EditTaskDialog,
-  useTaskStore,
   useTasks,
+  useDeleteTask,
 } from '@/features/task'
 
 export function TasksDialogs() {
+  const { activeOrgId } = useOrgStore()
   const { open, setOpen, currentRow, setCurrentRow, status } = useTasks()
-  const { deleteTask } = useTaskStore()
+  // deleteTask is a mutation hook, not from store
+  const deleteTaskMutation = useDeleteTask(activeOrgId || '')
   return (
     <>
       <AddTaskDialog
@@ -43,7 +46,9 @@ export function TasksDialogs() {
               }, 500)
             }}
             handleConfirm={() => {
-              deleteTask(currentRow.id)
+              if (currentRow) {
+                deleteTaskMutation.mutate(currentRow.id)
+              }
               toast.success('Task deleted successfully')
               setOpen(null)
               setTimeout(() => {

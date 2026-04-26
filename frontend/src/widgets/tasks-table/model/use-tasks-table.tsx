@@ -13,20 +13,21 @@ import {
   type RowSelectionState,
 } from '@tanstack/react-table'
 import { useTableUrlState } from '@/shared/hooks/use-table-url-state'
-import { type Membership } from '@/shared/model/types/membership'
 import { dateFilterFn } from '@/shared/ui/components/data-table/date-filter'
 import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
 import { TaskStatusEnum, type Task } from '@/entities/task'
+import { useGetMembers } from '@/features/organization'
 import { STATUS_CONFIG } from '@/features/task'
 import { tasksColumns } from '../ui/tasks-columns'
 
 interface UseTasksTableProps {
+  orgId: string
   data: Task[]
 }
 const route = getRouteApi('/_authenticated/task/')
 
-export function useTasksTable({ data }: UseTasksTableProps) {
+export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   // Local UI-only states
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
@@ -48,8 +49,8 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     globalFilter: { enabled: true, key: 'filter' },
     columnFilters: [
       { columnId: 'status', searchKey: 'status', type: 'array' },
-      { columnId: 'assignedLabels', searchKey: 'labels', type: 'array' },
-      { columnId: 'assignedMembers', searchKey: 'members', type: 'array' },
+      { columnId: 'labels', searchKey: 'labels', type: 'array' },
+      { columnId: 'assignees', searchKey: 'members', type: 'array' },
       {
         columnId: 'deadline',
         searchKey: 'deadline',
@@ -69,7 +70,7 @@ export function useTasksTable({ data }: UseTasksTableProps) {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data,
+    data: data || [],
     columns: tasksColumns,
     state: {
       sorting,
@@ -83,6 +84,7 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
+    manualFiltering: true,
     globalFilterFn: (row, _columnId, filterValue) => {
       const desc = String(row.getValue('description')).toLowerCase()
       const title = String(row.getValue('title')).toLowerCase()
@@ -110,6 +112,8 @@ export function useTasksTable({ data }: UseTasksTableProps) {
     ensurePageInRange(pageCount)
   }, [pageCount, ensurePageInRange])
 
+  const { data: orgMembers = [] } = useGetMembers(orgId)
+
   // Memoize filter options to avoid unnecessary recalculations
   const filterOptions = useMemo(() => {
     const statuses = Object.values(TaskStatusEnum).map((status) => ({
@@ -123,22 +127,13 @@ export function useTasksTable({ data }: UseTasksTableProps) {
       value: l.name,
     }))
 
-    const uniqueMembers = new Map<string, Membership>()
-    data.forEach((task) => {
-      task.assignedMembers?.forEach((member) => {
-        if (!uniqueMembers.has(member.id)) {
-          uniqueMembers.set(member.id, member)
-        }
-      })
-    })
-
-    const members = Array.from(uniqueMembers.values()).map((member) => ({
+    const members = orgMembers.map((member) => ({
       label: member.user?.firstName || 'User',
       value: member.id,
     }))
 
     return { statuses, labels, members }
-  }, [data])
+  }, [orgMembers])
 
   return {
     table,

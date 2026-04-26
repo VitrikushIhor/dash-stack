@@ -6,7 +6,7 @@ import {
 import { TaskRepository } from '../repositories/task.repository';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from '../enums/task-status.enum';
 
 @Injectable()
 export class TaskService {
@@ -32,10 +32,7 @@ export class TaskService {
     });
   }
 
-  async findAll(
-    organizationId: string,
-    filters: { status?: TaskStatus; assigneeId?: string } = {},
-  ) {
+  async findAll(organizationId: string, filters: any = {}) {
     return this.repository.findAll(organizationId, filters);
   }
 
@@ -78,5 +75,16 @@ export class TaskService {
     }
 
     await this.repository.delete(id, organizationId);
+  }
+
+  async updateMany(organizationId: string, ids: string[], dto: UpdateTaskDto) {
+    return this.repository.updateMany(organizationId, ids, {
+      ...dto,
+      deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+    });
+  }
+
+  async deleteMany(organizationId: string, ids: string[]) {
+    return this.repository.deleteMany(organizationId, ids);
   }
 }

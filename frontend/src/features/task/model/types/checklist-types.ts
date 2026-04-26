@@ -1,9 +1,7 @@
-import { type TodoChecklistType } from '@/entities/task'
-
-export type { TodoChecklistType }
+import { type Checklist } from '@/entities/task'
 
 export interface CheckListTodoState {
-  checklists: TodoChecklistType[]
+  checklists: Checklist[]
 }
 
 export interface CheckListTodoActions {
@@ -14,7 +12,7 @@ export interface CheckListTodoActions {
   updateTask: (checklistId: string, taskId: string, newTitle: string) => void
   toggleTask: (checklistId: string, taskId: string) => void
   deleteTask: (checklistId: string, taskId: string) => void
-  setChecklists: (checklists: TodoChecklistType[]) => void
+  setChecklists: (checklists: Checklist[]) => void
 }
 
 export type ChecklistTodoStore = CheckListTodoState & CheckListTodoActions

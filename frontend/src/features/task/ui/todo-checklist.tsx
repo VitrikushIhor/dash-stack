@@ -87,13 +87,13 @@ export const TodoChecklist = memo(function TodoChecklist({
   )
 
   const completedCount = useMemo(
-    () => checklist?.tasks.filter((task) => task.completed).length || 0,
-    [checklist?.tasks]
+    () => checklist?.items?.filter((task) => task.completed).length || 0,
+    [checklist?.items]
   )
 
   const progressText = useMemo(
-    () => `${completedCount}/${checklist?.tasks.length || 0}`,
-    [completedCount, checklist?.tasks.length]
+    () => `${completedCount}/${checklist?.items?.length || 0}`,
+    [completedCount, checklist?.items?.length]
   )
 
   if (!checklist) return null
@@ -145,7 +145,7 @@ export const TodoChecklist = memo(function TodoChecklist({
               >
                 {checklist.name}
               </button>
-              {checklist.tasks.length > 0 && (
+              {(checklist?.items?.length ?? 0) > 0 && (
                 <span className='text-muted-foreground text-sm'>
                   {progressText}
                 </span>
@@ -183,13 +183,13 @@ export const TodoChecklist = memo(function TodoChecklist({
 
       {isExpanded && (
         <div className='space-y-1'>
-          {checklist.tasks.length === 0 && !isAdding && (
+          {(checklist?.items?.length ?? 0) === 0 && !isAdding && (
             <p className='text-muted-foreground ml-5 py-2 text-sm'>
               No tasks in this checklist
             </p>
           )}
 
-          {checklist.tasks.map((task) => (
+          {(checklist?.items || []).map((task) => (
             <TodoItem
               key={task.id}
               taskId={task.id}

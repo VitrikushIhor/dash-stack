@@ -15,12 +15,15 @@ import {
 import { TaskService } from './services/task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { FindAllTasksDto } from './dto/find-all-tasks.dto';
+import { BulkUpdateTasksDto, BulkDeleteTasksDto } from './dto/bulk-action.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   MembershipRoleGuard,
   RequireOrgRole,
 } from '../common/guards/membership-role.guard';
-import { OrgRole, TaskStatus } from '@prisma/client';
+import { OrgRole } from '@prisma/client';
+import { TaskStatus } from './enums/task-status.enum';
 import {
   ApiTags,
   ApiOperation,
@@ -45,15 +48,8 @@ export class TaskController {
   @Get()
   @RequireOrgRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'List all tasks for an organization' })
-  @ApiQuery({ name: 'status', enum: TaskStatus, required: false })
-  @ApiQuery({ name: 'assigneeId', type: String, required: false })
-  findAll(
-    @Param('orgId') orgId: string,
-    @Query('status', new ParseEnumPipe(TaskStatus, { optional: true }))
-    status?: TaskStatus,
-    @Query('assigneeId') assigneeId?: string,
-  ) {
-    return this.taskService.findAll(orgId, { status, assigneeId });
+  findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
+    return this.taskService.findAll(orgId, dto);
   }
 
   @Get(':id')
@@ -80,5 +76,26 @@ export class TaskController {
   @ApiOperation({ summary: 'Delete a task' })
   async delete(@Param('orgId') orgId: string, @Param('id') id: string) {
     await this.taskService.delete(id, orgId);
+  }
+
+  @Patch('bulk/update')
+  @RequireOrgRole(OrgRole.MEMBER)
+  @ApiOperation({ summary: 'Bulk update tasks' })
+  async updateMany(
+    @Param('orgId') orgId: string,
+    @Body() dto: BulkUpdateTasksDto,
+  ) {
+    return this.taskService.updateMany(orgId, dto.ids, dto.data);
+  }
+
+  @Post('bulk/delete')
+  @RequireOrgRole(OrgRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Bulk delete tasks' })
+  async deleteMany(
+    @Param('orgId') orgId: string,
+    @Body() dto: BulkDeleteTasksDto,
+  ) {
+    await this.taskService.deleteMany(orgId, dto.ids);
   }
 }
