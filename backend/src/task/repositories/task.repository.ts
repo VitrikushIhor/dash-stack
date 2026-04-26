@@ -215,22 +215,16 @@ export class TaskRepository {
   async updateMany(
     organizationId: string,
     ids: string[],
-    data: UpdateTaskData,
+    data: Partial<
+      Omit<UpdateTaskData, 'assigneeIds' | 'labels' | 'checklists'>
+    >,
   ) {
-    const { assigneeIds, labels, checklists, ...rest } = data;
-
-    // For bulk update, we only support simple fields (status, deadline, etc.)
-    // Complex fields like assignees/labels are usually not updated in bulk via simple Patch
-    // but we can add support if needed. For now, let's keep it simple.
-
     return this.prisma.task.updateMany({
       where: {
         id: { in: ids },
         organizationId,
       },
-      data: {
-        ...rest,
-      },
+      data,
     });
   }
 

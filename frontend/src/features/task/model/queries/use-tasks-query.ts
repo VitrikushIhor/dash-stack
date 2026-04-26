@@ -8,7 +8,7 @@ export function useTasksQuery(
   filters?: TaskFilters
 ): UseQueryResult<Task[]> {
   return useQuery({
-    queryKey: [QUERY_KEYS.TASKS, orgId, filters],
+    queryKey: [QUERY_KEYS.TASKS, orgId, JSON.stringify(filters)],
     queryFn: () => taskApi.findAll(orgId, filters),
     enabled: !!orgId,
   })

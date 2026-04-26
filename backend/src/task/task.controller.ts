@@ -10,7 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ParseEnumPipe,
 } from '@nestjs/common';
 import { TaskService } from './services/task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -23,13 +22,7 @@ import {
   RequireOrgRole,
 } from '../common/guards/membership-role.guard';
 import { OrgRole } from '@prisma/client';
-import { TaskStatus } from './enums/task-status.enum';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -50,6 +43,27 @@ export class TaskController {
   @ApiOperation({ summary: 'List all tasks for an organization' })
   findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
     return this.taskService.findAll(orgId, dto);
+  }
+
+  @Patch('bulk/update')
+  @RequireOrgRole(OrgRole.MEMBER)
+  @ApiOperation({ summary: 'Bulk update tasks' })
+  async updateMany(
+    @Param('orgId') orgId: string,
+    @Body() dto: BulkUpdateTasksDto,
+  ) {
+    return this.taskService.updateMany(orgId, dto.ids, { status: dto.status });
+  }
+
+  @Delete('bulk')
+  @RequireOrgRole(OrgRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Bulk delete tasks' })
+  async deleteMany(
+    @Param('orgId') orgId: string,
+    @Body() dto: BulkDeleteTasksDto,
+  ) {
+    await this.taskService.deleteMany(orgId, dto.ids);
   }
 
   @Get(':id')
@@ -76,26 +90,5 @@ export class TaskController {
   @ApiOperation({ summary: 'Delete a task' })
   async delete(@Param('orgId') orgId: string, @Param('id') id: string) {
     await this.taskService.delete(id, orgId);
-  }
-
-  @Patch('bulk/update')
-  @RequireOrgRole(OrgRole.MEMBER)
-  @ApiOperation({ summary: 'Bulk update tasks' })
-  async updateMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkUpdateTasksDto,
-  ) {
-    return this.taskService.updateMany(orgId, dto.ids, dto.data);
-  }
-
-  @Post('bulk/delete')
-  @RequireOrgRole(OrgRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Bulk delete tasks' })
-  async deleteMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkDeleteTasksDto,
-  ) {
-    await this.taskService.deleteMany(orgId, dto.ids);
   }
 }

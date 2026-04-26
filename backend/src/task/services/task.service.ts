@@ -6,7 +6,7 @@ import {
 import { TaskRepository } from '../repositories/task.repository';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
-import { TaskStatus } from '../enums/task-status.enum';
+import { FindAllTasksDto } from '../dto/find-all-tasks.dto';
 
 @Injectable()
 export class TaskService {
@@ -32,7 +32,7 @@ export class TaskService {
     });
   }
 
-  async findAll(organizationId: string, filters: any = {}) {
+  async findAll(organizationId: string, filters: FindAllTasksDto = {}) {
     return this.repository.findAll(organizationId, filters);
   }
 
@@ -77,10 +77,14 @@ export class TaskService {
     await this.repository.delete(id, organizationId);
   }
 
-  async updateMany(organizationId: string, ids: string[], dto: UpdateTaskDto) {
+  async updateMany(
+    organizationId: string,
+    ids: string[],
+    data: Pick<UpdateTaskDto, 'status' | 'deadline'>,
+  ) {
     return this.repository.updateMany(organizationId, ids, {
-      ...dto,
-      deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+      ...data,
+      deadline: data.deadline ? new Date(data.deadline) : undefined,
     });
   }
 

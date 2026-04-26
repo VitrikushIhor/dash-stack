@@ -4,7 +4,6 @@ export default async () => {
     ['./task/dto/create-task.dto']: await import('./task/dto/create-task.dto'),
     ['./task/enums/task-status.enum']:
       await import('./task/enums/task-status.enum'),
-    ['./task/dto/update-task.dto']: await import('./task/dto/update-task.dto'),
   };
   return {
     '@nestjs/swagger/plugin': {
@@ -124,26 +123,6 @@ export default async () => {
         ],
         [import('./task/dto/update-task.dto'), { UpdateTaskDto: {} }],
         [
-          import('./common/pagination/pagination.dto'),
-          {
-            PaginationDto: {
-              page: {
-                required: false,
-                type: () => Number,
-                default: 1,
-                minimum: 1,
-              },
-              perPage: {
-                required: false,
-                type: () => Number,
-                default: 10,
-                minimum: 1,
-                maximum: 100,
-              },
-            },
-          },
-        ],
-        [
           import('./task/dto/find-all-tasks.dto'),
           {
             FindAllTasksDto: {
@@ -164,14 +143,34 @@ export default async () => {
           import('./task/dto/bulk-action.dto'),
           {
             BulkUpdateTasksDto: {
-              ids: { required: true, type: () => [String] },
-              data: {
+              ids: { required: true, type: () => [String], minItems: 1 },
+              status: {
                 required: true,
-                type: () => t['./task/dto/update-task.dto'].UpdateTaskDto,
+                enum: t['./task/enums/task-status.enum'].TaskStatus,
               },
             },
             BulkDeleteTasksDto: {
-              ids: { required: true, type: () => [String] },
+              ids: { required: true, type: () => [String], minItems: 1 },
+            },
+          },
+        ],
+        [
+          import('./common/pagination/pagination.dto'),
+          {
+            PaginationDto: {
+              page: {
+                required: false,
+                type: () => Number,
+                default: 1,
+                minimum: 1,
+              },
+              perPage: {
+                required: false,
+                type: () => Number,
+                default: 10,
+                minimum: 1,
+                maximum: 100,
+              },
             },
           },
         ],
@@ -241,11 +240,11 @@ export default async () => {
             TaskController: {
               create: { type: Object },
               findAll: { type: [Object] },
+              updateMany: { type: Object },
+              deleteMany: {},
               findById: { type: Object },
               update: { type: Object },
               delete: {},
-              updateMany: { type: Object },
-              deleteMany: {},
             },
           },
         ],

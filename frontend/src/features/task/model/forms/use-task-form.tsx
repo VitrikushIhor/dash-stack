@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -93,7 +92,8 @@ export function useTaskForm(
       setSelectedLabels([])
       setChecklists([])
     }
-  }, [task, initialStatus, form, setChecklists])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task, initialStatus, form])
 
   const handleSubmit = async (values: TaskFormValues) => {
     try {

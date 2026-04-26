@@ -2,29 +2,29 @@ import {
   IsArray,
   IsString,
   IsNotEmpty,
-  IsOptional,
-  ValidateNested,
+  ArrayMinSize,
+  IsEnum,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { UpdateTaskDto } from './update-task.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { TaskStatus } from '../enums/task-status.enum';
 
 export class BulkUpdateTasksDto {
   @ApiProperty({ example: ['task1', 'task2'] })
   @IsArray()
+  @ArrayMinSize(1)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
   ids: string[];
 
-  @ApiProperty()
-  @ValidateNested()
-  @Type(() => UpdateTaskDto)
-  data: UpdateTaskDto;
+  @ApiProperty({ enum: TaskStatus })
+  @IsEnum(TaskStatus)
+  status: TaskStatus;
 }
 
 export class BulkDeleteTasksDto {
   @ApiProperty({ example: ['task1', 'task2'] })
   @IsArray()
+  @ArrayMinSize(1)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
   ids: string[];

@@ -16,10 +16,20 @@ export interface TaskFilters {
 }
 
 export const taskApi = {
-  findAll: (orgId: string, filters?: TaskFilters): Promise<Task[]> =>
-    api.get<Task[]>(`/organizations/${orgId}/tasks`, {
-      params: filters as Record<string, string | undefined>,
-    }),
+  findAll: (orgId: string, filters?: TaskFilters): Promise<Task[]> => {
+    const params: Record<string, string | undefined> = {
+      search: filters?.search,
+      deadlineFrom: filters?.deadlineFrom,
+      deadlineTo: filters?.deadlineTo,
+      status: filters?.status?.join(','),
+      assigneeIds: filters?.assigneeIds?.join(','),
+      labelNames: filters?.labelNames?.join(','),
+    }
+
+    return api.get<Task[]>(`/organizations/${orgId}/tasks`, {
+      params,
+    })
+  },
 
   findById: (orgId: string, id: string): Promise<Task> =>
     api.get<Task>(`/organizations/${orgId}/tasks/${id}`),
@@ -36,10 +46,13 @@ export const taskApi = {
   bulkUpdate: (
     orgId: string,
     ids: string[],
-    data: UpdateTaskDto
+    data: Partial<Pick<UpdateTaskDto, 'status'>>
   ): Promise<void> =>
-    api.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, { ids, data }),
+    api.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, {
+      ids,
+      ...data,
+    }),
 
   bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
-    api.post<void>(`/organizations/${orgId}/tasks/bulk/delete`, { ids }),
+    api.delete<void>(`/organizations/${orgId}/tasks/bulk`, { data: { ids } }),
 }
