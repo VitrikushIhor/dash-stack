@@ -84,6 +84,7 @@ describe('TaskCardKanban', () => {
   })
 
   it('should show red text for deadline if task is overdue', () => {
+    vi.useFakeTimers()
     // Mock date to be after deadline
     vi.setSystemTime(new Date('2026-04-26T12:00:00Z'))
 

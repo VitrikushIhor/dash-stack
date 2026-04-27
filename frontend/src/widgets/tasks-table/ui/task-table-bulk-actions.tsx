@@ -39,6 +39,11 @@ export function TaskTableBulkActions<TData>({
   const { mutateAsync: bulkDelete } = useBulkDeleteTasks(activeOrgId || '')
 
   const handleBulkStatusChange = async (status: string) => {
+    if (!activeOrgId) {
+      toast.error('No organization selected')
+      return
+    }
+
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
 
     toast.promise(
@@ -58,6 +63,11 @@ export function TaskTableBulkActions<TData>({
   }
 
   const handleBulkDelete = async () => {
+    if (!activeOrgId) {
+      toast.error('No organization selected')
+      return
+    }
+
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
 
     toast.promise(bulkDelete(selectedIds), {
@@ -86,6 +96,7 @@ export function TaskTableBulkActions<TData>({
                   className='size-8'
                   aria-label='Update status'
                   title='Update status'
+                  disabled={!activeOrgId}
                 >
                   <CircleArrowUp />
                   <span className='sr-only'>Update status</span>
@@ -120,6 +131,7 @@ export function TaskTableBulkActions<TData>({
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
+              disabled={!activeOrgId}
             >
               <Trash2 />
               <span className='sr-only'>Delete selected tasks</span>

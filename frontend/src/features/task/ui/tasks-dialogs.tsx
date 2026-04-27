@@ -27,11 +27,13 @@ export function TasksDialogs() {
         <>
           <EditTaskDialog
             open={open === 'update'}
-            onOpenChange={() => {
-              setOpen('update')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'update' : null)
+              if (!isOpen) {
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             task={currentRow}
           />
@@ -39,17 +41,27 @@ export function TasksDialogs() {
           <ConfirmDialog
             destructive
             open={open === 'delete'}
-            onOpenChange={() => {
-              setOpen('delete')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'delete' : null)
+              if (!isOpen) {
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             handleConfirm={() => {
-              if (currentRow) {
-                deleteTaskMutation.mutate(currentRow.id)
+              if (!activeOrgId) {
+                toast.error('No organization selected')
+                return
               }
-              toast.success('Task deleted successfully')
+
+              if (currentRow) {
+                toast.promise(deleteTaskMutation.mutateAsync(currentRow.id), {
+                  loading: 'Deleting task...',
+                  success: 'Task deleted successfully',
+                  error: 'Failed to delete task',
+                })
+              }
               setOpen(null)
               setTimeout(() => {
                 setCurrentRow(null)

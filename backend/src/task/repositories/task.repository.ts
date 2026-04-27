@@ -112,6 +112,7 @@ export class TaskRepository {
               select: {
                 id: true,
                 firstName: true,
+                email: true,
                 avatar: true,
               },
             },

@@ -1,3 +1,4 @@
+import { type OrgRole } from '@/shared/model/types/org-role'
 import { type LabelColor } from '@/shared/ui/components/label/types.label'
 
 export enum TaskStatusEnum {
@@ -8,10 +9,14 @@ export enum TaskStatusEnum {
 
 export interface TaskAssignee {
   id: string // Membership ID
+  userId: string
+  orgId: string
+  role: OrgRole
+  joinedAt: string
   user: {
     id: string
     firstName: string
-    email?: string
+    email: string
     avatar: string | null
   }
 }

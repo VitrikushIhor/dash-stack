@@ -24,7 +24,7 @@ model User {
   refreshTokens RefreshToken[]
 
   // App relations
-  memberships   Membership[]
+  memberships Membership[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -190,12 +190,13 @@ model Task {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignees      Membership[]  @relation("TaskAssignees")
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignees      Membership[]    @relation("TaskAssignees")
   labels         TaskLabel[]
   checklists     Checklist[]
   calendarEvents CalendarEvent[]
 
+  @@unique([id, organizationId])
   @@index([organizationId])
   @@index([organizationId, status])
   @@map("tasks")

@@ -38,9 +38,11 @@ export function KanbanTaskBoard({
 
   const handleTaskMove = useCallback(
     (taskId: string, newStatus: TaskStatusEnum) => {
+      if (!activeOrgId) return
+
       updateTask({ id: taskId, data: { status: newStatus } })
     },
-    [updateTask]
+    [updateTask, activeOrgId]
   )
 
   const handleValueChange = useCallback(

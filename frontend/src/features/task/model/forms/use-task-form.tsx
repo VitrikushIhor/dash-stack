@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fileToBase64 } from '@/shared/lib/utils'
 import { type Membership } from '@/shared/model/types/membership'
-import { OrgRole } from '@/shared/model/types/org-role'
 import {
   type Label,
   type LabelColor,
@@ -65,22 +64,27 @@ export function useTaskForm(
       }
       fetchFiles()
 
-      const mappedMembers = (task.assignees || []).map((a) => ({
+      const mappedMembers: Membership[] = (task.assignees || []).map((a) => ({
         id: a.id,
-        user: a.user,
-        userId: a.user.id,
-        orgId: task.organizationId,
-        role: OrgRole.MEMBER,
-        joinedAt: '',
-      })) as Membership[]
+        user: {
+          ...a.user,
+          email: a.user.email,
+          firstName: a.user.firstName,
+          avatar: a.user.avatar || undefined,
+        },
+        userId: a.userId,
+        orgId: a.orgId,
+        role: a.role,
+        joinedAt: a.joinedAt,
+      }))
 
       setSelectedMembers(mappedMembers)
 
-      const mappedLabels = (task.labels || []).map((l) => ({
+      const mappedLabels: Label[] = (task.labels || []).map((l) => ({
         id: l.id,
         name: l.name,
         color: l.color as LabelColor,
-      })) as Label[]
+      }))
 
       setSelectedLabels(mappedLabels)
 
@@ -96,6 +100,11 @@ export function useTaskForm(
   }, [task, initialStatus, form])
 
   const handleSubmit = async (values: TaskFormValues) => {
+    if (!orgId) {
+      toast.error('No organization selected')
+      return
+    }
+
     try {
       const attachments = files.length
         ? await Promise.all(files.map((file) => fileToBase64(file)))
