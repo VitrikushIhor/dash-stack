@@ -10,9 +10,12 @@ import { LayoutGrid, LayoutList } from 'lucide-react'
 import { DataTable } from '@/shared/ui/components/data-table'
 import { Button } from '@/shared/ui/components/ui/button'
 import { InviteMemberDialog, InvitationsTable } from '@/features/invitation'
-import { useGetOrganization, useGetMembers } from '@/features/organization'
-import { useOrganizationPermission } from '@/features/organization/lib/hooks/use-organization-permission'
-import { columns } from '@/features/organization/ui/members-table/columns'
+import {
+  membersTableColumns,
+  useGetMembers,
+  useGetOrganization,
+  useOrganizationPermission,
+} from '@/features/organization'
 import { TeamGrid } from '@/features/team'
 
 export const Route = createFileRoute(
@@ -39,7 +42,7 @@ function OrganizationMembersPage() {
 
   const table = useReactTable({
     data: memberships ?? [],
-    columns,
+    columns: membersTableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),

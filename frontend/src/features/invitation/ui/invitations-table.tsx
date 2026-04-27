@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -6,8 +7,8 @@ import {
 } from '@tanstack/react-table'
 import { Loader2 } from 'lucide-react'
 import { DataTable } from '@/shared/ui/components/data-table'
-import { useListInvitations } from '../api/hooks/use-list-invitations'
-import { useRevokeInvite } from '../api/hooks/use-revoke-invite'
+import { useRevokeInvite } from '../model/mutations/use-revoke-invite'
+import { useListInvitations } from '../model/queries/use-list-invitations'
 import { getColumns } from './invitations-table/columns'
 
 interface InvitationsTableProps {
@@ -18,10 +19,14 @@ export const InvitationsTable = ({ orgId }: InvitationsTableProps) => {
   const { data: invitations, isLoading } = useListInvitations(orgId)
   const { mutate: revokeInvite, isPending: isRevoking } = useRevokeInvite()
 
-  const columns = getColumns({
-    onRevoke: (id) => revokeInvite({ orgId, id }),
-    isRevoking,
-  })
+  const columns = useMemo(
+    () =>
+      getColumns({
+        onRevoke: (id) => revokeInvite({ orgId, id }),
+        isRevoking,
+      }),
+    [revokeInvite, orgId, isRevoking]
+  )
 
   const table = useReactTable({
     data: invitations ?? [],

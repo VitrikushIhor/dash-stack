@@ -10,8 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { AuthLayout, useVerifyEmail } from '@/features/auth'
-import { VerificationStatus } from '@/features/auth/model/types/auth.types'
+import { AuthLayout, useVerifyEmail, VerificationStatus } from '@/features/auth'
 
 export function VerifyEmail() {
   const searchParams = useSearch({ strict: false }) as { token?: string }

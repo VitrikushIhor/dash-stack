@@ -19,7 +19,7 @@ import {
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
-import { useCreateOrganizationForm } from '../lib/hooks/use-create-organization-form'
+import { useCreateOrganizationForm } from '../model/forms/use-create-organization-form'
 
 interface CreateOrganizationDialogProps {
   children?: React.ReactNode

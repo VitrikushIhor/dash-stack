@@ -9,7 +9,7 @@ import {
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
-import { useUpdateOrganizationForm } from '../lib/hooks/use-update-organization-form'
+import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
 import { type Organization } from '../model/types/organization.types'
 
 interface OrganizationSettingsFormProps {

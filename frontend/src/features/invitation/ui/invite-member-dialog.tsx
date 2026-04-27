@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '@/shared/ui/components/ui/select'
 import { OrgRole } from '@/features/organization/model/types/organization.types'
-import { useInviteMemberForm } from '../lib/hooks/use-invite-member-form'
+import { useInviteMemberForm } from '../model/forms/use-invite-member-form'
 
 interface InviteMemberDialogProps {
   orgId: string

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { useAcceptInvite } from '../api/hooks/use-accept-invite'
+import { useAcceptInvite } from '../model/mutations/use-accept-invite'
 
 interface AcceptInvitePageProps {
   token: string
@@ -25,7 +25,6 @@ export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
     if (token) {
       acceptInvite(token, {
         onSuccess: () => {
-          // Redirect to organizations list after success
           timeoutId = setTimeout(() => {
             navigate({ to: '/organizations' })
           }, REDIRECT_DELAY)
