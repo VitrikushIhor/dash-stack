@@ -11,8 +11,8 @@ import {
   useGetOrganization,
   OrganizationSettingsForm,
   DeleteOrganizationButton,
+  useOrganizationPermission,
 } from '@/features/organization'
-import { useOrganizationPermission } from '@/features/organization/lib/hooks/use-organization-permission'
 
 export const Route = createFileRoute(
   '/_authenticated/organizations/$orgId/settings'

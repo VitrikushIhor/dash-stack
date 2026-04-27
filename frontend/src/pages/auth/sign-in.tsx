@@ -7,8 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/components/ui/card'
-import { AuthLayout } from '@/features/auth'
-import { SignInForm } from '@/features/auth/ui/sing-in-form'
+import { AuthLayout, SignInForm } from '@/features/auth'
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })

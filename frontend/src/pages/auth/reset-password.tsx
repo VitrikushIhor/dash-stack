@@ -19,12 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/shared/ui/components/ui/form'
-import { AuthLayout, useResetPassword } from '@/features/auth'
 import {
+  AuthLayout,
+  useResetPassword,
   resetPasswordDefaultValues,
   resetPasswordSchema,
   type TResetPasswordSchema,
-} from '@/features/auth/model/schema/reset-password.schema'
+} from '@/features/auth'
 
 export function ResetPassword() {
   const searchParams = useSearch({ strict: false }) as { token?: string }

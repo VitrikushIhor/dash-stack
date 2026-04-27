@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { OrgRole } from '@/shared/model/types/org-role'
 import { Button } from '@/shared/ui/components/ui/button'
 import {
   Dialog,
@@ -26,8 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/components/ui/select'
-import { OrgRole } from '@/features/organization/model/types/organization.types'
-import { useInviteMemberForm } from '../lib/hooks/use-invite-member-form'
+import { useInviteMemberForm } from '../model/forms/use-invite-member-form'
 
 interface InviteMemberDialogProps {
   orgId: string

@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-import { useForgotPassword } from '../api'
+import { useForgotPassword } from '../model/mutations/use-forgot-password'
 import {
   forgotPasswordDefaultValues,
   forgotPasswordSchema,
