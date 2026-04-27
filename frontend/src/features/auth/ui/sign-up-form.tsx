@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-import { useSignup } from '..'
+import { useSignup } from '../model/mutations/use-signup'
 import {
   signUpDefaultValues,
   signUpSchema,
