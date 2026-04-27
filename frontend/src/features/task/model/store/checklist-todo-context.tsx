@@ -6,24 +6,21 @@ import {
   useMemo,
   type ReactNode,
 } from 'react'
-import {
-  type ChecklistTodoStore,
-  type TodoChecklistType,
-} from '../types/checklist-types'
+import { type Checklist } from '@/entities/task'
+import { type ChecklistTodoStore } from '../types/checklist-types'
 
 const ChecklistTodoContext = createContext<ChecklistTodoStore | null>(null)
 
 interface TodoProviderProps {
   children: ReactNode
-  initialChecklists?: TodoChecklistType[]
+  initialChecklists?: Checklist[]
 }
 
 export function ChecklistTodoProvider({
   children,
   initialChecklists = [],
 }: TodoProviderProps) {
-  const [checklists, setChecklists] =
-    useState<TodoChecklistType[]>(initialChecklists)
+  const [checklists, setChecklists] = useState<Checklist[]>(initialChecklists)
 
   const addChecklist = useCallback(() => {
     setChecklists((prev) => [
@@ -31,7 +28,7 @@ export function ChecklistTodoProvider({
       {
         id: crypto.randomUUID(),
         name: `Checklist ${prev.length + 1}`,
-        tasks: [],
+        items: [],
       },
     ])
   }, [])
@@ -59,8 +56,8 @@ export function ChecklistTodoProvider({
         checklist.id === checklistId
           ? {
               ...checklist,
-              tasks: [
-                ...checklist.tasks,
+              items: [
+                ...checklist.items,
                 {
                   id: crypto.randomUUID(),
                   title,
@@ -80,7 +77,7 @@ export function ChecklistTodoProvider({
           checklist.id === checklistId
             ? {
                 ...checklist,
-                tasks: checklist.tasks.map((task) =>
+                items: checklist.items.map((task) =>
                   task.id === taskId ? { ...task, title: newTitle } : task
                 ),
               }
@@ -97,7 +94,7 @@ export function ChecklistTodoProvider({
         checklist.id === checklistId
           ? {
               ...checklist,
-              tasks: checklist.tasks.map((task) =>
+              items: checklist.items.map((task) =>
                 task.id === taskId
                   ? { ...task, completed: !task.completed }
                   : task
@@ -114,7 +111,7 @@ export function ChecklistTodoProvider({
         checklist.id === checklistId
           ? {
               ...checklist,
-              tasks: checklist.tasks.filter((task) => task.id !== taskId),
+              items: checklist.items.filter((task) => task.id !== taskId),
             }
           : checklist
       )
@@ -153,7 +150,6 @@ export function ChecklistTodoProvider({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useCheckListTodoContext() {
   const context = useContext(ChecklistTodoContext)
 
@@ -166,13 +162,11 @@ export function useCheckListTodoContext() {
   return context
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useTodoChecklists() {
   const { checklists } = useCheckListTodoContext()
   return checklists
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useChecklistTodoActions() {
   const {
     addChecklist,
@@ -209,7 +203,6 @@ export function useChecklistTodoActions() {
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useChecklist(checklistId: string) {
   const { checklists } = useCheckListTodoContext()
   return useMemo(

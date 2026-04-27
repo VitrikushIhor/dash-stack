@@ -37,7 +37,7 @@ export const TodoItem = memo(function TodoItem({
   onCancelEdit,
 }: TodoItemProps) {
   const checklist = useChecklist(checklistId)
-  const task = checklist?.tasks.find((t) => t.id === taskId)
+  const task = checklist?.items?.find((t) => t.id === taskId)
   const { toggleTask, deleteTask, updateTask } = useChecklistTodoActions()
 
   const handleToggle = useCallback(() => {

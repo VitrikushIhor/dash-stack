@@ -1,15 +1,18 @@
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/shared/ui/components/confirm-dialog'
+import { useOrgStore } from '@/features/organization'
 import {
   AddTaskDialog,
   EditTaskDialog,
-  useTaskStore,
   useTasks,
+  useDeleteTask,
 } from '@/features/task'
 
 export function TasksDialogs() {
+  const { activeOrgId } = useOrgStore()
   const { open, setOpen, currentRow, setCurrentRow, status } = useTasks()
-  const { deleteTask } = useTaskStore()
+  // deleteTask is a mutation hook, not from store
+  const deleteTaskMutation = useDeleteTask(activeOrgId || '')
   return (
     <>
       <AddTaskDialog
@@ -24,11 +27,13 @@ export function TasksDialogs() {
         <>
           <EditTaskDialog
             open={open === 'update'}
-            onOpenChange={() => {
-              setOpen('update')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'update' : null)
+              if (!isOpen) {
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             task={currentRow}
           />
@@ -36,15 +41,27 @@ export function TasksDialogs() {
           <ConfirmDialog
             destructive
             open={open === 'delete'}
-            onOpenChange={() => {
-              setOpen('delete')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'delete' : null)
+              if (!isOpen) {
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             handleConfirm={() => {
-              deleteTask(currentRow.id)
-              toast.success('Task deleted successfully')
+              if (!activeOrgId) {
+                toast.error('No organization selected')
+                return
+              }
+
+              if (currentRow) {
+                toast.promise(deleteTaskMutation.mutateAsync(currentRow.id), {
+                  loading: 'Deleting task...',
+                  success: 'Task deleted successfully',
+                  error: 'Failed to delete task',
+                })
+              }
               setOpen(null)
               setTimeout(() => {
                 setCurrentRow(null)

@@ -24,8 +24,7 @@ model User {
   refreshTokens RefreshToken[]
 
   // App relations
-  memberships   Membership[]
-  assignedTasks Task[]       @relation("TaskAssignee")
+  memberships Membership[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,6 +92,7 @@ model Organization {
   stripeId    String? // для payments
 
   memberships    Membership[]
+  tasks          Task[]
   projects       Project[]
   calendarEvents CalendarEvent[]
   invitations    Invitation[]
@@ -111,6 +111,7 @@ model Membership {
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  tasks        Task[]       @relation("TaskAssignees")
 
   @@unique([userId, orgId])
   @@index([userId])
@@ -165,7 +166,6 @@ model Project {
   color       String? // для UI (hex колір)
 
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  tasks        Task[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -173,39 +173,69 @@ model Project {
   @@index([orgId])
 }
 
-model Task {
-  id          String     @id @default(cuid())
-  projectId   String
-  title       String
-  description String?
-  status      TaskStatus @default(TODO)
-  priority    Priority   @default(MEDIUM)
-  assigneeId  String?
-  dueDate     DateTime?
+enum TaskStatus {
+  PLANNED
+  UPCOMING
+  COMPLETED
+}
 
-  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assignee       User?           @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+model Task {
+  id             String     @id @default(cuid())
+  title          String
+  description    String?
+  status         TaskStatus @default(PLANNED)
+  deadline       DateTime?
+  attachments    String[]   @default([])
+  organizationId String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignees      Membership[]    @relation("TaskAssignees")
+  labels         TaskLabel[]
+  checklists     Checklist[]
   calendarEvents CalendarEvent[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([projectId])
-  @@index([assigneeId])
-  @@index([status])
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@map("tasks")
 }
 
-enum TaskStatus {
-  TODO
-  IN_PROGRESS
-  DONE
-  BLOCKED
+model TaskLabel {
+  id     String @id @default(cuid())
+  name   String
+  color  String
+  taskId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_labels")
 }
 
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
+model Checklist {
+  id     String @id @default(cuid())
+  name   String
+  taskId String
+
+  task  Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  items ChecklistItem[]
+
+  @@index([taskId])
+  @@map("checklists")
+}
+
+model ChecklistItem {
+  id          String  @id @default(cuid())
+  title       String
+  completed   Boolean @default(false)
+  checklistId String
+
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("checklist_items")
 }
 
 // ============================================
@@ -228,7 +258,6 @@ model CalendarEvent {
   updatedAt DateTime @updatedAt
 
   @@index([orgId])
-  @@index([taskId])
   @@index([start])
 }
 

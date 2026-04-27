@@ -15,10 +15,12 @@ enum ApiMethod {
   DELETE = 'DELETE',
   PATCH = 'PATCH',
 }
+
 // Request options type
 interface RequestOptions {
   method?: ApiMethod
   body?: unknown
+  params?: Record<string, string | undefined>
   headers?: Record<string, string>
   skipAuth?: boolean
 }
@@ -58,6 +60,7 @@ export async function apiClient<T>(
   const {
     method = ApiMethod.GET,
     body,
+    params,
     headers = {},
     skipAuth = false,
   } = options
@@ -84,7 +87,25 @@ export async function apiClient<T>(
     fetchOptions.body = JSON.stringify(body)
   }
 
-  let response = await fetch(`${API_BASE_URL}/api${endpoint}`, fetchOptions)
+  // Serialize params to URLSearchParams
+  let queryString = ''
+  if (params) {
+    const searchParams = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        searchParams.append(key, value)
+      }
+    })
+    const str = searchParams.toString()
+    if (str) {
+      queryString = `?${str}`
+    }
+  }
+
+  let response = await fetch(
+    `${API_BASE_URL}/api${endpoint}${queryString}`,
+    fetchOptions
+  )
 
   // Handle 401 - try refresh token
   if (response.status === 401 && !skipAuth) {
@@ -100,7 +121,7 @@ export async function apiClient<T>(
       const newToken = await refreshPromise
       if (newToken) {
         requestHeaders['Authorization'] = `Bearer ${newToken}`
-        response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
+        response = await fetch(`${API_BASE_URL}/api${endpoint}${queryString}`, {
           ...fetchOptions,
           headers: requestHeaders,
         })
@@ -110,6 +131,11 @@ export async function apiClient<T>(
       window.location.href = '/sign-in'
       throw new ApiError(401, 'Session expired')
     }
+  }
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return {} as T
   }
 
   // Parse response
@@ -155,10 +181,8 @@ export const api = {
     options?: Omit<RequestOptions, 'method' | 'body'>
   ) => apiClient<T>(endpoint, { ...options, method: ApiMethod.PATCH, body }),
 
-  delete: <T>(
-    endpoint: string,
-    options?: Omit<RequestOptions, 'method' | 'body'>
-  ) => apiClient<T>(endpoint, { ...options, method: ApiMethod.DELETE }),
+  delete: <T>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
+    apiClient<T>(endpoint, { ...options, method: ApiMethod.DELETE }),
 }
 
 export default api

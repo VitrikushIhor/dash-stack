@@ -7,7 +7,8 @@ import {
   KanbanOverlay,
 } from '@/shared/ui/components/kanban'
 import { type Task, type TaskStatusEnum } from '@/entities/task'
-import { useTaskStore } from '@/features/task'
+import { useOrgStore } from '@/features/organization'
+import { useUpdateTask } from '@/features/task'
 import { groupTasksByStatus, KanbanViewMode } from '@/widgets/kanban-board'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
@@ -32,13 +33,16 @@ export function KanbanTaskBoard({
     }
   }, [groupedTask])
 
-  const updateTask = useTaskStore((state) => state.updateTask)
+  const { activeOrgId } = useOrgStore()
+  const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
 
   const handleTaskMove = useCallback(
     (taskId: string, newStatus: TaskStatusEnum) => {
-      updateTask(taskId, { status: newStatus })
+      if (!activeOrgId) return
+
+      updateTask({ id: taskId, data: { status: newStatus } })
     },
-    [updateTask]
+    [updateTask, activeOrgId]
   )
 
   const handleValueChange = useCallback(

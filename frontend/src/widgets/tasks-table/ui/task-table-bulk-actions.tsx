@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { sleep } from '@/shared/lib/utils'
 import { DataTableBulkActions } from '@/shared/ui/components/data-table/bulk-actions'
 import { Button } from '@/shared/ui/components/ui/button'
 import {
@@ -17,7 +16,12 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
 import { type TaskStatusEnum, type Task } from '@/entities/task'
-import { STATUS_CONFIG, useTaskStore } from '@/features/task'
+import { useOrgStore } from '@/features/organization'
+import {
+  STATUS_CONFIG,
+  useBulkUpdateTasks,
+  useBulkDeleteTasks,
+} from '@/features/task'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {
@@ -30,40 +34,53 @@ export function TaskTableBulkActions<TData>({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const { updateTask, deleteTask } = useTaskStore()
-  const handleBulkStatusChange = (status: string) => {
-    const selectedTasks = selectedRows.map((row) => row.original as Task)
-    selectedTasks.forEach((task) => {
-      updateTask(task.id, { status: status as TaskStatusEnum })
-    })
-    toast.promise(sleep(2000), {
-      loading: 'Updating status...',
-      success: () => {
-        table.resetRowSelection()
-        return `Status updated to "${status}" for ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''}.`
-      },
-      error: 'Error',
-    })
-    table.resetRowSelection()
+  const { activeOrgId } = useOrgStore()
+  const { mutateAsync: bulkUpdate } = useBulkUpdateTasks(activeOrgId || '')
+  const { mutateAsync: bulkDelete } = useBulkDeleteTasks(activeOrgId || '')
+
+  const handleBulkStatusChange = async (status: string) => {
+    if (!activeOrgId) {
+      toast.error('No organization selected')
+      return
+    }
+
+    const selectedIds = selectedRows.map((row) => (row.original as Task).id)
+
+    toast.promise(
+      bulkUpdate({
+        ids: selectedIds,
+        data: { status: status as TaskStatusEnum },
+      }),
+      {
+        loading: 'Updating status...',
+        success: () => {
+          table.resetRowSelection()
+          return `Status updated to "${status}" for ${selectedIds.length} task${selectedIds.length > 1 ? 's' : ''}.`
+        },
+        error: 'Failed to update tasks',
+      }
+    )
   }
 
-  const handleBulkDelete = () => {
-    const selectedTasks = selectedRows.map((row) => row.original as Task)
-    selectedTasks.forEach((task) => {
-      deleteTask(task.id)
-    })
-    toast.promise(sleep(2000), {
+  const handleBulkDelete = async () => {
+    if (!activeOrgId) {
+      toast.error('No organization selected')
+      return
+    }
+
+    const selectedIds = selectedRows.map((row) => (row.original as Task).id)
+
+    toast.promise(bulkDelete(selectedIds), {
       loading: 'Deleting tasks...',
       success: () => {
         table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'tasks' : 'task'
+        setShowDeleteConfirm(false)
+        return `Deleted ${selectedIds.length} ${
+          selectedIds.length > 1 ? 'tasks' : 'task'
         }`
       },
-      error: 'Error',
+      error: 'Failed to delete tasks',
     })
-    table.resetRowSelection()
-    setShowDeleteConfirm(false)
   }
 
   return (
@@ -79,6 +96,7 @@ export function TaskTableBulkActions<TData>({
                   className='size-8'
                   aria-label='Update status'
                   title='Update status'
+                  disabled={!activeOrgId}
                 >
                   <CircleArrowUp />
                   <span className='sr-only'>Update status</span>
@@ -113,6 +131,7 @@ export function TaskTableBulkActions<TData>({
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
+              disabled={!activeOrgId}
             >
               <Trash2 />
               <span className='sr-only'>Delete selected tasks</span>

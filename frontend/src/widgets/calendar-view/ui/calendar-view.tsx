@@ -1,4 +1,4 @@
-import type { Task } from '@/entities/task/model/types'
+import type { Task, TaskAssignee } from '@/entities/task/model/types'
 import {
   CalendarAgendaView,
   CalendarDayView,
@@ -19,11 +19,13 @@ export function CalendarView({ events }: CalendarViewProps) {
   // Filter events by selected user
   const filteredEvents = events.filter((event) => {
     if (selectedUserId === 'all') return true
-    return event.assignedMembers?.some((member) => member.id === selectedUserId)
+    return event.assignees?.some(
+      (member: TaskAssignee) => member.id === selectedUserId
+    )
   })
 
   const mappedEvents: IEvent[] = filteredEvents.map((task, index) => {
-    const user = task.assignedMembers?.[0]
+    const user = task.assignees?.[0]
     return {
       id: parseInt(task.id) || index,
       startDate: task.deadline || new Date().toISOString(),

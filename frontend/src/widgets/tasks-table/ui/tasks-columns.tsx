@@ -2,14 +2,20 @@ import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Calendar, ListTodo, Paperclip, Tag, Users } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { type Membership } from '@/shared/model/types/membership'
 import { AvatarGroup } from '@/shared/ui/components/avatar-group'
 import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
 import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
+import { TablePlaceholder } from '@/shared/ui/components/data-table/table-placeholder'
 import { LabelBadge } from '@/shared/ui/components/label/label-badge'
-import { type Label } from '@/shared/ui/components/label/types.label'
 import { Checkbox } from '@/shared/ui/components/ui/checkbox'
-import { TaskStatusEnum, type Task } from '@/entities/task'
+import {
+  type TaskStatusEnum,
+  type Task,
+  type TaskLabel,
+  type TaskAssignee,
+  calculateTaskProgress,
+  isTaskOverdue as checkOverdue,
+} from '@/entities/task'
 import { TaskStatusBadge } from '@/features/task'
 import { TaskTableRowActions } from './task-table-row-actions'
 
@@ -44,76 +50,63 @@ export const tasksColumns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Title' />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className='flex space-x-2'>
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('title')}
-          </span>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className='flex space-x-2'>
+        <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
+          {row.getValue<string>('title')}
+        </span>
+      </div>
+    ),
   },
   {
     accessorKey: 'description',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Description' />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className='flex space-x-2'>
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('description')}
-          </span>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className='flex space-x-2'>
+        <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
+          {row.getValue<string>('description')}
+        </span>
+      </div>
+    ),
   },
   {
     accessorKey: 'status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Status' />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className='flex w-[100px] items-center gap-2'>
-          <TaskStatusBadge status={row.getValue('status')} />
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className='flex w-[100px] items-center gap-2'>
+        <TaskStatusBadge status={row.getValue<TaskStatusEnum>('status')} />
+      </div>
+    ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
   },
 
   {
-    accessorKey: 'assignedLabels',
+    accessorKey: 'labels',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Label' />
     ),
     meta: { name: 'Label' },
     cell: ({ row }) => {
-      const assignedLabels = row.original.assignedLabels
+      const labels = row.original.labels ?? []
 
-      if (assignedLabels?.length === 0) {
+      if (labels.length === 0) {
         return (
-          <div className='flex w-[100px] items-center gap-2'>
-            <span
-              className='text-muted-foreground flex items-center gap-2 text-sm'
-              tabIndex={0}
-              aria-label='No checklists'
-              role='note'
-            >
-              <Tag className='h-4 w-4' aria-hidden='true' />
-              <span>No Labels</span>
-            </span>
-          </div>
+          <TablePlaceholder
+            icon={<Tag className='h-4 w-4' />}
+            label='No Labels'
+          />
         )
       }
 
       return (
-        <div className='flex w-[100px] items-center gap-2'>
-          {assignedLabels?.map((label) => (
+        <div className='flex w-[100px] flex-wrap items-center gap-1'>
+          {labels.map((label) => (
             <LabelBadge key={label.id} label={label} size='sm' />
           ))}
         </div>
@@ -121,54 +114,44 @@ export const tasksColumns: ColumnDef<Task>[] = [
     },
     filterFn: (row, columnId, filterValue: string[]) => {
       if (!filterValue || filterValue.length === 0) return true
-      const assignedLabels = row.getValue(columnId) as Label[]
-      return (
-        assignedLabels?.some((label) => filterValue.includes(label.name)) ??
-        false
-      )
+      const labels = row.getValue<TaskLabel[]>(columnId)
+      return labels?.some((label) => filterValue.includes(label.name)) ?? false
     },
   },
 
   {
-    accessorKey: 'assignedMembers',
+    accessorKey: 'assignees',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Team Members' />
     ),
     meta: { name: 'Team Members' },
     cell: ({ row }) => {
-      const assignedMembers = row.original.assignedMembers ?? []
+      const assignees = row.original.assignees ?? []
 
-      if (assignedMembers.length === 0) {
+      if (assignees.length === 0) {
         return (
-          <div className='flex w-[100px] items-center gap-2'>
-            <span
-              className='text-muted-foreground flex items-center gap-2 text-sm'
-              tabIndex={0}
-              aria-label='No team members'
-              role='note'
-            >
-              <Users className='h-4 w-4' aria-hidden='true' />
-              <span>No members</span>
-            </span>
-          </div>
+          <TablePlaceholder
+            icon={<Users className='h-4 w-4' />}
+            label='No members'
+          />
         )
       }
 
       return (
         <div className='flex w-[100px] items-center gap-2'>
-          <AvatarGroup members={assignedMembers} max={4} size='m' />
+          <AvatarGroup members={assignees} max={4} size='m' />
         </div>
       )
     },
-    filterFn: (row, id, value) => {
-      const assignedMembers = row.getValue(id) as Membership[] | undefined
+    filterFn: (row, id, value: string[]) => {
+      const assignees = row.getValue<TaskAssignee[]>(id)
 
-      if (!assignedMembers || assignedMembers.length === 0) {
+      if (!assignees || assignees.length === 0) {
         return false
       }
 
-      return value.some((selectedId: string) =>
-        assignedMembers.some((member) => member.id === selectedId)
+      return value.some((selectedId) =>
+        assignees.some((member) => member.id === selectedId)
       )
     },
   },
@@ -182,28 +165,20 @@ export const tasksColumns: ColumnDef<Task>[] = [
       const attachments = row.original.attachments ?? []
       if (attachments.length === 0) {
         return (
-          <div className='flex w-[100px] items-center gap-2'>
-            <span
-              className='text-muted-foreground flex items-center gap-2 text-sm'
-              tabIndex={0}
-              aria-label='No attachments'
-              role='note'
-            >
-              <Paperclip className='h-4 w-4' aria-hidden='true' />
-              <span>No Attachments</span>
-            </span>
-          </div>
+          <TablePlaceholder
+            icon={<Paperclip className='h-4 w-4' />}
+            label='No Attachments'
+          />
         )
       }
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <Paperclip className='h-4 w-4' aria-hidden='true' />
-          <span>{attachments.length}</span>
+          <span className='text-muted-foreground text-xs'>
+            {attachments.length}
+          </span>
         </div>
       )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
     },
   },
 
@@ -213,43 +188,24 @@ export const tasksColumns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title='Checklists' />
     ),
     cell: ({ row }) => {
-      const checklists = row.original.checklists ?? []
+      const { totalItems, completedItems } = calculateTaskProgress(row.original)
 
-      const totalTasks = checklists.reduce(
-        (acc, checklist) => acc + checklist.tasks.length,
-        0
-      )
-      const completedTasks = checklists.reduce(
-        (acc, checklist) =>
-          acc + checklist.tasks.filter((task) => task.completed).length,
-        0
-      )
-      if (checklists.length === 0) {
+      if (totalItems === 0) {
         return (
-          <div className='flex w-[100px] items-center gap-2'>
-            <span
-              className='text-muted-foreground flex items-center gap-2 text-sm'
-              tabIndex={0}
-              aria-label='No checklists'
-              role='note'
-            >
-              <ListTodo className='h-4 w-4' aria-hidden='true' />
-              <span>No Checklists</span>
-            </span>
-          </div>
+          <TablePlaceholder
+            icon={<ListTodo className='h-4 w-4' />}
+            label='No Checklists'
+          />
         )
       }
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <ListTodo className='text-muted-foreground h-4 w-4' />
           <span className='text-muted-foreground text-xs'>
-            {completedTasks}/{totalTasks}
+            {completedItems}/{totalItems}
           </span>
         </div>
       )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
     },
   },
 
@@ -258,27 +214,16 @@ export const tasksColumns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Deadline' />
     ),
-
     cell: ({ row }) => {
       const deadline = row.original.deadline ?? null
-      const isOverdue =
-        deadline &&
-        new Date(deadline) < new Date() &&
-        row.original.status !== TaskStatusEnum.COMPLETED
+      const isOverdue = checkOverdue(row.original)
 
       if (!deadline) {
         return (
-          <div className='flex w-[100px] items-center gap-2'>
-            <span
-              className='text-muted-foreground flex items-center gap-2 text-sm'
-              tabIndex={0}
-              aria-label='No checklists'
-              role='note'
-            >
-              <Calendar className='h-4 w-4' aria-hidden='true' />
-              <span>No Deadline</span>
-            </span>
-          </div>
+          <TablePlaceholder
+            icon={<Calendar className='h-4 w-4' />}
+            label='No Deadline'
+          />
         )
       }
       return (
@@ -286,11 +231,11 @@ export const tasksColumns: ColumnDef<Task>[] = [
           <Calendar
             className={cn(
               'h-4 w-4',
-              isOverdue ? 'font-medium text-red-600' : 'ext-muted-foreground'
+              isOverdue ? 'font-medium text-red-600' : 'text-muted-foreground'
             )}
           />
           <span className='text-muted-foreground text-xs'>
-            {format(deadline, 'dd.MM.yyyy')}
+            {format(new Date(deadline), 'dd.MM.yyyy')}
           </span>
         </div>
       )

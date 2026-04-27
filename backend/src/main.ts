@@ -56,6 +56,7 @@ async function bootstrap() {
       .setTitle(swaggerConfig.title || 'Nestjs')
       .setDescription(swaggerConfig.description || 'The nestjs API description')
       .setVersion(swaggerConfig.version || '1.0')
+      .addBearerAuth() // Added this since I saw @ApiBearerAuth() earlier
       .build();
     const document = SwaggerModule.createDocument(app, options);
 

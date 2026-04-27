@@ -5,6 +5,7 @@ import {
   CreateOrgSchema,
   type CreateOrgFormValues,
 } from '../../model/schema/organization-schema'
+import { useOrgStore } from '../../model/store/organization-store'
 
 interface UseCreateOrganizationFormProps {
   onSuccess?: () => void
@@ -14,6 +15,7 @@ export const useCreateOrganizationForm = ({
   onSuccess,
 }: UseCreateOrganizationFormProps = {}) => {
   const { mutate: createOrg, isPending } = useCreateOrganization()
+  const { setActiveOrgId } = useOrgStore()
 
   const form = useForm<CreateOrgFormValues>({
     resolver: zodResolver(CreateOrgSchema),
@@ -25,7 +27,8 @@ export const useCreateOrganizationForm = ({
 
   const onSubmit = (values: CreateOrgFormValues) => {
     createOrg(values, {
-      onSuccess: () => {
+      onSuccess: (org) => {
+        setActiveOrgId(org.id)
         form.reset()
         onSuccess?.()
       },
