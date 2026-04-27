@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { fileToBase64 } from '@/shared/lib/utils'
 import { type Membership } from '@/shared/model/types/membership'
 import {

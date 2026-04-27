@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { OrgRole } from '@/shared/model/types/org-role'
 import { type Label } from '@/shared/ui/components/label/types.label'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TaskCardKanban } from './task-card'
@@ -50,7 +51,16 @@ describe('TaskCardKanban', () => {
     assignees: [
       {
         id: 'mem-1',
-        user: { id: 'user-1', firstName: 'John', avatar: null },
+        userId: 'user-1',
+        orgId: 'org-1',
+        role: OrgRole.MEMBER,
+        joinedAt: new Date().toISOString(),
+        user: {
+          id: 'user-1',
+          firstName: 'John',
+          email: 'john@example.com',
+          avatar: null,
+        },
       },
     ],
     labels: [{ id: 'lbl-1', name: 'Urgent', color: 'red' }],
