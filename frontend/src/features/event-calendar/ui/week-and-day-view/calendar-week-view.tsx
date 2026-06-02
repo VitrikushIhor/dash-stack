@@ -1,21 +1,19 @@
 import {
   startOfWeek,
-  addDays,
   format,
   parseISO,
   isSameDay,
   areIntervalsOverlapping,
 } from 'date-fns'
-import { cn } from '@/shared/lib/utils'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { useCalendar } from '../../model/contexts/calendar-context'
 import {
   groupEvents,
   getEventBlockStyle,
-  isWorkingHour,
   getVisibleHours,
-} from '../../model/helpers'
-import type { IEvent } from '../../model/interfaces'
+  getWeekDays,
+} from '../../lib/helpers'
+import { useCalendar } from '../../model/calendar-context'
+import type { IEvent } from '../../model/types'
 import { DroppableTimeBlock } from '../dnd/droppable-time-block'
 import { CalendarTimeline } from './calendar-time-line'
 import { EventBlock } from './event-block'
@@ -27,7 +25,7 @@ interface IProps {
 }
 
 export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, workingHours, visibleHours } = useCalendar()
+  const { selectedDate, visibleHours } = useCalendar()
 
   const { hours, earliestEventHour, latestEventHour } = getVisibleHours(
     visibleHours,
@@ -35,7 +33,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
   )
 
   const weekStart = startOfWeek(selectedDate)
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const weekDays = getWeekDays(weekStart)
 
   return (
     <>
@@ -100,70 +98,55 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
                   return (
                     <div key={dayIndex} className='relative'>
-                      {hours.map((hour, index) => {
-                        const isDisabled = !isWorkingHour(
-                          day,
-                          hour,
-                          workingHours
-                        )
+                      {hours.map((hour, index) => (
+                        <div
+                          key={hour}
+                          className='relative'
+                          style={{ height: '96px' }}
+                        >
+                          {index !== 0 && (
+                            <div className='pointer-events-none absolute inset-x-0 top-0 border-b'></div>
+                          )}
 
-                        return (
-                          <div
-                            key={hour}
-                            className={cn(
-                              'relative',
-                              isDisabled && 'bg-calendar-disabled-hour'
-                            )}
-                            style={{ height: '96px' }}
+                          <DroppableTimeBlock date={day} hour={hour} minute={0}>
+                            {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 0 }}> */}
+                            <div className='hover:bg-accent absolute inset-x-0 top-0 h-[24px] cursor-pointer transition-colors' />
+                            {/* </AddEventDialog> */}
+                          </DroppableTimeBlock>
+
+                          <DroppableTimeBlock
+                            date={day}
+                            hour={hour}
+                            minute={15}
                           >
-                            {index !== 0 && (
-                              <div className='pointer-events-none absolute inset-x-0 top-0 border-b'></div>
-                            )}
+                            {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 15 }}> */}
+                            <div className='hover:bg-accent absolute inset-x-0 top-[24px] h-[24px] cursor-pointer transition-colors' />
+                            {/* </AddEventDialog> */}
+                          </DroppableTimeBlock>
 
-                            <DroppableTimeBlock
-                              date={day}
-                              hour={hour}
-                              minute={0}
-                            >
-                              {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 0 }}> */}
-                              <div className='hover:bg-accent absolute inset-x-0 top-0 h-[24px] cursor-pointer transition-colors' />
-                              {/* </AddEventDialog> */}
-                            </DroppableTimeBlock>
+                          <div className='pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed'></div>
 
-                            <DroppableTimeBlock
-                              date={day}
-                              hour={hour}
-                              minute={15}
-                            >
-                              {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 15 }}> */}
-                              <div className='hover:bg-accent absolute inset-x-0 top-[24px] h-[24px] cursor-pointer transition-colors' />
-                              {/* </AddEventDialog> */}
-                            </DroppableTimeBlock>
+                          <DroppableTimeBlock
+                            date={day}
+                            hour={hour}
+                            minute={30}
+                          >
+                            {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 30 }}> */}
+                            <div className='hover:bg-accent absolute inset-x-0 top-[48px] h-[24px] cursor-pointer transition-colors' />
+                            {/* </AddEventDialog> */}
+                          </DroppableTimeBlock>
 
-                            <div className='pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed'></div>
-
-                            <DroppableTimeBlock
-                              date={day}
-                              hour={hour}
-                              minute={30}
-                            >
-                              {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 30 }}> */}
-                              <div className='hover:bg-accent absolute inset-x-0 top-[48px] h-[24px] cursor-pointer transition-colors' />
-                              {/* </AddEventDialog> */}
-                            </DroppableTimeBlock>
-
-                            <DroppableTimeBlock
-                              date={day}
-                              hour={hour}
-                              minute={45}
-                            >
-                              {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 45 }}> */}
-                              <div className='hover:bg-accent absolute inset-x-0 top-[72px] h-[24px] cursor-pointer transition-colors' />
-                              {/* </AddEventDialog> */}
-                            </DroppableTimeBlock>
-                          </div>
-                        )
-                      })}
+                          <DroppableTimeBlock
+                            date={day}
+                            hour={hour}
+                            minute={45}
+                          >
+                            {/* <AddEventDialog startDate={day} startTime={{ hour, minute: 45 }}> */}
+                            <div className='hover:bg-accent absolute inset-x-0 top-[72px] h-[24px] cursor-pointer transition-colors' />
+                            {/* </AddEventDialog> */}
+                          </DroppableTimeBlock>
+                        </div>
+                      ))}
 
                       {groupedEvents.map((group, groupIndex) =>
                         group.map((event) => {

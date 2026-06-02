@@ -4,12 +4,12 @@ import {
   startOfDay,
   startOfWeek,
   endOfWeek,
-  addDays,
   differenceInDays,
   isBefore,
   isAfter,
 } from 'date-fns'
-import type { IEvent } from '../../model/interfaces'
+import { getWeekDays } from '../../lib/helpers'
+import type { IEvent } from '../../model/types'
 import { MonthEventBadge } from '../month-view/month-event-badge'
 
 interface IProps {
@@ -23,7 +23,7 @@ export function WeekViewMultiDayEventsRow({
 }: IProps) {
   const weekStart = startOfWeek(selectedDate)
   const weekEnd = endOfWeek(selectedDate)
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const weekDays = getWeekDays(weekStart)
 
   const processedEvents = useMemo(() => {
     return multiDayEvents

@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
-import { useCalendar } from '../../model/contexts/calendar-context'
 import {
   calculateMonthEventPositions,
   getCalendarCells,
-} from '../../model/helpers'
-import type { IEvent } from '../../model/interfaces'
+} from '../../lib/helpers'
+import { useCalendar } from '../../model/calendar-context'
+import type { IEvent } from '../../model/types'
 import { DayCell } from './day-cell'
 
 interface IProps {

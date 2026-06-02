@@ -6,8 +6,9 @@ import {
   getDaysInMonth,
   startOfMonth,
 } from 'date-fns'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { SHORT_WEEK_DAYS } from '../../lib/constants'
+import { useCalendar } from '../../model/calendar-context'
+import type { IEvent } from '../../model/types'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
@@ -30,7 +31,7 @@ export function YearViewMonth({ month, events }: IProps) {
     return [...blanks, ...days]
   }, [month])
 
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const weekDays = SHORT_WEEK_DAYS
 
   const handleClick = () => {
     setSelectedDate(new Date(month.getFullYear(), month.getMonth(), 1))

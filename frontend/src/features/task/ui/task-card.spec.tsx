@@ -59,7 +59,7 @@ describe('TaskCardKanban', () => {
           id: 'user-1',
           firstName: 'John',
           email: 'john@example.com',
-          avatar: null,
+          avatar: undefined,
         },
       },
     ],

@@ -25,14 +25,18 @@ import {
   isSameYear,
   isWithinInterval,
 } from 'date-fns'
-import { type ICalendarCell, type IEvent } from './interfaces'
 import {
+  type ICalendarCell,
+  type IEvent,
   type TVisibleHours,
-  type TWorkingHours,
   type TCalendarView,
-} from './types'
+} from '../model/types'
 
 // ================ Header helper functions ================ //
+
+export function getWeekDays(weekStart: Date) {
+  return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+}
 
 export function rangeText(view: TCalendarView, date: Date) {
   const formatString = 'MMM d, yyyy'
@@ -167,16 +171,6 @@ export function getEventBlockStyle(
   const left = groupIndex * width
 
   return { top: `${top}%`, width: `${width}%`, left: `${left}%` }
-}
-
-export function isWorkingHour(
-  day: Date,
-  hour: number,
-  workingHours: TWorkingHours
-) {
-  const dayIndex = day.getDay() as keyof typeof workingHours
-  const dayHours = workingHours[dayIndex]
-  return hour >= dayHours.from && hour < dayHours.to
 }
 
 export function getVisibleHours(

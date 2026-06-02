@@ -5,7 +5,7 @@ import {
   startOfDay,
   endOfDay,
 } from 'date-fns'
-import type { IEvent } from '../../model/interfaces'
+import type { IEvent } from '../../model/types'
 import { MonthEventBadge } from '../month-view/month-event-badge'
 
 interface IProps {

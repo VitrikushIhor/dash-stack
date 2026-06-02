@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import { parseISO, format, endOfDay, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { useCalendar } from '@/features/event-calendar/model/contexts/calendar-context'
-import type { IEvent } from '@/features/event-calendar/model/interfaces'
+import { useCalendar } from '@/features/event-calendar/model/calendar-context'
+import type { IEvent } from '@/features/event-calendar/model/types'
 import { AgendaDayGroup } from './agenda-day-group'
 
 interface IProps {

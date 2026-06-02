@@ -1,7 +1,7 @@
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { useCalendar } from '../../model/calendar-context'
+import type { IEvent } from '../../model/types'
 
 interface IProps {
   day: number

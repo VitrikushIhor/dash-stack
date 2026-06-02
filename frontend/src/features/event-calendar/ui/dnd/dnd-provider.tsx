@@ -1,6 +1,6 @@
 'use client'
 
-import { parseISO, differenceInMilliseconds } from 'date-fns'
+import { parseISO } from 'date-fns'
 import {
   DndContext,
   type DragEndEvent,
@@ -10,8 +10,7 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import { type IEvent } from '../../model/interfaces'
+import { type IEvent } from '../../model/types'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
@@ -19,8 +18,6 @@ interface DndProviderWrapperProps {
 }
 
 export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
-  const { setLocalEvents } = useCalendar()
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -42,11 +39,6 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     if (!droppedEvent || !overData) return
 
     const eventStartDate = parseISO(droppedEvent.startDate)
-    const eventEndDate = parseISO(droppedEvent.endDate)
-    const eventDurationMs = differenceInMilliseconds(
-      eventEndDate,
-      eventStartDate
-    )
 
     let newStartDate: Date
 
@@ -64,20 +56,6 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     } else {
       return
     }
-
-    const newEndDate = new Date(newStartDate.getTime() + eventDurationMs)
-
-    setLocalEvents((prev) =>
-      prev.map((e) =>
-        e.id === droppedEvent.id
-          ? {
-              ...e,
-              startDate: newStartDate.toISOString(),
-              endDate: newEndDate.toISOString(),
-            }
-          : e
-      )
-    )
   }
 
   return (

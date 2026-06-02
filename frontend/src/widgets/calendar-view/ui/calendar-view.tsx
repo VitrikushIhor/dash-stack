@@ -5,9 +5,9 @@ import {
   CalendarMonthView,
   CalendarWeekView,
   CalendarYearView,
+  type IEvent,
   useCalendar,
 } from '@/features/event-calendar'
-import { type IEvent } from '@/features/event-calendar/model/interfaces'
 
 interface CalendarViewProps {
   events: Task[]
@@ -27,7 +27,7 @@ export function CalendarView({ events }: CalendarViewProps) {
   const mappedEvents: IEvent[] = filteredEvents.map((task, index) => {
     const user = task.assignees?.[0]
     return {
-      id: parseInt(task.id) || index,
+      id: task.id || String(index),
       startDate: task.deadline || new Date().toISOString(),
       endDate: task.deadline || new Date().toISOString(),
       title: task.title,
@@ -37,9 +37,9 @@ export function CalendarView({ events }: CalendarViewProps) {
         ? {
             id: user.id,
             name: user.user?.firstName || 'User',
-            picturePath: user.user?.avatar || null,
+            avatar: user.user?.avatar || null,
           }
-        : { id: 'unknown', name: 'Unassigned', picturePath: null },
+        : { id: 'unknown', name: 'Unassigned', avatar: null },
     }
   })
 

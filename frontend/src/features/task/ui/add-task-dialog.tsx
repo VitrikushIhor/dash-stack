@@ -5,7 +5,6 @@ import { format } from 'date-fns'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/shared/lib/utils'
-import { type Membership } from '@/shared/model/types/membership'
 import {
   FileUpload,
   FileUploadDropzone,
@@ -55,7 +54,7 @@ import {
 import { Separator } from '@/shared/ui/components/ui/separator'
 import { Textarea } from '@/shared/ui/components/ui/textarea'
 import { TaskStatusEnum } from '@/entities/task'
-import { useGetOrganizations, useOrgStore } from '@/features/organization'
+import { useGetMembers, useOrgStore } from '@/features/organization'
 import { TodoChecklist, useTaskForm } from '@/features/task'
 import { TeamMemberPicker } from '@/features/team'
 import { type TaskFormValues } from '../model/schema/create-task-schema'
@@ -131,17 +130,8 @@ export function AddTaskDialog({
     }
   }
 
-  const { data: organizations } = useGetOrganizations()
-  const allMembers = useMemo(() => {
-    if (!organizations) return []
-    const membersMap = new Map<string, Membership>()
-    organizations.forEach((org) => {
-      org.memberships?.forEach((m) => {
-        membersMap.set(m.userId, m)
-      })
-    })
-    return Array.from(membersMap.values())
-  }, [organizations])
+  const { data: members } = useGetMembers(activeOrgId ?? '')
+  const allMembers = useMemo(() => members ?? [], [members])
 
   return (
     <Dialog open={open} onOpenChange={(open) => onOpenChange(open)}>

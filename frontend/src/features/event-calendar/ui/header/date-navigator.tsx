@@ -3,10 +3,14 @@ import { formatDate } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Badge } from '@/shared/ui/components/ui/badge'
 import { Button } from '@/shared/ui/components/ui/button'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import { getEventsCount, navigateDate, rangeText } from '../../model/helpers'
-import { type IEvent } from '../../model/interfaces'
-import { type TCalendarView } from '../../model/types'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui/components/ui/tooltip'
+import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
+import { useCalendar } from '../../model/calendar-context'
+import { type IEvent, type TCalendarView } from '../../model/types'
 
 interface IProps {
   view: TCalendarView
@@ -41,25 +45,35 @@ export function DateNavigator({ view, events }: IProps) {
       </div>
 
       <div className='flex items-center gap-2'>
-        <Button
-          variant='outline'
-          className='size-6.5 px-0 [&_svg]:size-4.5'
-          onClick={handlePrevious}
-        >
-          <ChevronLeft />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='outline'
+              className='size-6.5 px-0 [&_svg]:size-4.5'
+              onClick={handlePrevious}
+            >
+              <ChevronLeft />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Previous</TooltipContent>
+        </Tooltip>
 
         <p className='text-muted-foreground text-sm'>
           {rangeText(view, selectedDate)}
         </p>
 
-        <Button
-          variant='outline'
-          className='size-6.5 px-0 [&_svg]:size-4.5'
-          onClick={handleNext}
-        >
-          <ChevronRight />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='outline'
+              className='size-6.5 px-0 [&_svg]:size-4.5'
+              onClick={handleNext}
+            >
+              <ChevronRight />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Next</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   )

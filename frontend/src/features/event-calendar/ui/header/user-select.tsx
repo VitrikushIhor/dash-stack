@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/components/ui/select'
-import { useCalendar } from '../../model/contexts/calendar-context'
+import { useCalendar } from '../../model/calendar-context'
 
 export function UserSelect() {
   const { users, selectedUserId, setSelectedUserId } = useCalendar()
@@ -31,7 +31,7 @@ export function UserSelect() {
                 id: user.id,
                 first_name: user.name,
                 last_name: user.name,
-                avatar: user.picturePath,
+                avatar: user.avatar,
               }))}
               size='m'
             ></AvatarGroup>
@@ -43,10 +43,7 @@ export function UserSelect() {
           <SelectItem key={user.id} value={user.id} className='flex-1'>
             <div className='flex items-center gap-2'>
               <Avatar key={user.id} className='size-6'>
-                <AvatarImage
-                  src={user.picturePath ?? undefined}
-                  alt={user.name}
-                />
+                <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                 <AvatarFallback className='text-xxs'>
                   {user.name[0]}
                 </AvatarFallback>

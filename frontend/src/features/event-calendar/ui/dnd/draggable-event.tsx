@@ -2,7 +2,7 @@
 
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
-import { type IEvent } from '../../model/interfaces'
+import { type IEvent } from '../../model/types'
 
 interface DraggableEventProps {
   event: IEvent

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { useCalendar } from '../../model/calendar-context'
+import type { IEvent } from '../../model/types'
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {

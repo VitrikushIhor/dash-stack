@@ -7,13 +7,13 @@ import {
   useContext,
   useState,
 } from 'react'
-import { type IEvent, type IUser } from '../interfaces'
 import {
+  type IUser,
+  type IEvent,
   type TCalendarView,
   type TBadgeVariant,
   type TVisibleHours,
-  type TWorkingHours,
-} from '../types'
+} from './types'
 
 interface ICalendarContext {
   selectedDate: Date
@@ -23,54 +23,38 @@ interface ICalendarContext {
   badgeVariant: TBadgeVariant
   setBadgeVariant: (variant: TBadgeVariant) => void
   users: IUser[]
-  workingHours: TWorkingHours
-  setWorkingHours: Dispatch<SetStateAction<TWorkingHours>>
   visibleHours: TVisibleHours
   setVisibleHours: Dispatch<SetStateAction<TVisibleHours>>
   events: IEvent[]
-  setLocalEvents: Dispatch<SetStateAction<IEvent[]>>
   view: TCalendarView
   setView: Dispatch<SetStateAction<TCalendarView>>
 }
 
 const CalendarContext = createContext({} as ICalendarContext)
 
-const WORKING_HOURS = {
-  0: { from: 0, to: 0 },
-  1: { from: 8, to: 17 },
-  2: { from: 8, to: 17 },
-  3: { from: 8, to: 17 },
-  4: { from: 8, to: 17 },
-  5: { from: 8, to: 17 },
-  6: { from: 8, to: 12 },
-}
-
 const VISIBLE_HOURS = { from: 7, to: 18 }
-
 export function CalendarProvider({
   children,
   users,
   events,
+  view: propsView,
+  selectedDate: propsSelectedDate,
 }: {
   children: React.ReactNode
   users: IUser[]
   events: IEvent[]
+  view?: TCalendarView
+  selectedDate?: Date
 }) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>('colored')
   const [visibleHours, setVisibleHours] = useState<TVisibleHours>(VISIBLE_HOURS)
-  const [workingHours, setWorkingHours] = useState<TWorkingHours>(WORKING_HOURS)
-  const [view, setView] = useState<TCalendarView>('month')
-
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [view, setView] = useState<TCalendarView>(propsView || 'month')
+  const [selectedDate, setSelectedDate] = useState(
+    propsSelectedDate || new Date()
+  )
   const [selectedUserId, setSelectedUserId] = useState<IUser['id'] | 'all'>(
     'all'
   )
-
-  // This localEvents doesn't need to exists in a real scenario.
-  // It's used here just to simulate the update of the events.
-  // In a real scenario, the events would be updated in the backend
-  // and the request that fetches the events should be refetched
-  const [localEvents, setLocalEvents] = useState<IEvent[]>(events)
 
   const handleSelectDate = (date: Date | undefined) => {
     if (!date) return
@@ -89,11 +73,7 @@ export function CalendarProvider({
         users,
         visibleHours,
         setVisibleHours,
-        workingHours,
-        setWorkingHours,
-        // If you go to the refetch approach, you can remove the localEvents and pass the events directly
-        events: localEvents,
-        setLocalEvents,
+        events,
         view,
         setView,
       }}

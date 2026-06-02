@@ -1,7 +1,7 @@
 'use client'
 
 import { DragOverlay, useDndContext } from '@dnd-kit/core'
-import { type IEvent } from '../../model/interfaces'
+import { type IEvent } from '../../model/types'
 import { MonthEventBadge } from '../month-view/month-event-badge'
 
 export function CustomDragLayer() {

@@ -17,7 +17,7 @@ export interface TaskAssignee {
     id: string
     firstName: string
     email: string
-    avatar: string | null
+    avatar?: string
   }
 }
 

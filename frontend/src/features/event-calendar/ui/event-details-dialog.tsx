@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
-import { type IEvent } from '../model/interfaces'
+import { type IEvent } from '../model/types'
 
 interface IProps {
   event: IEvent

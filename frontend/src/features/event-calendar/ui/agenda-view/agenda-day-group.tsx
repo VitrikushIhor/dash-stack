@@ -1,5 +1,5 @@
 import { differenceInDays, format, parseISO, startOfDay } from 'date-fns'
-import type { IEvent } from '@/features/event-calendar/model/interfaces'
+import type { IEvent } from '@/features/event-calendar/model/types'
 import { AgendaEventCard } from './agenda-event-card'
 
 interface IProps {
