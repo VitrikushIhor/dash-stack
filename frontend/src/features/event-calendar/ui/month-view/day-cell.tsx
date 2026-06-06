@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
-import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/shared/lib/utils'
 import { getMonthCellEvents } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
@@ -18,8 +17,7 @@ interface IProps {
 const MAX_VISIBLE_EVENTS = 3
 
 export function DayCell({ cell, events, eventPositions }: IProps) {
-  const navigate = useNavigate()
-  const { setSelectedDate } = useCalendar()
+  const { setSelectedDate, setView } = useCalendar()
 
   const { day, currentMonth, date } = cell
 
@@ -31,8 +29,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
 
   const handleClick = () => {
     setSelectedDate(date)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    navigate({ to: '/day-view' as any })
+    setView('day')
   }
 
   return (

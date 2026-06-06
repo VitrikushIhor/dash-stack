@@ -15,7 +15,7 @@ export function AgendaDayGroup({ date, events, multiDayEvents }: IProps) {
 
   return (
     <div className='space-y-4'>
-      <div className='bg-background sticky top-0 flex items-center gap-4 py-2'>
+      <div className='bg-background sticky top-0 flex items-center gap-4 p-2'>
         <p className='text-sm font-semibold'>
           {format(date, 'EEEE, MMMM d, yyyy')}
         </p>
