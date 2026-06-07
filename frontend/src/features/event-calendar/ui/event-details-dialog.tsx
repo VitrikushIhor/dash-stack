@@ -1,5 +1,3 @@
-'use client'
-
 import { format, parseISO } from 'date-fns'
 import { Calendar, Clock, Text, User } from 'lucide-react'
 import { Button } from '@/shared/ui/components/ui/button'
@@ -11,16 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
-import { type IEvent } from '../model/types'
+import { type Task } from '@/entities/task'
+import { getTaskUser } from '@/features/event-calendar/lib/mappers'
 
 interface IProps {
-  event: IEvent
+  event: Task
   children: React.ReactNode
 }
 
 export function EventDetailsDialog({ event, children }: IProps) {
-  const startDate = parseISO(event.startDate)
-  const endDate = parseISO(event.endDate)
+  const startDate = parseISO(event.deadline)
+  const endDate = parseISO(event.deadline)
 
   return (
     <>
@@ -38,7 +37,7 @@ export function EventDetailsDialog({ event, children }: IProps) {
               <div>
                 <p className='text-sm font-medium'>Responsible</p>
                 <p className='text-muted-foreground text-sm'>
-                  {event.user.name}
+                  {getTaskUser(event).name}
                 </p>
               </div>
             </div>

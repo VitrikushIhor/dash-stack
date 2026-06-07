@@ -1,16 +1,18 @@
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
+import { type Task } from '@/entities/task'
+import { getTaskColor } from '@/features/event-calendar/lib/mappers'
 import { getMonthCellEvents } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
-import { type ICalendarCell, type IEvent } from '../../model/types'
+import { type ICalendarCell } from '../../model/types'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { EventBullet } from './event-bullet'
 import { MonthEventBadge } from './month-event-badge'
 
 interface IProps {
   cell: ICalendarCell
-  events: IEvent[]
+  events: Task[]
   eventPositions: Record<string, number>
 }
 
@@ -68,7 +70,10 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
               <div key={eventKey} className='lg:flex-1'>
                 {event && (
                   <>
-                    <EventBullet className='lg:hidden' color={event.color} />
+                    <EventBullet
+                      className='lg:hidden'
+                      color={getTaskColor(event)}
+                    />
                     <MonthEventBadge
                       className='hidden lg:flex'
                       event={event}

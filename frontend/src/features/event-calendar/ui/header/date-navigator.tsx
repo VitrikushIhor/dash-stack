@@ -8,13 +8,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
+import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
-import { type IEvent, type TCalendarView } from '../../model/types'
+import { type TCalendarView } from '../../model/types'
 
 interface IProps {
   view: TCalendarView
-  events: IEvent[]
+  events: Task[]
 }
 
 export function DateNavigator({ view, events }: IProps) {

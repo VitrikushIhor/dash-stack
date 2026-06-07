@@ -7,13 +7,8 @@ import {
   useContext,
   useState,
 } from 'react'
-import {
-  type IUser,
-  type IEvent,
-  type TCalendarView,
-  type TBadgeVariant,
-  type TVisibleHours,
-} from './types'
+import { type Task } from '@/entities/task'
+import { type IUser, type TCalendarView, type TBadgeVariant } from './types'
 
 interface ICalendarContext {
   selectedDate: Date
@@ -23,16 +18,13 @@ interface ICalendarContext {
   badgeVariant: TBadgeVariant
   setBadgeVariant: (variant: TBadgeVariant) => void
   users: IUser[]
-  visibleHours: TVisibleHours
-  setVisibleHours: Dispatch<SetStateAction<TVisibleHours>>
-  events: IEvent[]
+  events: Task[]
   view: TCalendarView
   setView: Dispatch<SetStateAction<TCalendarView>>
 }
 
 const CalendarContext = createContext({} as ICalendarContext)
 
-const VISIBLE_HOURS = { from: 7, to: 18 }
 export function CalendarProvider({
   children,
   users,
@@ -42,12 +34,11 @@ export function CalendarProvider({
 }: {
   children: React.ReactNode
   users: IUser[]
-  events: IEvent[]
+  events: Task[]
   view?: TCalendarView
   selectedDate?: Date
 }) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>('colored')
-  const [visibleHours, setVisibleHours] = useState<TVisibleHours>(VISIBLE_HOURS)
   const [view, setView] = useState<TCalendarView>(propsView || 'month')
   const [selectedDate, setSelectedDate] = useState(
     propsSelectedDate || new Date()
@@ -71,8 +62,6 @@ export function CalendarProvider({
         badgeVariant,
         setBadgeVariant,
         users,
-        visibleHours,
-        setVisibleHours,
         events,
         view,
         setView,

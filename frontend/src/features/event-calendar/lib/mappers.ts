@@ -1,14 +1,5 @@
 import type { Task } from '@/entities/task'
-import type { IEvent, IUser, TEventColor } from '../model/types'
-
-interface UserLike {
-  user: {
-    id: string
-    firstName?: string | null
-    email?: string | null
-    avatar?: string | null
-  }
-}
+import type { IUser, TEventColor } from '../model/types'
 
 const LABEL_COLOR_MAP: Record<string, TEventColor> = {
   red: 'red',
@@ -31,28 +22,33 @@ const LABEL_COLOR_MAP: Record<string, TEventColor> = {
   gray: 'gray',
 }
 
+export const getTaskColor = (task: Task): TEventColor => {
+  const label = task.label
+  return (label ? LABEL_COLOR_MAP[label.color] : 'blue') ?? 'blue'
+}
+
+export const getTaskUser = (task: Task): IUser => {
+  const assignee = task.assignees?.[0]
+  return assignee
+    ? {
+        id: assignee.userId,
+        name: assignee.user.firstName ?? assignee.user.email ?? 'Unknown',
+        avatar: assignee.user.avatar ?? null,
+      }
+    : { id: 'unassigned', name: 'Unassigned', avatar: null }
+}
+
+interface UserLike {
+  user: {
+    id: string
+    firstName?: string | null
+    email?: string | null
+    avatar?: string | null
+  }
+}
+
 export const memberToUser = (data: UserLike): IUser => ({
   id: data.user.id,
   name: data.user.firstName ?? data.user.email ?? 'Unknown',
   avatar: data.user.avatar ?? null,
 })
-
-export const taskToEvent = (task: Task): IEvent => {
-  const assignee = task.assignees?.[0]
-  const user: IUser = assignee
-    ? memberToUser(assignee)
-    : { id: 'unassigned', name: 'Unassigned', avatar: null }
-
-  const label = task.labels?.[0]
-  const color = (label ? LABEL_COLOR_MAP[label.color] : 'blue') ?? 'blue'
-
-  return {
-    id: task.id,
-    title: task.title,
-    description: task.description ?? '',
-    startDate: task.deadline ?? new Date().toISOString(),
-    endDate: task.deadline ?? new Date().toISOString(),
-    color,
-    user,
-  }
-}

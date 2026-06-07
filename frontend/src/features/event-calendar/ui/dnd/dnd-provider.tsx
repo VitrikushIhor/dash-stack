@@ -10,7 +10,7 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { type IEvent } from '../../model/types'
+import { type Task } from '@/entities/task'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
@@ -33,12 +33,12 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
 
     if (!over || !active.data.current) return
 
-    const droppedEvent = active.data.current.event as IEvent
+    const droppedEvent = active.data.current.event as Task
     const overData = over.data.current
 
     if (!droppedEvent || !overData) return
 
-    const eventStartDate = parseISO(droppedEvent.startDate)
+    const eventStartDate = parseISO(droppedEvent.deadline)
 
     let newStartDate: Date
 

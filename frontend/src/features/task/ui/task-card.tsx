@@ -63,11 +63,9 @@ export const TaskCardList = memo(
               </div>
             </div>
 
-            {task.labels && task.labels.length > 0 && (
+            {task.label && (
               <div className='flex shrink-0 gap-1'>
-                {task.labels.map((label) => (
-                  <LabelBadge size='sm' label={label} key={label.id} />
-                ))}
+                <LabelBadge size='sm' label={task.label} />
               </div>
             )}
 
@@ -144,18 +142,15 @@ export const TaskCardKanban = memo(
       >
         <CardHeader className='p-0'>
           <div className='flex items-start justify-between gap-2'>
-            {task.labels && task.labels.length > 0 && (
+            {task.label && (
               <div className='mt-2 flex flex-wrap gap-1'>
-                {task.labels.map((label) => (
-                  <Badge
-                    key={label.id}
-                    variant='secondary'
-                    className='px-2 py-0.5 text-xs'
-                    style={{ backgroundColor: label.color }}
-                  >
-                    {label.name}
-                  </Badge>
-                ))}
+                <Badge
+                  variant='secondary'
+                  className='px-2 py-0.5 text-xs'
+                  style={{ backgroundColor: task.label.color }}
+                >
+                  {task.label.name}
+                </Badge>
               </div>
             )}
             <div className='ml-auto'>

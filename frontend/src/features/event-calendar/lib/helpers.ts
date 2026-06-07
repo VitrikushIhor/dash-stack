@@ -17,7 +17,6 @@ import {
   differenceInMinutes,
   eachDayOfInterval,
   startOfDay,
-  differenceInDays,
   endOfYear,
   startOfYear,
   subYears,
@@ -25,12 +24,8 @@ import {
   isSameYear,
   isWithinInterval,
 } from 'date-fns'
-import {
-  type ICalendarCell,
-  type IEvent,
-  type TVisibleHours,
-  type TCalendarView,
-} from '../model/types'
+import { type Task } from '@/entities/task'
+import { type ICalendarCell, type TCalendarView } from '../model/types'
 
 // ================ Header helper functions ================ //
 
@@ -86,7 +81,7 @@ export function navigateDate(
 }
 
 export function getEventsCount(
-  events: IEvent[],
+  events: Task[],
   date: Date,
   view: TCalendarView
 ): number {
@@ -99,37 +94,37 @@ export function getEventsCount(
   }
 
   return events.filter((event) =>
-    compareFns[view](new Date(event.startDate), date)
+    compareFns[view](new Date(event.deadline), date)
   ).length
 }
 
 // ================ Week and day view helper functions ================ //
 
-export function getCurrentEvents(events: IEvent[]) {
+export function getCurrentEvents(events: Task[]) {
   const now = new Date()
   return (
     events.filter((event) =>
       isWithinInterval(now, {
-        start: parseISO(event.startDate),
-        end: parseISO(event.endDate),
+        start: parseISO(event.deadline),
+        end: parseISO(event.deadline),
       })
     ) || null
   )
 }
 
-export function groupEvents(dayEvents: IEvent[]) {
+export function groupEvents(dayEvents: Task[]) {
   const sortedEvents = dayEvents.sort(
-    (a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()
+    (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
   )
-  const groups: IEvent[][] = []
+  const groups: Task[][] = []
 
   for (const event of sortedEvents) {
-    const eventStart = parseISO(event.startDate)
+    const eventStart = parseISO(event.deadline)
 
     let placed = false
     for (const group of groups) {
       const lastEventInGroup = group[group.length - 1]
-      const lastEventEnd = parseISO(lastEventInGroup.endDate)
+      const lastEventEnd = parseISO(lastEventInGroup.deadline)
 
       if (eventStart >= lastEventEnd) {
         group.push(event)
@@ -145,13 +140,13 @@ export function groupEvents(dayEvents: IEvent[]) {
 }
 
 export function getEventBlockStyle(
-  event: IEvent,
+  event: Task,
   day: Date,
   groupIndex: number,
   groupSize: number,
   visibleHoursRange?: { from: number; to: number }
 ) {
-  const startDate = parseISO(event.startDate)
+  const startDate = parseISO(event.deadline)
   const dayStart = new Date(day.setHours(0, 0, 0, 0))
   const eventStart = startDate < dayStart ? dayStart : startDate
   const startMinutes = differenceInMinutes(eventStart, dayStart)
@@ -171,31 +166,6 @@ export function getEventBlockStyle(
   const left = groupIndex * width
 
   return { top: `${top}%`, width: `${width}%`, left: `${left}%` }
-}
-
-export function getVisibleHours(
-  visibleHours: TVisibleHours,
-  singleDayEvents: IEvent[]
-) {
-  let earliestEventHour = visibleHours.from
-  let latestEventHour = visibleHours.to
-
-  singleDayEvents.forEach((event) => {
-    const startHour = parseISO(event.startDate).getHours()
-    const endTime = parseISO(event.endDate)
-    const endHour = endTime.getHours() + (endTime.getMinutes() > 0 ? 1 : 0)
-    if (startHour < earliestEventHour) earliestEventHour = startHour
-    if (endHour > latestEventHour) latestEventHour = endHour
-  })
-
-  latestEventHour = Math.min(latestEventHour, 24)
-
-  const hours = Array.from(
-    { length: latestEventHour - earliestEventHour },
-    (_, i) => i + earliestEventHour
-  )
-
-  return { hours, earliestEventHour, latestEventHour }
 }
 
 // ================ Month view helper functions ================ //
@@ -243,8 +213,7 @@ export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
 }
 
 export function calculateMonthEventPositions(
-  multiDayEvents: IEvent[],
-  singleDayEvents: IEvent[],
+  singleDayEvents: Task[],
   selectedDate: Date
 ) {
   const monthStart = startOfMonth(selectedDate)
@@ -258,29 +227,14 @@ export function calculateMonthEventPositions(
   })
 
   const sortedEvents = [
-    ...multiDayEvents.sort((a, b) => {
-      const aDuration = differenceInDays(
-        parseISO(a.endDate),
-        parseISO(a.startDate)
-      )
-      const bDuration = differenceInDays(
-        parseISO(b.endDate),
-        parseISO(b.startDate)
-      )
-      return (
-        bDuration - aDuration ||
-        parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()
-      )
-    }),
     ...singleDayEvents.sort(
-      (a, b) =>
-        parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()
+      (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
     ),
   ]
 
   sortedEvents.forEach((event) => {
-    const eventStart = parseISO(event.startDate)
-    const eventEnd = parseISO(event.endDate)
+    const eventStart = parseISO(event.deadline)
+    const eventEnd = parseISO(event.deadline)
     const eventDays = eachDayOfInterval({
       start: eventStart < monthStart ? monthStart : eventStart,
       end: eventEnd > monthEnd ? monthEnd : eventEnd,
@@ -314,12 +268,12 @@ export function calculateMonthEventPositions(
 
 export function getMonthCellEvents(
   date: Date,
-  events: IEvent[],
+  events: Task[],
   eventPositions: Record<string, number>
 ) {
   const eventsForDate = events.filter((event) => {
-    const eventStart = parseISO(event.startDate)
-    const eventEnd = parseISO(event.endDate)
+    const eventStart = parseISO(event.deadline)
+    const eventEnd = parseISO(event.deadline)
     return (
       (date >= eventStart && date <= eventEnd) ||
       isSameDay(date, eventStart) ||
@@ -331,11 +285,8 @@ export function getMonthCellEvents(
     .map((event) => ({
       ...event,
       position: eventPositions[event.id] ?? -1,
-      isMultiDay: event.startDate !== event.endDate,
     }))
     .sort((a, b) => {
-      if (a.isMultiDay && !b.isMultiDay) return -1
-      if (!a.isMultiDay && b.isMultiDay) return 1
       return a.position - b.position
     })
 }

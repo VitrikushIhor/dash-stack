@@ -2,10 +2,10 @@
 
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
-import { type IEvent } from '../../model/types'
+import { type Task } from '@/entities/task'
 
 interface DraggableEventProps {
-  event: IEvent
+  event: Task
   children: React.ReactNode
 }
 

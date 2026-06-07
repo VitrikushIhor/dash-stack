@@ -3,13 +3,17 @@
 import { format, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { Clock, Text, User } from 'lucide-react'
+import { type Task } from '@/entities/task'
+import {
+  getTaskColor,
+  getTaskUser,
+} from '@/features/event-calendar/lib/mappers'
 import { useCalendar } from '@/features/event-calendar/model/calendar-context'
-import type { IEvent } from '@/features/event-calendar/model/types'
 import { EventDetailsDialog } from '../event-details-dialog'
 import { agendaEventCardVariants } from '../variants'
 
 interface IProps {
-  event: IEvent
+  event: Task
   eventCurrentDay?: number
   eventTotalDays?: number
 }
@@ -21,11 +25,11 @@ export function AgendaEventCard({
 }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const startDate = parseISO(event.startDate)
-  const endDate = parseISO(event.endDate)
+  const startDate = parseISO(event.deadline)
+  const endDate = parseISO(event.deadline)
 
   const color = (
-    badgeVariant === 'dot' ? `${event.color}-dot` : event.color
+    badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)
   ) as VariantProps<typeof agendaEventCardVariants>['color']
 
   const agendaEventCardClasses = agendaEventCardVariants({ color })
@@ -70,7 +74,7 @@ export function AgendaEventCard({
 
           <div className='mt-1 flex items-center gap-1'>
             <User className='size-3 shrink-0' />
-            <p className='text-foreground text-xs'>{event.user.name}</p>
+            <p className='text-foreground text-xs'>{getTaskUser(event).name}</p>
           </div>
 
           <div className='flex items-center gap-1'>

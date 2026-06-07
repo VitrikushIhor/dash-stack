@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
 import { format } from 'date-fns'
 import { CalendarIcon, CheckCheck, Plus, Upload, X } from 'lucide-react'
@@ -19,6 +17,7 @@ import {
 } from '@/shared/ui/components/file-upload'
 import { LabelSelector } from '@/shared/ui/components/label/label-selector'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
+import { type LabelColor } from '@/shared/ui/components/label/types.label'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Calendar } from '@/shared/ui/components/ui/calendar'
 import {
@@ -75,9 +74,9 @@ export function AddTaskDialog({
     checklists,
     addChecklist,
     form,
-    selectedLabels,
+    selectedLabel,
     selectedMembers,
-    setSelectedLabels,
+    setSelectedLabel,
     setSelectedMembers,
     handleSubmit,
     files,
@@ -228,11 +227,16 @@ export function AddTaskDialog({
               <Separator />
 
               <LabelSelector
-                selectedLabels={selectedLabels}
+                selectedLabel={selectedLabel}
                 availableLabels={mockAvailableLabels}
-                onLabelsChange={setSelectedLabels}
-                onCreateLabel={() => {}}
-                maxLabels={2}
+                onLabelChange={setSelectedLabel}
+                onCreateLabel={(name, color) => {
+                  setSelectedLabel({
+                    id: crypto.randomUUID(),
+                    name,
+                    color: color as LabelColor,
+                  })
+                }}
               />
 
               <Separator />

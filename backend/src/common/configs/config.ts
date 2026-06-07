@@ -1,6 +1,6 @@
 import type { Config } from './config.interface';
 
-const config: Config = {
+export default (): Config => ({
   nest: {
     port: parseInt(process.env.PORT || '8000', 10),
   },
@@ -30,6 +30,4 @@ const config: Config = {
     pass: process.env.SMTP_PASS || 'app_password',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   },
-};
-
-export default (): Config => config;
+});

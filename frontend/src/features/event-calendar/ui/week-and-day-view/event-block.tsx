@@ -2,8 +2,9 @@ import type { HTMLAttributes } from 'react'
 import { format, differenceInMinutes, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
+import { type Task } from '@/entities/task'
+import { getTaskColor } from '@/features/event-calendar/lib/mappers'
 import { useCalendar } from '../../model/calendar-context'
-import type { IEvent } from '../../model/types'
 import { DraggableEvent } from '../dnd/draggable-event'
 import { EventDetailsDialog } from '../event-details-dialog'
 import { calendarWeekEventCardVariants } from '../variants'
@@ -12,19 +13,19 @@ interface IProps
   extends
     HTMLAttributes<HTMLDivElement>,
     Omit<VariantProps<typeof calendarWeekEventCardVariants>, 'color'> {
-  event: IEvent
+  event: Task
 }
 
 export function EventBlock({ event, className }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const start = parseISO(event.startDate)
-  const end = parseISO(event.endDate)
+  const start = parseISO(event.deadline)
+  const end = parseISO(event.deadline)
   const durationInMinutes = differenceInMinutes(end, start)
   const heightInPixels = (durationInMinutes / 60) * 96 - 8
 
   const color = (
-    badgeVariant === 'dot' ? `${event.color}-dot` : event.color
+    badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)
   ) as VariantProps<typeof calendarWeekEventCardVariants>['color']
 
   const calendarWeekEventCardClasses = cn(

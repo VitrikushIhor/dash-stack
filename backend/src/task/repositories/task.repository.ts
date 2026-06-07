@@ -8,7 +8,7 @@ export class TaskRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTaskData) {
-    const { assigneeIds, labels, checklists, ...rest } = data;
+    const { assigneeIds, label, checklists, ...rest } = data;
 
     return this.prisma.task.create({
       data: {
@@ -18,9 +18,9 @@ export class TaskRepository {
               connect: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        labels: labels
+        label: label
           ? {
-              create: labels,
+              create: label,
             }
           : undefined,
         checklists: checklists
@@ -46,7 +46,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -92,9 +92,7 @@ export class TaskRepository {
           assigneeIds?.length
             ? { assignees: { some: { id: { in: assigneeIds } } } }
             : {},
-          labelNames?.length
-            ? { labels: { some: { name: { in: labelNames } } } }
-            : {},
+          labelNames?.length ? { label: { name: { in: labelNames } } } : {},
           deadlineFrom || deadlineTo
             ? {
                 deadline: {
@@ -118,7 +116,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -145,7 +143,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -156,7 +154,14 @@ export class TaskRepository {
   }
 
   async update(id: string, organizationId: string, data: UpdateTaskData) {
-    const { assigneeIds, labels, checklists, ...rest } = data;
+    const { assigneeIds, label, checklists, ...rest } = data;
+
+    // Delete old label if we are updating it to something else or to null
+    if (label !== undefined) {
+      await this.prisma.taskLabel.deleteMany({
+        where: { taskId: id },
+      });
+    }
 
     return this.prisma.task.update({
       where: { id, organizationId },
@@ -167,10 +172,9 @@ export class TaskRepository {
               set: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        labels: labels
+        label: label
           ? {
-              deleteMany: {},
-              create: labels,
+              create: label,
             }
           : undefined,
         checklists: checklists
@@ -197,7 +201,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -216,9 +220,7 @@ export class TaskRepository {
   async updateMany(
     organizationId: string,
     ids: string[],
-    data: Partial<
-      Omit<UpdateTaskData, 'assigneeIds' | 'labels' | 'checklists'>
-    >,
+    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'label' | 'checklists'>>,
   ) {
     return this.prisma.task.updateMany({
       where: {

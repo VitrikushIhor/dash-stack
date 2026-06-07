@@ -6,14 +6,14 @@ import {
   getDaysInMonth,
   startOfMonth,
 } from 'date-fns'
+import { type Task } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
 import { useCalendar } from '../../model/calendar-context'
-import type { IEvent } from '../../model/types'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
   month: Date
-  events: IEvent[]
+  events: Task[]
 }
 
 export function YearViewMonth({ month, events }: IProps) {
@@ -68,8 +68,8 @@ export function YearViewMonth({ month, events }: IProps) {
             const date = new Date(month.getFullYear(), month.getMonth(), day)
             const dayEvents = events.filter(
               (event) =>
-                isSameDay(parseISO(event.startDate), date) ||
-                isSameDay(parseISO(event.endDate), date)
+                isSameDay(parseISO(event.deadline), date) ||
+                isSameDay(parseISO(event.deadline), date)
             )
 
             return (

@@ -107,7 +107,7 @@ export function TaskPage() {
               options: filterOptions.statuses,
             },
             {
-              columnId: 'labels',
+              columnId: 'label',
               title: 'Label',
               options: filterOptions.labels,
             },

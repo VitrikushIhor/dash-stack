@@ -1,13 +1,12 @@
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+import { type Task } from '@/entities/task'
 import { useCalendar } from '../../model/calendar-context'
-import type { IEvent } from '../../model/types'
 import { EventBlock } from './event-block'
 
 interface IProps {
-  singleDayEvents: IEvent[]
-  multiDayEvents: IEvent[]
+  singleDayEvents: Task[]
 }
 
 export function CalendarDayView({ singleDayEvents }: IProps) {
@@ -15,7 +14,7 @@ export function CalendarDayView({ singleDayEvents }: IProps) {
 
   const dayEvents = singleDayEvents
     .filter((event) => {
-      const eventDate = parseISO(event.startDate)
+      const eventDate = parseISO(event.deadline)
       return (
         eventDate.getDate() === selectedDate.getDate() &&
         eventDate.getMonth() === selectedDate.getMonth() &&
@@ -23,8 +22,7 @@ export function CalendarDayView({ singleDayEvents }: IProps) {
       )
     })
     .sort(
-      (a, b) =>
-        parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()
+      (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
     )
 
   return (

@@ -8,7 +8,6 @@ import {
   CalendarProvider,
   DndProviderWrapper,
   memberToUser,
-  taskToEvent,
   type TCalendarView,
 } from '@/features/event-calendar'
 import { useGetMembers, useOrgStore } from '@/features/organization'
@@ -57,7 +56,7 @@ export function CalendarPage() {
   return (
     <CalendarProvider
       users={members.map(memberToUser)}
-      events={tasks.map(taskToEvent)}
+      events={tasks}
       view={initialView}
       selectedDate={initialDate}
     >

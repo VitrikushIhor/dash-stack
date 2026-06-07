@@ -31,7 +31,7 @@ export function useTaskForm(
   initialStatus?: TaskStatusEnum
 ) {
   const [selectedMembers, setSelectedMembers] = useState<Membership[]>([])
-  const [selectedLabels, setSelectedLabels] = useState<Label[]>([])
+  const [selectedLabel, setSelectedLabel] = useState<Label | null>(null)
   const [files, setFiles] = useState<File[]>([])
 
   const checklists = useTodoChecklists()
@@ -81,20 +81,22 @@ export function useTaskForm(
 
       setSelectedMembers(mappedMembers)
 
-      const mappedLabels: Label[] = (task.labels || []).map((l) => ({
-        id: l.id,
-        name: l.name,
-        color: l.color as LabelColor,
-      }))
-
-      setSelectedLabels(mappedLabels)
+      if (task.label) {
+        setSelectedLabel({
+          id: task.label.id,
+          name: task.label.name,
+          color: task.label.color as LabelColor,
+        })
+      } else {
+        setSelectedLabel(null)
+      }
 
       setChecklists(task.checklists || [])
     } else if (initialStatus !== undefined) {
       form.setValue('status', initialStatus)
       setFiles([])
       setSelectedMembers([])
-      setSelectedLabels([])
+      setSelectedLabel(null)
       setChecklists([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +105,12 @@ export function useTaskForm(
   const handleSubmit = async (values: TaskFormValues) => {
     if (!orgId) {
       toast.error('No organization selected')
-      return
+      return { success: false }
+    }
+
+    if (!selectedLabel) {
+      toast.error('Label is required')
+      return { success: false }
     }
 
     try {
@@ -118,7 +125,7 @@ export function useTaskForm(
         deadline: values.deadline?.toISOString(),
         attachments: attachments.length ? attachments : undefined,
         assigneeIds: selectedMembers.map((m) => m.id),
-        labels: selectedLabels.map((l) => ({ name: l.name, color: l.color })),
+        label: { name: selectedLabel.name, color: selectedLabel.color },
         checklists: checklists.map((cl) => ({
           name: cl.name,
           items: cl.items.map((item) => ({
@@ -148,7 +155,7 @@ export function useTaskForm(
     form.reset()
     setFiles([])
     setSelectedMembers([])
-    setSelectedLabels([])
+    setSelectedLabel(null)
     setChecklists([])
   }, [form, setChecklists])
 
@@ -156,8 +163,8 @@ export function useTaskForm(
     form,
     selectedMembers,
     setSelectedMembers,
-    selectedLabels,
-    setSelectedLabels,
+    selectedLabel,
+    setSelectedLabel,
     files,
     setFiles,
     checklists,

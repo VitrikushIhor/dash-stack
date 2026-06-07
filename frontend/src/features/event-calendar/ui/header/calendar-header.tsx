@@ -12,14 +12,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
+import { type Task } from '@/entities/task'
 import { useCalendar } from '../../model/calendar-context'
-import { type IEvent } from '../../model/types'
 import { DateNavigator } from './date-navigator'
 import { TodayButton } from './today-button'
 import { UserSelect } from './user-select'
 
 interface IProps {
-  events: IEvent[]
+  events: Task[]
 }
 
 export function CalendarHeader({ events }: IProps) {

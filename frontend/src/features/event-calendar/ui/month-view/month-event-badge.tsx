@@ -1,8 +1,9 @@
 import { endOfDay, format, isSameDay, parseISO, startOfDay } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
+import { type Task } from '@/entities/task'
+import { getTaskColor } from '@/features/event-calendar/lib/mappers'
 import { useCalendar } from '../../model/calendar-context'
-import { type IEvent } from '../../model/types'
 import { DraggableEvent } from '../dnd/draggable-event'
 import { EventDetailsDialog } from '../event-details-dialog'
 import { eventBadgeVariants } from '../variants'
@@ -11,7 +12,7 @@ interface IProps extends Omit<
   VariantProps<typeof eventBadgeVariants>,
   'color' | 'multiDayPosition'
 > {
-  event: IEvent
+  event: Task
   cellDate: Date
   eventCurrentDay?: number
   eventTotalDays?: number
@@ -29,8 +30,8 @@ export function MonthEventBadge({
 }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const itemStart = startOfDay(parseISO(event.startDate))
-  const itemEnd = endOfDay(parseISO(event.endDate))
+  const itemStart = startOfDay(parseISO(event.deadline))
+  const itemEnd = endOfDay(parseISO(event.deadline))
 
   if (cellDate < itemStart || cellDate > itemEnd) return null
 
@@ -53,7 +54,7 @@ export function MonthEventBadge({
   const renderBadgeText = ['first', 'none'].includes(position)
 
   const color = (
-    badgeVariant === 'dot' ? `${event.color}-dot` : event.color
+    badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)
   ) as VariantProps<typeof eventBadgeVariants>['color']
 
   const eventBadgeClasses = cn(
@@ -102,7 +103,7 @@ export function MonthEventBadge({
           </div>
 
           {renderBadgeText && (
-            <span>{format(new Date(event.startDate), 'h:mm a')}</span>
+            <span>{format(new Date(event.deadline), 'h:mm a')}</span>
           )}
         </div>
       </EventDetailsDialog>

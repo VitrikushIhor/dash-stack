@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
 import { format } from 'date-fns'
 import { DialogDescription } from '@radix-ui/react-dialog'
@@ -20,6 +18,7 @@ import {
 } from '@/shared/ui/components/file-upload'
 import { LabelSelector } from '@/shared/ui/components/label/label-selector'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
+import { type LabelColor } from '@/shared/ui/components/label/types.label'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Calendar } from '@/shared/ui/components/ui/calendar'
 import {
@@ -80,9 +79,9 @@ export function EditTaskDialog({
     checklists,
     addChecklist,
     form,
-    selectedLabels,
+    selectedLabel,
     selectedMembers,
-    setSelectedLabels,
+    setSelectedLabel,
     setSelectedMembers,
     handleSubmit,
     setFiles,
@@ -230,16 +229,17 @@ export function EditTaskDialog({
               <Separator />
 
               <LabelSelector
-                selectedLabels={selectedLabels}
+                selectedLabel={selectedLabel}
                 availableLabels={mockAvailableLabels}
-                onLabelsChange={setSelectedLabels}
-                onCreateLabel={() => {}}
-                maxLabels={2}
+                onLabelChange={setSelectedLabel}
+                onCreateLabel={(name, color) => {
+                  setSelectedLabel({
+                    id: crypto.randomUUID(),
+                    name,
+                    color: color as LabelColor,
+                  })
+                }}
               />
-
-              <Separator />
-
-              {/* Checklists */}
               <div className='space-y-2'>
                 <div className='flex items-center justify-between'>
                   <label className='text-sm font-medium'>Checklists</label>

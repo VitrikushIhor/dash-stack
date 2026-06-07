@@ -11,8 +11,7 @@ import {
 
 export function CalendarContent() {
   const { view } = useCalendar()
-  const { filteredEvents, singleDayEvents, multiDayEvents } =
-    useFilteredEvents()
+  const { filteredEvents, singleDayEvents } = useFilteredEvents()
 
   return (
     <>
@@ -23,29 +22,17 @@ export function CalendarContent() {
 
       <div className='bg-card rounded-xl border p-4 shadow-sm'>
         {view === 'day' && (
-          <CalendarDayView
-            singleDayEvents={singleDayEvents}
-            multiDayEvents={multiDayEvents}
-          />
+          <CalendarDayView singleDayEvents={singleDayEvents} />
         )}
         {view === 'month' && (
-          <CalendarMonthView
-            singleDayEvents={singleDayEvents}
-            multiDayEvents={multiDayEvents}
-          />
+          <CalendarMonthView singleDayEvents={singleDayEvents} />
         )}
         {view === 'week' && (
-          <CalendarWeekView
-            singleDayEvents={singleDayEvents}
-            multiDayEvents={multiDayEvents}
-          />
+          <CalendarWeekView singleDayEvents={singleDayEvents} />
         )}
         {view === 'year' && <CalendarYearView allEvents={filteredEvents} />}
         {view === 'agenda' && (
-          <CalendarAgendaView
-            multiDayEvents={multiDayEvents}
-            singleDayEvents={singleDayEvents}
-          />
+          <CalendarAgendaView singleDayEvents={singleDayEvents} />
         )}
       </div>
     </>

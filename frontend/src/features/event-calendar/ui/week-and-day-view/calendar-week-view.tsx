@@ -1,17 +1,15 @@
 import { startOfWeek, format, parseISO, isSameDay } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+import { type Task } from '@/entities/task'
 import { getWeekDays } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
-import type { IEvent } from '../../model/types'
 import { EventBlock } from './event-block'
-import { WeekViewMultiDayEventsRow } from './week-view-multi-day-events-row'
 
 interface IProps {
-  singleDayEvents: IEvent[]
-  multiDayEvents: IEvent[]
+  singleDayEvents: Task[]
 }
 
-export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
+export function CalendarWeekView({ singleDayEvents }: IProps) {
   const { selectedDate } = useCalendar()
 
   const weekStart = startOfWeek(selectedDate)
@@ -26,11 +24,6 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
       <div className='hidden flex-col sm:flex'>
         <div>
-          <WeekViewMultiDayEventsRow
-            selectedDate={selectedDate}
-            multiDayEvents={multiDayEvents}
-          />
-
           {/* Week header */}
           <div className='relative z-20 flex border-b'>
             <div className='grid flex-1 grid-cols-7 divide-x border-l'>
@@ -58,13 +51,13 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                   const dayEvents = singleDayEvents
                     .filter(
                       (event) =>
-                        isSameDay(parseISO(event.startDate), day) ||
-                        isSameDay(parseISO(event.endDate), day)
+                        isSameDay(parseISO(event.deadline), day) ||
+                        isSameDay(parseISO(event.deadline), day)
                     )
                     .sort(
                       (a, b) =>
-                        parseISO(a.startDate).getTime() -
-                        parseISO(b.startDate).getTime()
+                        parseISO(a.deadline).getTime() -
+                        parseISO(b.deadline).getTime()
                     )
 
                   return (

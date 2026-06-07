@@ -73,11 +73,8 @@ async function main() {
       assignees: {
         connect: [{ id: membership1.id }],
       },
-      labels: {
-        create: [
-          { name: 'Feature', color: 'blue' },
-          { name: 'High Priority', color: 'red' },
-        ],
+      label: {
+        create: { name: 'Feature', color: 'blue' },
       },
     },
   });
@@ -92,8 +89,8 @@ async function main() {
       assignees: {
         connect: [{ id: membership1.id }],
       },
-      labels: {
-        create: [{ name: 'DevOps', color: 'purple' }],
+      label: {
+        create: { name: 'DevOps', color: 'purple' },
       },
     },
   });
@@ -108,8 +105,8 @@ async function main() {
       assignees: {
         connect: [{ id: membership2.id }],
       },
-      labels: {
-        create: [{ name: 'Design', color: 'pink' }],
+      label: {
+        create: { name: 'Design', color: 'pink' },
       },
     },
   });
@@ -124,8 +121,8 @@ async function main() {
       assignees: {
         connect: [{ id: membership1.id }, { id: membership2.id }],
       },
-      labels: {
-        create: [{ name: 'Release', color: 'green' }],
+      label: {
+        create: { name: 'Release', color: 'green' },
       },
     },
   });

@@ -49,7 +49,7 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     globalFilter: { enabled: true, key: 'filter' },
     columnFilters: [
       { columnId: 'status', searchKey: 'status', type: 'array' },
-      { columnId: 'labels', searchKey: 'labels', type: 'array' },
+      { columnId: 'label', searchKey: 'labels', type: 'array' },
       { columnId: 'assignees', searchKey: 'members', type: 'array' },
       {
         columnId: 'deadline',

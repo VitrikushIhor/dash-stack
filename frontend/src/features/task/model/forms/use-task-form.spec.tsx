@@ -50,7 +50,7 @@ describe('useTaskForm', () => {
       deadline: undefined,
     })
     expect(result.current.selectedMembers).toEqual([])
-    expect(result.current.selectedLabels).toEqual([])
+    expect(result.current.selectedLabel).toBeNull()
     expect(result.current.files).toEqual([])
   })
 

@@ -63,7 +63,7 @@ describe('TaskCardKanban', () => {
         },
       },
     ],
-    labels: [{ id: 'lbl-1', name: 'Urgent', color: 'red' }],
+    label: { id: 'lbl-1', name: 'Urgent', color: 'red' },
     checklists: [
       {
         id: 'cl-1',

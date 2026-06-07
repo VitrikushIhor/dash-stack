@@ -1,34 +1,26 @@
 import { useMemo } from 'react'
+import { type Task } from '@/entities/task'
 import {
   calculateMonthEventPositions,
   getCalendarCells,
 } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
-import type { IEvent } from '../../model/types'
 import { DayCell } from './day-cell'
 
 interface IProps {
-  singleDayEvents: IEvent[]
-  multiDayEvents: IEvent[]
+  singleDayEvents: Task[]
 }
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export function CalendarMonthView({ singleDayEvents, multiDayEvents }: IProps) {
+export function CalendarMonthView({ singleDayEvents }: IProps) {
   const { selectedDate } = useCalendar()
-
-  const allEvents = [...multiDayEvents, ...singleDayEvents]
 
   const cells = useMemo(() => getCalendarCells(selectedDate), [selectedDate])
 
   const eventPositions = useMemo(
-    () =>
-      calculateMonthEventPositions(
-        multiDayEvents,
-        singleDayEvents,
-        selectedDate
-      ),
-    [multiDayEvents, singleDayEvents, selectedDate]
+    () => calculateMonthEventPositions(singleDayEvents, selectedDate),
+    [singleDayEvents, selectedDate]
   )
 
   return (
@@ -48,7 +40,7 @@ export function CalendarMonthView({ singleDayEvents, multiDayEvents }: IProps) {
           <DayCell
             key={cell.date.toISOString()}
             cell={cell}
-            events={allEvents}
+            events={singleDayEvents}
             eventPositions={eventPositions}
           />
         ))}

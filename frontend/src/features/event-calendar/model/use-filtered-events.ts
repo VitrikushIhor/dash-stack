@@ -6,22 +6,18 @@ export function useFilteredEvents() {
 
   const filteredEvents = useMemo(() => {
     if (selectedUserId === 'all') return events
-    return events.filter((e) => e.user.id === selectedUserId)
+    return events.filter((e) =>
+      e.assignees.some((a) => a.userId === selectedUserId)
+    )
   }, [events, selectedUserId])
 
   const singleDayEvents = useMemo(
-    () => filteredEvents.filter((e) => e.startDate === e.endDate),
-    [filteredEvents]
-  )
-
-  const multiDayEvents = useMemo(
-    () => filteredEvents.filter((e) => e.startDate !== e.endDate),
+    () => filteredEvents.filter((e) => e.deadline === e.deadline),
     [filteredEvents]
   )
 
   return {
     filteredEvents,
     singleDayEvents,
-    multiDayEvents,
   }
 }
