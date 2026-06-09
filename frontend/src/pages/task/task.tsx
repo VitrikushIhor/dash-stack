@@ -7,8 +7,9 @@ import { Search } from '@/shared/ui/components/search'
 import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
 import { Button } from '@/shared/ui/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/components/ui/tabs'
+import { useTasksQuery } from '@/entities/task'
+import { useTaskModalStore } from '@/features/manage-task'
 import { useOrgStore } from '@/features/organization'
-import { useTasks, TasksDialogs, useTasksQuery } from '@/features/task'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
 import { Header } from '@/widgets/layout/ui/header'
 import { Main } from '@/widgets/layout/ui/main'
@@ -23,6 +24,7 @@ export function TaskPage() {
   const { activeOrgId } = useOrgStore()
   const route = getRouteApi('/_authenticated/task/')
   const search = route.useSearch()
+  const { openCreate } = useTaskModalStore()
 
   const filters = useMemo(
     () => ({
@@ -42,7 +44,6 @@ export function TaskPage() {
 
   const { data: tasks } = useTasksQuery(activeOrgId || '', filters)
 
-  const { setOpen } = useTasks()
   const { table, filterOptions } = useTasksTable({
     orgId: activeOrgId || '',
     data: tasks || [],
@@ -87,7 +88,7 @@ export function TaskPage() {
             </Tabs>
           </div>
           <div className='flex items-center space-x-2'>
-            <Button onClick={() => setOpen('create')}>
+            <Button onClick={() => openCreate()}>
               <Plus className='mr-2 h-4 w-4' />
               Add Task
             </Button>
@@ -136,7 +137,7 @@ export function TaskPage() {
           )}
         </div>
       </Main>
-      <TasksDialogs />
+      {/* <TasksDialogs /> */}
     </>
   )
 }

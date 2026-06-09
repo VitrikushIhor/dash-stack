@@ -1,6 +1,5 @@
 import { Badge } from '@/shared/ui/components/ui/badge'
-import { type TaskStatusEnum } from '@/entities/task'
-import { STATUS_CONFIG } from '../model/types/task-status-config'
+import { type TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
 
 export function TaskStatusBadge({ status }: { status: TaskStatusEnum }) {
   const config = STATUS_CONFIG[status]

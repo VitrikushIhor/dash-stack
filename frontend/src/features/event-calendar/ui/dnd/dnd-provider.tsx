@@ -10,7 +10,8 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { type Task } from '@/entities/task'
+import { type Task, useUpdateTask } from '@/entities/task'
+import { useOrgStore } from '@/features/organization'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
@@ -18,6 +19,9 @@ interface DndProviderWrapperProps {
 }
 
 export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
+  const { activeOrgId } = useOrgStore()
+  const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -31,7 +35,7 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (!over || !active.data.current) return
+    if (!over || !active.data.current || !activeOrgId) return
 
     const droppedEvent = active.data.current.event as Task
     const overData = over.data.current
@@ -56,6 +60,13 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     } else {
       return
     }
+
+    updateTask({
+      id: droppedEvent.id,
+      data: {
+        deadline: newStartDate.toISOString(),
+      },
+    })
   }
 
   return (

@@ -11,6 +11,7 @@ import {
 } from '@/shared/ui/components/ui/dialog'
 import { type Task } from '@/entities/task'
 import { getTaskUser } from '@/features/event-calendar/lib/mappers'
+import { useTaskModalStore } from '@/features/manage-task'
 
 interface IProps {
   event: Task
@@ -18,6 +19,7 @@ interface IProps {
 }
 
 export function EventDetailsDialog({ event, children }: IProps) {
+  const { openEdit } = useTaskModalStore()
   const startDate = parseISO(event.deadline)
   const endDate = parseISO(event.deadline)
 
@@ -74,11 +76,13 @@ export function EventDetailsDialog({ event, children }: IProps) {
           </div>
 
           <DialogFooter>
-            {/* <EditEventDialog event={event}> */}
-            <Button type='button' variant='outline'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => openEdit(event)}
+            >
               Edit
             </Button>
-            {/* </EditEventDialog> */}
           </DialogFooter>
         </DialogContent>
       </Dialog>

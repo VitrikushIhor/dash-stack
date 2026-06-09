@@ -15,13 +15,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/components/ui/tooltip'
-import { type TaskStatusEnum, type Task } from '@/entities/task'
-import { useOrgStore } from '@/features/organization'
 import {
+  type TaskStatusEnum,
+  type Task,
   STATUS_CONFIG,
   useBulkUpdateTasks,
   useBulkDeleteTasks,
-} from '@/features/task'
+} from '@/entities/task'
+import { useOrgStore } from '@/features/organization'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {

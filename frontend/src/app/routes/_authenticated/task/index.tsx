@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { TaskStatusEnum } from '@/entities/task'
-import { ChecklistTodoProvider, TasksProvider } from '@/features/task'
 import { TaskPage } from '@/pages/task'
 
 const taskSearchSchema = z.object({
@@ -16,11 +15,5 @@ const taskSearchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/task/')({
   validateSearch: (search) => taskSearchSchema.parse(search),
-  component: () => (
-    <ChecklistTodoProvider>
-      <TasksProvider>
-        <TaskPage />
-      </TasksProvider>
-    </ChecklistTodoProvider>
-  ),
+  component: () => <TaskPage />,
 })

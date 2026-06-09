@@ -1,1 +1,1 @@
-export { CalendarHeaderSection } from './ui/calendar-header-section'
+export { CalendarView } from './ui/calendar-view'

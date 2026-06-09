@@ -1,3 +1,5 @@
 export { TeamGrid } from './ui/team-grid'
 export { TeamMemberPicker } from './ui/team-member-picker'
 export { TeamMemberSelector } from './ui/team-member-selector'
+export { FormMemberPicker } from './ui/form-member-picker'
+export { membershipSchema } from './model/membership-schema'

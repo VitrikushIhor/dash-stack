@@ -24,6 +24,27 @@ export type LabelColor =
   | 'rose'
   | 'gray'
 
+export const labelColorNames = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+  'gray',
+]
+
 export const labelColorStyles: Record<
   LabelColor,
   { bg: string; text: string; border: string }

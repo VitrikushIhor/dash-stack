@@ -6,10 +6,10 @@ import {
   KanbanBoard,
   KanbanOverlay,
 } from '@/shared/ui/components/kanban'
-import { type Task, type TaskStatusEnum } from '@/entities/task'
+import { type Task, type TaskStatusEnum, useUpdateTask } from '@/entities/task'
 import { useOrgStore } from '@/features/organization'
-import { useUpdateTask } from '@/features/task'
-import { groupTasksByStatus, KanbanViewMode } from '@/widgets/kanban-board'
+import { KanbanViewMode } from '../model/types/kanban-types'
+import { groupTasksByStatus } from '../model/utils'
 import { KanbanTaskCard } from './kanban-task-card'
 import { KanbanTaskColum } from './kanban-task-column'
 
@@ -24,6 +24,7 @@ export function KanbanTaskBoard({
 
   const [columns, setColumns] = useState<Record<string, Task[]>>(groupedTask)
   const prevColumnsRef = useRef<Record<string, Task[]>>(groupedTask)
+  const dragStartColumnsRef = useRef<Record<string, Task[]> | null>(null)
 
   useEffect(() => {
     if (prevColumnsRef.current !== groupedTask) {
@@ -47,30 +48,47 @@ export function KanbanTaskBoard({
 
   const handleValueChange = useCallback(
     (newColumns: Record<string, Task[]>) => {
-      const prevColumns = prevColumnsRef.current
-
-      for (const [columnId, newTasks] of Object.entries(newColumns)) {
-        const prevTasks = prevColumns[columnId] ?? []
-
-        for (const newTask of newTasks) {
-          const prevTask = prevTasks.find((t) => t.id === newTask.id)
-          if (!prevTask) {
-            const prevColumn = Object.entries(prevColumns).find(([, tasks]) =>
-              tasks.some((t) => t.id === newTask.id)
-            )?.[0]
-
-            if (prevColumn && prevColumn !== columnId) {
-              handleTaskMove(newTask.id, columnId as TaskStatusEnum)
-            }
-          }
-        }
-      }
-
       prevColumnsRef.current = newColumns
       setColumns(newColumns)
     },
-    [handleTaskMove]
+    []
   )
+
+  const handleDragStart = useCallback(() => {
+    dragStartColumnsRef.current = columns
+  }, [columns])
+
+  const handleDragCancel = useCallback(() => {
+    if (dragStartColumnsRef.current) {
+      setColumns(dragStartColumnsRef.current)
+      prevColumnsRef.current = dragStartColumnsRef.current
+      dragStartColumnsRef.current = null
+    }
+  }, [])
+
+  const handleDragEnd = useCallback(() => {
+    const startColumns = dragStartColumnsRef.current
+    if (!startColumns) return
+
+    for (const [columnId, newTasks] of Object.entries(columns)) {
+      const prevTasks = startColumns[columnId] ?? []
+
+      for (const newTask of newTasks) {
+        const prevTask = prevTasks.find((t) => t.id === newTask.id)
+        if (!prevTask) {
+          const prevColumn = Object.entries(startColumns).find(([, tasks]) =>
+            tasks.some((t) => t.id === newTask.id)
+          )?.[0]
+
+          if (prevColumn && prevColumn !== columnId) {
+            handleTaskMove(newTask.id, columnId as TaskStatusEnum)
+          }
+        }
+      }
+    }
+
+    dragStartColumnsRef.current = null
+  }, [columns, handleTaskMove])
 
   return (
     <>
@@ -80,6 +98,9 @@ export function KanbanTaskBoard({
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}
           orientation='horizontal'
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           <KanbanBoard className='grid auto-rows-fr grid-cols-3'>
             {Object.entries(columns).map(([columnValue, tasks]) => (
@@ -123,6 +144,9 @@ export function KanbanTaskBoard({
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}
           orientation='vertical'
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           {/* <KanbanBoard className='h-[calc(100vh-200px)] overflow-x-auto'> */}
           <KanbanBoard className=''>

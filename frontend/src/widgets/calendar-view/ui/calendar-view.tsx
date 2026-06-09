@@ -1,4 +1,10 @@
+import { useMemo } from 'react'
+import { type Membership } from '@/shared/model/types/membership'
+import { type Task } from '@/entities/task'
 import {
+  CalendarProvider,
+  DndProviderWrapper,
+  memberToUser,
   useCalendar,
   useFilteredEvents,
   CalendarAgendaView,
@@ -7,9 +13,17 @@ import {
   CalendarDayView,
   CalendarWeekView,
   CalendarYearView,
+  type TCalendarView,
 } from '@/features/event-calendar'
 
-export function CalendarContent() {
+interface CalendarViewProps {
+  tasks: Task[]
+  members: Membership[]
+  initialView: TCalendarView
+  initialDate: Date
+}
+
+function CalendarContent() {
   const { view } = useCalendar()
   const { filteredEvents, singleDayEvents } = useFilteredEvents()
 
@@ -36,5 +50,27 @@ export function CalendarContent() {
         )}
       </div>
     </>
+  )
+}
+
+export function CalendarView({
+  tasks,
+  members,
+  initialView,
+  initialDate,
+}: CalendarViewProps) {
+  const users = useMemo(() => members.map(memberToUser), [members])
+
+  return (
+    <CalendarProvider
+      users={users}
+      events={tasks}
+      view={initialView}
+      selectedDate={initialDate}
+    >
+      <DndProviderWrapper>
+        <CalendarContent />
+      </DndProviderWrapper>
+    </CalendarProvider>
   )
 }

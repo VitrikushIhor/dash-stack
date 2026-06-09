@@ -12,7 +12,7 @@ export function useFilteredEvents() {
   }, [events, selectedUserId])
 
   const singleDayEvents = useMemo(
-    () => filteredEvents.filter((e) => e.deadline === e.deadline),
+    () => filteredEvents.filter((e) => !!e.deadline),
     [filteredEvents]
   )
 

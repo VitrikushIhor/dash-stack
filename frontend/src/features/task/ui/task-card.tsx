@@ -12,8 +12,8 @@ import {
   TaskStatusEnum,
   calculateTaskProgress,
   isTaskOverdue,
+  STATUS_CONFIG,
 } from '@/entities/task'
-import { STATUS_CONFIG } from '../model/types/task-status-config'
 import { TaskCardActions } from './task-card-actions'
 
 interface TaskCardProps {
