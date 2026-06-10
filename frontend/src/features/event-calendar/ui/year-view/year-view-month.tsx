@@ -6,13 +6,14 @@ import {
   getDaysInMonth,
   startOfMonth,
 } from 'date-fns'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { type Task } from '@/entities/task'
+import { SHORT_WEEK_DAYS } from '../../lib/constants'
+import { useCalendar } from '../../model/calendar-context'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
   month: Date
-  events: IEvent[]
+  events: Task[]
 }
 
 export function YearViewMonth({ month, events }: IProps) {
@@ -30,7 +31,7 @@ export function YearViewMonth({ month, events }: IProps) {
     return [...blanks, ...days]
   }, [month])
 
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const weekDays = SHORT_WEEK_DAYS
 
   const handleClick = () => {
     setSelectedDate(new Date(month.getFullYear(), month.getMonth(), 1))
@@ -65,10 +66,8 @@ export function YearViewMonth({ month, events }: IProps) {
               return <div key={`blank-${index}`} className='h-10' />
 
             const date = new Date(month.getFullYear(), month.getMonth(), day)
-            const dayEvents = events.filter(
-              (event) =>
-                isSameDay(parseISO(event.startDate), date) ||
-                isSameDay(parseISO(event.endDate), date)
+            const dayEvents = events.filter((event) =>
+              isSameDay(parseISO(event.deadline), date)
             )
 
             return (

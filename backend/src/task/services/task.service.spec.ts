@@ -40,7 +40,11 @@ describe('TaskService', () => {
 
   describe('create', () => {
     const orgId = 'org-1';
-    const dto = { title: 'New Task', assigneeIds: ['mem-1'] };
+    const dto = {
+      title: 'New Task',
+      assigneeIds: ['mem-1'],
+      label: { name: 'Bug', color: '#FF0000' },
+    };
 
     it('should create a task if memberships are valid', async () => {
       mockTaskRepository.validateMemberships.mockResolvedValue(true);

@@ -1,12 +1,13 @@
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { type Task } from '@/entities/task'
+import { getTaskColor } from '@/features/event-calendar/lib/mappers'
+import { useCalendar } from '../../model/calendar-context'
 
 interface IProps {
   day: number
   date: Date
-  events: IEvent[]
+  events: Task[]
 }
 
 export function YearViewDayCell({ day, date, events }: IProps) {
@@ -43,13 +44,13 @@ export function YearViewDayCell({ day, date, events }: IProps) {
                 key={event.id}
                 className={cn(
                   'size-1.5 rounded-full',
-                  event.color === 'blue' && 'bg-blue-600',
-                  event.color === 'green' && 'bg-green-600',
-                  event.color === 'red' && 'bg-red-600',
-                  event.color === 'yellow' && 'bg-yellow-600',
-                  event.color === 'purple' && 'bg-purple-600',
-                  event.color === 'orange' && 'bg-orange-600',
-                  event.color === 'gray' && 'bg-neutral-600'
+                  getTaskColor(event) === 'blue' && 'bg-blue-600',
+                  getTaskColor(event) === 'green' && 'bg-green-600',
+                  getTaskColor(event) === 'red' && 'bg-red-600',
+                  getTaskColor(event) === 'yellow' && 'bg-yellow-600',
+                  getTaskColor(event) === 'purple' && 'bg-purple-600',
+                  getTaskColor(event) === 'orange' && 'bg-orange-600',
+                  getTaskColor(event) === 'gray' && 'bg-neutral-600'
                 )}
               />
             ))
@@ -58,12 +59,12 @@ export function YearViewDayCell({ day, date, events }: IProps) {
               <div
                 className={cn(
                   'size-1.5 rounded-full',
-                  events[0].color === 'blue' && 'bg-blue-600',
-                  events[0].color === 'green' && 'bg-green-600',
-                  events[0].color === 'red' && 'bg-red-600',
-                  events[0].color === 'yellow' && 'bg-yellow-600',
-                  events[0].color === 'purple' && 'bg-purple-600',
-                  events[0].color === 'orange' && 'bg-orange-600'
+                  getTaskColor(events[0]) === 'blue' && 'bg-blue-600',
+                  getTaskColor(events[0]) === 'green' && 'bg-green-600',
+                  getTaskColor(events[0]) === 'red' && 'bg-red-600',
+                  getTaskColor(events[0]) === 'yellow' && 'bg-yellow-600',
+                  getTaskColor(events[0]) === 'purple' && 'bg-purple-600',
+                  getTaskColor(events[0]) === 'orange' && 'bg-orange-600'
                 )}
               />
               <span className='text-muted-foreground text-[7px]'>

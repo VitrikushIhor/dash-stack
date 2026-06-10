@@ -59,11 +59,11 @@ describe('TaskCardKanban', () => {
           id: 'user-1',
           firstName: 'John',
           email: 'john@example.com',
-          avatar: null,
+          avatar: undefined,
         },
       },
     ],
-    labels: [{ id: 'lbl-1', name: 'Urgent', color: 'red' }],
+    label: { id: 'lbl-1', name: 'Urgent', color: 'red' },
     checklists: [
       {
         id: 'cl-1',

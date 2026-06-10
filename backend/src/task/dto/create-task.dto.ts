@@ -85,12 +85,11 @@ export class CreateTaskDto {
   @IsString({ each: true })
   assigneeIds?: string[]; // These are Membership IDs
 
-  @ApiPropertyOptional({ type: [CreateTaskLabelDto] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
+  @ApiProperty({ type: CreateTaskLabelDto })
+  @IsNotEmpty()
+  @ValidateNested()
   @Type(() => CreateTaskLabelDto)
-  labels?: CreateTaskLabelDto[];
+  label: CreateTaskLabelDto;
 
   @ApiPropertyOptional({ type: [CreateChecklistDto] })
   @IsOptional()

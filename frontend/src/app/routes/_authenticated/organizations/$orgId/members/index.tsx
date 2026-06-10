@@ -40,6 +40,7 @@ function OrganizationMembersPage() {
 
   const [view, setView] = useState<'grid' | 'table'>('grid')
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: memberships ?? [],
     columns: membersTableColumns,

@@ -6,6 +6,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from '@/shared/ui/components/ui/sidebar'
+import { ManageTaskModal } from '@/features/manage-task'
 import { AppSidebar } from '@/widgets/layout/ui/app-sidebar'
 import { LayoutProvider } from '@/app/context/layout-provider'
 import { SearchProvider } from '@/app/context/search-provider'
@@ -37,6 +38,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
             )}
           >
             {children ?? <Outlet />}
+            <ManageTaskModal />
           </SidebarInset>
         </SidebarProvider>
       </LayoutProvider>

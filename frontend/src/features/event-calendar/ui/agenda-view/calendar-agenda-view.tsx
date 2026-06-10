@@ -1,30 +1,23 @@
 import { useMemo } from 'react'
-import { parseISO, format, endOfDay, startOfDay, isSameMonth } from 'date-fns'
+import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { useCalendar } from '@/features/event-calendar/model/contexts/calendar-context'
-import type { IEvent } from '@/features/event-calendar/model/interfaces'
+import { type Task } from '@/entities/task'
+import { useCalendar } from '@/features/event-calendar/model/calendar-context'
 import { AgendaDayGroup } from './agenda-day-group'
 
 interface IProps {
-  singleDayEvents: IEvent[]
-  multiDayEvents: IEvent[]
+  singleDayEvents: Task[]
 }
 
-export function CalendarAgendaView({
-  singleDayEvents,
-  multiDayEvents,
-}: IProps) {
+export function CalendarAgendaView({ singleDayEvents }: IProps) {
   const { selectedDate } = useCalendar()
 
   const eventsByDay = useMemo(() => {
-    const allDates = new Map<
-      string,
-      { date: Date; events: IEvent[]; multiDayEvents: IEvent[] }
-    >()
+    const allDates = new Map<string, { date: Date; events: Task[] }>()
 
     singleDayEvents.forEach((event) => {
-      const eventDate = parseISO(event.startDate)
+      const eventDate = parseISO(event.deadline)
       if (!isSameMonth(eventDate, selectedDate)) return
 
       const dateKey = format(eventDate, 'yyyy-MM-dd')
@@ -33,44 +26,18 @@ export function CalendarAgendaView({
         allDates.set(dateKey, {
           date: startOfDay(eventDate),
           events: [],
-          multiDayEvents: [],
         })
       }
 
       allDates.get(dateKey)?.events.push(event)
     })
 
-    multiDayEvents.forEach((event) => {
-      const eventStart = parseISO(event.startDate)
-      const eventEnd = parseISO(event.endDate)
-
-      let currentDate = startOfDay(eventStart)
-      const lastDate = endOfDay(eventEnd)
-
-      while (currentDate <= lastDate) {
-        if (isSameMonth(currentDate, selectedDate)) {
-          const dateKey = format(currentDate, 'yyyy-MM-dd')
-
-          if (!allDates.has(dateKey)) {
-            allDates.set(dateKey, {
-              date: new Date(currentDate),
-              events: [],
-              multiDayEvents: [],
-            })
-          }
-
-          allDates.get(dateKey)?.multiDayEvents.push(event)
-        }
-        currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1))
-      }
-    })
-
     return Array.from(allDates.values()).sort(
       (a, b) => a.date.getTime() - b.date.getTime()
     )
-  }, [singleDayEvents, multiDayEvents, selectedDate])
+  }, [singleDayEvents, selectedDate])
 
-  const hasAnyEvents = singleDayEvents.length > 0 || multiDayEvents.length > 0
+  const hasAnyEvents = singleDayEvents.length > 0
 
   return (
     <div className='h-[800px]'>
@@ -81,7 +48,6 @@ export function CalendarAgendaView({
               key={format(dayGroup.date, 'yyyy-MM-dd')}
               date={dayGroup.date}
               events={dayGroup.events}
-              multiDayEvents={dayGroup.multiDayEvents}
             />
           ))}
 

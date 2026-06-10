@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/components/ui/dropdown-menu'
 import { type Task } from '@/entities/task'
-import { useTasks } from '@/features/task'
+import { useTaskModalStore } from '@/features/manage-task'
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>
@@ -21,16 +21,16 @@ export function TaskTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const task = row.original as Task
-  const { setOpen, setCurrentRow } = useTasks()
+  const { openEdit, openDelete } = useTaskModalStore()
+
   const openEditDialog = () => {
-    setCurrentRow(task)
-    setOpen('update')
+    openEdit(task)
   }
 
   const openDeleteDialog = () => {
-    setCurrentRow(task)
-    setOpen('delete')
+    openDelete(task)
   }
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>

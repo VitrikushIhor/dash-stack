@@ -1,9 +1,9 @@
 import {
-  ACCESS_TOKEN_KEY,
   ApiError,
   clearTokens,
   getAccessToken,
   getRefreshToken,
+  setTokens,
 } from './api-helpers'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -48,7 +48,7 @@ async function refreshAccessToken(): Promise<string> {
   }
 
   const data = await response.json()
-  localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken)
+  setTokens(data.accessToken, getRefreshToken() ?? '')
   return data.accessToken
 }
 

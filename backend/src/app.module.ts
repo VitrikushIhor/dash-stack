@@ -19,7 +19,11 @@ import config from './common/configs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      envFilePath: ['.env', '../.env'],
+    }),
     PrismaModule.forRootAsync({
       isGlobal: true,
       useFactory: (configService: ConfigService) => {

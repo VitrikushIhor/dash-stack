@@ -16,9 +16,8 @@ import { useTableUrlState } from '@/shared/hooks/use-table-url-state'
 import { dateFilterFn } from '@/shared/ui/components/data-table/date-filter'
 import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
-import { TaskStatusEnum, type Task } from '@/entities/task'
+import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
 import { useGetMembers } from '@/features/organization'
-import { STATUS_CONFIG } from '@/features/task'
 import { tasksColumns } from '../ui/tasks-columns'
 
 interface UseTasksTableProps {
@@ -49,7 +48,7 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     globalFilter: { enabled: true, key: 'filter' },
     columnFilters: [
       { columnId: 'status', searchKey: 'status', type: 'array' },
-      { columnId: 'labels', searchKey: 'labels', type: 'array' },
+      { columnId: 'label', searchKey: 'labels', type: 'array' },
       { columnId: 'assignees', searchKey: 'members', type: 'array' },
       {
         columnId: 'deadline',

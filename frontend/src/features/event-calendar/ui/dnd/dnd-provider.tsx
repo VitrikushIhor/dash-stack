@@ -1,6 +1,6 @@
 'use client'
 
-import { parseISO, differenceInMilliseconds } from 'date-fns'
+import { parseISO } from 'date-fns'
 import {
   DndContext,
   type DragEndEvent,
@@ -10,8 +10,8 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import { type IEvent } from '../../model/interfaces'
+import { type Task, useUpdateTask } from '@/entities/task'
+import { useOrgStore } from '@/features/organization'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
@@ -19,7 +19,8 @@ interface DndProviderWrapperProps {
 }
 
 export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
-  const { setLocalEvents } = useCalendar()
+  const { activeOrgId } = useOrgStore()
+  const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -34,19 +35,14 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (!over || !active.data.current) return
+    if (!over || !active.data.current || !activeOrgId) return
 
-    const droppedEvent = active.data.current.event as IEvent
+    const droppedEvent = active.data.current.event as Task
     const overData = over.data.current
 
     if (!droppedEvent || !overData) return
 
-    const eventStartDate = parseISO(droppedEvent.startDate)
-    const eventEndDate = parseISO(droppedEvent.endDate)
-    const eventDurationMs = differenceInMilliseconds(
-      eventEndDate,
-      eventStartDate
-    )
+    const eventStartDate = parseISO(droppedEvent.deadline)
 
     let newStartDate: Date
 
@@ -65,19 +61,12 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
       return
     }
 
-    const newEndDate = new Date(newStartDate.getTime() + eventDurationMs)
-
-    setLocalEvents((prev) =>
-      prev.map((e) =>
-        e.id === droppedEvent.id
-          ? {
-              ...e,
-              startDate: newStartDate.toISOString(),
-              endDate: newEndDate.toISOString(),
-            }
-          : e
-      )
-    )
+    updateTask({
+      id: droppedEvent.id,
+      data: {
+        deadline: newStartDate.toISOString(),
+      },
+    })
   }
 
   return (

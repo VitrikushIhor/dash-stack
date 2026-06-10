@@ -87,35 +87,34 @@ export const tasksColumns: ColumnDef<Task>[] = [
   },
 
   {
-    accessorKey: 'labels',
+    accessorKey: 'label',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Label' />
     ),
     meta: { name: 'Label' },
     cell: ({ row }) => {
-      const labels = row.original.labels ?? []
+      const label = row.original.label ?? null
 
-      if (labels.length === 0) {
+      if (!label) {
         return (
           <TablePlaceholder
             icon={<Tag className='h-4 w-4' />}
-            label='No Labels'
+            label='No Label'
           />
         )
       }
 
       return (
         <div className='flex w-[100px] flex-wrap items-center gap-1'>
-          {labels.map((label) => (
-            <LabelBadge key={label.id} label={label} size='sm' />
-          ))}
+          <LabelBadge key={label.id} label={label} size='sm' />
         </div>
       )
     },
     filterFn: (row, columnId, filterValue: string[]) => {
       if (!filterValue || filterValue.length === 0) return true
-      const labels = row.getValue<TaskLabel[]>(columnId)
-      return labels?.some((label) => filterValue.includes(label.name)) ?? false
+      const label = row.getValue<TaskLabel | null>(columnId)
+      if (!label) return false
+      return filterValue.includes(label.name)
     },
   },
 

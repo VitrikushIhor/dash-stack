@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import type { IEvent } from '../../model/interfaces'
+import { type Task } from '@/entities/task'
+import { useCalendar } from '../../model/calendar-context'
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {
-  allEvents: IEvent[]
+  allEvents: Task[]
 }
 
 export function CalendarYearView({ allEvents }: IProps) {

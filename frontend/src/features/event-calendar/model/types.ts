@@ -5,8 +5,18 @@ export type TEventColor =
   | 'red'
   | 'yellow'
   | 'purple'
-  | 'orange'
   | 'gray'
+  | 'orange'
 export type TBadgeVariant = 'dot' | 'colored' | 'mixed'
-export type TWorkingHours = { [key: number]: { from: number; to: number } }
-export type TVisibleHours = { from: number; to: number }
+
+export interface IUser {
+  id: string
+  name: string
+  avatar: string | null
+}
+
+export interface ICalendarCell {
+  day: number
+  currentMonth: boolean
+  date: Date
+}

@@ -21,65 +21,43 @@ import { LabelBadge } from './label-badge'
 import { labelColorStyles, type Label } from './types.label'
 
 interface LabelSelectorProps {
-  selectedLabels: Label[]
+  selectedLabel: Label | null
   availableLabels: Label[]
-  onLabelsChange: (labels: Label[]) => void
+  onLabelChange: (label: Label | null) => void
   onCreateLabel?: (name: string, color: string) => void
-  maxLabels?: number
   className?: string
 }
 
 export const LabelSelector = memo(function LabelSelector({
-  selectedLabels,
+  selectedLabel,
   availableLabels,
-  onLabelsChange,
+  onLabelChange,
   onCreateLabel,
-  maxLabels,
   className,
 }: LabelSelectorProps) {
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const selectedIds = useMemo(
-    () => new Set(selectedLabels.map((l) => l.id)),
-    [selectedLabels]
-  )
-
   const filteredLabels = useMemo(() => {
-    return availableLabels.filter(
-      (label) =>
-        !selectedIds.has(label.id) &&
-        label.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return availableLabels.filter((label) =>
+      label.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  }, [availableLabels, selectedIds, searchQuery])
-
-  const canAddMore = useMemo(() => {
-    if (!maxLabels) return true
-    return selectedLabels.length < maxLabels
-  }, [selectedLabels.length, maxLabels])
+  }, [availableLabels, searchQuery])
 
   const handleToggleLabel = useCallback(
     (label: Label) => {
-      if (selectedIds.has(label.id)) {
-        onLabelsChange(selectedLabels.filter((l) => l.id !== label.id))
-      } else if (canAddMore) {
-        onLabelsChange([...selectedLabels, label])
+      if (selectedLabel?.id !== label.id) {
+        onLabelChange(label)
       }
+      setOpen(false) // Close popover after selection
     },
-    [selectedLabels, selectedIds, onLabelsChange, canAddMore]
-  )
-
-  const handleRemoveLabel = useCallback(
-    (labelId: string) => {
-      onLabelsChange(selectedLabels.filter((l) => l.id !== labelId))
-    },
-    [selectedLabels, onLabelsChange]
+    [selectedLabel, onLabelChange]
   )
 
   return (
     <div className={cn('space-y-2', className)}>
       <div className='flex items-center justify-between'>
-        <label className='text-sm font-medium'>Labels</label>
+        <label className='text-sm font-medium'>Label</label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -87,7 +65,6 @@ export const LabelSelector = memo(function LabelSelector({
               variant='ghost'
               size='icon'
               className='h-8 w-8'
-              disabled={!canAddMore}
             >
               <Plus className='h-4 w-4' />
             </Button>
@@ -108,7 +85,7 @@ export const LabelSelector = memo(function LabelSelector({
                 <CommandGroup>
                   <ScrollArea className='h-[240px]'>
                     {filteredLabels.map((label) => {
-                      const isSelected = selectedIds.has(label.id)
+                      const isSelected = selectedLabel?.id === label.id
                       const colorStyle = labelColorStyles[label.color]
 
                       return (
@@ -172,21 +149,14 @@ export const LabelSelector = memo(function LabelSelector({
         </Popover>
       </div>
 
-      {selectedLabels.length === 0 ? (
+      {!selectedLabel ? (
         <div className='text-muted-foreground flex items-center gap-2 text-sm'>
           <Tag className='h-4 w-4' />
-          <span>No labels</span>
+          <span>No label</span>
         </div>
       ) : (
         <div className='flex flex-wrap gap-1.5'>
-          {selectedLabels.map((label) => (
-            <LabelBadge
-              key={label.id}
-              label={label}
-              onRemove={handleRemoveLabel}
-              size='sm'
-            />
-          ))}
+          <LabelBadge label={selectedLabel} size='sm' />
         </div>
       )}
     </div>

@@ -8,7 +8,7 @@ export class TaskRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTaskData) {
-    const { assigneeIds, labels, checklists, ...rest } = data;
+    const { assigneeIds, label, checklists, ...rest } = data;
 
     return this.prisma.task.create({
       data: {
@@ -18,9 +18,9 @@ export class TaskRepository {
               connect: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        labels: labels
+        label: label
           ? {
-              create: labels,
+              create: label,
             }
           : undefined,
         checklists: checklists
@@ -46,7 +46,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -92,9 +92,7 @@ export class TaskRepository {
           assigneeIds?.length
             ? { assignees: { some: { id: { in: assigneeIds } } } }
             : {},
-          labelNames?.length
-            ? { labels: { some: { name: { in: labelNames } } } }
-            : {},
+          labelNames?.length ? { label: { name: { in: labelNames } } } : {},
           deadlineFrom || deadlineTo
             ? {
                 deadline: {
@@ -118,7 +116,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -145,7 +143,7 @@ export class TaskRepository {
             },
           },
         },
-        labels: true,
+        label: true,
         checklists: {
           include: {
             items: true,
@@ -156,54 +154,62 @@ export class TaskRepository {
   }
 
   async update(id: string, organizationId: string, data: UpdateTaskData) {
-    const { assigneeIds, labels, checklists, ...rest } = data;
+    const { assigneeIds, label, checklists, ...rest } = data;
 
-    return this.prisma.task.update({
-      where: { id, organizationId },
-      data: {
-        ...rest,
-        assignees: assigneeIds
-          ? {
-              set: assigneeIds.map((id) => ({ id })),
-            }
-          : undefined,
-        labels: labels
-          ? {
-              deleteMany: {},
-              create: labels,
-            }
-          : undefined,
-        checklists: checklists
-          ? {
-              deleteMany: {},
-              create: checklists.map((cl) => ({
-                name: cl.name,
-                items: {
-                  create: cl.items,
+    return this.prisma.$transaction(async (tx) => {
+      // Delete old label if we are updating it to something else or to null
+      if (label !== undefined) {
+        await tx.taskLabel.deleteMany({
+          where: { taskId: id },
+        });
+      }
+
+      return tx.task.update({
+        where: { id, organizationId },
+        data: {
+          ...rest,
+          assignees: assigneeIds
+            ? {
+                set: assigneeIds.map((id) => ({ id })),
+              }
+            : undefined,
+          label: label
+            ? {
+                create: label,
+              }
+            : undefined,
+          checklists: checklists
+            ? {
+                deleteMany: {},
+                create: checklists.map((cl) => ({
+                  name: cl.name,
+                  items: {
+                    create: cl.items,
+                  },
+                })),
+              }
+            : undefined,
+        },
+        include: {
+          assignees: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  avatar: true,
                 },
-              })),
-            }
-          : undefined,
-      },
-      include: {
-        assignees: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                avatar: true,
               },
             },
           },
-        },
-        labels: true,
-        checklists: {
-          include: {
-            items: true,
+          label: true,
+          checklists: {
+            include: {
+              items: true,
+            },
           },
         },
-      },
+      });
     });
   }
 
@@ -216,9 +222,7 @@ export class TaskRepository {
   async updateMany(
     organizationId: string,
     ids: string[],
-    data: Partial<
-      Omit<UpdateTaskData, 'assigneeIds' | 'labels' | 'checklists'>
-    >,
+    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'label' | 'checklists'>>,
   ) {
     return this.prisma.task.updateMany({
       where: {

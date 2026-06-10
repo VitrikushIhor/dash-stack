@@ -2,7 +2,7 @@
 
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
-import { type ICalendarCell } from '../../model/interfaces'
+import { type ICalendarCell } from '../../model/types'
 
 interface DroppableDayCellProps {
   cell: ICalendarCell

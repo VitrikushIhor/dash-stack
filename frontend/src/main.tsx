@@ -12,6 +12,7 @@ import { routeTree } from '@/routeTree.gen'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/lib/handle-server-error'
+import { TooltipProvider } from '@/shared/ui/components/ui/tooltip'
 import { useAuthStore } from '@/features/auth'
 import { DirectionProvider } from '@/app/context/direction-provider'
 import { FontProvider } from '@/app/context/font-provider'
@@ -109,7 +110,9 @@ if (!rootElement.innerHTML) {
           <ThemeProvider>
             <FontProvider>
               <DirectionProvider>
-                <RouterProvider router={router} />
+                <TooltipProvider>
+                  <RouterProvider router={router} />
+                </TooltipProvider>
               </DirectionProvider>
             </FontProvider>
           </ThemeProvider>

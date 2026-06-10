@@ -1,25 +1,25 @@
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
-import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/shared/lib/utils'
-import { useCalendar } from '../../model/contexts/calendar-context'
-import { getMonthCellEvents } from '../../model/helpers'
-import { type ICalendarCell, type IEvent } from '../../model/interfaces'
+import { type Task } from '@/entities/task'
+import { getTaskColor } from '@/features/event-calendar/lib/mappers'
+import { getMonthCellEvents } from '../../lib/helpers'
+import { useCalendar } from '../../model/calendar-context'
+import { type ICalendarCell } from '../../model/types'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { EventBullet } from './event-bullet'
 import { MonthEventBadge } from './month-event-badge'
 
 interface IProps {
   cell: ICalendarCell
-  events: IEvent[]
+  events: Task[]
   eventPositions: Record<string, number>
 }
 
 const MAX_VISIBLE_EVENTS = 3
 
 export function DayCell({ cell, events, eventPositions }: IProps) {
-  const navigate = useNavigate()
-  const { setSelectedDate } = useCalendar()
+  const { setSelectedDate, setView } = useCalendar()
 
   const { day, currentMonth, date } = cell
 
@@ -31,8 +31,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
 
   const handleClick = () => {
     setSelectedDate(date)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    navigate({ to: '/day-view' as any })
+    setView('day')
   }
 
   return (
@@ -71,7 +70,10 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
               <div key={eventKey} className='lg:flex-1'>
                 {event && (
                   <>
-                    <EventBullet className='lg:hidden' color={event.color} />
+                    <EventBullet
+                      className='lg:hidden'
+                      color={getTaskColor(event)}
+                    />
                     <MonthEventBadge
                       className='hidden lg:flex'
                       event={event}

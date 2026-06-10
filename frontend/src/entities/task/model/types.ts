@@ -17,7 +17,7 @@ export interface TaskAssignee {
     id: string
     firstName: string
     email: string
-    avatar: string | null
+    avatar?: string
   }
 }
 
@@ -44,13 +44,13 @@ export interface Task {
   title: string
   status: TaskStatusEnum
   description?: string
-  deadline?: string // ISO string
+  deadline?: string | null // ISO string
   attachments: string[]
   organizationId: string
   createdAt: string
   updatedAt: string
   assignees: TaskAssignee[]
-  labels: TaskLabel[]
+  label: TaskLabel | null
   checklists?: Checklist[]
 }
 
@@ -61,7 +61,7 @@ export interface CreateTaskDto {
   deadline?: string // ISO string
   attachments?: string[]
   assigneeIds?: string[] // Membership IDs
-  labels?: Array<{ name: string; color: LabelColor }>
+  label?: { name: string; color: LabelColor } | null
   checklists?: Array<{
     name: string
     items: Array<{ title: string; completed?: boolean }>

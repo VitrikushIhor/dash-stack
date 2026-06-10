@@ -192,7 +192,7 @@ model Task {
 
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignees      Membership[]    @relation("TaskAssignees")
-  labels         TaskLabel[]
+  label          TaskLabel?
   checklists     Checklist[]
   calendarEvents CalendarEvent[]
 
@@ -206,7 +206,7 @@ model TaskLabel {
   id     String @id @default(cuid())
   name   String
   color  String
-  taskId String
+  taskId String @unique
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
