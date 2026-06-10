@@ -1,4 +1,8 @@
 {
   "prisma.pinToPrisma6": true,
-  "cSpell.words": ["cuid"]
+  "cSpell.words": ["cuid"],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "vitrikushihor",
+    "projectKey": "VitrikushIhor_dash-stack"
+  }
 }

@@ -25,7 +25,7 @@ export const useTaskModalStore = create<TaskModalState>((set) => ({
     set({
       isOpen: true,
       mode: TaskModalMode.CREATE,
-      selectedTask: initialData as Task | null,
+      selectedTask: (initialData as Task) ?? null,
     }),
   openEdit: (task) =>
     set({ isOpen: true, mode: TaskModalMode.EDIT, selectedTask: task }),

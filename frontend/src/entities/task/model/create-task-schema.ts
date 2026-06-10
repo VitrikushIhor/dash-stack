@@ -1,39 +1,16 @@
 import z from 'zod'
-import { OrgRole } from '@/shared/model/types/org-role'
 import { labelColorNames } from '@/shared/ui/components/label/types.label'
+import { checklistSchema } from '@/features/checklist'
+import { membershipSchema } from '@/features/team'
 import { TaskStatusEnum } from './types'
+
+export { checklistSchema, membershipSchema }
+export { checklistItemSchema } from '@/features/checklist'
 
 export const labelSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   color: z.enum(labelColorNames),
-})
-
-export const checklistItemSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1),
-  completed: z.boolean(),
-})
-
-export const checklistSchema = z.object({
-  id: z.string(),
-  name: z.string().min(1),
-  items: z.array(checklistItemSchema),
-})
-
-export const membershipSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  orgId: z.string(),
-  role: z.nativeEnum(OrgRole),
-  position: z.string().optional(),
-  joinedAt: z.string(),
-  user: z.object({
-    id: z.string(),
-    email: z.string().email(),
-    firstName: z.string().optional(),
-    avatar: z.string().url().optional(),
-  }),
 })
 
 export const taskFormSchema = z.object({

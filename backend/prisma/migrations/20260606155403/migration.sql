@@ -98,6 +98,9 @@ CREATE UNIQUE INDEX "tasks_id_organizationId_key" ON "tasks"("id", "organization
 CREATE INDEX "task_labels_taskId_idx" ON "task_labels"("taskId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "task_labels_taskId_key" ON "task_labels"("taskId");
+
+-- CreateIndex
 CREATE INDEX "checklists_taskId_idx" ON "checklists"("taskId");
 
 -- CreateIndex

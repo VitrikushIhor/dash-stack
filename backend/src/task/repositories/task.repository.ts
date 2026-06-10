@@ -156,58 +156,60 @@ export class TaskRepository {
   async update(id: string, organizationId: string, data: UpdateTaskData) {
     const { assigneeIds, label, checklists, ...rest } = data;
 
-    // Delete old label if we are updating it to something else or to null
-    if (label !== undefined) {
-      await this.prisma.taskLabel.deleteMany({
-        where: { taskId: id },
-      });
-    }
+    return this.prisma.$transaction(async (tx) => {
+      // Delete old label if we are updating it to something else or to null
+      if (label !== undefined) {
+        await tx.taskLabel.deleteMany({
+          where: { taskId: id },
+        });
+      }
 
-    return this.prisma.task.update({
-      where: { id, organizationId },
-      data: {
-        ...rest,
-        assignees: assigneeIds
-          ? {
-              set: assigneeIds.map((id) => ({ id })),
-            }
-          : undefined,
-        label: label
-          ? {
-              create: label,
-            }
-          : undefined,
-        checklists: checklists
-          ? {
-              deleteMany: {},
-              create: checklists.map((cl) => ({
-                name: cl.name,
-                items: {
-                  create: cl.items,
+      return tx.task.update({
+        where: { id, organizationId },
+        data: {
+          ...rest,
+          assignees: assigneeIds
+            ? {
+                set: assigneeIds.map((id) => ({ id })),
+              }
+            : undefined,
+          label: label
+            ? {
+                create: label,
+              }
+            : undefined,
+          checklists: checklists
+            ? {
+                deleteMany: {},
+                create: checklists.map((cl) => ({
+                  name: cl.name,
+                  items: {
+                    create: cl.items,
+                  },
+                })),
+              }
+            : undefined,
+        },
+        include: {
+          assignees: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  avatar: true,
                 },
-              })),
-            }
-          : undefined,
-      },
-      include: {
-        assignees: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                avatar: true,
               },
             },
           },
-        },
-        label: true,
-        checklists: {
-          include: {
-            items: true,
+          label: true,
+          checklists: {
+            include: {
+              items: true,
+            },
           },
         },
-      },
+      });
     });
   }
 

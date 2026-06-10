@@ -21,10 +21,7 @@ export const TaskModalView = ({
 }: TaskModalViewProps) => {
   return (
     <Dialog open={open} onOpenChange={(open) => onOpenChange(open)}>
-      <DialogContent
-        className='max-h-[90vh] max-w-3xl'
-        aria-describedby={title}
-      >
+      <DialogContent className='max-h-[90vh] max-w-3xl'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

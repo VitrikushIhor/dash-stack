@@ -49,11 +49,7 @@ export function CalendarWeekView({ singleDayEvents }: IProps) {
               <div className='grid min-h-[700px] grid-cols-7 divide-x'>
                 {weekDays.map((day, dayIndex) => {
                   const dayEvents = singleDayEvents
-                    .filter(
-                      (event) =>
-                        isSameDay(parseISO(event.deadline), day) ||
-                        isSameDay(parseISO(event.deadline), day)
-                    )
+                    .filter((event) => isSameDay(parseISO(event.deadline), day))
                     .sort(
                       (a, b) =>
                         parseISO(a.deadline).getTime() -

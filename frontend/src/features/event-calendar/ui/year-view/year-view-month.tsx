@@ -66,10 +66,8 @@ export function YearViewMonth({ month, events }: IProps) {
               return <div key={`blank-${index}`} className='h-10' />
 
             const date = new Date(month.getFullYear(), month.getMonth(), day)
-            const dayEvents = events.filter(
-              (event) =>
-                isSameDay(parseISO(event.deadline), date) ||
-                isSameDay(parseISO(event.deadline), date)
+            const dayEvents = events.filter((event) =>
+              isSameDay(parseISO(event.deadline), date)
             )
 
             return (
