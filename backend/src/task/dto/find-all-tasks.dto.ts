@@ -39,13 +39,31 @@ export class FindAllTasksDto {
   @Transform(({ value }) => (Array.isArray(value) ? value : value.split(',')))
   labelNames?: string[];
 
-  @ApiPropertyOptional({ description: 'Filter by deadline from date' })
+  @ApiPropertyOptional({
+    description: 'Filter tasks with dueDate >= this value (ISO 8601)',
+  })
   @IsOptional()
   @IsDateString()
-  deadlineFrom?: string;
+  dueDateFrom?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by deadline to date' })
+  @ApiPropertyOptional({
+    description: 'Filter tasks with dueDate <= this value (ISO 8601)',
+  })
   @IsOptional()
   @IsDateString()
-  deadlineTo?: string;
+  dueDateTo?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter tasks with startDate >= this value (ISO 8601)',
+  })
+  @IsOptional()
+  @IsDateString()
+  startDateFrom?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter tasks with startDate <= this value (ISO 8601)',
+  })
+  @IsOptional()
+  @IsDateString()
+  startDateTo?: string;
 }

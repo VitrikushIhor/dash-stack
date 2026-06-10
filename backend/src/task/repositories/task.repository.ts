@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateTaskData, UpdateTaskData } from '../interfaces/task.interface';
 import { TaskStatus } from '../enums/task-status.enum';
+import { toOptionalDate } from '../utils/date.utils';
 
 @Injectable()
 export class TaskRepository {
@@ -63,8 +64,10 @@ export class TaskRepository {
       status?: TaskStatus[];
       assigneeIds?: string[];
       labelNames?: string[];
-      deadlineFrom?: string;
-      deadlineTo?: string;
+      dueDateFrom?: string;
+      dueDateTo?: string;
+      startDateFrom?: string;
+      startDateTo?: string;
     } = {},
   ) {
     const {
@@ -72,8 +75,10 @@ export class TaskRepository {
       status,
       assigneeIds,
       labelNames,
-      deadlineFrom,
-      deadlineTo,
+      dueDateFrom,
+      dueDateTo,
+      startDateFrom,
+      startDateTo,
     } = filters;
 
     return this.prisma.task.findMany({
@@ -93,11 +98,19 @@ export class TaskRepository {
             ? { assignees: { some: { id: { in: assigneeIds } } } }
             : {},
           labelNames?.length ? { label: { name: { in: labelNames } } } : {},
-          deadlineFrom || deadlineTo
+          dueDateFrom || dueDateTo
             ? {
-                deadline: {
-                  gte: deadlineFrom ? new Date(deadlineFrom) : undefined,
-                  lte: deadlineTo ? new Date(deadlineTo) : undefined,
+                dueDate: {
+                  gte: toOptionalDate(dueDateFrom),
+                  lte: toOptionalDate(dueDateTo),
+                },
+              }
+            : {},
+          startDateFrom || startDateTo
+            ? {
+                startDate: {
+                  gte: toOptionalDate(startDateFrom),
+                  lte: toOptionalDate(startDateTo),
                 },
               }
             : {},

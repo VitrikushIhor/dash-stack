@@ -4,7 +4,9 @@ export interface CreateTaskData {
   title: string;
   description?: string;
   status?: TaskStatus;
-  deadline?: Date;
+  startDate?: Date;
+  dueDate?: Date;
+  completedAt?: Date;
   attachments?: string[];
   organizationId: string;
   assigneeIds?: string[];
@@ -19,7 +21,9 @@ export interface UpdateTaskData {
   title?: string;
   description?: string;
   status?: TaskStatus;
-  deadline?: Date;
+  startDate?: Date | null;
+  dueDate?: Date | null;
+  completedAt?: Date | null;
   attachments?: string[];
   assigneeIds?: string[];
   label?: { name: string; color: string } | null;

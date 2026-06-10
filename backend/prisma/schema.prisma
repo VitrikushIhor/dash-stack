@@ -184,7 +184,9 @@ model Task {
   title          String
   description    String?
   status         TaskStatus @default(PLANNED)
-  deadline       DateTime?
+  startDate      DateTime?
+  dueDate        DateTime?
+  completedAt    DateTime?
   attachments    String[]   @default([])
   organizationId String
   createdAt      DateTime   @default(now())
@@ -199,6 +201,7 @@ model Task {
   @@unique([id, organizationId])
   @@index([organizationId])
   @@index([organizationId, status])
+  @@index([organizationId, dueDate])
   @@map("tasks")
 }
 

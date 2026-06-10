@@ -60,7 +60,7 @@ async function main() {
     },
   });
 
-  // 4. Create Tasks with deadlines for the calendar
+  // 4. Create Tasks with due dates for the calendar
   const today = startOfDay(new Date());
 
   await prisma.task.create({
@@ -68,7 +68,8 @@ async function main() {
       title: 'Fix Calendar Data Connection',
       description: 'Connect frontend to real data using useTasksQuery',
       status: TaskStatus.COMPLETED,
-      deadline: today,
+      dueDate: today,
+      completedAt: today,
       organizationId: org.id,
       assignees: {
         connect: [{ id: membership1.id }],
@@ -84,7 +85,8 @@ async function main() {
       title: 'Database Migration',
       description: 'Sync Prisma schema with PostgreSQL',
       status: TaskStatus.COMPLETED,
-      deadline: addDays(today, 1),
+      dueDate: addDays(today, 1),
+      completedAt: addDays(today, 1),
       organizationId: org.id,
       assignees: {
         connect: [{ id: membership1.id }],
@@ -100,7 +102,7 @@ async function main() {
       title: 'UI Design Review',
       description: 'Review the new dashboard layout with the team',
       status: TaskStatus.UPCOMING,
-      deadline: addDays(today, 2),
+      dueDate: addDays(today, 2),
       organizationId: org.id,
       assignees: {
         connect: [{ id: membership2.id }],
@@ -116,7 +118,7 @@ async function main() {
       title: 'Release Beta Version',
       description: 'Deploy the first beta to staging environment',
       status: TaskStatus.PLANNED,
-      deadline: addDays(today, 5),
+      dueDate: addDays(today, 5),
       organizationId: org.id,
       assignees: {
         connect: [{ id: membership1.id }, { id: membership2.id }],
