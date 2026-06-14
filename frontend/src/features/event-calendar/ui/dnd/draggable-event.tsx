@@ -1,5 +1,3 @@
-'use client'
-
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'

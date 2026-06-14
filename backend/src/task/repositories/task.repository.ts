@@ -236,11 +236,13 @@ export class TaskRepository {
     organizationId: string,
     ids: string[],
     data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'label' | 'checklists'>>,
+    additionalWhere?: Record<string, any>,
   ) {
     return this.prisma.task.updateMany({
       where: {
         id: { in: ids },
         organizationId,
+        ...additionalWhere,
       },
       data,
     });

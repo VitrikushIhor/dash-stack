@@ -67,7 +67,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   title: 'My Event',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-15T14:30:00Z',
+  dueDate: '2026-06-15T14:30:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -117,8 +117,8 @@ describe('EventDetailsDialog', () => {
     expect(screen.getByText('Bob')).toBeInTheDocument()
   })
 
-  it('renders formatted start and end dates from the deadline', () => {
-    const event = makeTask({ deadline: '2026-06-15T14:30:00Z' })
+  it('renders formatted start and end dates from the.dueDate', () => {
+    const event = makeTask({ dueDate: '2026-06-15T14:30:00Z' })
     renderWithProvider(
       <EventDetailsDialog event={event}>
         <span>trigger</span>

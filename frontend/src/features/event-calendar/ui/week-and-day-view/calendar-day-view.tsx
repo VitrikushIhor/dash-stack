@@ -1,7 +1,7 @@
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { useCalendar } from '../../model/calendar-context'
 import { EventBlock } from './event-block'
 
@@ -14,16 +14,21 @@ export function CalendarDayView({ singleDayEvents }: IProps) {
 
   const dayEvents = singleDayEvents
     .filter((event) => {
-      const eventDate = parseISO(event.deadline)
+      const anchor = getTaskCalendarAnchor(event)
+      if (!anchor) return false
+      const eventDate = parseISO(anchor)
       return (
         eventDate.getDate() === selectedDate.getDate() &&
         eventDate.getMonth() === selectedDate.getMonth() &&
         eventDate.getFullYear() === selectedDate.getFullYear()
       )
     })
-    .sort(
-      (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
-    )
+    .sort((a, b) => {
+      const anchorA = getTaskCalendarAnchor(a)
+      const anchorB = getTaskCalendarAnchor(b)
+      if (!anchorA || !anchorB) return 0
+      return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+    })
 
   return (
     <div className='flex'>

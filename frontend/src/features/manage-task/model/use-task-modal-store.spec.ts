@@ -6,7 +6,7 @@ const mockTask: Task = {
   id: 'task-123',
   title: 'Test Task',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-10T12:00:00Z',
+  dueDate: '2026-06-10T12:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -38,7 +38,7 @@ describe('useTaskModalStore', () => {
     let state = useTaskModalStore.getState()
     expect(state.isOpen).toBe(true)
     expect(state.mode).toBe(TaskModalMode.CREATE)
-    expect(state.selectedTask).toBeUndefined()
+    expect(state.selectedTask).toBeNull()
 
     // With initial data (e.g., status)
     const initialData = { status: TaskStatusEnum.UPCOMING }

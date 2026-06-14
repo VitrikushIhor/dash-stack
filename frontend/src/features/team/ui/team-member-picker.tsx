@@ -43,14 +43,12 @@ export const TeamMemberPicker = memo(function TeamMemberPicker({
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-96 p-0' align='start'>
-            <div className='p-4'>
-              <TeamMemberSelector
-                selectedMembers={selectedMembers}
-                availableMembers={availableMembers}
-                onMembersChange={onMembersChange}
-                maxMembers={maxMembers}
-              />
-            </div>
+            <TeamMemberSelector
+              selectedMembers={selectedMembers}
+              availableMembers={availableMembers}
+              onMembersChange={onMembersChange}
+              maxMembers={maxMembers}
+            />
           </PopoverContent>
         </Popover>
       </div>

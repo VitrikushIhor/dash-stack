@@ -1,4 +1,4 @@
-import { TaskStatusEnum, type Task } from '../model/types'
+import { type Task } from '../model/types'
 
 /**
  * Calculates the total and completed items across all checklists of a task.
@@ -21,14 +21,49 @@ export const calculateTaskProgress = (task: Task) => {
 }
 
 /**
- * Checks if a task is overdue based on its deadline and current status.
+ * A task is completed when `completedAt` is set (system-managed by the backend).
+ * Prefer this over checking `status === COMPLETED` for display logic.
  */
-export const isTaskOverdue = (task: Task) => {
-  const { deadline, status } = task
-  if (!deadline) return false
+export const isTaskCompleted = (task: Task): boolean =>
+  Boolean(task.completedAt)
 
-  return new Date(deadline) < new Date() && status !== TaskStatusEnum.COMPLETED
-}
+/**
+ * A task is overdue when it has a dueDate in the past and has not been completed.
+ * Uses `completedAt` (not status) so the check remains accurate after the refactor.
+ */
+export const isTaskOverdue = (task: Task): boolean =>
+  !task.completedAt && !!task.dueDate && new Date(task.dueDate) < new Date()
+
+/**
+ * The effective start of a task for "days open" calculations.
+ * Falls back to createdAt when startDate is absent.
+ */
+export const getTaskEffectiveStart = (task: Task): string =>
+  task.startDate || task.createdAt
+
+/**
+ * Returns the single-point calendar anchor for placing a task on a calendar view.
+ *
+ * Decision: for this release the calendar uses single-point rendering.
+ * Priority: dueDate → startDate → undefined (task is hidden from calendar).
+ * Multi-day range rendering is explicitly out of scope for this PR.
+ */
+export const getTaskCalendarAnchor = (task: Task): string | undefined =>
+  task.dueDate || task.startDate || undefined
+
+/**
+ * Returns the primary display date for list/card/table views.
+ * Same priority as getTaskCalendarAnchor; kept separate to allow future divergence.
+ */
+export const getTaskDisplayDate = (task: Task): string | undefined =>
+  task.dueDate || task.startDate || undefined
+
+/**
+ * True when a task has both a start and a due date (i.e., it has a date range).
+ * Useful for future range-rendering in calendar/timeline views.
+ */
+export const hasTaskDateRange = (task: Task): boolean =>
+  Boolean(task.startDate && task.dueDate)
 
 /**
  * Loads files from URLs and converts them to File objects.

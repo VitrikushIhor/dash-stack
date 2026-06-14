@@ -243,26 +243,28 @@ describe('TaskService', () => {
   // bulk operations
   // ──────────────────────────────────────────────
   describe('bulk operations', () => {
-    it('should call updateMany with completedAt=Date when setting COMPLETED', async () => {
+    it('should split updateMany into two queries when setting COMPLETED to preserve completedAt', async () => {
       const ids = ['1', '2'];
-      mockTaskRepository.updateMany.mockResolvedValue({ count: 2 });
+      mockTaskRepository.updateMany.mockResolvedValueOnce({ count: 1 }); // uncompleted
+      mockTaskRepository.updateMany.mockResolvedValueOnce({ count: 1 }); // completed
 
-      await service.updateMany('org-1', ids, { status: TaskStatus.COMPLETED });
+      const result = await service.updateMany('org-1', ids, {
+        status: TaskStatus.COMPLETED,
+      });
 
-      const updateCall = mockTaskRepository.updateMany.mock.calls[0][2];
-      expect(updateCall.completedAt).toBeInstanceOf(Date);
-      expect(updateCall.status).toBe(TaskStatus.COMPLETED);
-    });
+      expect(mockTaskRepository.updateMany).toHaveBeenCalledTimes(2);
+      expect(result.count).toBe(2);
 
-    it('should call updateMany with completedAt=null when setting non-COMPLETED', async () => {
-      const ids = ['1', '2'];
-      mockTaskRepository.updateMany.mockResolvedValue({ count: 2 });
+      // Call 1: uncompleted tasks
+      const call1Args = mockTaskRepository.updateMany.mock.calls[0];
+      expect(call1Args[2].status).toBe(TaskStatus.COMPLETED);
+      expect(call1Args[2].completedAt).toBeInstanceOf(Date);
+      expect(call1Args[3]).toEqual({ completedAt: null });
 
-      await service.updateMany('org-1', ids, { status: TaskStatus.PLANNED });
-
-      const updateCall = mockTaskRepository.updateMany.mock.calls[0][2];
-      expect(updateCall.completedAt).toBeNull();
-      expect(updateCall.status).toBe(TaskStatus.PLANNED);
+      // Call 2: already completed tasks
+      const call2Args = mockTaskRepository.updateMany.mock.calls[1];
+      expect(call2Args[2].status).toBe(TaskStatus.COMPLETED);
+      expect(call2Args[3]).toEqual({ completedAt: { not: null } });
     });
 
     it('should throw BadRequestException when status is undefined in updateMany', async () => {
@@ -271,17 +273,18 @@ describe('TaskService', () => {
         service.updateMany('org-1', ['1', '2'], { status: undefined as any }),
       ).rejects.toThrow(BadRequestException);
 
-      // Repository must NOT be called — the guard fires before persistence
+      // Should not do any updates
       expect(mockTaskRepository.updateMany).not.toHaveBeenCalled();
     });
 
-    it('should return the count from updateMany', async () => {
-      mockTaskRepository.updateMany.mockResolvedValue({ count: 2 });
+    it('should return the correct count from updateMany for non-COMPLETED', async () => {
+      mockTaskRepository.updateMany.mockResolvedValue({ count: 3 });
 
-      const result = await service.updateMany('org-1', ['1', '2'], {
-        status: TaskStatus.COMPLETED,
+      const result = await service.updateMany('org-1', ['1', '2', '3'], {
+        status: TaskStatus.PLANNED,
       });
-      expect(result.count).toBe(2);
+      expect(result.count).toBe(3);
+      expect(mockTaskRepository.updateMany).toHaveBeenCalledTimes(1);
     });
 
     it('should call deleteMany in repository', async () => {

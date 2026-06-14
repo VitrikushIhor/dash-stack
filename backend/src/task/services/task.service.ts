@@ -111,12 +111,31 @@ export class TaskService {
     if (data.status === undefined) {
       throw new BadRequestException('status is required for bulk update');
     }
-    const completedAt =
-      data.status === TaskStatus.COMPLETED ? new Date() : null;
 
+    if (data.status === TaskStatus.COMPLETED) {
+      // Update uncompleted tasks (set status and completedAt)
+      const uncompletedUpdate = await this.repository.updateMany(
+        organizationId,
+        ids,
+        { status: data.status, completedAt: new Date() },
+        { completedAt: null },
+      );
+
+      // Update already completed tasks (just update status if needed)
+      const completedUpdate = await this.repository.updateMany(
+        organizationId,
+        ids,
+        { status: data.status },
+        { completedAt: { not: null } },
+      );
+
+      return { count: uncompletedUpdate.count + completedUpdate.count };
+    }
+
+    // Clear completedAt when reverting from COMPLETED
     return this.repository.updateMany(organizationId, ids, {
       status: data.status,
-      completedAt,
+      completedAt: null,
     });
   }
 

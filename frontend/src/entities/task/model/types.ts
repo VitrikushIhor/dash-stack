@@ -44,7 +44,9 @@ export interface Task {
   title: string
   status: TaskStatusEnum
   description?: string
-  deadline?: string | null // ISO string
+  startDate?: string | null // ISO string — optional start marker
+  dueDate?: string | null // ISO string — primary deadline date
+  completedAt?: string | null // ISO string — system-managed, set on COMPLETED
   attachments: string[]
   organizationId: string
   createdAt: string
@@ -58,7 +60,8 @@ export interface CreateTaskDto {
   title: string
   description?: string
   status?: TaskStatusEnum
-  deadline?: string // ISO string
+  startDate?: string // ISO string
+  dueDate?: string // ISO string
   attachments?: string[]
   assigneeIds?: string[] // Membership IDs
   label?: { name: string; color: LabelColor } | null
@@ -68,4 +71,13 @@ export interface CreateTaskDto {
   }>
 }
 
-export type UpdateTaskDto = Partial<CreateTaskDto>
+/**
+ * On update, startDate and dueDate support explicit null to clear the field.
+ * undefined = do not send (Prisma skips), null = clear (Prisma sets NULL).
+ */
+export interface UpdateTaskDto extends Partial<
+  Omit<CreateTaskDto, 'startDate' | 'dueDate'>
+> {
+  startDate?: string | null
+  dueDate?: string | null
+}

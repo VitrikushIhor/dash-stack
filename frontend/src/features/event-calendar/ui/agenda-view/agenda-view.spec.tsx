@@ -42,7 +42,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   title: 'Test Event',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-15T10:00:00Z',
+  dueDate: '2026-06-15T10:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -93,12 +93,12 @@ describe('AgendaDayGroup', () => {
       makeTask({
         id: 't-2',
         title: 'Later Event',
-        deadline: '2026-06-15T14:00:00Z',
+        dueDate: '2026-06-15T14:00:00Z',
       }),
       makeTask({
         id: 't-1',
         title: 'Early Event',
-        deadline: '2026-06-15T08:00:00Z',
+        dueDate: '2026-06-15T08:00:00Z',
       }),
     ]
     renderWithProvider(<AgendaDayGroup date={date} events={events} />)

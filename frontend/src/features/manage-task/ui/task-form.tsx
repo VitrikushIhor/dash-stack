@@ -1,11 +1,7 @@
-import { format } from 'date-fns'
 import { type UseFormReturn } from 'react-hook-form'
-import { CalendarIcon } from 'lucide-react'
-import { cn } from '@/shared/lib/utils'
 import { type Membership } from '@/shared/model/types/membership'
 import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
 import { Button } from '@/shared/ui/components/ui/button'
-import { Calendar } from '@/shared/ui/components/ui/calendar'
 import {
   Form,
   FormControl,
@@ -15,11 +11,6 @@ import {
   FormMessage,
 } from '@/shared/ui/components/ui/form'
 import { Input } from '@/shared/ui/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/shared/ui/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -36,6 +27,7 @@ import { FormLabelSelector } from '@/shared/ui/form-fields/form-label-selector'
 import { TaskStatusEnum, type TaskFormValues } from '@/entities/task'
 import { FormChecklist } from '@/features/checklist'
 import { FormMemberPicker } from '@/features/team'
+import { TaskDatePickerField } from './task-date-picker-field'
 
 type TaskFormProps = {
   onSubmit: (values: TaskFormValues) => void
@@ -165,45 +157,27 @@ export function TaskForm({
 
         <Separator />
 
-        <FormField
-          control={form.control}
-          name={'deadline'}
-          render={({ field }) => (
-            <FormItem className={cn('flex flex-col space-y-2')}>
-              <FormLabel>Deadline</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant='outline'
-                      className={cn(
-                        'w-full pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, 'dd MMM yyyy')
-                      ) : (
-                        <span>Deadline</span>
-                      )}
-                      <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
-                  <Calendar
-                    mode='single'
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className='grid grid-cols-2 gap-4'>
+          <TaskDatePickerField
+            form={form}
+            name='startDate'
+            label='Start Date'
+            placeholder='Pick start date'
+            disabled={(date) =>
+              date < new Date(new Date().setHours(0, 0, 0, 0))
+            }
+          />
+          <TaskDatePickerField
+            form={form}
+            name='dueDate'
+            label='Due Date'
+            placeholder='Pick due date'
+            disabled={(date) =>
+              date < new Date(new Date().setHours(0, 0, 0, 0))
+            }
+          />
+        </div>
+
         <Separator />
 
         <FormFileUpload
@@ -218,10 +192,17 @@ export function TaskForm({
 
         {/* Action Buttons */}
         <div className='flex justify-end gap-2 pt-4'>
-          <Button type='button' variant='outline' onClick={onCancel}>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onCancel}
+            disabled={form.formState.isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type='submit'>{submitText}</Button>
+          <Button type='submit' disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? 'Saving...' : submitText}
+          </Button>
         </div>
       </form>
     </Form>

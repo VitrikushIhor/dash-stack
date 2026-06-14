@@ -1,7 +1,7 @@
 import { endOfDay, format, isSameDay, parseISO, startOfDay } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getTaskColor } from '@/features/event-calendar/lib/mappers'
 import { useCalendar } from '../../model/calendar-context'
 import { DraggableEvent } from '../dnd/draggable-event'
@@ -30,8 +30,11 @@ export function MonthEventBadge({
 }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const itemStart = startOfDay(parseISO(event.deadline))
-  const itemEnd = endOfDay(parseISO(event.deadline))
+  const anchor = getTaskCalendarAnchor(event)
+  if (!anchor) return null
+
+  const itemStart = startOfDay(parseISO(anchor))
+  const itemEnd = endOfDay(parseISO(anchor))
 
   if (cellDate < itemStart || cellDate > itemEnd) return null
 
@@ -102,9 +105,7 @@ export function MonthEventBadge({
             )}
           </div>
 
-          {renderBadgeText && (
-            <span>{format(new Date(event.deadline), 'h:mm a')}</span>
-          )}
+          {renderBadgeText && <span>{format(new Date(anchor), 'h:mm a')}</span>}
         </div>
       </EventDetailsDialog>
     </DraggableEvent>

@@ -47,7 +47,7 @@ describe('TaskCardKanban', () => {
     title: 'Test Task',
     description: 'Test Description',
     status: TaskStatusEnum.UPCOMING,
-    deadline: '2026-04-26T10:00:00Z',
+    dueDate: '2026-04-26T10:00:00Z',
     assignees: [
       {
         id: 'mem-1',

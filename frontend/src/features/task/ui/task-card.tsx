@@ -30,8 +30,8 @@ export const TaskCardList = memo(
     const { totalItems, completedItems } = calculateTaskProgress(task)
     const overdue = isTaskOverdue(task)
     const isCompleted = task.status === TaskStatusEnum.COMPLETED
-    const date = task.deadline
-      ? format(new Date(task.deadline), 'dd.MM.yyyy')
+    const date = task.dueDate
+      ? format(new Date(task.dueDate), 'dd.MM.yyyy')
       : undefined
 
     return (
@@ -128,8 +128,8 @@ export const TaskCardKanban = memo(
     const { totalItems, completedItems } = calculateTaskProgress(task)
     const overdue = isTaskOverdue(task)
     const isCompleted = task.status === TaskStatusEnum.COMPLETED
-    const date = task.deadline
-      ? format(new Date(task.deadline), 'dd.MM.yyyy')
+    const date = task.dueDate
+      ? format(new Date(task.dueDate), 'dd.MM.yyyy')
       : undefined
 
     return (

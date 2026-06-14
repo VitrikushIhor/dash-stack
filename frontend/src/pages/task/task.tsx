@@ -32,11 +32,11 @@ export function TaskPage() {
       status: search.status,
       assigneeIds: search.members,
       labelNames: search.labels,
-      deadlineFrom: search.deadline?.[0]
-        ? new Date(Number(search.deadline[0])).toISOString()
+      dueDateFrom: search.dueDate?.[0]
+        ? new Date(Number(search.dueDate[0])).toISOString()
         : undefined,
-      deadlineTo: search.deadline?.[1]
-        ? new Date(Number(search.deadline[1])).toISOString()
+      dueDateTo: search.dueDate?.[1]
+        ? new Date(Number(search.dueDate[1])).toISOString()
         : undefined,
     }),
     [search]
@@ -120,8 +120,8 @@ export function TaskPage() {
           ]}
           dateFilters={[
             {
-              columnId: 'deadline',
-              title: 'Deadline',
+              columnId: 'dueDate',
+              title: 'Due Date',
               type: 'range',
             },
           ]}

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { getTaskCalendarAnchor } from '@/entities/task'
 import { useCalendar } from './calendar-context'
 
 export function useFilteredEvents() {
@@ -12,7 +13,7 @@ export function useFilteredEvents() {
   }, [events, selectedUserId])
 
   const singleDayEvents = useMemo(
-    () => filteredEvents.filter((e) => !!e.deadline),
+    () => filteredEvents.filter((e) => !!getTaskCalendarAnchor(e)),
     [filteredEvents]
   )
 

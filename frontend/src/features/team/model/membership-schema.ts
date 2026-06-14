@@ -6,12 +6,12 @@ export const membershipSchema = z.object({
   userId: z.string(),
   orgId: z.string(),
   role: z.nativeEnum(OrgRole),
-  position: z.string().optional(),
+  position: z.string().nullish(),
   joinedAt: z.string(),
   user: z.object({
     id: z.string(),
     email: z.string().email(),
-    firstName: z.string().optional(),
-    avatar: z.string().url().optional(),
+    firstName: z.string().nullish(),
+    avatar: z.string().url().nullish(),
   }),
 })

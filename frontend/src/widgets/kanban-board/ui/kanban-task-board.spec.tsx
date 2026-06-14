@@ -21,11 +21,16 @@ vi.mock('@/entities/task', async (importOriginal) => {
 
 const mockActiveOrgId = { value: 'org-1' as string | null }
 
-vi.mock('@/features/organization', () => ({
-  useOrgStore: () => ({
-    activeOrgId: mockActiveOrgId.value,
-  }),
-}))
+vi.mock('@/features/organization', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@/features/organization')>()
+  return {
+    ...actual,
+    useOrgStore: () => ({
+      activeOrgId: mockActiveOrgId.value,
+    }),
+  }
+})
 
 const mockOpenCreate = vi.fn()
 const mockOpenEdit = vi.fn()
@@ -79,7 +84,7 @@ vi.mock('@/shared/ui/components/kanban', () => {
               id: 'task-1',
               title: 'Task 1',
               status: TaskStatusEnum.UPCOMING,
-              deadline: '2026-06-10T12:00:00Z',
+              dueDate: '2026-06-10T12:00:00Z',
               attachments: [],
               organizationId: 'org-1',
               createdAt: '2026-06-09T12:00:00Z',
@@ -230,7 +235,7 @@ const makeTask = (overrides: Partial<Task>): Task => ({
   id: 'task-default',
   title: 'Default Task',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-10T12:00:00Z',
+  dueDate: '2026-06-10T12:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '2026-06-09T12:00:00Z',
@@ -351,7 +356,7 @@ describe('KanbanTaskBoard', () => {
           id: 'task-4',
           title: 'Task 4',
           status: TaskStatusEnum.COMPLETED,
-          deadline: '2026-06-13T12:00:00Z',
+          dueDate: '2026-06-13T12:00:00Z',
           attachments: [],
           organizationId: 'org-1',
           createdAt: '2026-06-09T12:00:00Z',

@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
+import { logger } from '@/shared/lib/logger'
 import {
   type Task,
-  type UpdateTaskDto,
   useCreateTask,
   useUpdateTask,
   type TaskFormValues,
@@ -36,34 +36,31 @@ export function ManageTaskForm({
   const allMembers = useMemo(() => members ?? [], [members])
 
   const onSubmit = async (values: TaskFormValues) => {
-    if (mode === TaskModalMode.CREATE && !values.label) {
-      toast.error('Label is required')
-      return
-    }
-
     try {
-      const baseData = await mapTaskFormToDto(values)
-
       if (mode === TaskModalMode.CREATE) {
-        const res = await createTaskMutation.mutateAsync(baseData)
+        const createData = await mapTaskFormToDto(values, TaskModalMode.CREATE)
+        const res = await createTaskMutation.mutateAsync(createData)
         if (res) {
           toast.success('Task created successfully')
           close()
         }
       } else {
         if (!selectedTask) return
+        const updateData = await mapTaskFormToDto(values, TaskModalMode.EDIT)
         const res = await updateTaskMutation.mutateAsync({
           id: selectedTask.id,
-          data: baseData as UpdateTaskDto,
+          data: updateData,
         })
         if (res) {
           toast.success('Task updated successfully')
           close()
         }
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: unknown) {
+      logger.error(error)
+      const message =
+        error instanceof Error ? error.message : 'Failed to save task'
+      toast.error(message)
     }
   }
 

@@ -6,7 +6,7 @@ import {
   getDaysInMonth,
   startOfMonth,
 } from 'date-fns'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
 import { useCalendar } from '../../model/calendar-context'
 import { YearViewDayCell } from './year-view-day-cell'
@@ -66,9 +66,10 @@ export function YearViewMonth({ month, events }: IProps) {
               return <div key={`blank-${index}`} className='h-10' />
 
             const date = new Date(month.getFullYear(), month.getMonth(), day)
-            const dayEvents = events.filter((event) =>
-              isSameDay(parseISO(event.deadline), date)
-            )
+            const dayEvents = events.filter((event) => {
+              const anchor = getTaskCalendarAnchor(event)
+              return anchor && isSameDay(parseISO(anchor), date)
+            })
 
             return (
               <YearViewDayCell
