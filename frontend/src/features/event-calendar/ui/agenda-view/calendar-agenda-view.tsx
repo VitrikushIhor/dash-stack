@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
-import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { useCalendar } from '@/features/event-calendar/model/calendar-context'
 import { AgendaDayGroup } from './agenda-day-group'

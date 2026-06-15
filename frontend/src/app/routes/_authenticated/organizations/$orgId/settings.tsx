@@ -5,10 +5,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/components/ui/card'
-import { Separator } from '@/shared/ui/components/ui/separator'
+} from '@/shared/ui/core/card'
+import { Separator } from '@/shared/ui/core/separator'
+import { useGetOrganization } from '@/entities/organization'
 import {
-  useGetOrganization,
   OrganizationSettingsForm,
   DeleteOrganizationButton,
   useOrganizationPermission,

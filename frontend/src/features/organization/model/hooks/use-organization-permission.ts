@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { OrgRole } from '@/shared/model/types/org-role'
-import { useCurrentUser } from '@/features/auth'
-import { type Organization } from '../types/organization.types'
+import { OrgRole } from '@/shared/model'
+import { type Organization } from '@/entities/organization'
+import { useCurrentUser } from '@/entities/session'
 
 export const useOrganizationPermission = (
   organization?: Organization | null

@@ -12,12 +12,14 @@ import {
   type VisibilityState,
   type RowSelectionState,
 } from '@tanstack/react-table'
-import { useTableUrlState } from '@/shared/hooks/use-table-url-state'
-import { dateFilterFn } from '@/shared/ui/components/data-table/date-filter'
-import { dateRangeFilterFn } from '@/shared/ui/components/data-table/date-range-filter'
-import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
+import { useTableUrlState } from '@/shared/lib'
+import {
+  dateFilterFn,
+  dateRangeFilterFn,
+  mockAvailableLabels,
+} from '@/shared/ui'
+import { useGetMembers } from '@/entities/organization'
 import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
-import { useGetMembers } from '@/features/organization'
 import { tasksColumns } from '../ui/tasks-columns'
 
 interface UseTasksTableProps {

@@ -4,9 +4,9 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { LabelSelector } from '../components/label/label-selector'
-import { type Label } from '../components/label/types.label'
+} from '@/shared/ui/core/form'
+import { LabelSelector } from '../label/label-selector'
+import { type Label } from '../label/types.label'
 
 interface FormLabelSelectorProps {
   name: string

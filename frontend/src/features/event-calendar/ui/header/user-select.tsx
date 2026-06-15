@@ -1,16 +1,12 @@
-import { AvatarGroup } from '@/shared/ui/components/avatar-group'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
+import { AvatarGroup } from '@/shared/ui'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/components/ui/select'
+} from '@/shared/ui/core/select'
 import { useCalendar } from '../../model/calendar-context'
 
 export function UserSelect() {

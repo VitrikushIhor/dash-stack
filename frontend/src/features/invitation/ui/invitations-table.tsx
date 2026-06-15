@@ -6,7 +6,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { Loader2 } from 'lucide-react'
-import { DataTable } from '@/shared/ui/components/data-table'
+import { DataTable } from '@/shared/ui'
 import { useRevokeInvite } from '../model/mutations/use-revoke-invite'
 import { useListInvitations } from '../model/queries/use-list-invitations'
 import { getColumns } from './invitations-table/columns'

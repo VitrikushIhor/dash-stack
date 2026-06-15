@@ -1,0 +1,20 @@
+import { api } from '@/shared/api'
+import { type Membership } from '@/shared/model'
+import {
+  type Invitation,
+  type CreateInvitationDto,
+} from '../model/types/invitation.types'
+
+export const invitationApi = {
+  sendInvite: ({ orgId, dto }: { orgId: string; dto: CreateInvitationDto }) =>
+    api.post<Invitation>(`/organizations/${orgId}/invitations`, dto),
+
+  listPending: (orgId: string) =>
+    api.get<Invitation[]>(`/organizations/${orgId}/invitations`),
+
+  revokeInvite: ({ orgId, id }: { orgId: string; id: string }) =>
+    api.delete(`/organizations/${orgId}/invitations/${id}`),
+
+  acceptInvite: (token: string) =>
+    api.post<Membership>(`/invitations/${token}/accept`),
+}

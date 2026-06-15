@@ -14,7 +14,7 @@ vi.mock('@/features/manage-task', () => ({
   }),
 }))
 
-vi.mock('@/shared/ui/components/ui/button', () => ({
+vi.mock('@/shared/ui/core/button', () => ({
   Button: ({
     children,
     onClick,
@@ -32,7 +32,7 @@ vi.mock('@/shared/ui/components/ui/button', () => ({
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/dialog', () => ({
+vi.mock('@/shared/ui/core/dialog', () => ({
   Dialog: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='dialog'>{children}</div>
   ),

@@ -1,15 +1,11 @@
 import { Outlet } from '@tanstack/react-router'
+import { LayoutProvider, SearchProvider } from '@/shared/lib/context'
 import { getCookie } from '@/shared/lib/cookies'
 import { cn } from '@/shared/lib/utils'
-import { SkipToMain } from '@/shared/ui/components/skip-to-main'
-import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/shared/ui/components/ui/sidebar'
+import { SkipToMain } from '@/shared/ui'
+import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
 import { ManageTaskModal } from '@/features/manage-task'
-import { AppSidebar } from '@/widgets/layout/ui/app-sidebar'
-import { LayoutProvider } from '@/app/context/layout-provider'
-import { SearchProvider } from '@/app/context/search-provider'
+import { AppSidebar, CommandMenu } from '@/widgets/layout'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -39,6 +35,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           >
             {children ?? <Outlet />}
             <ManageTaskModal />
+            <CommandMenu />
           </SidebarInset>
         </SidebarProvider>
       </LayoutProvider>

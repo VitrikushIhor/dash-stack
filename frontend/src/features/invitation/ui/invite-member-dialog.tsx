@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { OrgRole } from '@/shared/model/types/org-role'
-import { Button } from '@/shared/ui/components/ui/button'
+import { OrgRole } from '@/shared/model'
+import { Button } from '@/shared/ui/core/button'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/shared/ui/components/ui/dialog'
+} from '@/shared/ui/core/dialog'
 import {
   Form,
   FormControl,
@@ -18,15 +18,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { Input } from '@/shared/ui/components/ui/input'
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/components/ui/select'
+} from '@/shared/ui/core/select'
 import { useInviteMemberForm } from '../model/forms/use-invite-member-form'
 
 interface InviteMemberDialogProps {

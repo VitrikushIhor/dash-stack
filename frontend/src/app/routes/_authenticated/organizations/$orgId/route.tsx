@@ -6,17 +6,13 @@ import {
 } from '@tanstack/react-router'
 import { Loader2, LayoutDashboard, Users, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
-import { Search } from '@/shared/ui/components/search'
-import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
+import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
 import {
   organizationApi,
   organizationKeys,
   useGetOrganization,
-} from '@/features/organization'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+} from '@/entities/organization'
+import { Header, Main, NavUser } from '@/widgets/layout'
 
 export const Route = createFileRoute('/_authenticated/organizations/$orgId')({
   loader: ({ context, params }) =>

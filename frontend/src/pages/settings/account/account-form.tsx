@@ -4,8 +4,8 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { cn } from '@/shared/lib/utils'
-import { DatePicker } from '@/shared/ui/components/date-picker'
-import { Button } from '@/shared/ui/components/ui/button'
+import { DatePicker } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import {
   Command,
   CommandEmpty,
@@ -13,7 +13,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/shared/ui/components/ui/command'
+} from '@/shared/ui/core/command'
 import {
   Form,
   FormControl,
@@ -22,13 +22,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { Input } from '@/shared/ui/components/ui/input'
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/shared/ui/components/ui/popover'
+} from '@/shared/ui/core/popover'
 
 const languages = [
   { label: 'English', value: 'en' },

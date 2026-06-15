@@ -2,9 +2,8 @@ import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { GeneralError, NotFoundError } from '@/shared/ui/components/errors'
-import { NavigationProgress } from '@/shared/ui/components/navigation-progress'
-import { Toaster } from '@/shared/ui/components/ui/sonner'
+import { GeneralError, NotFoundError, NavigationProgress } from '@/shared/ui'
+import { Toaster } from '@/shared/ui/core/sonner'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient

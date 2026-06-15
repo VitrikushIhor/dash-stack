@@ -3,8 +3,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/shared/ui/components/ui/dialog'
-import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+} from '@/shared/ui/core/dialog'
+import { ScrollArea } from '@/shared/ui/core/scroll-area'
 
 type TaskModalViewProps = {
   title: string

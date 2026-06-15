@@ -19,6 +19,8 @@ interface ICalendarContext {
   events: Task[]
   view: TCalendarView
   setView: Dispatch<SetStateAction<TCalendarView>>
+  onEditTask?: (task: Task) => void
+  onCreateTask?: () => void
 }
 
 const CalendarContext = createContext({} as ICalendarContext)

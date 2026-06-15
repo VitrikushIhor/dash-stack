@@ -1,4 +1,4 @@
-import { type OrgRole } from '@/shared/model/types/org-role'
+import { type OrgRole } from '@/shared/model'
 
 export interface Invitation {
   id: string

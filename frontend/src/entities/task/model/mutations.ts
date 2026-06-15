@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from '@tanstack/react-query'
-import { QUERY_KEYS } from '@/shared/api/query-keys'
+import { QUERY_KEYS } from '@/shared/api'
 import { taskApi } from '../api/task-api'
 import { type Task, type CreateTaskDto, type UpdateTaskDto } from './types'
 

@@ -2,19 +2,20 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { DataTableBulkActions } from '@/shared/ui/components/data-table/bulk-actions'
-import { Button } from '@/shared/ui/components/ui/button'
+import { DataTableBulkActions } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
+} from '@/shared/ui/core/dropdown-menu'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/shared/ui/components/ui/tooltip'
+} from '@/shared/ui/core/tooltip'
+import { useOrgStore } from '@/entities/organization'
 import {
   type TaskStatusEnum,
   type Task,
@@ -22,7 +23,6 @@ import {
   useBulkUpdateTasks,
   useBulkDeleteTasks,
 } from '@/entities/task'
-import { useOrgStore } from '@/features/organization'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {

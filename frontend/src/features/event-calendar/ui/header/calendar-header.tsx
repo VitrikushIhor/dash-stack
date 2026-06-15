@@ -6,14 +6,13 @@ import {
   Grid2x2,
   CalendarRange,
 } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/shared/ui/components/ui/tooltip'
+} from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
-import { useTaskModalStore } from '@/features/manage-task'
 import { useCalendar } from '../../model/calendar-context'
 import { DateNavigator } from './date-navigator'
 import { TodayButton } from './today-button'
@@ -24,9 +23,7 @@ interface IProps {
 }
 
 export function CalendarHeader({ events }: IProps) {
-  const { view, setView } = useCalendar()
-
-  const { openCreate } = useTaskModalStore()
+  const { view, setView, onCreateTask } = useCalendar()
 
   return (
     <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
@@ -119,7 +116,10 @@ export function CalendarHeader({ events }: IProps) {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className='w-full sm:w-auto' onClick={() => openCreate()}>
+            <Button
+              className='w-full sm:w-auto'
+              onClick={() => onCreateTask?.()}
+            >
               <Plus />
               Add Event
             </Button>

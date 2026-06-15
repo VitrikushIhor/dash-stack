@@ -1,9 +1,9 @@
 import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Trash2 } from 'lucide-react'
-import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
-import { Badge } from '@/shared/ui/components/ui/badge'
-import { Button } from '@/shared/ui/components/ui/button'
+import { DataTableColumnHeader } from '@/shared/ui'
+import { Badge } from '@/shared/ui/core/badge'
+import { Button } from '@/shared/ui/core/button'
 import { type Invitation } from '../../model/types/invitation.types'
 
 interface ColumnsProps {

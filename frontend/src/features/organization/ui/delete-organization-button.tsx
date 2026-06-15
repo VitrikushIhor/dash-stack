@@ -10,9 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/shared/ui/components/ui/alert-dialog'
-import { Button } from '@/shared/ui/components/ui/button'
-import { useDeleteOrganization } from '../model/mutations/use-delete-organization'
+} from '@/shared/ui/core/alert-dialog'
+import { Button } from '@/shared/ui/core/button'
+import { useDeleteOrganization } from '@/entities/organization'
 
 interface DeleteOrganizationButtonProps {
   orgId: string

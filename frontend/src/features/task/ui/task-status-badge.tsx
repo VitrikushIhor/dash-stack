@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/ui/components/ui/badge'
+import { Badge } from '@/shared/ui/core/badge'
 import { type TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
 
 export function TaskStatusBadge({ status }: { status: TaskStatusEnum }) {

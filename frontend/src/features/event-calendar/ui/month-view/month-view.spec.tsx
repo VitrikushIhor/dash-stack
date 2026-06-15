@@ -8,7 +8,7 @@ import { EventBullet } from './event-bullet'
 
 // --- Mocks ---
 
-vi.mock('@/shared/ui/components/ui/tooltip', () => ({
+vi.mock('@/shared/ui/core/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipTrigger: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>

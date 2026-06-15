@@ -1,16 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
 import {
+  ConfigDrawer,
   ForbiddenError,
   GeneralError,
   MaintenanceError,
   NotFoundError,
   UnauthorisedError,
-} from '@/shared/ui/components/errors'
-import { Search } from '@/shared/ui/components/search'
-import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
-import { Header } from '@/widgets/layout/ui/header'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+  Search,
+  ThemeSwitch,
+} from '@/shared/ui'
+import { Header, NavUser } from '@/widgets/layout'
 
 export const Route = createFileRoute('/_authenticated/errors/$error')({
   component: RouteComponent,

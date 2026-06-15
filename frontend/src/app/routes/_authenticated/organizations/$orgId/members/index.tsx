@@ -7,16 +7,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { LayoutGrid, LayoutList } from 'lucide-react'
-import { DataTable } from '@/shared/ui/components/data-table'
-import { Button } from '@/shared/ui/components/ui/button'
+import { DataTable } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
+import { useGetMembers, useGetOrganization } from '@/entities/organization'
+import { TeamGrid } from '@/entities/team'
 import { InviteMemberDialog, InvitationsTable } from '@/features/invitation'
 import {
   membersTableColumns,
-  useGetMembers,
-  useGetOrganization,
   useOrganizationPermission,
 } from '@/features/organization'
-import { TeamGrid } from '@/features/team'
 
 export const Route = createFileRoute(
   '/_authenticated/organizations/$orgId/members/'

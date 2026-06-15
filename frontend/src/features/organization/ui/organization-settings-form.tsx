@@ -1,4 +1,4 @@
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -6,11 +6,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { Input } from '@/shared/ui/components/ui/input'
-import { Textarea } from '@/shared/ui/components/ui/textarea'
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
+import { Textarea } from '@/shared/ui/core/textarea'
+import { type Organization } from '@/entities/organization'
 import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
-import { type Organization } from '../model/types/organization.types'
 
 interface OrganizationSettingsFormProps {
   organization: Organization

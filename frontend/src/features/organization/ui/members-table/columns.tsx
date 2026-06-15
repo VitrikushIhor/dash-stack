@@ -2,21 +2,11 @@ import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { type ColumnDef } from '@tanstack/react-table'
 import { getInitials } from '@/shared/lib/utils'
-import {
-  getMemberDisplayName,
-  getRoleVariant,
-} from '@/shared/model/utils/membership'
-import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
-import { Badge } from '@/shared/ui/components/ui/badge'
-import {
-  type Membership,
-  type OrgRole,
-} from '../../model/types/organization.types'
+import { getMemberDisplayName, getRoleVariant } from '@/shared/model'
+import { DataTableColumnHeader } from '@/shared/ui'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
+import { Badge } from '@/shared/ui/core/badge'
+import { type Membership, type OrgRole } from '@/entities/organization'
 
 export const columns: ColumnDef<Membership>[] = [
   {

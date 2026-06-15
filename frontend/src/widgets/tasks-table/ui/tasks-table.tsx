@@ -1,6 +1,6 @@
 import { type Table } from '@tanstack/react-table'
 import { cn } from '@/shared/lib/utils'
-import { DataTable } from '@/shared/ui/components/data-table/data-table'
+import { DataTable } from '@/shared/ui'
 import { type Task } from '@/entities/task'
 import { TaskTableBulkActions } from './task-table-bulk-actions'
 

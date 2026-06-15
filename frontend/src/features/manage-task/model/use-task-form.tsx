@@ -1,11 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  type Task,
-  TaskStatusEnum,
-  taskFormSchema,
-  type TaskFormValues,
-} from '@/entities/task'
+import { type Task, TaskStatusEnum } from '@/entities/task'
+import { taskFormSchema, type TaskFormValues } from './create-task-schema'
 
 export function useTaskForm({
   initialTask,

@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { Calendar, Clock, Text, User } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Dialog,
   DialogContent,
@@ -8,10 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/shared/ui/components/ui/dialog'
+} from '@/shared/ui/core/dialog'
 import { getTaskCalendarAnchor, type Task } from '@/entities/task'
 import { getTaskUser } from '@/features/event-calendar/lib/mappers'
-import { useTaskModalStore } from '@/features/manage-task'
+import { useCalendar } from '../model/calendar-context'
 
 interface IProps {
   event: Task
@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export function EventDetailsDialog({ event, children }: IProps) {
-  const { openEdit } = useTaskModalStore()
+  const { onEditTask } = useCalendar()
   const anchor = getTaskCalendarAnchor(event)
   if (!anchor) return null
   const startDate = parseISO(anchor)
@@ -81,7 +81,7 @@ export function EventDetailsDialog({ event, children }: IProps) {
             <Button
               type='button'
               variant='outline'
-              onClick={() => openEdit(event)}
+              onClick={() => onEditTask?.(event)}
             >
               Edit
             </Button>

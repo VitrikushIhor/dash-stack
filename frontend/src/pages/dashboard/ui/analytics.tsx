@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/components/ui/card'
+} from '@/shared/ui/core/card'
 import { AnalyticsChart } from './analytics-chart'
 
 export function Analytics() {

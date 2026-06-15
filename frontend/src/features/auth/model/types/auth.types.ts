@@ -1,17 +1,8 @@
+import '@/entities/session'
+
 export interface AuthTokens {
   accessToken: string
   refreshToken: string
-}
-
-export interface User {
-  id: string
-  email: string
-  firstName: string | null
-  lastName: string | null
-  avatar: string | null
-  emailVerified: string | null
-  createdAt: string
-  updatedAt: string
 }
 
 export interface SignupInput {

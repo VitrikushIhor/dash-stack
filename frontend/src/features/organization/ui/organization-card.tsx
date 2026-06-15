@@ -5,9 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/components/ui/card'
-import { useOrgStore } from '../model/store/organization-store'
-import { type Organization } from '../model/types/organization.types'
+} from '@/shared/ui/core/card'
+import { useOrgStore, type Organization } from '@/entities/organization'
 
 interface OrganizationCardProps {
   organization: Organization
