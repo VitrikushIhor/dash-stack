@@ -45,7 +45,7 @@ const mockTask: Task = {
   id: 'task-123',
   title: 'Mutation Task',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-10T12:00:00Z',
+  dueDate: '2026-06-10T12:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',

@@ -14,7 +14,7 @@ const mockEvents: Task[] = [
     id: 't-1',
     title: 'Event 1',
     status: TaskStatusEnum.PLANNED,
-    deadline: '2026-06-10T12:00:00Z',
+    dueDate: '2026-06-10T12:00:00Z',
     attachments: [],
     organizationId: 'org-1',
     createdAt: '2026-06-09T12:00:00Z',

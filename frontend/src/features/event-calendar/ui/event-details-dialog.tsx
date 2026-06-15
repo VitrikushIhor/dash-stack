@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/components/ui/dialog'
-import { type Task } from '@/entities/task'
+import { getTaskCalendarAnchor, type Task } from '@/entities/task'
 import { getTaskUser } from '@/features/event-calendar/lib/mappers'
 import { useTaskModalStore } from '@/features/manage-task'
 
@@ -20,8 +20,10 @@ interface IProps {
 
 export function EventDetailsDialog({ event, children }: IProps) {
   const { openEdit } = useTaskModalStore()
-  const startDate = parseISO(event.deadline)
-  const endDate = parseISO(event.deadline)
+  const anchor = getTaskCalendarAnchor(event)
+  if (!anchor) return null
+  const startDate = parseISO(anchor)
+  const endDate = startDate
 
   return (
     <>

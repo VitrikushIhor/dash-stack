@@ -21,7 +21,7 @@ const mockEvents: Task[] = [
     id: 't-1',
     title: 'Event 1 (Assigned to u-1)',
     status: TaskStatusEnum.PLANNED,
-    deadline: '2026-06-10T12:00:00Z',
+    dueDate: '2026-06-10T12:00:00Z',
     attachments: [],
     organizationId: 'org-1',
     createdAt: '',
@@ -42,7 +42,7 @@ const mockEvents: Task[] = [
     id: 't-2',
     title: 'Event 2 (Assigned to u-2)',
     status: TaskStatusEnum.PLANNED,
-    deadline: '2026-06-11T12:00:00Z',
+    dueDate: '2026-06-11T12:00:00Z',
     attachments: [],
     organizationId: 'org-1',
     createdAt: '',
@@ -63,7 +63,7 @@ const mockEvents: Task[] = [
     id: 't-3',
     title: 'Event 3 (No deadline, Assigned to u-1)',
     status: TaskStatusEnum.PLANNED,
-    deadline: '', // No deadline
+    dueDate: '', // No deadline
     attachments: [],
     organizationId: 'org-1',
     createdAt: '',
@@ -94,7 +94,7 @@ describe('useFilteredEvents', () => {
 
     expect(result.current.filteredEvents).toHaveLength(3)
     expect(result.current.filteredEvents).toEqual(mockEvents)
-    expect(result.current.singleDayEvents).toHaveLength(2) // t-1 and t-2 have deadlines
+    expect(result.current.singleDayEvents).toHaveLength(2) // t-1 and t-2 have.dueDates
     expect(result.current.singleDayEvents.map((e) => e.id)).toEqual([
       't-1',
       't-2',

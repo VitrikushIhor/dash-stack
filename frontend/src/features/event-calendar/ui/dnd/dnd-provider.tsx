@@ -1,5 +1,3 @@
-'use client'
-
 import { parseISO } from 'date-fns'
 import {
   DndContext,
@@ -10,7 +8,11 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { type Task, useUpdateTask } from '@/entities/task'
+import {
+  type Task,
+  useUpdateTask,
+  getTaskCalendarAnchor,
+} from '@/entities/task'
 import { useOrgStore } from '@/features/organization'
 import { CustomDragLayer } from './custom-drag-layer'
 
@@ -42,7 +44,8 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
 
     if (!droppedEvent || !overData) return
 
-    const eventStartDate = parseISO(droppedEvent.deadline)
+    const anchor = getTaskCalendarAnchor(droppedEvent)
+    const eventStartDate = anchor ? parseISO(anchor) : new Date()
 
     let newStartDate: Date
 
@@ -64,7 +67,7 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     updateTask({
       id: droppedEvent.id,
       data: {
-        deadline: newStartDate.toISOString(),
+        dueDate: newStartDate.toISOString(),
       },
     })
   }

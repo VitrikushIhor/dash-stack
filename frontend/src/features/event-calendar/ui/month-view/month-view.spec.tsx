@@ -58,7 +58,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   title: 'Task One',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-15T10:00:00Z',
+  dueDate: '2026-06-15T10:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -141,10 +141,10 @@ describe('DayCell', () => {
   it('renders "+N more" indicator when there are more than 3 events', () => {
     const cell = makeCell({ date: new Date('2026-06-15T00:00:00Z') })
     const events = [
-      makeTask({ id: 't-1', deadline: '2026-06-15T08:00:00Z' }),
-      makeTask({ id: 't-2', deadline: '2026-06-15T09:00:00Z' }),
-      makeTask({ id: 't-3', deadline: '2026-06-15T10:00:00Z' }),
-      makeTask({ id: 't-4', deadline: '2026-06-15T11:00:00Z' }),
+      makeTask({ id: 't-1', dueDate: '2026-06-15T08:00:00Z' }),
+      makeTask({ id: 't-2', dueDate: '2026-06-15T09:00:00Z' }),
+      makeTask({ id: 't-3', dueDate: '2026-06-15T10:00:00Z' }),
+      makeTask({ id: 't-4', dueDate: '2026-06-15T11:00:00Z' }),
     ]
     // eventPositions assigns positions 0,1,2,3
     const eventPositions = { 't-1': 0, 't-2': 1, 't-3': 2, 't-4': 3 }

@@ -24,7 +24,7 @@ const mockTask: Task = {
   id: 'task-1',
   title: 'Query Task 1',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-10T12:00:00Z',
+  dueDate: '2026-06-10T12:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',

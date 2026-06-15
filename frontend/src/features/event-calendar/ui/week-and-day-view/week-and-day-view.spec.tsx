@@ -42,7 +42,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   title: 'Daily Task',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-06-10T10:00:00Z',
+  dueDate: '2026-06-10T10:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -90,12 +90,12 @@ describe('CalendarDayView', () => {
       makeTask({
         id: 't-1',
         title: 'Morning Standup',
-        deadline: '2026-06-10T09:00:00Z',
+        dueDate: '2026-06-10T09:00:00Z',
       }),
       makeTask({
         id: 't-2',
         title: 'Team Review',
-        deadline: '2026-06-10T14:00:00Z',
+        dueDate: '2026-06-10T14:00:00Z',
       }),
     ]
     renderWithProvider(<CalendarDayView singleDayEvents={events} />)
@@ -109,7 +109,7 @@ describe('CalendarDayView', () => {
       makeTask({
         id: 't-other',
         title: 'Other Day Event',
-        deadline: '2026-06-11T10:00:00Z',
+        dueDate: '2026-06-11T10:00:00Z',
       }),
     ]
     renderWithProvider(<CalendarDayView singleDayEvents={events} />)
@@ -122,12 +122,12 @@ describe('CalendarDayView', () => {
       makeTask({
         id: 't-2',
         title: 'Afternoon Meeting',
-        deadline: '2026-06-10T15:00:00Z',
+        dueDate: '2026-06-10T15:00:00Z',
       }),
       makeTask({
         id: 't-1',
         title: 'Morning Call',
-        deadline: '2026-06-10T08:00:00Z',
+        dueDate: '2026-06-10T08:00:00Z',
       }),
     ]
     renderWithProvider(<CalendarDayView singleDayEvents={events} />)
@@ -180,7 +180,7 @@ describe('CalendarWeekView', () => {
       makeTask({
         id: 't-1',
         title: 'Mid-Week Task',
-        deadline: '2026-06-10T10:00:00Z',
+        dueDate: '2026-06-10T10:00:00Z',
       }),
     ]
     renderWithProvider(

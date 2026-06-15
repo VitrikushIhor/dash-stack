@@ -1,11 +1,12 @@
-'use client'
-
+import { useMemo } from 'react'
 import { DragOverlay, useDndContext } from '@dnd-kit/core'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { MonthEventBadge } from '../month-view/month-event-badge'
 
 export function CustomDragLayer() {
   const { active } = useDndContext()
+
+  const fallbackDate = useMemo(() => new Date(), [])
 
   if (!active || active.data.current?.type !== 'event') {
     return null
@@ -18,7 +19,7 @@ export function CustomDragLayer() {
       <div className='pointer-events-none opacity-80'>
         <MonthEventBadge
           event={event}
-          cellDate={new Date(event.deadline)}
+          cellDate={new Date(getTaskCalendarAnchor(event) || fallbackDate)}
           position='none'
         />
       </div>

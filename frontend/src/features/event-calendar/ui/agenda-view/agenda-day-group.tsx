@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { AgendaEventCard } from './agenda-event-card'
 
 interface IProps {
@@ -8,9 +8,12 @@ interface IProps {
 }
 
 export function AgendaDayGroup({ date, events }: IProps) {
-  const sortedEvents = [...events].sort(
-    (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
-  )
+  const sortedEvents = [...events].sort((a, b) => {
+    const anchorA = getTaskCalendarAnchor(a)
+    const anchorB = getTaskCalendarAnchor(b)
+    if (!anchorA || !anchorB) return 0
+    return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+  })
 
   return (
     <div className='space-y-4'>

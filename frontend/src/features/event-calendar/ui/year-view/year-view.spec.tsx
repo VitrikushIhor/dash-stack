@@ -26,7 +26,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   title: 'Year Task',
   status: TaskStatusEnum.PLANNED,
-  deadline: '2026-03-15T10:00:00Z',
+  dueDate: '2026-03-15T10:00:00Z',
   attachments: [],
   organizationId: 'org-1',
   createdAt: '',
@@ -73,7 +73,7 @@ describe('CalendarYearView', () => {
   })
 
   it('passes events to child months (event dot renders for march)', () => {
-    const event = makeTask({ deadline: '2026-03-15T10:00:00Z' })
+    const event = makeTask({ dueDate: '2026-03-15T10:00:00Z' })
     renderWithProvider(<CalendarYearView allEvents={[event]} />)
     // Day 15 should appear somewhere in the rendered grid
     expect(screen.getAllByText('15').length).toBeGreaterThan(0)
@@ -137,8 +137,8 @@ describe('YearViewDayCell', () => {
 
   it('renders one dot per event when events ≤ 3', () => {
     const events = [
-      makeTask({ id: 't-1', deadline: '2026-06-15T08:00:00Z' }),
-      makeTask({ id: 't-2', deadline: '2026-06-15T09:00:00Z' }),
+      makeTask({ id: 't-1', dueDate: '2026-06-15T08:00:00Z' }),
+      makeTask({ id: 't-2', dueDate: '2026-06-15T09:00:00Z' }),
     ]
     const { container } = renderWithProvider(
       <YearViewDayCell day={15} date={date} events={events} />
@@ -149,7 +149,7 @@ describe('YearViewDayCell', () => {
 
   it('renders "+N" overflow indicator when events > 3', () => {
     const events = Array.from({ length: 5 }, (_, i) =>
-      makeTask({ id: `t-${i}`, deadline: '2026-06-15T08:00:00Z' })
+      makeTask({ id: `t-${i}`, dueDate: '2026-06-15T08:00:00Z' })
     )
     renderWithProvider(<YearViewDayCell day={15} date={date} events={events} />)
     // Shows "+4" (5 total, 1 shown as dot + +4)

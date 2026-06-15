@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { useCalendar } from '@/features/event-calendar/model/calendar-context'
 import { AgendaDayGroup } from './agenda-day-group'
 
@@ -17,7 +17,9 @@ export function CalendarAgendaView({ singleDayEvents }: IProps) {
     const allDates = new Map<string, { date: Date; events: Task[] }>()
 
     singleDayEvents.forEach((event) => {
-      const eventDate = parseISO(event.deadline)
+      const anchor = getTaskCalendarAnchor(event)
+      if (!anchor) return
+      const eventDate = parseISO(anchor)
       if (!isSameMonth(eventDate, selectedDate)) return
 
       const dateKey = format(eventDate, 'yyyy-MM-dd')

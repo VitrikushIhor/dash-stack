@@ -7,6 +7,8 @@ import { TaskRepository } from '../repositories/task.repository';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { FindAllTasksDto } from '../dto/find-all-tasks.dto';
+import { TaskStatus } from '../enums/task-status.enum';
+import { toDateOrUndefined, toDateOrNullish } from '../utils/date.utils';
 
 @Injectable()
 export class TaskService {
@@ -25,10 +27,15 @@ export class TaskService {
       }
     }
 
+    const completedAt =
+      dto.status === TaskStatus.COMPLETED ? new Date() : undefined;
+
     return this.repository.create({
       ...dto,
       organizationId,
-      deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+      startDate: toDateOrUndefined(dto.startDate),
+      dueDate: toDateOrUndefined(dto.dueDate),
+      completedAt,
     });
   }
 
@@ -62,9 +69,28 @@ export class TaskService {
       }
     }
 
+    // System-manage completedAt on status transitions.
+    // undefined = "do not include in update payload" (Prisma skips undefined keys)
+    let completedAt: Date | null | undefined = undefined;
+    if (dto.status !== undefined) {
+      const wasCompleted = task.status === TaskStatus.COMPLETED;
+      const willBeCompleted = dto.status === TaskStatus.COMPLETED;
+
+      if (willBeCompleted && !wasCompleted) {
+        // Transitioning INTO completed for the first time
+        completedAt = new Date();
+      } else if (!willBeCompleted && wasCompleted) {
+        // Reverting OUT of completed — clear the timestamp
+        completedAt = null;
+      }
+      // If staying in same status (including COMPLETED→COMPLETED), leave undefined
+    }
+
     return this.repository.update(id, organizationId, {
       ...dto,
-      deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+      startDate: toDateOrNullish(dto.startDate),
+      dueDate: toDateOrNullish(dto.dueDate),
+      completedAt,
     });
   }
 
@@ -80,11 +106,36 @@ export class TaskService {
   async updateMany(
     organizationId: string,
     ids: string[],
-    data: Pick<UpdateTaskDto, 'status' | 'deadline'>,
+    data: Pick<UpdateTaskDto, 'status'>,
   ) {
+    if (data.status === undefined) {
+      throw new BadRequestException('status is required for bulk update');
+    }
+
+    if (data.status === TaskStatus.COMPLETED) {
+      // Update uncompleted tasks (set status and completedAt)
+      const uncompletedUpdate = await this.repository.updateMany(
+        organizationId,
+        ids,
+        { status: data.status, completedAt: new Date() },
+        { completedAt: null },
+      );
+
+      // Update already completed tasks (just update status if needed)
+      const completedUpdate = await this.repository.updateMany(
+        organizationId,
+        ids,
+        { status: data.status },
+        { completedAt: { not: null } },
+      );
+
+      return { count: uncompletedUpdate.count + completedUpdate.count };
+    }
+
+    // Clear completedAt when reverting from COMPLETED
     return this.repository.updateMany(organizationId, ids, {
-      ...data,
-      deadline: data.deadline ? new Date(data.deadline) : undefined,
+      status: data.status,
+      completedAt: null,
     });
   }
 

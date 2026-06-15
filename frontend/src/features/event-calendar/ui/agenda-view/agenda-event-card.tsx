@@ -1,9 +1,7 @@
-'use client'
-
 import { format, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { Clock, Text, User } from 'lucide-react'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import {
   getTaskColor,
   getTaskUser,
@@ -25,8 +23,10 @@ export function AgendaEventCard({
 }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const startDate = parseISO(event.deadline)
-  const endDate = parseISO(event.deadline)
+  const anchor = getTaskCalendarAnchor(event)
+  if (!anchor) return null
+  const startDate = parseISO(anchor)
+  const endDate = startDate
 
   const color = (
     badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)

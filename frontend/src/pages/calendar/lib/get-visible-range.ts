@@ -16,28 +16,28 @@ export const getVisibleRange = (view: TCalendarView, date: Date) => {
     case 'month':
     case 'agenda':
       return {
-        deadlineFrom: formatISO(startOfMonth(date)),
-        deadlineTo: formatISO(endOfMonth(date)),
+        dueDateFrom: formatISO(startOfMonth(date)),
+        dueDateTo: formatISO(endOfMonth(date)),
       }
     case 'week':
       return {
-        deadlineFrom: formatISO(startOfWeek(date)),
-        deadlineTo: formatISO(endOfWeek(date)),
+        dueDateFrom: formatISO(startOfWeek(date)),
+        dueDateTo: formatISO(endOfWeek(date)),
       }
     case 'day':
       return {
-        deadlineFrom: formatISO(startOfDay(date)),
-        deadlineTo: formatISO(endOfDay(date)),
+        dueDateFrom: formatISO(startOfDay(date)),
+        dueDateTo: formatISO(endOfDay(date)),
       }
     case 'year':
       return {
-        deadlineFrom: formatISO(startOfYear(date)),
-        deadlineTo: formatISO(endOfYear(date)),
+        dueDateFrom: formatISO(startOfYear(date)),
+        dueDateTo: formatISO(endOfYear(date)),
       }
     default:
       return {
-        deadlineFrom: formatISO(startOfMonth(date)),
-        deadlineTo: formatISO(endOfMonth(date)),
+        dueDateFrom: formatISO(startOfMonth(date)),
+        dueDateTo: formatISO(endOfMonth(date)),
       }
   }
 }

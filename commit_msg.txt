@@ -1,0 +1,8 @@
+fix: Address CodeRabbit review feedback on task dates
+
+- Add defensive date parsing in utils to prevent Invalid Date errors
+- Validate invalid date strings in IsDueDateAfterStartDate decorator
+- Apply IsDueDateAfterStartDate cross-field validation to UpdateTaskDto
+- Add @ApiBody to bulk action endpoints for correct Swagger generation
+- Fix negative height computation for zero-duration events in calendar
+- Enforce anchor existence for calendar events (early return on missing)

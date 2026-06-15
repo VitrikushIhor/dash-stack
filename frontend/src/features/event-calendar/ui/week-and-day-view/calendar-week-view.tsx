@@ -1,6 +1,7 @@
+import { useMemo } from 'react'
 import { startOfWeek, format, parseISO, isSameDay } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getWeekDays } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
 import { EventBlock } from './event-block'
@@ -12,8 +13,24 @@ interface IProps {
 export function CalendarWeekView({ singleDayEvents }: IProps) {
   const { selectedDate } = useCalendar()
 
-  const weekStart = startOfWeek(selectedDate)
-  const weekDays = getWeekDays(weekStart)
+  const weekStart = useMemo(() => startOfWeek(selectedDate), [selectedDate])
+  const weekDays = useMemo(() => getWeekDays(weekStart), [weekStart])
+
+  const eventsByDay = useMemo(() => {
+    return weekDays.map((day) => {
+      return singleDayEvents
+        .filter((event) => {
+          const anchor = getTaskCalendarAnchor(event)
+          return anchor && isSameDay(parseISO(anchor), day)
+        })
+        .sort((a, b) => {
+          const anchorA = getTaskCalendarAnchor(a)
+          const anchorB = getTaskCalendarAnchor(b)
+          if (!anchorA || !anchorB) return 0
+          return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+        })
+    })
+  }, [singleDayEvents, weekDays])
 
   return (
     <>
@@ -47,14 +64,8 @@ export function CalendarWeekView({ singleDayEvents }: IProps) {
             {/* Week grid */}
             <div className='relative flex-1 border-l'>
               <div className='grid min-h-[700px] grid-cols-7 divide-x'>
-                {weekDays.map((day, dayIndex) => {
-                  const dayEvents = singleDayEvents
-                    .filter((event) => isSameDay(parseISO(event.deadline), day))
-                    .sort(
-                      (a, b) =>
-                        parseISO(a.deadline).getTime() -
-                        parseISO(b.deadline).getTime()
-                    )
+                {weekDays.map((_, dayIndex) => {
+                  const dayEvents = eventsByDay[dayIndex]
 
                   return (
                     <div

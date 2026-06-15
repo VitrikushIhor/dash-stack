@@ -8,7 +8,7 @@ const taskSearchSchema = z.object({
   status: z.array(z.nativeEnum(TaskStatusEnum)).optional(),
   labels: z.array(z.string()).optional(),
   members: z.array(z.string()).optional(),
-  deadline: z.array(z.union([z.string(), z.number()])).optional(),
+  dueDate: z.array(z.union([z.string(), z.number()])).optional(),
   page: z.number().optional(),
   pageSize: z.number().optional(),
 })

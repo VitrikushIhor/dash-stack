@@ -10,13 +10,14 @@ import {
 export function useTaskForm({
   initialTask,
 }: { initialTask?: Task | null } = {}) {
-  const defaultFormData = {
+  const defaultFormData: TaskFormValues = {
     title: initialTask?.title || '',
     description: initialTask?.description || '',
     status: initialTask?.status ?? TaskStatusEnum.PLANNED,
-    deadline: initialTask?.deadline
-      ? new Date(initialTask?.deadline)
+    startDate: initialTask?.startDate
+      ? new Date(initialTask.startDate)
       : undefined,
+    dueDate: initialTask?.dueDate ? new Date(initialTask.dueDate) : undefined,
     assignees: initialTask?.assignees || [],
     label: initialTask?.label || null,
     files: [],

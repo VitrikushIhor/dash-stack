@@ -11,16 +11,20 @@ export interface TaskFilters {
   status?: TaskStatusEnum[]
   assigneeIds?: string[]
   labelNames?: string[]
-  deadlineFrom?: string
-  deadlineTo?: string
+  dueDateFrom?: string
+  dueDateTo?: string
+  startDateFrom?: string
+  startDateTo?: string
 }
 
 export const taskApi = {
   findAll: (orgId: string, filters?: TaskFilters): Promise<Task[]> => {
     const params: Record<string, string | undefined> = {
       search: filters?.search,
-      deadlineFrom: filters?.deadlineFrom,
-      deadlineTo: filters?.deadlineTo,
+      dueDateFrom: filters?.dueDateFrom,
+      dueDateTo: filters?.dueDateTo,
+      startDateFrom: filters?.startDateFrom,
+      startDateTo: filters?.startDateTo,
       status: filters?.status?.join(','),
       assigneeIds: filters?.assigneeIds?.join(','),
       labelNames: filters?.labelNames?.join(','),

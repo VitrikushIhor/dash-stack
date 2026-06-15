@@ -22,7 +22,7 @@ import {
   RequireOrgRole,
 } from '../common/guards/membership-role.guard';
 import { OrgRole } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -48,6 +48,7 @@ export class TaskController {
   @Patch('bulk/update')
   @RequireOrgRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Bulk update tasks' })
+  @ApiBody({ type: BulkUpdateTasksDto })
   async updateMany(
     @Param('orgId') orgId: string,
     @Body() dto: BulkUpdateTasksDto,
@@ -59,6 +60,7 @@ export class TaskController {
   @RequireOrgRole(OrgRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Bulk delete tasks' })
+  @ApiBody({ type: BulkDeleteTasksDto })
   async deleteMany(
     @Param('orgId') orgId: string,
     @Body() dto: BulkDeleteTasksDto,

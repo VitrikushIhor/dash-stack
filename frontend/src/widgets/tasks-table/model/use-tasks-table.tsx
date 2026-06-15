@@ -51,8 +51,8 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       { columnId: 'label', searchKey: 'labels', type: 'array' },
       { columnId: 'assignees', searchKey: 'members', type: 'array' },
       {
-        columnId: 'deadline',
-        searchKey: 'deadline',
+        columnId: 'dueDate',
+        searchKey: 'dueDate',
         type: 'array',
         serialize: (value: unknown) => {
           if (!Array.isArray(value)) return undefined

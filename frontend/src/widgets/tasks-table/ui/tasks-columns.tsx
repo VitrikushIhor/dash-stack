@@ -209,19 +209,19 @@ export const tasksColumns: ColumnDef<Task>[] = [
   },
 
   {
-    accessorKey: 'deadline',
+    accessorKey: 'dueDate',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Deadline' />
+      <DataTableColumnHeader column={column} title='Due Date' />
     ),
     cell: ({ row }) => {
-      const deadline = row.original.deadline ?? null
+      const dueDate = row.original.dueDate ?? null
       const isOverdue = checkOverdue(row.original)
 
-      if (!deadline) {
+      if (!dueDate) {
         return (
           <TablePlaceholder
             icon={<Calendar className='h-4 w-4' />}
-            label='No Deadline'
+            label='No Due Date'
           />
         )
       }
@@ -234,7 +234,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
             )}
           />
           <span className='text-muted-foreground text-xs'>
-            {format(new Date(deadline), 'dd.MM.yyyy')}
+            {format(new Date(dueDate), 'dd.MM.yyyy')}
           </span>
         </div>
       )

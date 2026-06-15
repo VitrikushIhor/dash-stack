@@ -2,7 +2,7 @@ import type { HTMLAttributes } from 'react'
 import { format, differenceInMinutes, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getTaskColor } from '@/features/event-calendar/lib/mappers'
 import { useCalendar } from '../../model/calendar-context'
 import { DraggableEvent } from '../dnd/draggable-event'
@@ -19,10 +19,14 @@ interface IProps
 export function EventBlock({ event, className }: IProps) {
   const { badgeVariant } = useCalendar()
 
-  const start = parseISO(event.deadline)
-  const end = parseISO(event.deadline)
+  const anchor = getTaskCalendarAnchor(event)
+  if (!anchor) {
+    throw new Error(`Event ${event.id} has no calendar anchor`)
+  }
+  const start = parseISO(anchor)
+  const end = start
   const durationInMinutes = differenceInMinutes(end, start)
-  const heightInPixels = (durationInMinutes / 60) * 96 - 8
+  const heightInPixels = Math.max(32, (durationInMinutes / 60) * 96 - 8)
 
   const color = (
     badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)

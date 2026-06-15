@@ -22,9 +22,8 @@ import {
   subYears,
   addYears,
   isSameYear,
-  isWithinInterval,
 } from 'date-fns'
-import { type Task } from '@/entities/task'
+import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { type ICalendarCell, type TCalendarView } from '../model/types'
 
 // ================ Header helper functions ================ //
@@ -93,9 +92,10 @@ export function getEventsCount(
     month: isSameMonth,
   }
 
-  return events.filter((event) =>
-    compareFns[view](new Date(event.deadline), date)
-  ).length
+  return events.filter((event) => {
+    const anchor = getTaskCalendarAnchor(event)
+    return anchor && compareFns[view](new Date(anchor), date)
+  }).length
 }
 
 // ================ Week and day view helper functions ================ //
@@ -103,28 +103,33 @@ export function getEventsCount(
 export function getCurrentEvents(events: Task[]) {
   const now = new Date()
   return (
-    events.filter((event) =>
-      isWithinInterval(now, {
-        start: parseISO(event.deadline),
-        end: parseISO(event.deadline),
-      })
-    ) || null
+    events.filter((event) => {
+      const anchor = getTaskCalendarAnchor(event)
+      if (!anchor) return false
+      return isSameDay(now, parseISO(anchor))
+    }) || null
   )
 }
 
 export function groupEvents(dayEvents: Task[]) {
-  const sortedEvents = dayEvents.sort(
-    (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
-  )
+  const sortedEvents = dayEvents.sort((a, b) => {
+    const anchorA = getTaskCalendarAnchor(a)
+    const anchorB = getTaskCalendarAnchor(b)
+    if (!anchorA || !anchorB) return 0
+    return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+  })
   const groups: Task[][] = []
 
   for (const event of sortedEvents) {
-    const eventStart = parseISO(event.deadline)
+    const anchor = getTaskCalendarAnchor(event)
+    if (!anchor) continue
+    const eventStart = parseISO(anchor)
 
     let placed = false
     for (const group of groups) {
       const lastEventInGroup = group[group.length - 1]
-      const lastEventEnd = parseISO(lastEventInGroup.deadline)
+      const lastAnchor = getTaskCalendarAnchor(lastEventInGroup)
+      const lastEventEnd = lastAnchor ? parseISO(lastAnchor) : eventStart
 
       if (eventStart >= lastEventEnd) {
         group.push(event)
@@ -146,7 +151,11 @@ export function getEventBlockStyle(
   groupSize: number,
   visibleHoursRange?: { from: number; to: number }
 ) {
-  const startDate = parseISO(event.deadline)
+  const anchor = getTaskCalendarAnchor(event)
+  if (!anchor) {
+    throw new Error(`Event ${event.id} has no calendar anchor`)
+  }
+  const startDate = parseISO(anchor)
   const dayStart = new Date(day.setHours(0, 0, 0, 0))
   const eventStart = startDate < dayStart ? dayStart : startDate
   const startMinutes = differenceInMinutes(eventStart, dayStart)
@@ -227,14 +236,19 @@ export function calculateMonthEventPositions(
   })
 
   const sortedEvents = [
-    ...singleDayEvents.sort(
-      (a, b) => parseISO(a.deadline).getTime() - parseISO(b.deadline).getTime()
-    ),
+    ...singleDayEvents.sort((a, b) => {
+      const anchorA = getTaskCalendarAnchor(a)
+      const anchorB = getTaskCalendarAnchor(b)
+      if (!anchorA || !anchorB) return 0
+      return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+    }),
   ]
 
   sortedEvents.forEach((event) => {
-    const eventStart = parseISO(event.deadline)
-    const eventEnd = parseISO(event.deadline)
+    const anchor = getTaskCalendarAnchor(event)
+    if (!anchor) return
+    const eventStart = parseISO(anchor)
+    const eventEnd = parseISO(anchor)
     const eventDays = eachDayOfInterval({
       start: eventStart < monthStart ? monthStart : eventStart,
       end: eventEnd > monthEnd ? monthEnd : eventEnd,
@@ -272,8 +286,10 @@ export function getMonthCellEvents(
   eventPositions: Record<string, number>
 ) {
   const eventsForDate = events.filter((event) => {
-    const eventStart = parseISO(event.deadline)
-    const eventEnd = parseISO(event.deadline)
+    const anchor = getTaskCalendarAnchor(event)
+    if (!anchor) return false
+    const eventStart = parseISO(anchor)
+    const eventEnd = parseISO(anchor)
     return (
       (date >= eventStart && date <= eventEnd) ||
       isSameDay(date, eventStart) ||
