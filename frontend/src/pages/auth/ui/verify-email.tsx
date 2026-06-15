@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
-import { getErrorMessage } from '@/shared/api/api-helpers'
+import { getErrorMessage } from '@/shared/api'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,

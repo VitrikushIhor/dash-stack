@@ -1,5 +1,5 @@
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
-import { useTheme } from '@/app/context/theme-provider'
+import { useTheme } from '@/shared/lib/context'
 
 export function Toaster({ ...props }: ToasterProps) {
   const { theme = 'system' } = useTheme()

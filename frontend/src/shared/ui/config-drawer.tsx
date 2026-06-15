@@ -11,6 +11,12 @@ import { IconSidebarSidebar } from '@/shared/assets/custom/icon-sidebar-sidebar'
 import { IconThemeDark } from '@/shared/assets/custom/icon-theme-dark'
 import { IconThemeLight } from '@/shared/assets/custom/icon-theme-light'
 import { IconThemeSystem } from '@/shared/assets/custom/icon-theme-system'
+import {
+  useDirection,
+  type Collapsible,
+  useLayout,
+  useTheme,
+} from '@/shared/lib/context'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -22,9 +28,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/shared/ui/core/sheet'
-import { useDirection } from '@/app/context/direction-provider'
-import { type Collapsible, useLayout } from '@/app/context/layout-provider'
-import { useTheme } from '@/app/context/theme-provider'
 import { useSidebar } from './core/sidebar'
 
 export function ConfigDrawer() {

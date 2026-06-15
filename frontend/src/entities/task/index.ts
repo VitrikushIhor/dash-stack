@@ -21,11 +21,7 @@ export {
   useBulkDeleteTasks,
 } from './model/mutations'
 export { STATUS_CONFIG } from './model/task-status-config'
-export {
-  taskFormSchema,
-  type TaskFormValues,
-  labelSchema,
-  checklistSchema,
-  checklistItemSchema,
-  membershipSchema,
-} from './model/create-task-schema'
+
+export { ChecklistWidget } from './ui/checklist/checklist-widget'
+export { FormChecklist } from './ui/checklist/form-checklist'
+export { TodoItem } from './ui/checklist/todo-item'

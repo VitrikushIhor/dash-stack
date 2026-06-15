@@ -3,8 +3,6 @@ export { authApi } from './api/auth-api'
 export { authKeys } from './api/auth-query-keys'
 
 // Queries
-export { useCurrentUser } from './model/queries/use-current-user'
-export { useIsAuthenticated } from './model/queries/use-is-authenticated'
 
 // Mutations
 export { useLogin } from './model/mutations/use-login'

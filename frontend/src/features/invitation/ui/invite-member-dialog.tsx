@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { OrgRole } from '@/shared/model/types/org-role'
+import { OrgRole } from '@/shared/model'
 import { Button } from '@/shared/ui/core/button'
 import {
   Dialog,

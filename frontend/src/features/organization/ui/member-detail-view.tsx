@@ -6,12 +6,12 @@ import {
   formatJoinedDate,
   getRoleVariant,
   getMemberDisplayName,
-} from '@/shared/model/utils/membership'
+} from '@/shared/model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
-import { type Membership } from '../model/types/organization.types'
+import { type Membership } from '@/entities/organization'
 
 interface MemberDetailViewProps {
   membership: Membership

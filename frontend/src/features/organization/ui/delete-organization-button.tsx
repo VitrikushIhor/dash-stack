@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from '@/shared/ui/core/alert-dialog'
 import { Button } from '@/shared/ui/core/button'
-import { useDeleteOrganization } from '../model/mutations/use-delete-organization'
+import { useDeleteOrganization } from '@/entities/organization'
 
 interface DeleteOrganizationButtonProps {
   orgId: string

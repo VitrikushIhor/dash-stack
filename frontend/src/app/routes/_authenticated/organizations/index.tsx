@@ -2,14 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Loader2, Plus } from 'lucide-react'
 import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
+import { useGetOrganizations } from '@/entities/organization'
 import {
-  useGetOrganizations,
   OrganizationCard,
   CreateOrganizationDialog,
 } from '@/features/organization'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+import { Header, Main, NavUser } from '@/widgets/layout'
 
 export const Route = createFileRoute('/_authenticated/organizations/')({
   component: OrganizationsListPage,

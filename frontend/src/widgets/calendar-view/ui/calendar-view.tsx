@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { type Membership } from '@/shared/model/types/membership'
+import { type Membership } from '@/shared/model'
 import { type Task } from '@/entities/task'
 import {
   CalendarProvider,

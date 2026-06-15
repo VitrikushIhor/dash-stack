@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/shared/lib/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', 'dist'],
     coverage: {
@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => ({
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
-        'src/test/',
+        'src/shared/lib/test/',
         '**/*.d.ts',
         'src/main.tsx',
         'src/routeTree.gen.ts',

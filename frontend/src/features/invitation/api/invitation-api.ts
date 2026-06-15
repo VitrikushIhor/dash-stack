@@ -1,5 +1,5 @@
-import { api } from '@/shared/api/api-client'
-import { type Membership } from '@/features/organization/model/types/organization.types'
+import { api } from '@/shared/api'
+import { type Membership } from '@/shared/model'
 import {
   type Invitation,
   type CreateInvitationDto,

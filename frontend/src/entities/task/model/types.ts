@@ -1,4 +1,4 @@
-import { type OrgRole } from '@/shared/model/types/org-role'
+import { type OrgRole } from '@/shared/model'
 import { type LabelColor } from '@/shared/ui'
 
 export enum TaskStatusEnum {

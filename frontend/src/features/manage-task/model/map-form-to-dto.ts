@@ -1,10 +1,7 @@
 import { fileToBase64 } from '@/shared/lib/utils'
 import { type LabelColor } from '@/shared/ui'
-import {
-  type CreateTaskDto,
-  type UpdateTaskDto,
-  type TaskFormValues,
-} from '@/entities/task'
+import { type CreateTaskDto, type UpdateTaskDto } from '@/entities/task'
+import { type TaskFormValues } from './create-task-schema'
 import { TaskModalMode } from './use-task-modal-store'
 
 /**
@@ -48,7 +45,7 @@ export async function mapTaskFormToDto(
     startDate: serializeDate(values.startDate, mode),
     dueDate: serializeDate(values.dueDate, mode),
     attachments: attachments.length ? attachments : undefined,
-    assigneeIds: values.assignees?.map((m) => m.id) || [],
+    assigneeIds: values.assignees?.map((m: { id: string }) => m.id) || [],
     label: values.label
       ? {
           name: values.label.name,
@@ -56,12 +53,19 @@ export async function mapTaskFormToDto(
         }
       : undefined,
     checklists:
-      values.checklists?.map((cl) => ({
-        name: cl.name,
-        items: cl.items.map((item) => ({
-          title: item.title,
-          completed: item.completed,
-        })),
-      })) || [],
+      values.checklists?.map(
+        (cl: {
+          name: string
+          items: { title: string; completed: boolean }[]
+        }) => ({
+          name: cl.name,
+          items: cl.items.map(
+            (item: { title: string; completed: boolean }) => ({
+              title: item.title,
+              completed: item.completed,
+            })
+          ),
+        })
+      ) || [],
   }
 }

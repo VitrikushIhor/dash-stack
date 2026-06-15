@@ -11,12 +11,14 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from '@/routeTree.gen'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { toast } from 'sonner'
+import {
+  DirectionProvider,
+  FontProvider,
+  ThemeProvider,
+} from '@/shared/lib/context'
 import { handleServerError } from '@/shared/lib/handle-server-error'
 import { TooltipProvider } from '@/shared/ui/core/tooltip'
 import { useAuthStore } from '@/features/auth'
-import { DirectionProvider } from '@/app/context/direction-provider'
-import { FontProvider } from '@/app/context/font-provider'
-import { ThemeProvider } from '@/app/context/theme-provider'
 // Styles
 import '@/app/styles/index.css'
 

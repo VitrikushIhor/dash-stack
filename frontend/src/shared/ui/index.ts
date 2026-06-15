@@ -1,6 +1,5 @@
 export * from './avatar-group'
 export * from './avatar-upload'
-export * from './command-menu'
 export * from './config-drawer'
 export * from './confirm-dialog'
 export * from './data-table/bulk-actions'

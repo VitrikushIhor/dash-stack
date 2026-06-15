@@ -9,13 +9,11 @@ import {
 } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
+import { useOrgStore } from '@/entities/organization'
 import { useTasksQuery } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
-import { useOrgStore } from '@/features/organization'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+import { Header, Main, NavUser } from '@/widgets/layout'
 import { TasksTable, useTasksTable } from '@/widgets/tasks-table'
 
 export function TaskPage() {

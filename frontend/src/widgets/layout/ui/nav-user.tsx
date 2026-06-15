@@ -23,7 +23,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/core/sidebar'
-import { useCurrentUser, useLogout } from '@/features/auth'
+import { useCurrentUser } from '@/entities/session'
+import { useLogout } from '@/features/auth'
 
 function getUserInitials(
   firstName?: string | null,

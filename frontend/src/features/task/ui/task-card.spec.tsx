@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { OrgRole } from '@/shared/model/types/org-role'
+import { OrgRole } from '@/shared/model'
 import { type Label } from '@/shared/ui'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TaskCardKanban } from './task-card'

@@ -1,7 +1,7 @@
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { Users, Briefcase, Calendar } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
-import { useGetOrganization } from '@/features/organization'
+import { useGetOrganization } from '@/entities/organization'
 
 export const Route = createFileRoute('/_authenticated/organizations/$orgId/')({
   component: OrganizationOverviewPage,

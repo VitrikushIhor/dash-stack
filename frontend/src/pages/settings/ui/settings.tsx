@@ -2,9 +2,7 @@ import { Outlet } from '@tanstack/react-router'
 import { Monitor, Bell, Palette, Wrench, UserCog } from 'lucide-react'
 import { ConfigDrawer, Search, SidebarNav, ThemeSwitch } from '@/shared/ui'
 import { Separator } from '@/shared/ui/core/separator'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+import { Header, Main, NavUser } from '@/widgets/layout'
 
 const sidebarNavItems = [
   {

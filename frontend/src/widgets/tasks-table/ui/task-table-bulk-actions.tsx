@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
+import { useOrgStore } from '@/entities/organization'
 import {
   type TaskStatusEnum,
   type Task,
@@ -22,7 +23,6 @@ import {
   useBulkUpdateTasks,
   useBulkDeleteTasks,
 } from '@/entities/task'
-import { useOrgStore } from '@/features/organization'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {

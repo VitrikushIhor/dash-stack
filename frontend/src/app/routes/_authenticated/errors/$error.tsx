@@ -9,8 +9,7 @@ import {
   Search,
   ThemeSwitch,
 } from '@/shared/ui'
-import { Header } from '@/widgets/layout/ui/header'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+import { Header, NavUser } from '@/widgets/layout'
 
 export const Route = createFileRoute('/_authenticated/errors/$error')({
   component: RouteComponent,

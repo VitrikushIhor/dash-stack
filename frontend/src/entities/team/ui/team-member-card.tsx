@@ -1,11 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { Mail } from 'lucide-react'
 import { getInitials } from '@/shared/lib/utils'
-import { type Membership } from '@/shared/model/types/membership'
 import {
+  type Membership,
   formatPosition,
   getMemberDisplayName,
-} from '@/shared/model/utils/membership'
+} from '@/shared/model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Card, CardContent } from '@/shared/ui/core/card'
 

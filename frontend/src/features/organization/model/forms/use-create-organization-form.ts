@@ -1,11 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateOrganization } from '../mutations/use-create-organization'
+import { useCreateOrganization, useOrgStore } from '@/entities/organization'
 import {
   CreateOrgSchema,
   type CreateOrgFormValues,
 } from '../schema/organization-schema'
-import { useOrgStore } from '../store/organization-store'
 
 interface UseCreateOrganizationFormProps {
   onSuccess?: () => void

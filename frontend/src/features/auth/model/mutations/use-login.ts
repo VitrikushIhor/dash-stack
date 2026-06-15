@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { getErrorMessage } from '@/shared/api/api-helpers'
+import { getErrorMessage } from '@/shared/api'
 import { authApi } from '../../api/auth-api'
 import { authKeys } from '../../api/auth-query-keys'
 

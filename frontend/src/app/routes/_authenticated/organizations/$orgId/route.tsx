@@ -11,10 +11,8 @@ import {
   organizationApi,
   organizationKeys,
   useGetOrganization,
-} from '@/features/organization'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+} from '@/entities/organization'
+import { Header, Main, NavUser } from '@/widgets/layout'
 
 export const Route = createFileRoute('/_authenticated/organizations/$orgId')({
   loader: ({ context, params }) =>

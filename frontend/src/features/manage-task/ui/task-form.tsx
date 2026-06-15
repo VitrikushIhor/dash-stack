@@ -1,6 +1,10 @@
 import { type UseFormReturn } from 'react-hook-form'
-import { type Membership } from '@/shared/model/types/membership'
-import { mockAvailableLabels } from '@/shared/ui'
+import { type Membership } from '@/shared/model'
+import {
+  mockAvailableLabels,
+  FormFileUpload,
+  FormLabelSelector,
+} from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -22,11 +26,9 @@ import {
 } from '@/shared/ui/core/select'
 import { Separator } from '@/shared/ui/core/separator'
 import { Textarea } from '@/shared/ui/core/textarea'
-import { FormFileUpload } from '@/shared/ui/form-fields/form-file-upload'
-import { FormLabelSelector } from '@/shared/ui/form-fields/form-label-selector'
-import { TaskStatusEnum, type TaskFormValues } from '@/entities/task'
-import { FormChecklist } from '@/features/checklist'
-import { FormMemberPicker } from '@/features/team'
+import { TaskStatusEnum, FormChecklist } from '@/entities/task'
+import { FormMemberPicker } from '@/entities/team'
+import { type TaskFormValues } from '../model/create-task-schema'
 import { TaskDatePickerField } from './task-date-picker-field'
 
 type TaskFormProps = {

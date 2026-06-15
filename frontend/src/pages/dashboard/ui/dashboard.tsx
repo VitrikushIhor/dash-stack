@@ -8,9 +8,7 @@ import {
   CardTitle,
 } from '@/shared/ui/core/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
-import { Header } from '@/widgets/layout/ui/header'
-import { Main } from '@/widgets/layout/ui/main'
-import { NavUser } from '@/widgets/layout/ui/nav-user'
+import { Header, Main, NavUser } from '@/widgets/layout'
 import { Analytics } from './analytics'
 import { Overview } from './overview'
 import { RecentSales } from './recent-sales'

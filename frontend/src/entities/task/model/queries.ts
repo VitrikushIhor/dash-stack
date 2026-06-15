@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { QUERY_KEYS } from '@/shared/api/query-keys'
+import { QUERY_KEYS } from '@/shared/api'
 import { taskApi, type TaskFilters } from '../api/task-api'
 import { type Task } from './types'
 

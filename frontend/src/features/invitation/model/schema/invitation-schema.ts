@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { OrgRole } from '@/shared/model/types/org-role'
+import { OrgRole } from '@/shared/model'
 
 export const InviteSchema = z.object({
   email: z.string().email(),

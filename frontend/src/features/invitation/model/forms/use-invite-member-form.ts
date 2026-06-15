@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { OrgRole } from '@/features/organization/model/types/organization.types'
+import { OrgRole } from '@/shared/model'
 import { useSendInvite } from '../mutations/use-send-invite'
 import {
   InviteSchema,

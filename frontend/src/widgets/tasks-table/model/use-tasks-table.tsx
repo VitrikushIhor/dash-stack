@@ -18,8 +18,8 @@ import {
   dateRangeFilterFn,
   mockAvailableLabels,
 } from '@/shared/ui'
+import { useGetMembers } from '@/entities/organization'
 import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
-import { useGetMembers } from '@/features/organization'
 import { tasksColumns } from '../ui/tasks-columns'
 
 interface UseTasksTableProps {

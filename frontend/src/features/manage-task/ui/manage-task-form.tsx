@@ -1,13 +1,9 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/shared/lib/logger'
-import {
-  type Task,
-  useCreateTask,
-  useUpdateTask,
-  type TaskFormValues,
-} from '@/entities/task'
-import { useGetMembers, useOrgStore } from '@/features/organization'
+import { useGetMembers, useOrgStore } from '@/entities/organization'
+import { type Task, useCreateTask, useUpdateTask } from '@/entities/task'
+import { type TaskFormValues } from '../model/create-task-schema'
 import { mapTaskFormToDto } from '../model/map-form-to-dto'
 import { useTaskAttachments } from '../model/use-task-attachments'
 import { useTaskForm } from '../model/use-task-form'

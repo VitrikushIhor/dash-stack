@@ -9,8 +9,8 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { type Organization } from '@/entities/organization'
 import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
-import { type Organization } from '../model/types/organization.types'
 
 interface OrganizationSettingsFormProps {
   organization: Organization

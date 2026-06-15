@@ -1,4 +1,4 @@
-import { QUERY_KEYS } from '@/shared/api/query-keys'
+import { QUERY_KEYS } from '@/shared/api'
 
 export const invitationKeys = {
   all: [QUERY_KEYS.INVITATIONS] as const,

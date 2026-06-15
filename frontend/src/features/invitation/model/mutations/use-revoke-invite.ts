@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ApiError } from '@/shared/api/api-helpers'
+import { ApiError } from '@/shared/api'
 import { invitationApi } from '../../api/invitation-api'
 import { invitationKeys } from '../../api/invitation-query-keys'
 

@@ -4,8 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Loader2 } from 'lucide-react'
 import { clearTokens } from '@/shared/api'
-import { authKeys } from '@/features/auth'
-import { authApi } from '@/features/auth/api/auth-api'
+import { authKeys, authApi } from '@/features/auth'
 
 export function OAuthCallback() {
   const navigate = useNavigate()

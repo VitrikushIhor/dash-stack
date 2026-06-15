@@ -1,11 +1,13 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useUpdateOrganization } from '../mutations/use-update-organization'
+import {
+  useUpdateOrganization,
+  type Organization,
+} from '@/entities/organization'
 import {
   UpdateOrgSchema,
   type UpdateOrgFormValues,
 } from '../schema/organization-schema'
-import { type Organization } from '../types/organization.types'
 
 export const useUpdateOrganizationForm = (organization: Organization) => {
   const { mutate: updateOrg, isPending } = useUpdateOrganization()

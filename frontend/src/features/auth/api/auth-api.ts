@@ -1,14 +1,8 @@
-import { api } from '@/shared/api/api-client'
-import {
-  clearTokens,
-  getRefreshToken,
-  setTokens,
-} from '@/shared/api/api-helpers'
+import { api, clearTokens, getRefreshToken, setTokens } from '@/shared/api'
 import {
   type AuthTokens,
   type SignupInput,
   type LoginInput,
-  type User,
 } from '../model/types/auth.types'
 
 // Auth API functions
@@ -74,10 +68,6 @@ export const authApi = {
     const data = await api.post<AuthTokens>('/auth/oauth/exchange', { token })
     setTokens(data.accessToken, data.refreshToken)
     return data
-  },
-
-  getMe: (): Promise<User> => {
-    return api.get<User>('/auth/me')
   },
 }
 

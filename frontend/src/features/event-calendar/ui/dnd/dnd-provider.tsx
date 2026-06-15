@@ -8,12 +8,12 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
+import { useOrgStore } from '@/entities/organization'
 import {
   type Task,
   useUpdateTask,
   getTaskCalendarAnchor,
 } from '@/entities/task'
-import { useOrgStore } from '@/features/organization'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {

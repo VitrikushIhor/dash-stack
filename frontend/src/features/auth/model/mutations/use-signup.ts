@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { getErrorMessage } from '@/shared/api/api-helpers'
+import { getErrorMessage } from '@/shared/api'
 import authApi from '../../api/auth-api'
 import { type SignupInput } from '../types/auth.types'
 

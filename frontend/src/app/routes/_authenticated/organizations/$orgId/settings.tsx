@@ -7,8 +7,8 @@ import {
   CardTitle,
 } from '@/shared/ui/core/card'
 import { Separator } from '@/shared/ui/core/separator'
+import { useGetOrganization } from '@/entities/organization'
 import {
-  useGetOrganization,
   OrganizationSettingsForm,
   DeleteOrganizationButton,
   useOrganizationPermission,
