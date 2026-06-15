@@ -22,7 +22,6 @@ import {
   subYears,
   addYears,
   isSameYear,
-  isWithinInterval,
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { type ICalendarCell, type TCalendarView } from '../model/types'
@@ -107,10 +106,7 @@ export function getCurrentEvents(events: Task[]) {
     events.filter((event) => {
       const anchor = getTaskCalendarAnchor(event)
       if (!anchor) return false
-      return isWithinInterval(now, {
-        start: parseISO(anchor),
-        end: parseISO(anchor),
-      })
+      return isSameDay(now, parseISO(anchor))
     }) || null
   )
 }
@@ -156,7 +152,10 @@ export function getEventBlockStyle(
   visibleHoursRange?: { from: number; to: number }
 ) {
   const anchor = getTaskCalendarAnchor(event)
-  const startDate = anchor ? parseISO(anchor) : new Date()
+  if (!anchor) {
+    throw new Error(`Event ${event.id} has no calendar anchor`)
+  }
+  const startDate = parseISO(anchor)
   const dayStart = new Date(day.setHours(0, 0, 0, 0))
   const eventStart = startDate < dayStart ? dayStart : startDate
   const startMinutes = differenceInMinutes(eventStart, dayStart)

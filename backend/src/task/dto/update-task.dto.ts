@@ -1,6 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsDueDateAfterStartDate } from './create-task.dto';
 import { IsDateString, IsOptional, ValidateIf } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { CreateTaskDto } from './create-task.dto';
 
@@ -46,6 +46,7 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsDateString()
+  @IsDueDateAfterStartDate()
   @Transform(({ value }) => (value === null ? null : value))
   declare dueDate?: string | null;
 }

@@ -24,7 +24,8 @@ export function AgendaEventCard({
   const { badgeVariant } = useCalendar()
 
   const anchor = getTaskCalendarAnchor(event)
-  const startDate = anchor ? parseISO(anchor) : new Date()
+  if (!anchor) return null
+  const startDate = parseISO(anchor)
   const endDate = startDate
 
   const color = (

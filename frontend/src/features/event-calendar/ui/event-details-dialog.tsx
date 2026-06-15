@@ -21,7 +21,8 @@ interface IProps {
 export function EventDetailsDialog({ event, children }: IProps) {
   const { openEdit } = useTaskModalStore()
   const anchor = getTaskCalendarAnchor(event)
-  const startDate = anchor ? parseISO(anchor) : new Date()
+  if (!anchor) return null
+  const startDate = parseISO(anchor)
   const endDate = startDate
 
   return (

@@ -20,10 +20,13 @@ export function EventBlock({ event, className }: IProps) {
   const { badgeVariant } = useCalendar()
 
   const anchor = getTaskCalendarAnchor(event)
-  const start = anchor ? parseISO(anchor) : new Date()
+  if (!anchor) {
+    throw new Error(`Event ${event.id} has no calendar anchor`)
+  }
+  const start = parseISO(anchor)
   const end = start
   const durationInMinutes = differenceInMinutes(end, start)
-  const heightInPixels = (durationInMinutes / 60) * 96 - 8
+  const heightInPixels = Math.max(32, (durationInMinutes / 60) * 96 - 8)
 
   const color = (
     badgeVariant === 'dot' ? `${getTaskColor(event)}-dot` : getTaskColor(event)

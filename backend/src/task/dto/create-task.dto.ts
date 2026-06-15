@@ -15,7 +15,7 @@ import {
 import { Type } from 'class-transformer';
 import { TaskStatus } from '../enums/task-status.enum';
 
-function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
+export function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
   return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: 'isDueDateAfterStartDate',
@@ -31,7 +31,12 @@ function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
           if (!dto.startDate || !value) {
             return true;
           }
-          return new Date(value as string) >= new Date(dto.startDate);
+          const dueDate = new Date(value as string);
+          const startDate = new Date(dto.startDate);
+          if (isNaN(dueDate.getTime()) || isNaN(startDate.getTime())) {
+            return false;
+          }
+          return dueDate >= startDate;
         },
       },
     });

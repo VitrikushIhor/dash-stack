@@ -1,5 +1,11 @@
-export const toDateOrUndefined = (value?: string): Date | undefined =>
-  value ? new Date(value) : undefined;
+export const toDateOrUndefined = (value?: string): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date string: ${value}`);
+  }
+  return date;
+};
 
 /**
  * Handles the three-state optional/nullable date semantics used in update DTOs:
@@ -13,12 +19,22 @@ export const toDateOrNullish = (
 ): Date | null | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return null;
-  return new Date(value);
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date string: ${value}`);
+  }
+  return date;
 };
 
 /**
  * Returns `new Date(value)` when defined, `undefined` otherwise.
  * Used for optional range filter boundaries in repository queries.
  */
-export const toOptionalDate = (value?: string): Date | undefined =>
-  value ? new Date(value) : undefined;
+export const toOptionalDate = (value?: string): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date string: ${value}`);
+  }
+  return date;
+};
