@@ -6,12 +6,8 @@ import {
   formatPosition,
   getMemberDisplayName,
 } from '@/shared/model/utils/membership'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
-import { Card, CardContent } from '@/shared/ui/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
+import { Card, CardContent } from '@/shared/ui/core/card'
 
 interface TeamMemberCardProps {
   membership: Membership

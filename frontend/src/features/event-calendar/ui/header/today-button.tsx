@@ -3,7 +3,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/shared/ui/components/ui/tooltip'
+} from '@/shared/ui/core/tooltip'
 import { useCalendar } from '../../model/calendar-context'
 
 export function TodayButton() {

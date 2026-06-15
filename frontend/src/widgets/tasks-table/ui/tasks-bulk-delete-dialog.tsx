@@ -1,14 +1,10 @@
 import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
-import { ConfirmDialog } from '@/shared/ui/components/confirm-dialog'
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@/shared/ui/components/ui/alert'
-import { Input } from '@/shared/ui/components/ui/input'
-import { Label } from '@/shared/ui/components/ui/label'
+import { ConfirmDialog } from '@/shared/ui'
+import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/core/alert'
+import { Input } from '@/shared/ui/core/input'
+import { Label } from '@/shared/ui/core/label'
 
 type TaskMultiDeleteDialogProps<TData> = {
   open: boolean

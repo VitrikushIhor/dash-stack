@@ -1,14 +1,14 @@
 import { memo } from 'react'
 import { GripVertical, Plus } from 'lucide-react'
-import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui/components/kanban'
+import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/shared/ui/components/ui/accordion'
-import { Button } from '@/shared/ui/components/ui/button'
-import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+} from '@/shared/ui/core/accordion'
+import { Button } from '@/shared/ui/core/button'
+import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
 import { KanbanViewMode } from '../model/types/kanban-types'

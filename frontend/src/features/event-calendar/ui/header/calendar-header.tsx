@@ -6,12 +6,12 @@ import {
   Grid2x2,
   CalendarRange,
 } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/shared/ui/components/ui/tooltip'
+} from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
 import { useCalendar } from '../../model/calendar-context'

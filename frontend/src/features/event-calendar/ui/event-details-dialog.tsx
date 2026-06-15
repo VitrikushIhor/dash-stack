@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { Calendar, Clock, Text, User } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/shared/ui/components/ui/dialog'
+} from '@/shared/ui/core/dialog'
 import { getTaskCalendarAnchor, type Task } from '@/entities/task'
 import { getTaskUser } from '@/features/event-calendar/lib/mappers'
 import { useTaskModalStore } from '@/features/manage-task'

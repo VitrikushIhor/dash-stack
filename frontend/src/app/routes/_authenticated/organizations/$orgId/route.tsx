@@ -6,9 +6,7 @@ import {
 } from '@tanstack/react-router'
 import { Loader2, LayoutDashboard, Users, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
-import { Search } from '@/shared/ui/components/search'
-import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
+import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
 import {
   organizationApi,
   organizationKeys,

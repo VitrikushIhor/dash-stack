@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/components/ui/card'
+} from '@/shared/ui/core/card'
 import { useOrgStore } from '../model/store/organization-store'
 import { type Organization } from '../model/types/organization.types'
 

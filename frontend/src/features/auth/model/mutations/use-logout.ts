@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { clearTokens } from '@/shared/api/api-helpers'
-import { authApi } from '../api/auth-api'
+import { authApi } from '../../api/auth-api'
 
 export function useLogout() {
   const queryClient = useQueryClient()

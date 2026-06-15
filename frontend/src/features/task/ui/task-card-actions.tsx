@@ -1,5 +1,5 @@
 import { MoreVertical, MoreHorizontal } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
+} from '@/shared/ui/core/dropdown-menu'
 import { type Task } from '@/entities/task'
 
 interface TaskCardActionsProps {

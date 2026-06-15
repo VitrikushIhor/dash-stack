@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import { organizationApi } from '../api/organization-api'
-import { organizationKeys } from '../api/organization-query-keys'
+import { organizationApi } from '../../api/organization-api'
+import { organizationKeys } from '../../api/organization-query-keys'
 import { type Organization } from '../types/organization.types'
 
 export const useGetOrganization = (

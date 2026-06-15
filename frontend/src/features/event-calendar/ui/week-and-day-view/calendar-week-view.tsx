@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { startOfWeek, format, parseISO, isSameDay } from 'date-fns'
-import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getWeekDays } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'

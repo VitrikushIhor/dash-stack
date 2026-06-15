@@ -2,7 +2,7 @@ import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { OrgRole } from '@/shared/model/types/org-role'
-import { type Label } from '@/shared/ui/components/label/types.label'
+import { type Label } from '@/shared/ui'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TaskCardKanban } from './task-card'
 
@@ -14,25 +14,25 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 // Mock UI components that might cause issues
-vi.mock('@/shared/ui/components/avatar-group', () => ({
+vi.mock('@/shared/ui', () => ({
   AvatarGroup: () => <div data-testid='avatar-group'>Avatars</div>,
 }))
 
-vi.mock('@/shared/ui/components/label/label-badge', () => ({
+vi.mock('@/shared/ui', () => ({
   LabelBadge: ({ label }: { label: Label }) => <span>{label.name}</span>,
 }))
 
-vi.mock('@/shared/ui/components/ui/badge', () => ({
+vi.mock('@/shared/ui/core/badge', () => ({
   Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }))
 
-vi.mock('@/shared/ui/components/ui/card', () => ({
+vi.mock('@/shared/ui/core/card', () => ({
   Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('@/shared/ui/components/ui/progress', () => ({
+vi.mock('@/shared/ui/core/progress', () => ({
   Progress: ({ value }: { value: number }) => <div>Progress: {value}%</div>,
 }))
 

@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { Github, Loader2 } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 
 interface OAuthButtonsProps {
   disabled?: boolean

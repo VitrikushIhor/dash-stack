@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ApiError } from '@/shared/api/api-helpers'
 import { QUERY_KEYS } from '@/shared/api/query-keys'
-import { invitationApi } from '../api/invitation-api'
+import { invitationApi } from '../../api/invitation-api'
 
 export const useAcceptInvite = () => {
   const queryClient = useQueryClient()

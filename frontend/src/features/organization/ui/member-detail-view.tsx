@@ -7,19 +7,10 @@ import {
   getRoleVariant,
   getMemberDisplayName,
 } from '@/shared/model/utils/membership'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
-import { Badge } from '@/shared/ui/components/ui/badge'
-import { Button } from '@/shared/ui/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/ui/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
+import { Badge } from '@/shared/ui/core/badge'
+import { Button } from '@/shared/ui/core/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import { type Membership } from '../model/types/organization.types'
 
 interface MemberDetailViewProps {

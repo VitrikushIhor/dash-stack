@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/shared/api/api-helpers'
-import { authApi } from '../api/auth-api'
-import { authKeys } from '../api/auth-query-keys'
+import { authApi } from '../../api/auth-api'
+import { authKeys } from '../../api/auth-query-keys'
 
 export function useLogin(options?: { redirectTo?: string }) {
   const queryClient = useQueryClient()

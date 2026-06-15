@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { cn } from '@/shared/lib/utils'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -13,13 +13,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
+} from '@/shared/ui/core/form'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
   InputOTPSeparator,
-} from '@/shared/ui/components/ui/input-otp'
+} from '@/shared/ui/core/input-otp'
 
 const formSchema = z.object({
   otp: z

@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { type Membership } from '@/shared/model/types/membership'
-import { organizationApi } from '../api/organization-api'
-import { organizationKeys } from '../api/organization-query-keys'
+import { organizationApi } from '../../api/organization-api'
+import { organizationKeys } from '../../api/organization-query-keys'
 
 export const useGetMember = (orgId: string, userId: string) => {
   const queryClient = useQueryClient()

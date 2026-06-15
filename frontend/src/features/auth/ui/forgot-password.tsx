@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/components/ui/card'
+} from '@/shared/ui/core/card'
 import { AuthLayout } from './auth-layout'
 import { ForgotPasswordForm } from './forgot-password-form'
 

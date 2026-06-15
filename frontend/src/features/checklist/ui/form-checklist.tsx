@@ -1,12 +1,12 @@
 import { useFormContext } from 'react-hook-form'
 import { Plus, CheckCheck } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
+} from '@/shared/ui/core/form'
 import { type Checklist } from '@/entities/task'
 import { ChecklistWidget } from './checklist-widget'
 

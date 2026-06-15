@@ -7,11 +7,7 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,13 +16,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
+} from '@/shared/ui/core/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/shared/ui/components/ui/sidebar'
+} from '@/shared/ui/core/sidebar'
 import { useCurrentUser, useLogout } from '@/features/auth'
 
 function getUserInitials(

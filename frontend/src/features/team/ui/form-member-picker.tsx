@@ -5,7 +5,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
+} from '@/shared/ui/core/form'
 import { TeamMemberPicker } from './team-member-picker'
 
 interface FormMemberPickerProps {

@@ -1,12 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/ui/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import { useAcceptInvite } from '../model/mutations/use-accept-invite'
 
 interface AcceptInvitePageProps {

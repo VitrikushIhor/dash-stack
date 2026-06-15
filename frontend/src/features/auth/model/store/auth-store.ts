@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { authApi } from '@/shared/api'
 import { getAccessToken } from '@/shared/api/api-helpers'
+import { authApi } from '../../api/auth-api'
 import { type User } from '../types/auth.types'
 
 interface AuthState {

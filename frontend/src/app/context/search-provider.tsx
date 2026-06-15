@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { CommandMenu } from '@/shared/ui/components/command-menu'
+import { CommandMenu } from '@/shared/ui'
 
 type SearchContextType = {
   open: boolean

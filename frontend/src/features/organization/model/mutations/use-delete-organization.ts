@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ApiError } from '@/shared/api/api-helpers'
-import { organizationApi } from '../api/organization-api'
-import { organizationKeys } from '../api/organization-query-keys'
+import { organizationApi } from '../../api/organization-api'
+import { organizationKeys } from '../../api/organization-query-keys'
 
 export const useDeleteOrganization = () => {
   const queryClient = useQueryClient()

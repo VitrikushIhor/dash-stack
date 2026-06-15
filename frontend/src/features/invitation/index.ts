@@ -1,6 +1,6 @@
 export * from './model/types/invitation.types'
-export { invitationApi } from './model/api/invitation-api'
-export { invitationKeys } from './model/api/invitation-query-keys'
+export { invitationApi } from './api/invitation-api'
+export { invitationKeys } from './api/invitation-query-keys'
 
 // Queries
 export { useListInvitations } from './model/queries/use-list-invitations'

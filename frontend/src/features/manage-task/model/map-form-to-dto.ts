@@ -1,5 +1,5 @@
 import { fileToBase64 } from '@/shared/lib/utils'
-import { type LabelColor } from '@/shared/ui/components/label/types.label'
+import { type LabelColor } from '@/shared/ui'
 import {
   type CreateTaskDto,
   type UpdateTaskDto,

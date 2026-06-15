@@ -1,12 +1,12 @@
 import { type ReactNode } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
-import { Badge } from '@/shared/ui/components/ui/badge'
+import { Badge } from '@/shared/ui/core/badge'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/ui/components/ui/collapsible'
+} from '@/shared/ui/core/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
+} from '@/shared/ui/core/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -25,7 +25,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from '@/shared/ui/components/ui/sidebar'
+} from '@/shared/ui/core/sidebar'
 import {
   type NavCollapsible,
   type NavItem,

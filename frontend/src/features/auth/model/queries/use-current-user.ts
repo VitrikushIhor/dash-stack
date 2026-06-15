@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getAccessToken } from '@/shared/api/api-helpers'
-import { authApi } from '../api/auth-api'
-import { authKeys } from '../api/auth-query-keys'
+import { authApi } from '../../api/auth-api'
+import { authKeys } from '../../api/auth-query-keys'
 
 export function useCurrentUser() {
   return useQuery({

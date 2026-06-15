@@ -30,13 +30,13 @@ vi.mock('@/features/manage-task', () => ({
   }),
 }))
 
-vi.mock('@/shared/ui/components/ui/scroll-area', () => ({
+vi.mock('@/shared/ui/core/scroll-area', () => ({
   ScrollArea: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='scroll-area'>{children}</div>
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/tooltip', () => ({
+vi.mock('@/shared/ui/core/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipTrigger: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>

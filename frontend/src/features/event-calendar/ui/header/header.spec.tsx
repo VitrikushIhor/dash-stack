@@ -9,7 +9,7 @@ import { UserSelect } from './user-select'
 
 // --- Mocks ---
 
-vi.mock('@/shared/ui/components/ui/tooltip', () => ({
+vi.mock('@/shared/ui/core/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipTrigger: ({
     children,
@@ -25,7 +25,7 @@ vi.mock('@/shared/ui/components/ui/tooltip', () => ({
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/badge', () => ({
+vi.mock('@/shared/ui/core/badge', () => ({
   Badge: ({
     children,
     className,
@@ -35,7 +35,7 @@ vi.mock('@/shared/ui/components/ui/badge', () => ({
   }) => <span className={className}>{children}</span>,
 }))
 
-vi.mock('@/shared/ui/components/ui/button', () => ({
+vi.mock('@/shared/ui/core/button', () => ({
   Button: ({
     children,
     onClick,
@@ -57,7 +57,7 @@ vi.mock('@/shared/ui/components/ui/button', () => ({
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/select', () => ({
+vi.mock('@/shared/ui/core/select', () => ({
   Select: ({
     children,
     value: _value,
@@ -87,13 +87,13 @@ vi.mock('@/shared/ui/components/ui/select', () => ({
   ),
 }))
 
-vi.mock('@/shared/ui/components/avatar-group', () => ({
+vi.mock('@/shared/ui', () => ({
   AvatarGroup: ({ children }: { children?: React.ReactNode }) => (
     <div data-testid='avatar-group'>{children}</div>
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/avatar', () => ({
+vi.mock('@/shared/ui/core/avatar', () => ({
   Avatar: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),

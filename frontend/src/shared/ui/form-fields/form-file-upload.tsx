@@ -1,12 +1,12 @@
 import { useFormContext } from 'react-hook-form'
 import { Upload, X } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
+} from '@/shared/ui/core/form'
 import {
   FileUpload,
   FileUploadDropzone,
@@ -17,7 +17,7 @@ import {
   FileUploadItemProgress,
   FileUploadList,
   FileUploadTrigger,
-} from '../components/file-upload'
+} from '../file-upload'
 
 interface FormFileUploadProps extends React.ComponentProps<typeof FileUpload> {
   name: string

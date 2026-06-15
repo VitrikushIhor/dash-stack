@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { cn } from '@/shared/lib/utils'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -13,16 +13,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { Input } from '@/shared/ui/components/ui/input'
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/components/ui/select'
-import { Textarea } from '@/shared/ui/components/ui/textarea'
+} from '@/shared/ui/core/select'
+import { Textarea } from '@/shared/ui/core/textarea'
 
 const profileFormSchema = z.object({
   username: z

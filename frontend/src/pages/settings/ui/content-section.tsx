@@ -1,4 +1,4 @@
-import { Separator } from '@/shared/ui/components/ui/separator'
+import { Separator } from '@/shared/ui/core/separator'
 
 type ContentSectionProps = {
   title: string

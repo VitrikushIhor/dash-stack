@@ -2,11 +2,10 @@ import { memo } from 'react'
 import { format } from 'date-fns'
 import { Calendar, Paperclip, ListTodo } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { AvatarGroup } from '@/shared/ui/components/avatar-group'
-import { LabelBadge } from '@/shared/ui/components/label/label-badge'
-import { Badge } from '@/shared/ui/components/ui/badge'
-import { Card, CardContent, CardHeader } from '@/shared/ui/components/ui/card'
-import { Checkbox } from '@/shared/ui/components/ui/checkbox'
+import { AvatarGroup, LabelBadge } from '@/shared/ui'
+import { Badge } from '@/shared/ui/core/badge'
+import { Card, CardContent, CardHeader } from '@/shared/ui/core/card'
+import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
   type Task,
   TaskStatusEnum,

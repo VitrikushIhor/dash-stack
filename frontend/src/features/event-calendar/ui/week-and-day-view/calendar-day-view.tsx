@@ -1,6 +1,6 @@
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
-import { ScrollArea } from '@/shared/ui/components/ui/scroll-area'
+import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { useCalendar } from '../../model/calendar-context'
 import { EventBlock } from './event-block'

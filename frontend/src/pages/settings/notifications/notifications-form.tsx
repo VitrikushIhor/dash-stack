@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
-import { Button } from '@/shared/ui/components/ui/button'
-import { Checkbox } from '@/shared/ui/components/ui/checkbox'
+import { Button } from '@/shared/ui/core/button'
+import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
   Form,
   FormControl,
@@ -13,12 +13,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from '@/shared/ui/components/ui/radio-group'
-import { Switch } from '@/shared/ui/components/ui/switch'
+} from '@/shared/ui/core/form'
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
+import { Switch } from '@/shared/ui/core/switch'
 
 const notificationsFormSchema = z.object({
   type: z.enum(['all', 'mentions', 'none'], {

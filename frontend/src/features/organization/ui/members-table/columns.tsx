@@ -6,13 +6,9 @@ import {
   getMemberDisplayName,
   getRoleVariant,
 } from '@/shared/model/utils/membership'
-import { DataTableColumnHeader } from '@/shared/ui/components/data-table'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
-import { Badge } from '@/shared/ui/components/ui/badge'
+import { DataTableColumnHeader } from '@/shared/ui'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
+import { Badge } from '@/shared/ui/core/badge'
 import {
   type Membership,
   type OrgRole,

@@ -8,7 +8,7 @@ import { CalendarWeekView } from './calendar-week-view'
 
 // --- Mocks ---
 
-vi.mock('@/shared/ui/components/ui/scroll-area', () => ({
+vi.mock('@/shared/ui/core/scroll-area', () => ({
   ScrollArea: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='scroll-area'>{children}</div>
   ),

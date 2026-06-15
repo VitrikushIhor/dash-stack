@@ -3,7 +3,7 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarRail,
-} from '@/shared/ui/components/ui/sidebar'
+} from '@/shared/ui/core/sidebar'
 import { useLayout } from '@/app/context/layout-provider'
 import { AppTitle } from './app-title'
 import { sidebarData } from './data/sidebar-data'

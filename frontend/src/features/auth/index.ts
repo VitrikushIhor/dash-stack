@@ -1,6 +1,6 @@
 export * from './model/types/auth.types'
-export { authApi } from './model/api/auth-api'
-export { authKeys } from './model/api/auth-query-keys'
+export { authApi } from './api/auth-api'
+export { authKeys } from './api/auth-query-keys'
 
 // Queries
 export { useCurrentUser } from './model/queries/use-current-user'

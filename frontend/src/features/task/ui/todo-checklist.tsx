@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, memo } from 'react'
 import { Plus, ChevronDown, ChevronUp, EllipsisVertical } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +8,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
-import { Input } from '@/shared/ui/components/ui/input'
+} from '@/shared/ui/core/dropdown-menu'
+import { Input } from '@/shared/ui/core/input'
 import {
   useChecklist,
   useChecklistTodoActions,

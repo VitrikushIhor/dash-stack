@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { formatDate } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Badge } from '@/shared/ui/components/ui/badge'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Badge } from '@/shared/ui/core/badge'
+import { Button } from '@/shared/ui/core/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/shared/ui/components/ui/tooltip'
+} from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'

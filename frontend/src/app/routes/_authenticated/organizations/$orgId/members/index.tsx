@@ -7,8 +7,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { LayoutGrid, LayoutList } from 'lucide-react'
-import { DataTable } from '@/shared/ui/components/data-table'
-import { Button } from '@/shared/ui/components/ui/button'
+import { DataTable } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import { InviteMemberDialog, InvitationsTable } from '@/features/invitation'
 import {
   membersTableColumns,

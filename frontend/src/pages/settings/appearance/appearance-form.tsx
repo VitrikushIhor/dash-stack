@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { cn } from '@/shared/lib/utils'
-import { Button, buttonVariants } from '@/shared/ui/components/ui/button'
+import { Button, buttonVariants } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -13,11 +13,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from '@/shared/ui/components/ui/radio-group'
+} from '@/shared/ui/core/form'
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import { fonts } from '@/app/config/fonts'
 import { useFont } from '@/app/context/font-provider'
 import { useTheme } from '@/app/context/theme-provider'

@@ -1,5 +1,5 @@
 import z from 'zod'
-import { labelColorNames } from '@/shared/ui/components/label/types.label'
+import { labelColorNames } from '@/shared/ui'
 import { checklistSchema } from '@/features/checklist'
 import { membershipSchema } from '@/features/team'
 import { TaskStatusEnum } from './types'

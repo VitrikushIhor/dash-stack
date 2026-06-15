@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { type FileUploadProps } from '@/shared/ui/components/file-upload'
+import { type FileUploadProps } from '@/shared/ui'
 
 export function useTaskAttachments() {
   const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(

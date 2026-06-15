@@ -1,11 +1,8 @@
 import { Outlet } from '@tanstack/react-router'
 import { getCookie } from '@/shared/lib/cookies'
 import { cn } from '@/shared/lib/utils'
-import { SkipToMain } from '@/shared/ui/components/skip-to-main'
-import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/shared/ui/components/ui/sidebar'
+import { SkipToMain } from '@/shared/ui'
+import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
 import { ManageTaskModal } from '@/features/manage-task'
 import { AppSidebar } from '@/widgets/layout/ui/app-sidebar'
 import { LayoutProvider } from '@/app/context/layout-provider'

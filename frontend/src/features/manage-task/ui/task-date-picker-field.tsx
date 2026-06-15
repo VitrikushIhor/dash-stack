@@ -6,20 +6,20 @@ import {
 } from 'react-hook-form'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { Button } from '@/shared/ui/components/ui/button'
-import { Calendar } from '@/shared/ui/components/ui/calendar'
+import { Button } from '@/shared/ui/core/button'
+import { Calendar } from '@/shared/ui/core/calendar'
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
+} from '@/shared/ui/core/form'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/shared/ui/components/ui/popover'
+} from '@/shared/ui/core/popover'
 
 interface TaskDatePickerFieldProps<T extends FieldValues> {
   form: UseFormReturn<T>

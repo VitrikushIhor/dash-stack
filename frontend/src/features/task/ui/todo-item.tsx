@@ -1,7 +1,7 @@
 import { useCallback, memo } from 'react'
 import { EllipsisVertical } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
-import { Checkbox } from '@/shared/ui/components/ui/checkbox'
+import { Button } from '@/shared/ui/core/button'
+import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/components/ui/dropdown-menu'
-import { Input } from '@/shared/ui/components/ui/input'
-import { Label } from '@/shared/ui/components/ui/label'
+} from '@/shared/ui/core/dropdown-menu'
+import { Input } from '@/shared/ui/core/input'
+import { Label } from '@/shared/ui/core/label'
 import {
   useChecklist,
   useChecklistTodoActions,

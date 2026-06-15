@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import authApi from '../api/auth-api'
+import authApi from '../../api/auth-api'
 
 export function useForgotPassword() {
   return useMutation({

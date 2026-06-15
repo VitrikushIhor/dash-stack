@@ -1,13 +1,13 @@
 import { useState, memo } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { type Membership } from '@/shared/model/types/membership'
-import { AvatarGroup } from '@/shared/ui/components/avatar-group'
-import { Button } from '@/shared/ui/components/ui/button'
+import { AvatarGroup } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/shared/ui/components/ui/popover'
+} from '@/shared/ui/core/popover'
 import { TeamMemberSelector } from './team-member-selector'
 
 interface TeamMemberPickerProps {

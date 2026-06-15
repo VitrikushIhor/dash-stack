@@ -3,12 +3,8 @@ import { Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { getInitials, stringToColor } from '@/shared/lib/utils'
 import { type Membership } from '@/shared/model/types/membership'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
-import { Badge } from '@/shared/ui/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
+import { Badge } from '@/shared/ui/core/badge'
 import {
   Command,
   CommandEmpty,
@@ -16,7 +12,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/shared/ui/components/ui/command'
+} from '@/shared/ui/core/command'
 
 interface TeamMemberSelectorProps {
   selectedMembers: Membership[]

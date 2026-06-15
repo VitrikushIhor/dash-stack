@@ -1,6 +1,6 @@
 export * from './model/types/organization.types'
-export { organizationApi } from './model/api/organization-api'
-export { organizationKeys } from './model/api/organization-query-keys'
+export { organizationApi } from './api/organization-api'
+export { organizationKeys } from './api/organization-query-keys'
 
 // Queries
 export { useGetOrganizations } from './model/queries/use-get-organizations'

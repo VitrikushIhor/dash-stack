@@ -44,7 +44,7 @@ vi.mock('@/features/manage-task', () => ({
   }),
 }))
 
-vi.mock('@/shared/ui/components/kanban', () => {
+vi.mock('@/shared/ui', () => {
   return {
     Kanban: ({
       children,
@@ -204,7 +204,7 @@ vi.mock('@/features/task', () => ({
   TaskStatusBadge: () => null,
 }))
 
-vi.mock('@/shared/ui/components/ui/accordion', () => ({
+vi.mock('@/shared/ui/core/accordion', () => ({
   Accordion: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='accordion-root'>{children}</div>
   ),
@@ -223,7 +223,7 @@ vi.mock('@/shared/ui/components/ui/accordion', () => ({
   ),
 }))
 
-vi.mock('@/shared/ui/components/ui/scroll-area', () => ({
+vi.mock('@/shared/ui/core/scroll-area', () => ({
   ScrollArea: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='scroll-area'>{children}</div>
   ),

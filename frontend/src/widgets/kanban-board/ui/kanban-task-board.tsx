@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Kanban,
-  KanbanBoard,
-  KanbanOverlay,
-} from '@/shared/ui/components/kanban'
+import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui'
 import { type Task, type TaskStatusEnum, useUpdateTask } from '@/entities/task'
 import { useOrgStore } from '@/features/organization'
 import { KanbanViewMode } from '../model/types/kanban-types'

@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Loader2, Plus } from 'lucide-react'
-import { ConfigDrawer } from '@/shared/ui/components/config-drawer'
-import { Search } from '@/shared/ui/components/search'
-import { ThemeSwitch } from '@/shared/ui/components/theme-switch'
-import { Button } from '@/shared/ui/components/ui/button'
+import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import {
   useGetOrganizations,
   OrganizationCard,

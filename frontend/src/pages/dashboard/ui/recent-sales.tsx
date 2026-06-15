@@ -1,8 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/ui/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 
 export function RecentSales() {
   return (

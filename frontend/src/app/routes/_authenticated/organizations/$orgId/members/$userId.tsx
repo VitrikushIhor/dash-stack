@@ -1,6 +1,6 @@
 import { createFileRoute, useParams, Link } from '@tanstack/react-router'
 import { Loader2, ArrowLeft } from 'lucide-react'
-import { Button } from '@/shared/ui/components/ui/button'
+import { Button } from '@/shared/ui/core/button'
 import { useGetMember, MemberDetailView } from '@/features/organization'
 
 export const Route = createFileRoute(

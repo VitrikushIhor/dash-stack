@@ -1,7 +1,7 @@
 import { type UseFormReturn } from 'react-hook-form'
 import { type Membership } from '@/shared/model/types/membership'
-import { mockAvailableLabels } from '@/shared/ui/components/label/mock-labels'
-import { Button } from '@/shared/ui/components/ui/button'
+import { mockAvailableLabels } from '@/shared/ui'
+import { Button } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -9,8 +9,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/ui/components/ui/form'
-import { Input } from '@/shared/ui/components/ui/input'
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
 import {
   Select,
   SelectContent,
@@ -19,9 +19,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/components/ui/select'
-import { Separator } from '@/shared/ui/components/ui/separator'
-import { Textarea } from '@/shared/ui/components/ui/textarea'
+} from '@/shared/ui/core/select'
+import { Separator } from '@/shared/ui/core/separator'
+import { Textarea } from '@/shared/ui/core/textarea'
 import { FormFileUpload } from '@/shared/ui/form-fields/form-file-upload'
 import { FormLabelSelector } from '@/shared/ui/form-fields/form-label-selector'
 import { TaskStatusEnum, type TaskFormValues } from '@/entities/task'
