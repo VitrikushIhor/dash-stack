@@ -1,8 +1,6 @@
 import {
   Controller,
   Post,
-  Delete,
-  Body,
   HttpCode,
   HttpStatus,
   UseGuards,

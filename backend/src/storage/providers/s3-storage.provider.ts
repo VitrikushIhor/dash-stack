@@ -5,8 +5,8 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
-import { randomUUID } from 'crypto';
-import { extname } from 'path';
+import { randomUUID } from 'node:crypto';
+import { extname } from 'node:path';
 import type {
   IStorageProvider,
   UploadFileDto,
@@ -85,7 +85,13 @@ export class S3StorageProvider implements IStorageProvider {
         throw new StorageUploadException(error);
       }
       this.logger.error(`S3 upload failed for key "${key}" with unknown error`);
-      throw new StorageUploadException(new Error(String(error)));
+      throw new StorageUploadException(
+        new Error(
+          typeof error === 'object' && error !== null
+            ? JSON.stringify(error)
+            : String(error),
+        ),
+      );
     }
   }
 
@@ -108,7 +114,13 @@ export class S3StorageProvider implements IStorageProvider {
         throw new StorageDeleteException(error);
       }
       this.logger.error(`S3 delete failed for key "${key}" with unknown error`);
-      throw new StorageDeleteException(new Error(String(error)));
+      throw new StorageDeleteException(
+        new Error(
+          typeof error === 'object' && error !== null
+            ? JSON.stringify(error)
+            : String(error),
+        ),
+      );
     }
   }
 

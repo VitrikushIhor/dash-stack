@@ -45,12 +45,12 @@ function generalFileFilter(
 
 export const ImageUploadInterceptor = FileInterceptor('file', {
   storage: memoryStorage(),
-  limits: { fileSize: MAX_IMAGE_SIZE },
+  limits: { fileSize: MAX_IMAGE_SIZE, files: 1 },
   fileFilter: imageFileFilter,
 });
 
 export const FileUploadInterceptor = FileInterceptor('file', {
   storage: memoryStorage(),
-  limits: { fileSize: MAX_FILE_SIZE },
+  limits: { fileSize: MAX_FILE_SIZE, files: 1 },
   fileFilter: generalFileFilter,
 });

@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
-import { extname, join } from 'path';
-import { mkdir, writeFile, unlink } from 'fs/promises';
+import { randomUUID } from 'node:crypto';
+import { extname, join } from 'node:path';
+import { mkdir, writeFile, unlink } from 'node:fs/promises';
 import type {
   IStorageProvider,
   UploadFileDto,
@@ -59,7 +59,13 @@ export class LocalStorageProvider implements IStorageProvider {
       this.logger.error(
         `Local upload failed for key "${key}" with unknown error`,
       );
-      throw new StorageUploadException(new Error(String(error)));
+      throw new StorageUploadException(
+        new Error(
+          typeof error === 'object' && error !== null
+            ? JSON.stringify(error)
+            : String(error),
+        ),
+      );
     }
   }
 
@@ -87,7 +93,13 @@ export class LocalStorageProvider implements IStorageProvider {
       this.logger.error(
         `Local delete failed for key "${key}" with unknown error`,
       );
-      throw new StorageDeleteException(new Error(String(error)));
+      throw new StorageDeleteException(
+        new Error(
+          typeof error === 'object' && error !== null
+            ? JSON.stringify(error)
+            : String(error),
+        ),
+      );
     }
   }
 

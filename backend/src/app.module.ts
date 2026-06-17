@@ -18,7 +18,7 @@ import { TaskModule } from './task/task.module';
 import { StorageModule } from './storage/storage.module';
 import config from './common/configs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { join } from 'node:path';
 
 @Module({
   imports: [
