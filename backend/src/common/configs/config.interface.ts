@@ -4,6 +4,7 @@ export interface Config {
   swagger: SwaggerConfig;
   security: SecurityConfig;
   email: EmailConfig;
+  storage: StorageConfig;
 }
 
 export interface NestConfig {
@@ -36,4 +37,13 @@ export interface EmailConfig {
   user: string;
   pass: string;
   frontendUrl: string;
+}
+
+export interface StorageConfig {
+  provider: string;
+  s3Bucket: string;
+  s3Region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  cloudfrontDomain: string;
 }

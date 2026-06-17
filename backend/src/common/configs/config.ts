@@ -30,4 +30,12 @@ export default (): Config => ({
     pass: process.env.SMTP_PASS || 'app_password',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   },
+  storage: {
+    provider: process.env.STORAGE_PROVIDER || 's3',
+    s3Bucket: process.env.AWS_S3_BUCKET,
+    s3Region: process.env.AWS_S3_REGION || 'us-east-1',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    cloudfrontDomain: process.env.AWS_CLOUDFRONT_DOMAIN,
+  },
 });
