@@ -4,6 +4,8 @@ export default async () => {
     ['./task/dto/create-task.dto']: await import('./task/dto/create-task.dto'),
     ['./task/enums/task-status.enum']:
       await import('./task/enums/task-status.enum'),
+    ['./storage/dto/upload-response.dto']:
+      await import('./storage/dto/upload-response.dto'),
   };
   return {
     '@nestjs/swagger/plugin': {
@@ -168,6 +170,17 @@ export default async () => {
           },
         ],
         [
+          import('./storage/dto/upload-response.dto'),
+          {
+            UploadResponseDto: {
+              key: { required: true, type: () => String },
+              url: { required: true, type: () => String },
+              size: { required: true, type: () => Number },
+              mimeType: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
           import('./common/pagination/pagination.dto'),
           {
             PaginationDto: {
@@ -253,11 +266,24 @@ export default async () => {
             TaskController: {
               create: { type: Object },
               findAll: { type: [Object] },
-              updateMany: {},
+              updateMany: { type: Object },
               deleteMany: {},
               findById: { type: Object },
               update: { type: Object },
               delete: {},
+            },
+          },
+        ],
+        [
+          import('./storage/storage.controller'),
+          {
+            StorageController: {
+              uploadImage: {
+                type: t['./storage/dto/upload-response.dto'].UploadResponseDto,
+              },
+              uploadFile: {
+                type: t['./storage/dto/upload-response.dto'].UploadResponseDto,
+              },
             },
           },
         ],

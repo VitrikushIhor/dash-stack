@@ -25,6 +25,12 @@ build
 coverage
 .nyc_output
 
+# serverless directories
+.serverless/
+
+# local storage
+backend/uploads/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

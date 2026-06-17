@@ -15,7 +15,10 @@ import { EmailModule } from './email/email.module';
 import { OrganizationModule } from './organization/organization.module';
 import { InvitationModule } from './invitation/invitation.module';
 import { TaskModule } from './task/task.module';
+import { StorageModule } from './storage/storage.module';
 import config from './common/configs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -23,6 +26,10 @@ import config from './common/configs/config';
       isGlobal: true,
       load: [config],
       envFilePath: ['.env', '../.env'],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     PrismaModule.forRootAsync({
       isGlobal: true,
@@ -98,6 +105,7 @@ import config from './common/configs/config';
     OrganizationModule,
     InvitationModule,
     TaskModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [
