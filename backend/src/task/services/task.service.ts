@@ -9,10 +9,14 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 import { FindAllTasksDto } from '../dto/find-all-tasks.dto';
 import { TaskStatus } from '../enums/task-status.enum';
 import { toDateOrUndefined, toDateOrNullish } from '../utils/date.utils';
+import { StorageService } from '../../storage/storage.service';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly repository: TaskRepository) {}
+  constructor(
+    private readonly repository: TaskRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async create(organizationId: string, dto: CreateTaskDto) {
     if (dto.assigneeIds?.length) {
@@ -66,6 +70,19 @@ export class TaskService {
         throw new BadRequestException(
           'One or more assigneeIds do not belong to this organization',
         );
+      }
+    }
+
+    if (dto.attachments !== undefined) {
+      const existingAttachments = task.attachments || [];
+      const newAttachments = dto.attachments;
+
+      const toDelete = existingAttachments.filter(
+        (key) => !newAttachments.includes(key),
+      );
+
+      for (const key of toDelete) {
+        await this.storageService.deleteFile(key);
       }
     }
 
