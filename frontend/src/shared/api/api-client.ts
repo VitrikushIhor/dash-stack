@@ -65,8 +65,10 @@ export async function apiClient<T>(
     skipAuth = false,
   } = options
 
+  const isFormData = body instanceof FormData
+
   const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(!isFormData && { 'Content-Type': 'application/json' }),
     ...headers,
   }
 
@@ -84,7 +86,7 @@ export async function apiClient<T>(
   }
 
   if (body) {
-    fetchOptions.body = JSON.stringify(body)
+    fetchOptions.body = isFormData ? body : JSON.stringify(body)
   }
 
   // Serialize params to URLSearchParams

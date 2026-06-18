@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
+import { useAttachments } from '@/shared/lib'
 import { logger } from '@/shared/lib/logger'
 import { useGetMembers, useOrgStore } from '@/entities/organization'
 import { type Task, useCreateTask, useUpdateTask } from '@/entities/task'
 import { type TaskFormValues } from '../model/create-task-schema'
 import { mapTaskFormToDto } from '../model/map-form-to-dto'
-import { useTaskAttachments } from '../model/use-task-attachments'
 import { useTaskForm } from '../model/use-task-form'
 import { TaskModalMode } from '../model/use-task-modal-store'
 import { TaskForm } from './task-form'
@@ -26,7 +26,7 @@ export function ManageTaskForm({
   const updateTaskMutation = useUpdateTask(activeOrgId || '')
 
   const { form } = useTaskForm({ initialTask: selectedTask })
-  const { onUpload, onFileReject } = useTaskAttachments()
+  const { onUpload, onFileReject } = useAttachments()
 
   const { data: members } = useGetMembers(activeOrgId ?? '')
   const allMembers = useMemo(() => members ?? [], [members])
@@ -34,7 +34,7 @@ export function ManageTaskForm({
   const onSubmit = async (values: TaskFormValues) => {
     try {
       if (mode === TaskModalMode.CREATE) {
-        const createData = await mapTaskFormToDto(values, TaskModalMode.CREATE)
+        const createData = mapTaskFormToDto(values, TaskModalMode.CREATE)
         const res = await createTaskMutation.mutateAsync(createData)
         if (res) {
           toast.success('Task created successfully')
@@ -42,7 +42,7 @@ export function ManageTaskForm({
         }
       } else {
         if (!selectedTask) return
-        const updateData = await mapTaskFormToDto(values, TaskModalMode.EDIT)
+        const updateData = mapTaskFormToDto(values, TaskModalMode.EDIT)
         const res = await updateTaskMutation.mutateAsync({
           id: selectedTask.id,
           data: updateData,

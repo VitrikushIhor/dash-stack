@@ -1,18 +1,9 @@
-import { fileToBase64 } from '@/shared/lib/utils'
+import { type FileWithServerData } from '@/shared/api'
 import { type LabelColor } from '@/shared/ui'
 import { type CreateTaskDto, type UpdateTaskDto } from '@/entities/task'
 import { type TaskFormValues } from './create-task-schema'
 import { TaskModalMode } from './use-task-modal-store'
 
-/**
- * Serialises a form date field for the API payload.
- *
- * - `undefined` → `undefined`  (Prisma/backend skips the field — no change on update)
- * - `null`      → depends on mode:
- *     - 'create' → `undefined`  (backend create DTO does not accept null)
- *     - 'edit'   → `null`       (backend update DTO accepts null to clear the column)
- * - `Date`      → ISO string
- */
 function serializeDate(
   value: Date | null | undefined,
   mode: TaskModalMode
@@ -22,21 +13,25 @@ function serializeDate(
   return value.toISOString()
 }
 
-export async function mapTaskFormToDto(
+function collectAttachmentKeys(files: File[]): string[] {
+  return files
+    .map((file) => (file as FileWithServerData).s3Key)
+    .filter((key): key is string => Boolean(key))
+}
+
+export function mapTaskFormToDto(
   values: TaskFormValues,
   mode: TaskModalMode.CREATE
-): Promise<CreateTaskDto>
-export async function mapTaskFormToDto(
+): CreateTaskDto
+export function mapTaskFormToDto(
   values: TaskFormValues,
   mode: TaskModalMode.EDIT
-): Promise<UpdateTaskDto>
-export async function mapTaskFormToDto(
+): UpdateTaskDto
+export function mapTaskFormToDto(
   values: TaskFormValues,
   mode: TaskModalMode = TaskModalMode.CREATE
-): Promise<CreateTaskDto | UpdateTaskDto> {
-  const attachments = values.files?.length
-    ? await Promise.all(values.files.map((file: File) => fileToBase64(file)))
-    : []
+): CreateTaskDto | UpdateTaskDto {
+  const attachmentKeys = collectAttachmentKeys(values.files ?? [])
 
   return {
     title: values.title,
@@ -44,7 +39,7 @@ export async function mapTaskFormToDto(
     status: values.status,
     startDate: serializeDate(values.startDate, mode),
     dueDate: serializeDate(values.dueDate, mode),
-    attachments: attachments.length ? attachments : undefined,
+    attachments: attachmentKeys,
     assigneeIds: values.assignees?.map((m: { id: string }) => m.id) || [],
     label: values.label
       ? {

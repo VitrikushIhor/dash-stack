@@ -6,42 +6,32 @@ datasource db {
   provider = "postgresql"
 }
 
-// ============================================
-// AUTH MODELS
-// ============================================
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String? // null якщо OAuth-only користувач
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  email         String         @unique
+  password      String?
+  avatar        String?
   emailVerified DateTime?
   firstName     String?
   lastName      String?
-  avatar        String?
-
-  // OAuth providers
   accounts      Account[]
+  memberships   Membership[]
   refreshTokens RefreshToken[]
-
-  // App relations
-  memberships Membership[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  provider          String // "google", "github", "credentials"
+  provider          String
   providerAccountId String
-  accessToken       String? @db.Text
-  refreshToken      String? @db.Text
+  accessToken       String?
+  refreshToken      String?
   expiresAt         Int?
   tokenType         String?
   scope             String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -59,59 +49,46 @@ model VerificationToken {
   @@index([email])
 }
 
-enum TokenType {
-  EMAIL_VERIFICATION
-  PASSWORD_RESET
-}
-
 model RefreshToken {
   id        String   @id @default(cuid())
   userId    String
   token     String   @unique
   expiresAt DateTime
-  userAgent String? // browser/device info
+  userAgent String?
   ipAddress String?
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([token])
 }
 
-// ============================================
-// ORGANIZATION & MEMBERSHIP
-// ============================================
-
 model Organization {
-  id          String  @id @default(cuid())
-  name        String
-  slug        String  @unique
-  description String?
-  logo        String?
-  stripeId    String? // для payments
-
-  memberships    Membership[]
-  tasks          Task[]
-  projects       Project[]
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  description    String?
+  logo           String?
+  stripeId       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   calendarEvents CalendarEvent[]
   invitations    Invitation[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  memberships    Membership[]
+  projects       Project[]
+  tasks          Task[]
 }
 
 model Membership {
-  id       String        @id @default(cuid())
-  userId   String
-  orgId    String
-  role     OrgRole       @default(MEMBER)
-  position TeamPosition?
-  joinedAt DateTime      @default(now())
-
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  tasks        Task[]       @relation("TaskAssignees")
+  id           String        @id @default(cuid())
+  userId       String
+  orgId        String
+  role         OrgRole       @default(MEMBER)
+  position     TeamPosition?
+  joinedAt     DateTime      @default(now())
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks        Task[]        @relation("TaskAssignees")
 
   @@unique([userId, orgId])
   @@index([userId])
@@ -119,22 +96,113 @@ model Membership {
 }
 
 model Invitation {
-  id         String    @id @default(cuid())
-  email      String
-  orgId      String
-  role       OrgRole   @default(MEMBER)
-  token      String    @unique @default(cuid())
-  expiresAt  DateTime
-  invitedBy  String
-  acceptedAt DateTime?
-
+  id           String       @id @default(cuid())
+  email        String
+  orgId        String
+  role         OrgRole      @default(MEMBER)
+  token        String       @unique @default(cuid())
+  expiresAt    DateTime
+  invitedBy    String
+  acceptedAt   DateTime?
+  createdAt    DateTime     @default(now())
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
 
   @@index([email])
   @@index([orgId])
   @@index([token])
+}
+
+model Project {
+  id           String       @id @default(cuid())
+  orgId        String
+  name         String
+  description  String?
+  color        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model Task {
+  id             String          @id @default(cuid())
+  title          String
+  description    String?
+  status         TaskStatus      @default(PLANNED)
+  attachments    String[]        @default([])
+  organizationId String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  completedAt    DateTime?
+  dueDate        DateTime?
+  startDate      DateTime?
+  calendarEvents CalendarEvent[]
+  checklists     Checklist[]
+  label          TaskLabel?
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignees      Membership[]    @relation("TaskAssignees")
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, dueDate])
+  @@map("tasks")
+}
+
+model TaskLabel {
+  id     String @id @default(cuid())
+  name   String
+  color  String
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_labels")
+}
+
+model Checklist {
+  id     String          @id @default(cuid())
+  name   String
+  taskId String
+  items  ChecklistItem[]
+  task   Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("checklists")
+}
+
+model ChecklistItem {
+  id          String    @id @default(cuid())
+  title       String
+  completed   Boolean   @default(false)
+  checklistId String
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("checklist_items")
+}
+
+model CalendarEvent {
+  id           String       @id @default(cuid())
+  orgId        String
+  taskId       String?
+  title        String
+  start        DateTime
+  end          DateTime?
+  type         EventType    @default(TASK)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  task         Task?        @relation(fields: [taskId], references: [id])
+
+  @@index([orgId])
+  @@index([start])
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
 }
 
 enum OrgRole {
@@ -154,114 +222,10 @@ enum TeamPosition {
   DEVOPS_ENGINEER
 }
 
-// ============================================
-// PROJECTS & TASKS
-// ============================================
-
-model Project {
-  id          String  @id @default(cuid())
-  orgId       String
-  name        String
-  description String?
-  color       String? // для UI (hex колір)
-
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orgId])
-}
-
 enum TaskStatus {
   PLANNED
   UPCOMING
   COMPLETED
-}
-
-model Task {
-  id             String     @id @default(cuid())
-  title          String
-  description    String?
-  status         TaskStatus @default(PLANNED)
-  startDate      DateTime?
-  dueDate        DateTime?
-  completedAt    DateTime?
-  attachments    String[]   @default([])
-  organizationId String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignees      Membership[]    @relation("TaskAssignees")
-  label          TaskLabel?
-  checklists     Checklist[]
-  calendarEvents CalendarEvent[]
-
-  @@unique([id, organizationId])
-  @@index([organizationId])
-  @@index([organizationId, status])
-  @@index([organizationId, dueDate])
-  @@map("tasks")
-}
-
-model TaskLabel {
-  id     String @id @default(cuid())
-  name   String
-  color  String
-  taskId String @unique
-
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@index([taskId])
-  @@map("task_labels")
-}
-
-model Checklist {
-  id     String @id @default(cuid())
-  name   String
-  taskId String
-
-  task  Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  items ChecklistItem[]
-
-  @@index([taskId])
-  @@map("checklists")
-}
-
-model ChecklistItem {
-  id          String  @id @default(cuid())
-  title       String
-  completed   Boolean @default(false)
-  checklistId String
-
-  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
-
-  @@index([checklistId])
-  @@map("checklist_items")
-}
-
-// ============================================
-// CALENDAR
-// ============================================
-
-model CalendarEvent {
-  id     String    @id @default(cuid())
-  orgId  String
-  taskId String?
-  title  String
-  start  DateTime
-  end    DateTime?
-  type   EventType @default(TASK)
-
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  task         Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orgId])
-  @@index([start])
 }
 
 enum EventType {

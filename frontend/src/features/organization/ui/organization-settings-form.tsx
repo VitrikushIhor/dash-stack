@@ -1,3 +1,4 @@
+import { useAttachments } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -9,6 +10,7 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { FormFileUpload } from '@/shared/ui/form-fields/form-file-upload'
 import { type Organization } from '@/entities/organization'
 import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
 
@@ -20,6 +22,7 @@ export const OrganizationSettingsForm = ({
   organization,
 }: OrganizationSettingsFormProps) => {
   const { form, onSubmit, isPending } = useUpdateOrganizationForm(organization)
+  const { onUpload, onFileReject } = useAttachments()
 
   return (
     <Form {...form}>
@@ -50,18 +53,13 @@ export const OrganizationSettingsForm = ({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='logo'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Logo URL</FormLabel>
-              <FormControl>
-                <Input placeholder='https://...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <FormFileUpload
+          name='files'
+          label='Logo'
+          onUpload={onUpload}
+          onFileReject={onFileReject}
+          maxFiles={1}
+          className='w-full'
         />
         <Button type='submit' disabled={isPending}>
           {isPending ? 'Saving...' : 'Save Changes'}
