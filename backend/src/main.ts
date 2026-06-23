@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { DomainExceptionFilter } from './common/filters/domain-exception.filter';
 import type {
   CorsConfig,
   NestConfig,
@@ -42,6 +43,7 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(
     new PrismaClientExceptionFilter(httpAdapter),
+    new DomainExceptionFilter(),
     new HttpExceptionFilter(),
   );
 

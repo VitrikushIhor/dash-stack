@@ -10,7 +10,6 @@ import { PrismaModule } from 'nestjs-prisma';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { OrganizationModule } from './organization/organization.module';
 import { InvitationModule } from './invitation/invitation.module';
@@ -99,7 +98,6 @@ import { join } from 'node:path';
     ]),
 
     AuthModule,
-    UsersModule,
     HealthModule,
     EmailModule,
     OrganizationModule,
