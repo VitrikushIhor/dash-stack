@@ -78,6 +78,11 @@ import { join } from 'node:path';
             customProps: () => ({
               context: 'HTTP',
             }),
+            redact: [
+              'req.headers.authorization',
+              'req.body.password',
+              'req.body.newPassword',
+            ],
             transport: {
               target: 'pino-pretty',
               options: {

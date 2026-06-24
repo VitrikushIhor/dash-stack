@@ -7,7 +7,7 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
 import {
   MembershipRoleGuard,
   RequireOrgRole,

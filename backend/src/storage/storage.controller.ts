@@ -15,7 +15,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
 import { StorageService } from './storage.service';
 import { UploadResponseDto } from './dto/upload-response.dto';
 import {

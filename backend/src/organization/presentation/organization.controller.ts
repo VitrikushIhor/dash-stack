@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import {
   MembershipRoleGuard,
   RequireOrgRole,

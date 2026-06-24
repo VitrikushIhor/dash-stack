@@ -3,6 +3,7 @@ export enum DomainErrorCode {
   BAD_REQUEST = 'BAD_REQUEST',
   CONFLICT = 'CONFLICT',
   FORBIDDEN = 'FORBIDDEN',
+  UNAUTHORIZED = 'UNAUTHORIZED',
 }
 
 export class DomainException extends Error {
@@ -36,5 +37,11 @@ export class ConflictException extends DomainException {
 export class ForbiddenException extends DomainException {
   constructor(message: string) {
     super(message, DomainErrorCode.FORBIDDEN);
+  }
+}
+
+export class UnauthorizedException extends DomainException {
+  constructor(message: string) {
+    super(message, DomainErrorCode.UNAUTHORIZED);
   }
 }

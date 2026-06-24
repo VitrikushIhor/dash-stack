@@ -16,6 +16,7 @@ const DOMAIN_ERROR_TO_HTTP: Record<DomainErrorCode, HttpStatus> = {
   [DomainErrorCode.BAD_REQUEST]: HttpStatus.BAD_REQUEST,
   [DomainErrorCode.CONFLICT]: HttpStatus.CONFLICT,
   [DomainErrorCode.FORBIDDEN]: HttpStatus.FORBIDDEN,
+  [DomainErrorCode.UNAUTHORIZED]: HttpStatus.UNAUTHORIZED,
 };
 
 @Catch(DomainException)

@@ -1,5 +1,5 @@
 import { Controller, Post, Param, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
 import { UserEntity } from '../../../common/decorators/user.decorator';
 import { User } from '@prisma/client';
 import { AcceptInviteCommand } from './../../application/commands/accept-invite.command';
