@@ -4,6 +4,8 @@ import { RefreshTokenRepositoryPort } from '../../ports/outgoing/refresh-token.r
 import { TokenGeneratorPort } from '../../ports/outgoing/token-generator.port';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 
+import { RefreshTokenCommand } from '../../commands/refresh-token.command';
+
 @Injectable()
 export class RefreshTokenUseCase {
   constructor(
@@ -13,8 +15,10 @@ export class RefreshTokenUseCase {
     private readonly tokenGenerator: TokenGeneratorPort,
   ) {}
 
-  async execute(token: string): Promise<{ accessToken: string }> {
-    const refreshToken = await this.refreshTokenRepo.findByToken(token);
+  async execute(
+    command: RefreshTokenCommand,
+  ): Promise<{ accessToken: string }> {
+    const refreshToken = await this.refreshTokenRepo.findByToken(command.token);
 
     if (!refreshToken) {
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_REFRESH_TOKEN);

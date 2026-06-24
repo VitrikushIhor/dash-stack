@@ -43,55 +43,55 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() data: SignupDto) {
-    return this.signupUseCase.execute(
-      data.email,
-      data.password,
-      data.first_name,
-      data.last_name,
-    );
+    return this.signupUseCase.execute({
+      email: data.email,
+      password: data.password,
+      firstName: data.first_name,
+      lastName: data.last_name,
+    });
   }
 
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
   async verifyEmail(@Body() { token }: VerifyEmailDto) {
-    return this.verifyEmailUseCase.execute(token);
+    return this.verifyEmailUseCase.execute({ token });
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() { email, password }: LoginDto) {
-    return this.loginUseCase.execute(email, password);
+    return this.loginUseCase.execute({ email, password });
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() { token }: RefreshTokenDto) {
-    return this.refreshTokenUseCase.execute(token);
+    return this.refreshTokenUseCase.execute({ token });
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Body() { refreshToken }: LogoutDto) {
-    return this.logoutUseCase.execute(refreshToken);
+    return this.logoutUseCase.execute({ refreshToken });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout-all')
   @HttpCode(HttpStatus.OK)
   async logoutAll(@Request() req) {
-    return this.logoutAllUseCase.execute(req.user.id);
+    return this.logoutAllUseCase.execute({ userId: req.user.id });
   }
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() { email }: ForgotPasswordDto) {
-    return this.forgotPasswordUseCase.execute(email);
+    return this.forgotPasswordUseCase.execute({ email });
   }
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() { token, password }: ResetPasswordDto) {
-    return this.resetPasswordUseCase.execute(token, password);
+    return this.resetPasswordUseCase.execute({ token, newPassword: password });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -105,6 +105,6 @@ export class AuthController {
   @Post('oauth/exchange')
   @HttpCode(HttpStatus.OK)
   async oauthExchange(@Body() { token }: OAuthExchangeDto) {
-    return this.oauthExchangeUseCase.execute(token);
+    return this.oauthExchangeUseCase.execute({ auth0Token: token });
   }
 }

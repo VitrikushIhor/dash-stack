@@ -8,6 +8,8 @@ import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokenType } from '../../../domain/enums/token-type.enum';
 import { PASSWORD_RESET_TOKEN_TTL } from '../../../domain/constants/auth.constants';
 
+import { ForgotPasswordCommand } from '../../commands/forgot-password.command';
+
 @Injectable()
 export class ForgotPasswordUseCase {
   constructor(
@@ -19,8 +21,8 @@ export class ForgotPasswordUseCase {
     private readonly mailer: AuthMailerPort,
   ) {}
 
-  async execute(rawEmail: string): Promise<{ message: string }> {
-    const email = new Email(rawEmail);
+  async execute(command: ForgotPasswordCommand): Promise<{ message: string }> {
+    const email = new Email(command.email);
     const user = await this.userRepo.findByEmail(email.value);
 
     // Always return success to prevent email enumeration

@@ -6,6 +6,8 @@ import { Auth0ClientPort } from '../../ports/outgoing/auth0-client.port';
 import { AuthTokens } from '../../../shared/types/token.type';
 import { UNKNOWN_PROVIDER } from '../../../domain/constants/auth.constants';
 
+import { OAuthExchangeCommand } from '../../commands/oauth-exchange.command';
+
 @Injectable()
 export class OAuthExchangeUseCase {
   private readonly logger = new Logger(OAuthExchangeUseCase.name);
@@ -21,8 +23,8 @@ export class OAuthExchangeUseCase {
     private readonly auth0Client: Auth0ClientPort,
   ) {}
 
-  async execute(auth0Token: string): Promise<AuthTokens> {
-    const userInfo = await this.auth0Client.getUserInfo(auth0Token);
+  async execute(command: OAuthExchangeCommand): Promise<AuthTokens> {
+    const userInfo = await this.auth0Client.getUserInfo(command.auth0Token);
     const [provider, providerAccountId] = this.parseAuth0Sub(userInfo.sub);
 
     const existingAccount = await this.accountRepo.findByProvider(

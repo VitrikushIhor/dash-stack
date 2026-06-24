@@ -8,6 +8,8 @@ import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokens } from '../../../shared/types/token.type';
 import { AuthTokenType } from '../../../domain/enums/token-type.enum';
 
+import { VerifyEmailCommand } from '../../commands/verify-email.command';
+
 @Injectable()
 export class VerifyEmailUseCase {
   constructor(
@@ -19,9 +21,10 @@ export class VerifyEmailUseCase {
     private readonly tokenGenerator: TokenGeneratorPort,
   ) {}
 
-  async execute(token: string): Promise<AuthTokens> {
-    const verificationToken =
-      await this.verificationTokenRepo.findByToken(token);
+  async execute(command: VerifyEmailCommand): Promise<AuthTokens> {
+    const verificationToken = await this.verificationTokenRepo.findByToken(
+      command.token,
+    );
 
     if (!verificationToken) {
       throw new BadRequestException(AUTH_ERRORS.INVALID_VERIFICATION_TOKEN);

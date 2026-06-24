@@ -11,6 +11,8 @@ import { Email } from '../../../domain/value-objects/email.vo';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokens } from '../../../shared/types/token.type';
 
+import { LoginCommand } from '../../commands/login.command';
+
 @Injectable()
 export class LoginUseCase {
   constructor(
@@ -22,8 +24,8 @@ export class LoginUseCase {
     private readonly tokenGenerator: TokenGeneratorPort,
   ) {}
 
-  async execute(rawEmail: string, password: string): Promise<AuthTokens> {
-    const email = new Email(rawEmail);
+  async execute(command: LoginCommand): Promise<AuthTokens> {
+    const email = new Email(command.email);
     const user = await this.userRepo.findByEmail(email.value);
 
     if (!user) {
@@ -35,7 +37,7 @@ export class LoginUseCase {
     }
 
     const passwordValid = await this.passwordHasher.validatePassword(
-      password,
+      command.password,
       user.password,
     );
 

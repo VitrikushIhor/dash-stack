@@ -10,6 +10,8 @@ import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokenType } from '../../../domain/enums/token-type.enum';
 import { EMAIL_VERIFICATION_TOKEN_TTL } from '../../../domain/constants/auth.constants';
 
+import { SignupCommand } from '../../commands/signup.command';
+
 @Injectable()
 export class SignupUseCase {
   constructor(
@@ -23,26 +25,23 @@ export class SignupUseCase {
     private readonly mailer: AuthMailerPort,
   ) {}
 
-  async execute(
-    rawEmail: string,
-    password: string,
-    firstName?: string,
-    lastName?: string,
-  ): Promise<{ message: string }> {
-    const email = new Email(rawEmail);
+  async execute(command: SignupCommand): Promise<{ message: string }> {
+    const email = new Email(command.email);
 
     const existingUser = await this.userRepo.findByEmail(email.value);
     if (existingUser) {
       throw new ConflictException(AUTH_ERRORS.USER_ALREADY_EXISTS);
     }
 
-    const hashedPassword = await this.passwordHasher.hashPassword(password);
+    const hashedPassword = await this.passwordHasher.hashPassword(
+      command.password,
+    );
 
     const user = await this.userRepo.create({
       email: email.value,
       password: hashedPassword,
-      firstName: firstName || null,
-      lastName: lastName || null,
+      firstName: command.firstName || null,
+      lastName: command.lastName || null,
       emailVerified: null,
     });
 
