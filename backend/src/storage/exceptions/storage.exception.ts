@@ -1,39 +1,34 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '../../common/exceptions/domain.exception';
+import { STORAGE_ERRORS } from './storage-errors';
 
-export class StorageException extends HttpException {
+export class StorageException extends Error {
   constructor(
     message: string,
-    status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
-    options?: { cause?: Error },
+    public readonly cause?: Error,
   ) {
-    super(message, status, options);
+    super(message);
+    this.name = this.constructor.name;
+    if (cause?.stack) {
+      this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
+    }
   }
 }
 
 export class StorageUploadException extends StorageException {
   constructor(cause?: Error) {
-    super(
-      'Failed to upload file to storage',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      {
-        cause,
-      },
-    );
+    super(STORAGE_ERRORS.UPLOAD_FAILED, cause);
   }
 }
 
 export class StorageDeleteException extends StorageException {
   constructor(cause?: Error) {
-    super(
-      'Failed to delete file from storage',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      { cause },
-    );
+    super(STORAGE_ERRORS.DELETE_FAILED, cause);
   }
 }
 
-export class StorageValidationException extends StorageException {
+export class StorageValidationException extends BadRequestException {
   constructor(message: string) {
-    super(message, HttpStatus.BAD_REQUEST);
+    super(message);
+    this.name = this.constructor.name;
   }
 }

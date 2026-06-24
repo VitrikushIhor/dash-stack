@@ -1,6 +1,7 @@
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { BadRequestException } from '@nestjs/common';
+import { StorageValidationException } from '../exceptions/storage.exception';
+import { STORAGE_ERRORS } from '../exceptions/storage-errors';
 import type { Request } from 'express';
 import {
   MAX_IMAGE_SIZE,
@@ -18,8 +19,8 @@ function imageFileFilter(
     callback(null, true);
   } else {
     callback(
-      new BadRequestException(
-        `Invalid file type: ${file.mimetype}. Allowed types: ${ALLOWED_IMAGE_MIMES.join(', ')}`,
+      new StorageValidationException(
+        STORAGE_ERRORS.INVALID_IMAGE_TYPE(file.mimetype, ALLOWED_IMAGE_MIMES),
       ),
       false,
     );
@@ -35,8 +36,8 @@ function generalFileFilter(
     callback(null, true);
   } else {
     callback(
-      new BadRequestException(
-        `Invalid file type: ${file.mimetype}. Allowed types: ${ALLOWED_FILE_MIMES.join(', ')}`,
+      new StorageValidationException(
+        STORAGE_ERRORS.INVALID_FILE_TYPE(file.mimetype, ALLOWED_FILE_MIMES),
       ),
       false,
     );
