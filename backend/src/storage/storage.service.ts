@@ -6,6 +6,7 @@ import type {
 } from './interfaces/storage.interface';
 import { STORAGE_PROVIDER } from './interfaces/storage.interface';
 import { StorageValidationException } from './exceptions/storage.exception';
+import { STORAGE_ERRORS } from './exceptions/storage-errors';
 import {
   MAX_IMAGE_WIDTH,
   MAX_IMAGE_HEIGHT,
@@ -31,13 +32,13 @@ export class StorageService {
   ): Promise<StorageUploadResult> {
     if (!ALLOWED_IMAGE_MIMES.includes(file.mimetype)) {
       throw new StorageValidationException(
-        `Invalid image type: ${file.mimetype}. Allowed: ${ALLOWED_IMAGE_MIMES.join(', ')}`,
+        STORAGE_ERRORS.INVALID_IMAGE_TYPE(file.mimetype, ALLOWED_IMAGE_MIMES),
       );
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
       throw new StorageValidationException(
-        `Image too large: ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum: ${MAX_IMAGE_SIZE / 1024 / 1024}MB`,
+        STORAGE_ERRORS.IMAGE_TOO_LARGE(file.size, MAX_IMAGE_SIZE),
       );
     }
 
@@ -67,13 +68,13 @@ export class StorageService {
   ): Promise<StorageUploadResult> {
     if (!ALLOWED_FILE_MIMES.includes(file.mimetype)) {
       throw new StorageValidationException(
-        `Invalid file type: ${file.mimetype}. Allowed: ${ALLOWED_FILE_MIMES.join(', ')}`,
+        STORAGE_ERRORS.INVALID_FILE_TYPE(file.mimetype, ALLOWED_FILE_MIMES),
       );
     }
 
     if (file.size > MAX_FILE_SIZE) {
       throw new StorageValidationException(
-        `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum: ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+        STORAGE_ERRORS.FILE_TOO_LARGE(file.size, MAX_FILE_SIZE),
       );
     }
 

@@ -71,7 +71,7 @@ export default async () => {
           },
         ],
         [
-          import('./invitation/dto/create-invitation.dto'),
+          import('./invitation/presentation/dto/create-invitation.dto'),
           {
             CreateInvitationDto: {
               email: { required: true, type: () => String, format: 'email' },
@@ -252,18 +252,18 @@ export default async () => {
           },
         ],
         [
-          import('./invitation/invitation.controller'),
+          import('./invitation/presentation/controllers/invitation.controller'),
           {
             InvitationController: {
-              sendInvite: {},
-              listPending: {},
+              sendInvite: { type: Object },
+              listPending: { type: [Object] },
               revokeInvite: {},
             },
           },
         ],
         [
-          import('./invitation/invitation-accept.controller'),
-          { InvitationAcceptController: { acceptInvite: {} } },
+          import('./invitation/presentation/controllers/invitation-accept.controller'),
+          { InvitationAcceptController: { acceptInvite: { type: Object } } },
         ],
         [
           import('./task/presentation/task.controller'),

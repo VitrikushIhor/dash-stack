@@ -11,6 +11,7 @@ import { EmailModule } from '../email/email.module';
 import { PasswordService } from './services/password.service';
 import { TokensService } from './services/tokens.service';
 import { OAuthService } from './services/oauth.service';
+import { AuthMailerService } from './services/auth-mailer.service';
 import { UserRepository } from './repositories/user.repository';
 import { AccountRepository } from './repositories/account.repository';
 import { VerificationTokenRepository } from './repositories/verification-token.repository';
@@ -42,6 +43,7 @@ import { RefreshTokenRepository } from './repositories/refresh-token.repository'
     PasswordService,
     TokensService,
     OAuthService,
+    AuthMailerService,
     // Repositories
     UserRepository,
     AccountRepository,

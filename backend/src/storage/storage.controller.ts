@@ -6,7 +6,6 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,6 +22,8 @@ import {
   ImageUploadInterceptor,
   FileUploadInterceptor,
 } from './interceptors/file-upload.interceptor';
+import { StorageValidationException } from './exceptions/storage.exception';
+import { STORAGE_ERRORS } from './exceptions/storage-errors';
 
 @ApiTags('Storage')
 @Controller('storage')
@@ -66,7 +67,7 @@ export class StorageController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadResponseDto> {
     if (!file) {
-      throw new BadRequestException('No file provided');
+      throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }
     return this.storageService.uploadImage(file, 'images');
   }
@@ -101,7 +102,7 @@ export class StorageController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadResponseDto> {
     if (!file) {
-      throw new BadRequestException('No file provided');
+      throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }
     return this.storageService.uploadFile(file, 'files');
   }

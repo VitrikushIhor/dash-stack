@@ -11,7 +11,7 @@ import { randomUUID } from 'crypto';
 import { PasswordService } from './services/password.service';
 import { SignupInput } from './dto/signup.input';
 import { Token } from './models/token.model';
-import { EmailService } from '../email/email.service';
+import { AuthMailerService } from './services/auth-mailer.service';
 import { TokensService } from './services/tokens.service';
 import { UserRepository } from './repositories/user.repository';
 import { VerificationTokenRepository } from './repositories/verification-token.repository';
@@ -21,7 +21,7 @@ import { RefreshTokenRepository } from './repositories/refresh-token.repository'
 export class AuthService {
   constructor(
     private readonly passwordService: PasswordService,
-    private readonly emailService: EmailService,
+    private readonly authMailerService: AuthMailerService,
     private readonly tokensService: TokensService,
     private readonly userRepo: UserRepository,
     private readonly verificationTokenRepo: VerificationTokenRepository,
@@ -55,7 +55,7 @@ export class AuthService {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
     });
 
-    await this.emailService.sendVerificationEmail(user.email, token);
+    await this.authMailerService.sendVerificationEmail(user.email, token);
 
     return { message: 'Verification email sent. Please check your inbox.' };
   }
@@ -175,7 +175,7 @@ export class AuthService {
       expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
     });
 
-    await this.emailService.sendPasswordResetEmail(email, token);
+    await this.authMailerService.sendPasswordResetEmail(email, token);
 
     return {
       message: 'If an account exists, a password reset email has been sent.',

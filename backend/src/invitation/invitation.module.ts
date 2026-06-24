@@ -8,6 +8,7 @@ import { AcceptInviteUseCase } from './application/use-cases/accept-invite.use-c
 import { RevokeInviteUseCase } from './application/use-cases/revoke-invite.use-case';
 import { ListPendingInvitationsUseCase } from './application/use-cases/list-pending-invitations.use-case';
 import { PrismaInvitationRepository } from './infrastructure/persistence/prisma-invitation.repository';
+import { EmailInvitationMailerAdapter } from './infrastructure/integrations/email-invitation-mailer.adapter';
 
 @Module({
   imports: [EmailModule],
@@ -22,9 +23,10 @@ import { PrismaInvitationRepository } from './infrastructure/persistence/prisma-
       provide: 'InvitationRepositoryPort',
       useExisting: PrismaInvitationRepository,
     },
+    EmailInvitationMailerAdapter,
     {
       provide: 'InvitationMailerPort',
-      useExisting: EmailService,
+      useExisting: EmailInvitationMailerAdapter,
     },
   ],
   exports: [SendInviteUseCase, AcceptInviteUseCase],
