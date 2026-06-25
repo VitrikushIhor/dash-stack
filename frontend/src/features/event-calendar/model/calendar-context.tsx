@@ -31,12 +31,16 @@ export function CalendarProvider({
   events,
   view: propsView,
   selectedDate: propsSelectedDate,
+  onCreateTask,
+  onEditTask,
 }: {
   children: React.ReactNode
   users: IUser[]
   events: Task[]
   view?: TCalendarView
   selectedDate?: Date
+  onCreateTask?: () => void
+  onEditTask?: (task: Task) => void
 }) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>('colored')
   const [view, setView] = useState<TCalendarView>(propsView || 'month')
@@ -65,6 +69,8 @@ export function CalendarProvider({
         events,
         view,
         setView,
+        onCreateTask,
+        onEditTask,
       }}
     >
       {children}

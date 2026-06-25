@@ -21,9 +21,9 @@ vi.mock('@/entities/task', async (importOriginal) => {
 
 const mockActiveOrgId = { value: 'org-1' as string | null }
 
-vi.mock('@/features/organization', async (importOriginal) => {
+vi.mock('@/entities/organization', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@/features/organization')>()
+    await importOriginal<typeof import('@/entities/organization')>()
   return {
     ...actual,
     useOrgStore: () => ({
