@@ -48,7 +48,7 @@ export class OrganizationController {
     const command: CreateOrganizationCommand = {
       name: dto.name,
       description: dto.description ?? null,
-      logo: null,
+      logo: dto.logo ?? null,
     };
     return this.createOrganizationUseCase.execute(user.id, command);
   }

@@ -4,22 +4,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/core/dialog'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/ui/core/form'
-import { Input } from '@/shared/ui/core/input'
-import { Textarea } from '@/shared/ui/core/textarea'
-import { useCreateOrganizationForm } from '../model/forms/use-create-organization-form'
+import { CreateOrganizationForm } from './create-organization-form'
 
 interface CreateOrganizationDialogProps {
   children?: React.ReactNode
@@ -29,9 +18,6 @@ export const CreateOrganizationDialog = ({
   children,
 }: CreateOrganizationDialogProps) => {
   const [open, setOpen] = useState(false)
-  const { form, onSubmit, isPending } = useCreateOrganizationForm({
-    onSuccess: () => setOpen(false),
-  })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,48 +31,9 @@ export const CreateOrganizationDialog = ({
             Create a new organization to manage your projects and team.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className='space-y-4 py-4'
-          >
-            <FormField
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Acme Inc.' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder='Tell us about your organization...'
-                      className='resize-none'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button type='submit' disabled={isPending}>
-                Create
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <div className='py-4'>
+          <CreateOrganizationForm onSuccess={() => setOpen(false)} />
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -20,4 +20,11 @@ export class CreateOrganizationDto {
   @IsString()
   @MaxLength(200)
   description?: string;
+
+  @ApiPropertyOptional({
+    description: 'A URL to the organization logo',
+  })
+  @IsOptional()
+  @IsString()
+  logo?: string;
 }

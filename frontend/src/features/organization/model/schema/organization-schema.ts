@@ -3,6 +3,11 @@ import { z } from 'zod'
 export const CreateOrgSchema = z.object({
   name: z.string().min(2).max(50),
   description: z.string().max(200).optional(),
+  logo: z.string().url().optional().or(z.literal('')),
+  logoFile: z
+    .custom<File>((v) => v instanceof File)
+    .nullable()
+    .optional(),
 })
 
 export type CreateOrgFormValues = z.infer<typeof CreateOrgSchema>
