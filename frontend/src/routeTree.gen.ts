@@ -10,8 +10,9 @@
 
 import { Route as rootRouteImport } from './app/routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './app/routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './app/routes/_authenticated/index'
+import { Route as IndexRouteImport } from './app/routes/index'
 import { Route as OauthCallbackRouteImport } from './app/routes/oauth/callback'
+import { Route as AuthenticatedDashboardRouteImport } from './app/routes/_authenticated/dashboard'
 import { Route as AuthenticatedCalendarRouteImport } from './app/routes/_authenticated/calendar'
 import { Route as errors503RouteImport } from './app/routes/(errors)/503'
 import { Route as errors500RouteImport } from './app/routes/(errors)/500'
@@ -43,15 +44,20 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
   id: '/oauth/callback',
   path: '/oauth/callback',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   id: '/calendar',
@@ -199,7 +205,7 @@ const AuthenticatedOrganizationsOrgIdMembersUserIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/reset-password': typeof authResetPasswordRoute
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/organizations/$orgId/members/': typeof AuthenticatedOrganizationsOrgIdMembersIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
@@ -240,8 +248,8 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/oauth/callback': typeof OauthCallbackRoute
-  '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/invite/accept': typeof AuthenticatedInviteAcceptRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -258,6 +266,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -271,8 +280,8 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/oauth/callback': typeof OauthCallbackRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/organizations/$orgId': typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/invite/accept': typeof AuthenticatedInviteAcceptRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
+    | '/dashboard'
     | '/oauth/callback'
     | '/organizations/$orgId'
     | '/errors/$error'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/organizations/$orgId/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -332,8 +343,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/calendar'
+    | '/dashboard'
     | '/oauth/callback'
-    | '/'
     | '/errors/$error'
     | '/invite/accept'
     | '/settings/account'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/organizations/$orgId/members'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/_authenticated/settings'
     | '/(auth)/forgot-password'
@@ -362,8 +374,8 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/calendar'
+    | '/_authenticated/dashboard'
     | '/oauth/callback'
-    | '/_authenticated/'
     | '/_authenticated/organizations/$orgId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/invite/accept'
@@ -381,6 +393,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authResetPasswordRoute: typeof authResetPasswordRoute
@@ -404,12 +417,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/oauth/callback': {
       id: '/oauth/callback'
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oauth/callback'
       preLoaderRoute: typeof OauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/calendar': {
       id: '/_authenticated/calendar'
@@ -653,7 +673,7 @@ const AuthenticatedOrganizationsOrgIdRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOrganizationsOrgIdRouteRoute: typeof AuthenticatedOrganizationsOrgIdRouteRouteWithChildren
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedInviteAcceptRoute: typeof AuthenticatedInviteAcceptRoute
@@ -664,7 +684,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOrganizationsOrgIdRouteRoute:
     AuthenticatedOrganizationsOrgIdRouteRouteWithChildren,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
@@ -677,6 +697,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authResetPasswordRoute: authResetPasswordRoute,
