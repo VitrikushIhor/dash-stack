@@ -213,6 +213,7 @@ describe('Calendar Views & Header Integration', () => {
           users={mockUsers}
           events={mockEvents}
           selectedDate={selectedDate}
+          onCreateTask={mockOpenCreate}
         >
           <CalendarHeader events={mockEvents} />
         </CalendarProvider>

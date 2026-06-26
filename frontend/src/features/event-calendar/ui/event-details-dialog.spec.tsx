@@ -8,9 +8,9 @@ import { EventDetailsDialog } from './event-details-dialog'
 
 const mockOpenEdit = vi.fn()
 
-vi.mock('@/features/manage-task', () => ({
-  useTaskModalStore: () => ({
-    openEdit: mockOpenEdit,
+vi.mock('../model/calendar-context', () => ({
+  useCalendar: () => ({
+    onEditTask: mockOpenEdit,
   }),
 }))
 

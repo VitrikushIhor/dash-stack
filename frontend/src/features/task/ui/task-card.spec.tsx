@@ -16,9 +16,6 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock UI components that might cause issues
 vi.mock('@/shared/ui', () => ({
   AvatarGroup: () => <div data-testid='avatar-group'>Avatars</div>,
-}))
-
-vi.mock('@/shared/ui', () => ({
   LabelBadge: ({ label }: { label: Label }) => <span>{label.name}</span>,
 }))
 
