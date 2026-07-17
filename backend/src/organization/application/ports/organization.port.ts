@@ -1,4 +1,5 @@
 import { OrganizationReadModel } from '../read-models/organization.read-model';
+import { UserMembershipReadModel } from '../../../user/application/read-models/user-membership.read-model';
 
 export interface CreateOrganizationData {
   name: string;
@@ -31,7 +32,11 @@ export interface OrganizationRepositoryPort {
     data: CreateOrganizationData,
   ): Promise<OrganizationReadModel>;
   findManyByUserId(userId: string): Promise<OrganizationReadModel[]>;
-  findById(id: string): Promise<OrganizationReadModel | null>;
+  findById(
+    id: string,
+    requesterId: string,
+  ): Promise<OrganizationReadModel | null>;
+  findUserMemberships(userId: string): Promise<UserMembershipReadModel[]>;
   update(
     orgId: string,
     data: Partial<CreateOrganizationData>,

@@ -48,7 +48,7 @@ export class OrganizationController {
     const command: CreateOrganizationCommand = {
       name: dto.name,
       description: dto.description ?? null,
-      logo: null,
+      logo: dto.logo ?? null,
     };
     return this.createOrganizationUseCase.execute(user.id, command);
   }
@@ -61,8 +61,8 @@ export class OrganizationController {
   @Get(':orgId')
   @UseGuards(MembershipRoleGuard)
   @RequireOrgRole(OrgRole.GUEST)
-  findById(@Param('orgId') orgId: string) {
-    return this.findOrganizationByIdUseCase.execute(orgId);
+  findById(@Param('orgId') orgId: string, @UserEntity() user: { id: string }) {
+    return this.findOrganizationByIdUseCase.execute(orgId, user.id);
   }
 
   @Patch(':orgId')

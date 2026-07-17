@@ -10,6 +10,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme Corp',
+        slug: 'acme-corp',
         description: 'A great company',
         logo: null,
         createdAt: new Date('2024-01-01'),
@@ -21,6 +22,7 @@ describe('PrismaOrganizationMapper', () => {
       expect(result).toMatchObject({
         id: 'org-1',
         name: 'Acme Corp',
+        slug: 'acme-corp',
         description: 'A great company',
         logo: null,
         createdAt: raw.createdAt,
@@ -32,6 +34,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme',
+        slug: 'acme',
         description: null,
         logo: null,
         createdAt: new Date(),
@@ -56,6 +59,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme',
+        slug: 'acme',
         description: null,
         logo: null,
         createdAt: new Date(),
@@ -71,6 +75,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme',
+        slug: 'acme',
         description: null,
         logo: null,
         createdAt: new Date(),
@@ -87,6 +92,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme',
+        slug: 'acme',
         description: null,
         logo: null,
         createdAt: new Date(),
@@ -102,6 +108,7 @@ describe('PrismaOrganizationMapper', () => {
       const raw = {
         id: 'org-1',
         name: 'Acme',
+        slug: 'acme',
         description: null,
         logo: 'https://cdn.example.com/logo.png',
         createdAt: new Date(),

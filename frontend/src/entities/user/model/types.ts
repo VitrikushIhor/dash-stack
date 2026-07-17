@@ -3,7 +3,7 @@ export interface User {
   firstName: string
   lastName?: string
   email: string
-  avatar?: string
-  createdAt: string
-  updatedAt: string
+  avatar?: string | null
+  createdAt?: string
+  updatedAt?: string
 }

@@ -22,6 +22,7 @@ const makeRepository = (): jest.Mocked<OrganizationRepositoryPort> => ({
   create: jest.fn(),
   findManyByUserId: jest.fn(),
   findById: jest.fn(),
+  findUserMemberships: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
   findOrganizationMembers: jest.fn(),

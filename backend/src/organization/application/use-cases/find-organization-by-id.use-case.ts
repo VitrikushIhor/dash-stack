@@ -9,7 +9,10 @@ export class FindOrganizationByIdUseCase {
     private readonly organizationRepository: OrganizationRepositoryPort,
   ) {}
 
-  async execute(orgId: string): Promise<OrganizationReadModel | null> {
-    return this.organizationRepository.findById(orgId);
+  async execute(
+    orgId: string,
+    requesterId: string,
+  ): Promise<OrganizationReadModel | null> {
+    return this.organizationRepository.findById(orgId, requesterId);
   }
 }

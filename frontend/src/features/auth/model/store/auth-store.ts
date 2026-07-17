@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { getAccessToken } from '@/shared/api'
-import { type User, sessionApi } from '@/entities/session'
+import { type User, userApi } from '@/entities/user'
 import { authApi } from '../../api/auth-api'
 
 interface AuthState {
@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthState>()(
 
         set({ isLoading: true })
         try {
-          const user = await sessionApi.getMe()
+          const user = await userApi.getMe()
           set({
             user,
             isAuthenticated: true,

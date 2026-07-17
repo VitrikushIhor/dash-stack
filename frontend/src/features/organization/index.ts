@@ -4,6 +4,7 @@ export { useCreateOrganizationForm } from './model/forms/use-create-organization
 export { useUpdateOrganizationForm } from './model/forms/use-update-organization-form'
 
 // UI
+export { CreateOrganizationForm } from './ui/create-organization-form'
 export { CreateOrganizationDialog } from './ui/create-organization-dialog'
 export { OrganizationCard } from './ui/organization-card'
 export { OrganizationSettingsForm } from './ui/organization-settings-form'

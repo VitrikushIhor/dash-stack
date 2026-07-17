@@ -21,4 +21,5 @@ export enum VerificationStatus {
   LOADING = 'loading',
   SUCCESS = 'success',
   ERROR = 'error',
+  MISSING_TOKEN = 'missing-token',
 }

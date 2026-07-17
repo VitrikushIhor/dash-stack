@@ -1,4 +1,4 @@
-import { useCurrentUser } from './use-current-user'
+import { useCurrentUser } from '@/entities/user'
 
 export function useIsAuthenticated() {
   const { data: user, isLoading } = useCurrentUser()

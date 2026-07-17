@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/shared/api'
+import { userKeys } from '@/entities/user/api/user-query-keys'
 import { authApi } from '../../api/auth-api'
-import { authKeys } from '../../api/auth-query-keys'
 
 export function useLogin(options?: { redirectTo?: string }) {
   const queryClient = useQueryClient()
@@ -12,7 +12,7 @@ export function useLogin(options?: { redirectTo?: string }) {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: authKeys.user })
+      await queryClient.invalidateQueries({ queryKey: userKeys.me() })
 
       toast.success(`Welcome back, ${variables.email}!`)
       const targetPath = options?.redirectTo || '/'

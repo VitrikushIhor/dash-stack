@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/routes/__root'
+import { Route as CreateOrganizationRouteImport } from './app/routes/create-organization'
 import { Route as AuthenticatedRouteRouteImport } from './app/routes/_authenticated/route'
 import { Route as IndexRouteImport } from './app/routes/index'
 import { Route as OauthCallbackRouteImport } from './app/routes/oauth/callback'
@@ -40,6 +41,11 @@ import { Route as AuthenticatedOrganizationsOrgIdSettingsRouteImport } from './a
 import { Route as AuthenticatedOrganizationsOrgIdMembersIndexRouteImport } from './app/routes/_authenticated/organizations/$orgId/members/index'
 import { Route as AuthenticatedOrganizationsOrgIdMembersUserIdRouteImport } from './app/routes/_authenticated/organizations/$orgId/members/$userId'
 
+const CreateOrganizationRoute = CreateOrganizationRouteImport.update({
+  id: '/create-organization',
+  path: '/create-organization',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -206,6 +212,7 @@ const AuthenticatedOrganizationsOrgIdMembersUserIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/create-organization': typeof CreateOrganizationRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/reset-password': typeof authResetPasswordRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/create-organization': typeof CreateOrganizationRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/create-organization': typeof CreateOrganizationRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/reset-password': typeof authResetPasswordRoute
@@ -301,6 +310,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/create-organization'
     | '/settings'
     | '/forgot-password'
     | '/reset-password'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/create-organization'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/create-organization'
     | '/_authenticated/settings'
     | '/(auth)/forgot-password'
     | '/(auth)/reset-password'
@@ -395,6 +407,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  CreateOrganizationRoute: typeof CreateOrganizationRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authResetPasswordRoute: typeof authResetPasswordRoute
   authSignInRoute: typeof authSignInRoute
@@ -410,6 +423,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/create-organization': {
+      id: '/create-organization'
+      path: '/create-organization'
+      fullPath: '/create-organization'
+      preLoaderRoute: typeof CreateOrganizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -699,6 +719,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  CreateOrganizationRoute: CreateOrganizationRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authResetPasswordRoute: authResetPasswordRoute,
   authSignInRoute: authSignInRoute,

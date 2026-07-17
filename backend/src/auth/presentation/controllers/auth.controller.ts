@@ -94,14 +94,6 @@ export class AuthController {
     return this.resetPasswordUseCase.execute({ token, newPassword: password });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async me(@Request() req) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = req.user;
-    return user;
-  }
-
   @Post('oauth/exchange')
   @HttpCode(HttpStatus.OK)
   async oauthExchange(@Body() { token }: OAuthExchangeDto) {

@@ -77,3 +77,26 @@ export function stringToColor(str: string): string {
   const hue = hash % 360
   return `hsl(${hue}, 65%, 50%)`
 }
+
+export function getUserInitials(
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string | null
+) {
+  if (firstName && lastName)
+    return `${firstName[0]}${lastName[0]}`.toUpperCase()
+  if (firstName) return firstName.slice(0, 2).toUpperCase()
+  if (email) return email.slice(0, 2).toUpperCase()
+  return 'U'
+}
+
+export function getUserDisplayName(
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string | null
+) {
+  if (firstName && lastName) return `${firstName} ${lastName}`
+  if (firstName) return firstName
+  if (email) return email
+  return 'User'
+}

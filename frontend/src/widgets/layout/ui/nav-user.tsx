@@ -7,6 +7,7 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react'
+import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
   DropdownMenu,
@@ -23,31 +24,19 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/core/sidebar'
-import { useCurrentUser } from '@/entities/session'
+import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
-
-function getUserInitials(
-  firstName?: string | null,
-  lastName?: string | null,
-  email?: string
-) {
-  if (firstName && lastName)
-    return `${firstName[0]}${lastName[0]}`.toUpperCase()
-  if (firstName) return firstName.slice(0, 2).toUpperCase()
-  if (email) return email.slice(0, 2).toUpperCase()
-  return 'U'
-}
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { data: user } = useCurrentUser()
   const logoutMutation = useLogout()
 
-  const displayName =
-    user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.firstName || user?.email || 'User'
-
+  const displayName = getUserDisplayName(
+    user?.firstName,
+    user?.lastName,
+    user?.email
+  )
   const initials = getUserInitials(user?.firstName, user?.lastName, user?.email)
 
   return (

@@ -13,7 +13,7 @@ describe('LoginUseCase', () => {
 
   beforeEach(() => {
     userRepoMock = {
-      findByEmail: jest.fn(),
+      findByEmailWithPassword: jest.fn(),
     };
     passwordHasherMock = {
       validatePassword: jest.fn(),
@@ -30,7 +30,7 @@ describe('LoginUseCase', () => {
   });
 
   it('should successfully log in a verified user', async () => {
-    userRepoMock.findByEmail.mockResolvedValue({
+    userRepoMock.findByEmailWithPassword.mockResolvedValue({
       id: '1',
       email: 'test@example.com',
       password: 'hashed_password',
@@ -47,7 +47,9 @@ describe('LoginUseCase', () => {
       password: 'password123',
     });
 
-    expect(userRepoMock.findByEmail).toHaveBeenCalledWith('test@example.com');
+    expect(userRepoMock.findByEmailWithPassword).toHaveBeenCalledWith(
+      'test@example.com',
+    );
     expect(passwordHasherMock.validatePassword).toHaveBeenCalledWith(
       'password123',
       'hashed_password',
@@ -60,7 +62,7 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw UnauthorizedException if user not found', async () => {
-    userRepoMock.findByEmail.mockResolvedValue(null);
+    userRepoMock.findByEmailWithPassword.mockResolvedValue(null);
 
     await expect(
       useCase.execute({ email: 'test@example.com', password: 'pwd' }),
@@ -68,7 +70,7 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw BadRequestException if user has no password (social login)', async () => {
-    userRepoMock.findByEmail.mockResolvedValue({
+    userRepoMock.findByEmailWithPassword.mockResolvedValue({
       id: '1',
       password: null,
     });
@@ -79,7 +81,7 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw UnauthorizedException on wrong password', async () => {
-    userRepoMock.findByEmail.mockResolvedValue({
+    userRepoMock.findByEmailWithPassword.mockResolvedValue({
       id: '1',
       password: 'hashed_password',
     });
@@ -91,7 +93,7 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw ForbiddenException if email not verified', async () => {
-    userRepoMock.findByEmail.mockResolvedValue({
+    userRepoMock.findByEmailWithPassword.mockResolvedValue({
       id: '1',
       password: 'hashed_password',
       emailVerified: null,
