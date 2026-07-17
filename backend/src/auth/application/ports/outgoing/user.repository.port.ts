@@ -7,20 +7,24 @@ export interface CreateUserData {
   emailVerified?: Date | null;
 }
 
-export interface UserModel {
+export interface UserSummary {
   id: string;
   email: string;
-  password: string | null;
   firstName: string | null;
   lastName: string | null;
   avatar: string | null;
   emailVerified: Date | null;
 }
 
+export interface UserWithPassword extends UserSummary {
+  password: string | null;
+}
+
 export interface UserRepositoryPort {
-  findByEmail(email: string): Promise<UserModel | null>;
-  findById(id: string): Promise<UserModel | null>;
-  create(data: CreateUserData): Promise<UserModel>;
-  updateEmailVerified(email: string, date: Date): Promise<UserModel>;
-  updatePassword(email: string, hashedPassword: string): Promise<UserModel>;
+  findByEmail(email: string): Promise<UserSummary | null>;
+  findByEmailWithPassword(email: string): Promise<UserWithPassword | null>;
+  findById(id: string): Promise<UserSummary | null>;
+  create(data: CreateUserData): Promise<UserSummary>;
+  updateEmailVerified(email: string, date: Date): Promise<UserSummary>;
+  updatePassword(email: string, hashedPassword: string): Promise<UserSummary>;
 }

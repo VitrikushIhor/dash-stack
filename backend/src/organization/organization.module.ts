@@ -10,6 +10,8 @@ import { FindOrganizationMemberUseCase } from './application/use-cases/find-orga
 import { PrismaOrganizationRepository } from './infrastructure/persistence/prisma-organization.repository';
 import { OrganizationSlugService } from './application/services/organization-slug.service';
 
+import { FindUserMembershipsUseCase } from './application/use-cases/find-user-memberships.use-case';
+
 @Module({
   controllers: [OrganizationController],
   providers: [
@@ -25,7 +27,8 @@ import { OrganizationSlugService } from './application/services/organization-slu
     DeleteOrganizationUseCase,
     FindOrganizationMembersUseCase,
     FindOrganizationMemberUseCase,
+    FindUserMembershipsUseCase,
   ],
-  exports: ['OrganizationRepositoryPort'],
+  exports: ['OrganizationRepositoryPort', FindUserMembershipsUseCase],
 })
 export class OrganizationModule {}

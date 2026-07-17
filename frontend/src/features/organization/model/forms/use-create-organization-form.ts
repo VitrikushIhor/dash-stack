@@ -31,7 +31,7 @@ export const useCreateOrganizationForm = ({
   })
 
   const onSubmit = async (values: CreateOrgFormValues) => {
-    let logoUrl = values.logo || ''
+    let logoUrl = values.logo || undefined
 
     if (values.logoFile) {
       try {

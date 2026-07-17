@@ -61,8 +61,8 @@ export class OrganizationController {
   @Get(':orgId')
   @UseGuards(MembershipRoleGuard)
   @RequireOrgRole(OrgRole.GUEST)
-  findById(@Param('orgId') orgId: string) {
-    return this.findOrganizationByIdUseCase.execute(orgId);
+  findById(@Param('orgId') orgId: string, @UserEntity() user: { id: string }) {
+    return this.findOrganizationByIdUseCase.execute(orgId, user.id);
   }
 
   @Patch(':orgId')

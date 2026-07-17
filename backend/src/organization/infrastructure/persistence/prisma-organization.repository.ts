@@ -52,15 +52,36 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
     return rawOrgs.map((org) => PrismaOrganizationMapper.toReadModel(org));
   }
 
-  async findById(id: string): Promise<OrganizationReadModel | null> {
+  async findById(
+    id: string,
+    requesterId: string,
+  ): Promise<OrganizationReadModel | null> {
     const rawOrg = await this.prisma.organization.findUnique({
       where: { id },
       include: {
         _count: { select: this.countSelect },
+        memberships: {
+          where: { userId: requesterId },
+          select: { role: true },
+          take: 1,
+        },
       },
     });
 
     return PrismaOrganizationMapper.toReadModel(rawOrg);
+  }
+
+  async findUserMemberships(userId: string) {
+    const memberships = await this.prisma.membership.findMany({
+      where: { userId },
+      select: {
+        role: true,
+        organization: {
+          select: { id: true, name: true, slug: true, logo: true },
+        },
+      },
+    });
+    return memberships;
   }
 
   async update(

@@ -8,6 +8,7 @@ const mockOrganizationReadModel = (
 ): OrganizationReadModel => ({
   id: 'org-1',
   name: 'Acme Corp',
+  slug: 'acme-corp',
   description: null,
   logo: null,
   createdAt: new Date('2024-01-01'),
@@ -25,6 +26,7 @@ describe('CreateOrganizationUseCase', () => {
       create: jest.fn(),
       findManyByUserId: jest.fn(),
       findById: jest.fn(),
+      findUserMemberships: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
       findOrganizationMembers: jest.fn(),

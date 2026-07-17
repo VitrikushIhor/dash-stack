@@ -9,6 +9,7 @@ export interface Organization {
   description?: string
   logo?: string
   memberships?: Membership[]
+  currentUserRole?: OrgRole | null
   stats?: {
     projects: number
     members: number
@@ -18,6 +19,17 @@ export interface Organization {
   updatedAt: string
 }
 
+export type OrganizationSummary = Pick<
+  Organization,
+  'id' | 'name' | 'slug' | 'logo'
+> &
+  Partial<Pick<Organization, 'description' | 'stats'>>
+
+export interface UserMembership {
+  role: OrgRole
+  organization: OrganizationSummary
+}
+
 export interface CreateOrganizationDto {
   name: string
   description?: string
@@ -25,6 +37,6 @@ export interface CreateOrganizationDto {
 
 export interface UpdateOrganizationDto {
   name?: string
-  description?: string
-  logo?: string
+  description?: string | null
+  logo?: string | null
 }

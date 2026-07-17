@@ -14,7 +14,8 @@ import {
 } from '@/shared/ui/core/dropdown-menu'
 import { LogoIcon } from '@/shared/ui/icons'
 import { useGetOrganizations } from '@/entities/organization'
-import { useIsAuthenticated, useCurrentUser } from '@/entities/session'
+import { useIsAuthenticated } from '@/entities/session'
+import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
 
 const NAV_LINKS = [

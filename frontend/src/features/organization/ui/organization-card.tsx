@@ -6,10 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { useOrgStore, type Organization } from '@/entities/organization'
+import { useOrgStore, type OrganizationSummary } from '@/entities/organization'
 
 interface OrganizationCardProps {
-  organization: Organization
+  organization: OrganizationSummary
 }
 
 export const OrganizationCard = ({ organization }: OrganizationCardProps) => {

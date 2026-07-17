@@ -26,7 +26,7 @@ export class LoginUseCase {
 
   async execute(command: LoginCommand): Promise<AuthTokens> {
     const email = new Email(command.email);
-    const user = await this.userRepo.findByEmail(email.value);
+    const user = await this.userRepo.findByEmailWithPassword(email.value);
 
     if (!user) {
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);

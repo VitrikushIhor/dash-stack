@@ -8,6 +8,7 @@ const mockOrg = (
 ): OrganizationReadModel => ({
   id: 'org-1',
   name: 'Acme Corp',
+  slug: 'acme-corp',
   description: null,
   logo: null,
   createdAt: new Date('2024-01-01'),
@@ -24,6 +25,7 @@ describe('FindOrganizationByIdUseCase', () => {
       create: jest.fn(),
       findManyByUserId: jest.fn(),
       findById: jest.fn(),
+      findUserMemberships: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
       findOrganizationMembers: jest.fn(),
@@ -38,16 +40,16 @@ describe('FindOrganizationByIdUseCase', () => {
     const expected = mockOrg();
     repository.findById.mockResolvedValue(expected);
 
-    const result = await useCase.execute('org-1');
+    const result = await useCase.execute('org-1', 'user-1');
 
     expect(result).toBe(expected);
-    expect(repository.findById).toHaveBeenCalledWith('org-1');
+    expect(repository.findById).toHaveBeenCalledWith('org-1', 'user-1');
   });
 
   it('returns null when not found', async () => {
     repository.findById.mockResolvedValue(null);
 
-    const result = await useCase.execute('org-999');
+    const result = await useCase.execute('org-999', 'user-1');
 
     expect(result).toBeNull();
   });
@@ -62,6 +64,7 @@ describe('FindOrganizationsByUserIdUseCase', () => {
       create: jest.fn(),
       findManyByUserId: jest.fn(),
       findById: jest.fn(),
+      findUserMemberships: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
       findOrganizationMembers: jest.fn(),

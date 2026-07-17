@@ -1,4 +1,4 @@
-import { FormAvatarUpload } from '@/shared/ui'
+import { FormLogoUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -61,7 +61,7 @@ export const CreateOrganizationForm = ({
             </FormItem>
           )}
         />
-        <FormAvatarUpload
+        <FormLogoUpload
           name='logoFile'
           label='Organization Logo'
           className='w-full'

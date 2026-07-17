@@ -4,6 +4,7 @@ import { createFileFromKey, type FileWithServerData } from '@/shared/api'
 import {
   useUpdateOrganization,
   type Organization,
+  type UpdateOrganizationDto,
 } from '@/entities/organization'
 import {
   UpdateOrgSchema,
@@ -13,9 +14,9 @@ import {
 export const useUpdateOrganizationForm = (organization: Organization) => {
   const { mutate: updateOrg, isPending } = useUpdateOrganization()
 
-  const defaultFiles = organization.logo
-    ? [createFileFromKey(organization.logo)]
-    : []
+  const defaultFile = organization.logo
+    ? createFileFromKey(organization.logo)
+    : null
 
   const form = useForm<UpdateOrgFormValues>({
     resolver: zodResolver(UpdateOrgSchema),
@@ -23,24 +24,32 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
       name: organization.name,
       description: organization.description || '',
       logo: organization.logo || '',
-      files: defaultFiles,
+      logoFile: defaultFile,
     },
   })
 
   const onSubmit = (values: UpdateOrgFormValues) => {
     let logoUrl = values.logo || ''
 
-    if (values.files && values.files.length > 0) {
-      const file = values.files[0] as FileWithServerData
+    if (values.logoFile) {
+      const file = values.logoFile as FileWithServerData
       logoUrl = file.s3Url || file.s3Key || logoUrl
-    } else if (values.files?.length === 0) {
+    } else if (values.logoFile === null) {
       logoUrl = ''
     }
 
-    const dto = {
+    const dto: UpdateOrganizationDto = {
       name: values.name,
-      description: values.description,
-      logo: logoUrl,
+    }
+
+    if (values.description !== undefined) {
+      dto.description = values.description === '' ? null : values.description
+    }
+
+    if (logoUrl) {
+      dto.logo = logoUrl
+    } else if (values.logoFile === null) {
+      dto.logo = null
     }
 
     updateOrg({

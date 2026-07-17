@@ -4,6 +4,6 @@ export interface User {
   lastName?: string
   email: string
   avatar?: string
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   UserRepositoryPort,
-  UserModel,
+  UserSummary,
 } from '../../ports/outgoing/user.repository.port';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ValidateUserUseCase {
     private readonly userRepo: UserRepositoryPort,
   ) {}
 
-  async execute(userId: string): Promise<UserModel | null> {
+  async execute(userId: string): Promise<UserSummary | null> {
     return this.userRepo.findById(userId);
   }
 }

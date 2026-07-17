@@ -24,7 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/core/sidebar'
-import { useCurrentUser } from '@/entities/session'
+import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
 
 export function NavUser() {

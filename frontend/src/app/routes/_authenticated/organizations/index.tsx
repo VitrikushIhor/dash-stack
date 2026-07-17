@@ -63,8 +63,11 @@ function OrganizationsListPage() {
           </div>
         ) : (
           <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-            {organizations.map((org) => (
-              <OrganizationCard key={org.id} organization={org} />
+            {organizations.map((membership) => (
+              <OrganizationCard
+                key={membership.organization.id}
+                organization={membership.organization}
+              />
             ))}
           </div>
         )}
