@@ -26,8 +26,8 @@ services:
   backend:
     container_name: dash-stack-backend
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     restart: unless-stopped
     ports:
       - '${BACKEND_PORT:-8000}:8000'
@@ -55,8 +55,8 @@ services:
   frontend:
     container_name: dash-stack-frontend
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     restart: unless-stopped
     ports:
       - '${FRONTEND_PORT:-80}:80'

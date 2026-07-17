@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev, develop]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   # ============================================
@@ -260,7 +260,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: .
           file: ./frontend/Dockerfile
           push: false
           tags: dash-stack-frontend:${{ github.sha }}
@@ -286,7 +286,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: .
           file: ./backend/Dockerfile
           push: false
           tags: dash-stack-backend:${{ github.sha }}
