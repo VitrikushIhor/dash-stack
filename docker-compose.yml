@@ -43,6 +43,8 @@ services:
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       ENABLE_LOGS: ${ENABLE_LOGS:-false}
+    env_file:
+      - .env
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:8000/health']
       interval: 30s
@@ -59,10 +61,10 @@ services:
       dockerfile: frontend/Dockerfile
     restart: unless-stopped
     ports:
-      - '${FRONTEND_PORT:-80}:80'
+      - '${FRONTEND_PORT:-80}:8080'
     depends_on:
       - backend
 
 volumes:
   postgres_data:
-    name: dash-stack-db-data
+    name: dash-stack-db-data-dev

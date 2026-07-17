@@ -25,13 +25,26 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/backend/node_modules ./node_modules
-COPY --from=builder /app/backend/package.json ./
-COPY --from=builder /app/backend/dist ./dist
-COPY --from=builder /app/backend/prisma ./prisma
+# Copy root package and lockfile
+COPY --from=builder /app/package.json /app/package-lock.json ./
 
-# Prune dev dependencies to reduce image size
+# Copy root node_modules (which contains the generated Prisma client and all hoisted deps)
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy backend workspace package and files
+COPY --from=builder /app/backend/package.json ./backend/
+COPY --from=builder /app/backend/dist ./backend/dist
+COPY --from=builder /app/backend/prisma ./backend/prisma
+COPY --from=builder /app/backend/tsconfig.json ./backend/
+
+# Prune dev dependencies from the root workspace
 RUN npm prune --production
+
+# Use non-root user
+USER node
+
+# We run from the backend workspace
+WORKDIR /app/backend
 
 EXPOSE 8000
 CMD [ "npm", "run", "start:prod" ]

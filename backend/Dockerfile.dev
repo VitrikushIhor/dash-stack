@@ -8,8 +8,13 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-# Copy source code
-COPY . .
+# Copy source code explicitly to avoid leaking sensitive files
+COPY src ./src/
+COPY tsconfig.json tsconfig.build.json ./
+COPY nest-cli.json ./
+
+# Use non-root user
+USER node
 
 # Expose port
 EXPOSE 8000
