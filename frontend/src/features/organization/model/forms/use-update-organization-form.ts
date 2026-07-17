@@ -1,6 +1,12 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileFromKey, type FileWithServerData } from '@/shared/api'
+import {
+  createFileFromKey,
+  type FileWithServerData,
+  storageApi,
+} from '@/shared/api'
+import { handleServerError } from '@/shared/lib/handle-server-error'
 import {
   useUpdateOrganization,
   type Organization,
@@ -12,7 +18,8 @@ import {
 } from '../schema/organization-schema'
 
 export const useUpdateOrganizationForm = (organization: Organization) => {
-  const { mutate: updateOrg, isPending } = useUpdateOrganization()
+  const { mutate: updateOrg, isPending: isUpdating } = useUpdateOrganization()
+  const [isUploading, setIsUploading] = useState(false)
 
   const defaultFile = organization.logo
     ? createFileFromKey(organization.logo)
@@ -28,12 +35,24 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
     },
   })
 
-  const onSubmit = (values: UpdateOrgFormValues) => {
+  const onSubmit = async (values: UpdateOrgFormValues) => {
     let logoUrl = values.logo || ''
 
     if (values.logoFile) {
       const file = values.logoFile as FileWithServerData
-      logoUrl = file.s3Url || file.s3Key || logoUrl
+      if (file.s3Url || file.s3Key) {
+        logoUrl = file.s3Url || file.s3Key || logoUrl
+      } else {
+        try {
+          setIsUploading(true)
+          const res = await storageApi.uploadImage(file)
+          logoUrl = res.url
+        } catch (err) {
+          handleServerError(err)
+          setIsUploading(false)
+          return
+        }
+      }
     } else if (values.logoFile === null) {
       logoUrl = ''
     }
@@ -52,15 +71,20 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
       dto.logo = null
     }
 
-    updateOrg({
-      orgId: organization.id,
-      dto,
-    })
+    updateOrg(
+      {
+        orgId: organization.id,
+        dto,
+      },
+      {
+        onSettled: () => setIsUploading(false),
+      }
+    )
   }
 
   return {
     form,
     onSubmit,
-    isPending,
+    isPending: isUpdating || isUploading,
   }
 }

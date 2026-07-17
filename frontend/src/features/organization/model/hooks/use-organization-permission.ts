@@ -7,7 +7,7 @@ export const useOrganizationPermission = (
 ) => {
   const { isLoading: isAuthLoading } = useCurrentUser()
 
-  const role = organization?.currentUserRole as OrgRole | undefined
+  const role = organization?.currentUserRole ?? undefined
   const isOwner = role === OrgRole.OWNER
   const isAdmin = role === OrgRole.ADMIN
   const canManage = isOwner || isAdmin

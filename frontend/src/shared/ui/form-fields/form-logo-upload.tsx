@@ -21,7 +21,7 @@ export function FormLogoUpload({
   className,
   maxSize,
 }: FormLogoUploadProps) {
-  const { control } = useFormContext()
+  const { control, setError, clearErrors } = useFormContext()
 
   return (
     <FormField
@@ -35,7 +35,16 @@ export function FormLogoUpload({
           <FormControl>
             <LogoUpload
               value={field.value}
-              onValueChange={field.onChange}
+              onValueChange={(file) => {
+                clearErrors(name)
+                field.onChange(file)
+              }}
+              onFileReject={(_, message) => {
+                setError(name, {
+                  type: 'manual',
+                  message,
+                })
+              }}
               maxSize={maxSize}
               className='mx-auto'
             />

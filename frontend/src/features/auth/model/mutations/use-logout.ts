@@ -11,13 +11,11 @@ export function useLogout() {
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      // Clear all queries
       queryClient.clear()
       toast.success('Logged out successfully')
       navigate({ to: '/sign-in', replace: true })
     },
     onError: () => {
-      // Still clear tokens and redirect on error
       clearTokens()
       queryClient.clear()
       navigate({ to: '/sign-in', replace: true })

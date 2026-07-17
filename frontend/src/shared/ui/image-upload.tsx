@@ -59,8 +59,8 @@ export function ImageUpload({
   const validateAndSetFile = (file: File | null) => {
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      onFileReject?.(file, 'File must be an image')
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      onFileReject?.(file, 'Unsupported image format')
       return
     }
 

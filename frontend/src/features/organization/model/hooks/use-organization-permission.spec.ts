@@ -118,4 +118,20 @@ describe('useOrganizationPermission', () => {
     expect(result.current.canManage).toBe(false)
     expect(result.current.isMember).toBe(false)
   })
+
+  it('should handle explicit null for currentUserRole', () => {
+    const org = {
+      id: 'org-1',
+      name: 'Test Org',
+      currentUserRole: null,
+    } as unknown as Organization
+    const { result } = renderHook(() => useOrganizationPermission(org))
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.role).toBeUndefined()
+    expect(result.current.isOwner).toBe(false)
+    expect(result.current.isAdmin).toBe(false)
+    expect(result.current.canManage).toBe(false)
+    expect(result.current.isMember).toBe(false)
+  })
 })
