@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  email         String         @unique
+  password      String?
+  avatar        String?
+  emailVerified DateTime?
+  firstName     String?
+  lastName      String?
+  accounts      Account[]
+  memberships   Membership[]
+  refreshTokens RefreshToken[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  tokenType         String?
+  scope             String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  type      TokenType
+  expires   DateTime
+  createdAt DateTime  @default(now())
+
+  @@unique([email, token])
+  @@index([email])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Organization {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  description    String?
+  logo           String?
+  stripeId       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  calendarEvents CalendarEvent[]
+  invitations    Invitation[]
+  memberships    Membership[]
+  projects       Project[]
+  tasks          Task[]
+}
+
+model Membership {
+  id           String        @id @default(cuid())
+  userId       String
+  orgId        String
+  role         OrgRole       @default(MEMBER)
+  position     TeamPosition?
+  joinedAt     DateTime      @default(now())
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks        Task[]        @relation("TaskAssignees")
+
+  @@unique([userId, orgId])
+  @@index([userId])
+  @@index([orgId])
+}
+
+model Invitation {
+  id           String       @id @default(cuid())
+  email        String
+  orgId        String
+  role         OrgRole      @default(MEMBER)
+  token        String       @unique @default(cuid())
+  expiresAt    DateTime
+  invitedBy    String
+  acceptedAt   DateTime?
+  createdAt    DateTime     @default(now())
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([orgId])
+  @@index([token])
+}
+
+model Project {
+  id           String       @id @default(cuid())
+  orgId        String
+  name         String
+  description  String?
+  color        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model Task {
+  id             String          @id @default(cuid())
+  title          String
+  description    String?
+  status         TaskStatus      @default(PLANNED)
+  attachments    String[]        @default([])
+  organizationId String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  completedAt    DateTime?
+  dueDate        DateTime?
+  startDate      DateTime?
+  calendarEvents CalendarEvent[]
+  checklists     Checklist[]
+  label          TaskLabel?
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignees      Membership[]    @relation("TaskAssignees")
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, dueDate])
+  @@map("tasks")
+}
+
+model TaskLabel {
+  id     String @id @default(cuid())
+  name   String
+  color  String
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_labels")
+}
+
+model Checklist {
+  id     String          @id @default(cuid())
+  name   String
+  taskId String
+  items  ChecklistItem[]
+  task   Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("checklists")
+}
+
+model ChecklistItem {
+  id          String    @id @default(cuid())
+  title       String
+  completed   Boolean   @default(false)
+  checklistId String
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("checklist_items")
+}
+
+model CalendarEvent {
+  id           String       @id @default(cuid())
+  orgId        String
+  taskId       String?
+  title        String
+  start        DateTime
+  end          DateTime?
+  type         EventType    @default(TASK)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  task         Task?        @relation(fields: [taskId], references: [id])
+
+  @@index([orgId])
+  @@index([start])
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+enum TeamPosition {
+  PRODUCT_MANAGER
+  LEAD_DEVELOPER
+  FRONTEND_DEVELOPER
+  BACKEND_DEVELOPER
+  UI_UX_DESIGNER
+  QA_ENGINEER
+  DEVOPS_ENGINEER
+}
+
+enum TaskStatus {
+  PLANNED
+  UPCOMING
+  COMPLETED
+}
+
+enum EventType {
+  TASK
+  MEETING
+  DEADLINE
+  REMINDER
+}

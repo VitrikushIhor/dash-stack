@@ -1,5 +1,6 @@
 node_modules
-dist
+**/node_modules
+**/dist
 .git
 .gitignore
 .env
@@ -15,4 +16,6 @@ yarn-error.log*
 coverage
 .nyc_output
 *.log
-
+.husky
+README.md
+README.ua.md

@@ -1,0 +1,15 @@
+export interface NavLink {
+  label: string
+  href: string
+}
+
+export interface PricingTier {
+  name: string
+  price: string
+  period?: string
+  description: string
+  features: string[]
+  cta: string
+  highlighted: boolean
+  badge?: string
+}

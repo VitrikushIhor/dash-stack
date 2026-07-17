@@ -1,0 +1,6 @@
+export { LogoIcon } from './logo-icon'
+export { ChartLineIcon } from './chart-line-icon'
+export { BarChartIcon } from './bar-chart-icon'
+export { ActivityIcon } from './activity-icon'
+export { AnalyticsIcon } from './analytics-icon'
+export { CheckIcon } from './check-icon'
