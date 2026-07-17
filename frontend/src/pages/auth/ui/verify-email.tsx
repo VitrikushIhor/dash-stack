@@ -12,34 +12,40 @@ import {
 } from '@/shared/ui/core/card'
 import { AuthLayout, useVerifyEmail, VerificationStatus } from '@/features/auth'
 
+const REDIRECT_DELAY_MS = 3000
+
 export function VerifyEmail() {
-  const searchParams = useSearch({ strict: false }) as { token?: string }
-  const token = searchParams.token
+  const { token } = useSearch({ strict: false }) as { token?: string }
   const navigate = useNavigate()
-  const verifyMutation = useVerifyEmail()
-  const hasTriedRef = useRef(false)
+  const { mutate, isSuccess, isError, error } = useVerifyEmail()
+  const hasTriedRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (token && !hasTriedRef.current) {
-      hasTriedRef.current = true
-      verifyMutation.mutate(token)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
+    if (!token || hasTriedRef.current === token) return
+    hasTriedRef.current = token
+    mutate(token)
+  }, [token, mutate])
 
-  const status = verifyMutation.isPending
-    ? VerificationStatus.LOADING
-    : verifyMutation.isSuccess
+  useEffect(() => {
+    if (!isSuccess) return
+    const timeoutId = setTimeout(() => {
+      navigate({ to: '/sign-in', replace: true })
+    }, REDIRECT_DELAY_MS)
+    return () => clearTimeout(timeoutId)
+  }, [isSuccess, navigate])
+
+  const status: VerificationStatus = !token
+    ? VerificationStatus.MISSING_TOKEN
+    : isSuccess
       ? VerificationStatus.SUCCESS
-      : verifyMutation.isError
+      : isError
         ? VerificationStatus.ERROR
-        : !token
-          ? VerificationStatus.ERROR
-          : VerificationStatus.LOADING
+        : VerificationStatus.LOADING
 
-  const errorMessage = verifyMutation.error
-    ? getErrorMessage(verifyMutation.error)
-    : 'No verification token provided'
+  const errorMessage =
+    status === VerificationStatus.MISSING_TOKEN
+      ? 'Verification link is invalid: no token provided'
+      : getErrorMessage(error)
 
   return (
     <AuthLayout>
@@ -52,43 +58,63 @@ export function VerifyEmail() {
             {status === VerificationStatus.LOADING && 'Verifying your email...'}
             {status === VerificationStatus.SUCCESS &&
               'Your email has been verified!'}
-            {status === VerificationStatus.ERROR && 'Verification failed'}
+            {(status === VerificationStatus.ERROR ||
+              status === VerificationStatus.MISSING_TOKEN) &&
+              'Verification failed'}
           </CardDescription>
         </CardHeader>
         <CardContent className='flex flex-col items-center gap-4'>
-          {status === VerificationStatus.LOADING && (
-            <Loader2 className='text-primary h-12 w-12 animate-spin' />
-          )}
-
+          {status === VerificationStatus.LOADING && <LoadingState />}
           {status === VerificationStatus.SUCCESS && (
-            <>
-              <CheckCircle2 className='h-12 w-12 text-green-500' />
-              <p className='text-muted-foreground text-center text-sm'>
-                Your account is now active. You can start using the application.
-              </p>
-              <Button onClick={() => navigate({ to: '/' })} className='mt-2'>
-                Go to Dashboard
-              </Button>
-            </>
+            <SuccessState
+              onContinue={() => navigate({ to: '/sign-in', replace: true })}
+            />
           )}
-
-          {status === VerificationStatus.ERROR && (
-            <>
-              <XCircle className='text-destructive h-12 w-12' />
-              <p className='text-muted-foreground text-center text-sm'>
-                {errorMessage}
-              </p>
-              <Button
-                variant='outline'
-                onClick={() => navigate({ to: '/sign-in' })}
-                className='mt-2'
-              >
-                Back to Sign In
-              </Button>
-            </>
+          {(status === VerificationStatus.ERROR ||
+            status === VerificationStatus.MISSING_TOKEN) && (
+            <ErrorState
+              message={errorMessage}
+              onBack={() => navigate({ to: '/sign-in', replace: true })}
+            />
           )}
         </CardContent>
       </Card>
     </AuthLayout>
+  )
+}
+
+function LoadingState() {
+  return <Loader2 className='text-primary h-12 w-12 animate-spin' />
+}
+
+function SuccessState({ onContinue }: { onContinue: () => void }) {
+  return (
+    <>
+      <CheckCircle2 className='h-12 w-12 text-green-500' />
+      <p className='text-muted-foreground text-center text-sm'>
+        Your account is now active. Redirecting you to sign in...
+      </p>
+      <Button onClick={onContinue} className='mt-2'>
+        Continue now
+      </Button>
+    </>
+  )
+}
+
+function ErrorState({
+  message,
+  onBack,
+}: {
+  message: string
+  onBack: () => void
+}) {
+  return (
+    <>
+      <XCircle className='text-destructive h-12 w-12' />
+      <p className='text-muted-foreground text-center text-sm'>{message}</p>
+      <Button variant='outline' onClick={onBack} className='mt-2'>
+        Back to Sign In
+      </Button>
+    </>
   )
 }
