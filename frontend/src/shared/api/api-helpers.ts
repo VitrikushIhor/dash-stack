@@ -42,3 +42,12 @@ export class ApiError extends Error {
     this.name = 'ApiError'
   }
 }
+
+export const getFileUrl = (
+  key: string | null | undefined
+): string | undefined => {
+  if (!key) return undefined
+  if (key.startsWith('http')) return key
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  return `${baseUrl}/uploads/${key}`
+}

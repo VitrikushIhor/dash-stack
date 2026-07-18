@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type FileWithServerData, storageApi } from '@/shared/api'
+import { type FileWithServerData, useUploadImage } from '@/shared/api'
 import { handleServerError } from '@/shared/lib/handle-server-error'
 import {
   useUpdateOrganization,
@@ -15,7 +14,7 @@ import {
 
 export const useUpdateOrganizationForm = (organization: Organization) => {
   const { mutate: updateOrg, isPending: isUpdating } = useUpdateOrganization()
-  const [isUploading, setIsUploading] = useState(false)
+  const uploadImage = useUploadImage()
 
   const form = useForm<UpdateOrgFormValues>({
     resolver: zodResolver(UpdateOrgSchema),
@@ -36,12 +35,10 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
         logoUrl = file.s3Url || file.s3Key || logoUrl
       } else {
         try {
-          setIsUploading(true)
-          const res = await storageApi.uploadImage(file)
+          const res = await uploadImage.mutateAsync(file)
           logoUrl = res.url
         } catch (err) {
           handleServerError(err)
-          setIsUploading(false)
           return
         }
       }
@@ -63,20 +60,15 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
       dto.logo = null
     }
 
-    updateOrg(
-      {
-        orgId: organization.id,
-        dto,
-      },
-      {
-        onSettled: () => setIsUploading(false),
-      }
-    )
+    updateOrg({
+      orgId: organization.id,
+      dto,
+    })
   }
 
   return {
     form,
     onSubmit,
-    isPending: isUpdating || isUploading,
+    isPending: isUpdating || uploadImage.isPending,
   }
 }

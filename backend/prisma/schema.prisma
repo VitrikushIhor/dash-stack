@@ -16,6 +16,9 @@ model User {
   emailVerified DateTime?
   firstName     String?
   lastName      String?
+  dob           DateTime?
+  bio           String?
+  urls          String[]       @default([])
   accounts      Account[]
   memberships   Membership[]
   refreshTokens RefreshToken[]

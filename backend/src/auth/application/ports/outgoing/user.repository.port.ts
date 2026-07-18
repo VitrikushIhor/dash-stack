@@ -14,6 +14,9 @@ export interface UserSummary {
   lastName: string | null;
   avatar: string | null;
   emailVerified: Date | null;
+  dob: Date | null;
+  bio: string | null;
+  urls: string[];
 }
 
 export interface UserWithPassword extends UserSummary {
@@ -27,4 +30,16 @@ export interface UserRepositoryPort {
   create(data: CreateUserData): Promise<UserSummary>;
   updateEmailVerified(email: string, date: Date): Promise<UserSummary>;
   updatePassword(email: string, hashedPassword: string): Promise<UserSummary>;
+  updateProfile(
+    userId: string,
+    data: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      dob?: Date;
+      bio?: string;
+      urls?: string[];
+      avatar?: string;
+    },
+  ): Promise<UserSummary>;
 }

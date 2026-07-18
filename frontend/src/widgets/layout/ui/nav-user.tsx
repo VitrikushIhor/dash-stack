@@ -1,12 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react'
+import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
+import { getFileUrl } from '@/shared/api'
 import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
@@ -50,7 +44,7 @@ export function NavUser() {
             >
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage
-                  src={user?.avatar ?? undefined}
+                  src={getFileUrl(user?.avatar) ?? undefined}
                   alt={displayName}
                 />
                 <AvatarFallback className='rounded-lg'>
@@ -74,7 +68,7 @@ export function NavUser() {
               <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarImage
-                    src={user?.avatar ?? undefined}
+                    src={getFileUrl(user?.avatar) ?? undefined}
                     alt={displayName}
                   />
                   <AvatarFallback className='rounded-lg'>
@@ -97,21 +91,9 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to='/settings/account'>
-                  <BadgeCheck />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link to='/settings'>
-                  <CreditCard />
-                  Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to='/settings/notifications'>
-                  <Bell />
-                  Notifications
+                  <BadgeCheck />
+                  Profile
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

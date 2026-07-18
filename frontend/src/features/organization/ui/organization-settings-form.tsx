@@ -1,3 +1,4 @@
+import { getFileUrl } from '@/shared/api'
 import { FormLogoUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -54,7 +55,7 @@ export const OrganizationSettingsForm = ({
         <FormLogoUpload
           name='logoFile'
           label='Organization Logo'
-          defaultPreview={organization.logo || undefined}
+          defaultPreview={getFileUrl(organization.logo)}
           className='w-full'
         />
         <Button type='submit' disabled={isPending}>
