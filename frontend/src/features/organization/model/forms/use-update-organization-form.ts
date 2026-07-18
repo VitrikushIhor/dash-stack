@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  createFileFromKey,
-  type FileWithServerData,
-  storageApi,
-} from '@/shared/api'
+import { type FileWithServerData, storageApi } from '@/shared/api'
 import { handleServerError } from '@/shared/lib/handle-server-error'
 import {
   useUpdateOrganization,
@@ -21,17 +17,13 @@ export const useUpdateOrganizationForm = (organization: Organization) => {
   const { mutate: updateOrg, isPending: isUpdating } = useUpdateOrganization()
   const [isUploading, setIsUploading] = useState(false)
 
-  const defaultFile = organization.logo
-    ? createFileFromKey(organization.logo)
-    : null
-
   const form = useForm<UpdateOrgFormValues>({
     resolver: zodResolver(UpdateOrgSchema),
     defaultValues: {
       name: organization.name,
       description: organization.description || '',
       logo: organization.logo || '',
-      logoFile: defaultFile,
+      logoFile: undefined,
     },
   })
 
