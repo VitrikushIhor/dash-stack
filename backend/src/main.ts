@@ -21,11 +21,7 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   // Security
-  app.use(
-    helmet({
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-    }),
-  );
+  app.use(helmet());
   app.setGlobalPrefix('api');
 
   // Validation
