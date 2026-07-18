@@ -13,14 +13,12 @@ export function useActiveOrganization() {
     return selected?.organization ?? memberships[0].organization
   }, [memberships, activeOrgId])
 
-  // Sync back to store if missing, but only once we have data
-  // This is better done centrally here rather than in a UI widget,
-  // so the whole app agrees on what the active org is if none was set.
   useEffect(() => {
-    if (memberships?.length && !activeOrgId) {
-      setActiveOrgId(memberships[0].organization.id)
+    const resolvedOrgId = activeOrg?.id
+    if (resolvedOrgId && resolvedOrgId !== activeOrgId) {
+      setActiveOrgId(resolvedOrgId)
     }
-  }, [memberships, activeOrgId, setActiveOrgId])
+  }, [activeOrg?.id, activeOrgId, setActiveOrgId])
 
   return {
     activeOrg,

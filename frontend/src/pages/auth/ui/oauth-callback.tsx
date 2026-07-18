@@ -30,11 +30,18 @@ export function OAuthCallback() {
       if (isAuthenticated && user) {
         try {
           const auth0Token = await getAccessTokenSilently()
-
           await authApi.oauthExchange(auth0Token)
-
           await queryClient.invalidateQueries({ queryKey: authKeys.user })
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to exchange token:', err)
+          clearTokens()
+          queryClient.removeQueries({ queryKey: authKeys.user })
+          navigate({ to: '/sign-in', replace: true })
+          return
+        }
 
+        try {
           const memberships = await queryClient.fetchQuery({
             queryKey: organizationKeys.lists(),
             queryFn: userApi.getMyMemberships,
@@ -44,15 +51,15 @@ export function OAuthCallback() {
             navigate({ to: '/create-organization', replace: true })
             return
           }
-
-          navigate({ to: '/', replace: true })
-        } catch (err) {
+        } catch (membershipErr) {
           // eslint-disable-next-line no-console
-          console.error('Failed to exchange token:', err)
-          clearTokens()
-          queryClient.removeQueries({ queryKey: authKeys.user })
-          navigate({ to: '/sign-in', replace: true })
+          console.error(
+            'Failed to fetch memberships during bootstrap:',
+            membershipErr
+          )
         }
+
+        navigate({ to: '/', replace: true })
       } else if (!isLoading && !isAuthenticated) {
         navigate({ to: '/sign-in', replace: true })
       }

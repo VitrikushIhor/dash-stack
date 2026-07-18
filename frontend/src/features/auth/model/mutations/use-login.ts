@@ -16,14 +16,20 @@ export function useLogin(options?: { redirectTo?: string }) {
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({ queryKey: userKeys.me() })
 
-      const memberships = await queryClient.fetchQuery({
-        queryKey: organizationKeys.lists(),
-        queryFn: userApi.getMyMemberships,
-      })
+      let memberships: { organization: { id: string } }[] | null = null
+      try {
+        memberships = await queryClient.fetchQuery({
+          queryKey: organizationKeys.lists(),
+          queryFn: userApi.getMyMemberships,
+        })
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch memberships during login:', err)
+      }
 
       toast.success(`Welcome back, ${variables.email}!`)
 
-      if (memberships.length === 0) {
+      if (memberships !== null && memberships.length === 0) {
         navigate({ to: '/create-organization', replace: true })
         return
       }

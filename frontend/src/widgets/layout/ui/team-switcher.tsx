@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
 import {
@@ -101,7 +100,7 @@ export function TeamSwitcher() {
             <DropdownMenuLabel className='text-muted-foreground text-xs'>
               Organizations
             </DropdownMenuLabel>
-            {memberships?.map((membership, index) => (
+            {memberships?.map((membership) => (
               <DropdownMenuItem
                 key={membership.organization.id}
                 onClick={() => {
@@ -127,7 +126,6 @@ export function TeamSwitcher() {
                 <span className='flex-1 truncate'>
                   {membership.organization.name}
                 </span>
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
