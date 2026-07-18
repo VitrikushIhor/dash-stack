@@ -70,9 +70,10 @@ export class PrismaUserRepository implements UserRepositoryPort {
     });
   }
 
-  updateProfile(
-    id: string,
+  async updateProfile(
+    userId: string,
     data: {
+      email?: string;
       firstName?: string;
       lastName?: string;
       dob?: Date;
@@ -82,8 +83,16 @@ export class PrismaUserRepository implements UserRepositoryPort {
     },
   ): Promise<UserSummary> {
     return this.prisma.user.update({
-      where: { id },
-      data,
+      where: { id: userId },
+      data: {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dob: data.dob,
+        bio: data.bio,
+        urls: data.urls,
+        avatar: data.avatar,
+      },
       select: userSummarySelect,
     });
   }

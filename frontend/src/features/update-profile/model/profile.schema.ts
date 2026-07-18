@@ -1,5 +1,24 @@
 import { z } from 'zod'
 
+const avatarSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('file'),
+    value: z
+      .instanceof(File)
+      .refine((f) => f.size <= 5_000_000, 'Max size is 5MB')
+      .refine((f) => f.type.startsWith('image/'), 'Must be an image'),
+  }),
+  z.object({
+    kind: z.literal('key'),
+    value: z.string().min(1),
+  }),
+  z.object({
+    kind: z.literal('none'),
+  }),
+])
+
+export type AvatarValue = z.infer<typeof avatarSchema>
+
 export const profileFormSchema = z.object({
   firstName: z
     .string()
@@ -9,15 +28,14 @@ export const profileFormSchema = z.object({
     .string()
     .min(2, 'Last Name must be at least 2 characters.')
     .max(30, 'Last Name must not be longer than 30 characters.'),
-  dob: z.date({
-    required_error: 'A date of birth is required.',
-  }),
+  dob: z.date().optional(),
   email: z
     .string({
-      required_error: 'Please enter an email address.',
+      message: 'Please enter an email address.',
     })
+    .min(1, 'Please enter an email address.')
     .email('Please enter a valid email address.'),
-  bio: z.string().max(160).min(4),
+  bio: z.string().max(160, 'Bio must not be longer than 160 characters.'),
   urls: z
     .array(
       z.object({
@@ -25,7 +43,7 @@ export const profileFormSchema = z.object({
       })
     )
     .optional(),
-  avatar: z.any().optional(),
+  avatar: avatarSchema,
 })
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -35,7 +53,7 @@ export const defaultProfileValues: Partial<ProfileFormValues> = {
   lastName: '',
   email: '',
   bio: 'I own a computer.',
-  avatar: undefined,
+  avatar: { kind: 'none' },
   urls: [
     { value: 'https://shadcn.com' },
     { value: 'http://twitter.com/shadcn' },

@@ -18,12 +18,13 @@ export class UpdateCurrentUserUseCase {
     }
 
     const updatedUser = await this.userRepo.updateProfile(command.userId, {
-      firstName: command.firstName,
-      lastName: command.lastName,
-      dob: command.dob ? new Date(command.dob) : undefined,
-      bio: command.bio,
-      urls: command.urls,
-      avatar: command.avatar,
+      email: command.email,
+      firstName: command.firstName ?? null,
+      lastName: command.lastName ?? null,
+      dob: command.dob ? new Date(command.dob) : null,
+      bio: command.bio ?? null,
+      urls: command.urls ?? null,
+      avatar: command.avatar ?? null,
     });
 
     return UserReadModel.fromSummary(updatedUser);

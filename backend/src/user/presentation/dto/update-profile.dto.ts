@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
@@ -7,49 +7,55 @@ import {
   IsUrl,
   MinLength,
   MaxLength,
+  IsEmail,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateProfileDto {
-  @ApiPropertyOptional({ example: 'John' })
+  @ApiPropertyOptional({ example: 'john.doe@example.com' })
   @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiProperty({ example: 'John' })
+  @ValidateIf((o) => o.firstName !== null)
   @IsString()
   @MinLength(2)
   @MaxLength(30)
-  firstName?: string;
+  firstName: string | null;
 
-  @ApiPropertyOptional({ example: 'Doe' })
-  @IsOptional()
+  @ApiProperty({ example: 'Doe' })
+  @ValidateIf((o) => o.lastName !== null)
   @IsString()
   @MinLength(2)
   @MaxLength(30)
-  lastName?: string;
+  lastName: string | null;
 
-  @ApiPropertyOptional({ example: '1990-01-01' })
-  @IsOptional()
+  @ApiProperty({ example: '1990-01-01' })
+  @ValidateIf((o) => o.dob !== null)
   @IsDateString()
-  dob?: string;
+  dob: string | null;
 
-  @ApiPropertyOptional({ example: 'I am a backend developer.' })
-  @IsOptional()
+  @ApiProperty({ example: 'I am a backend developer.' })
+  @ValidateIf((o) => o.bio !== null)
   @IsString()
   @MinLength(4)
   @MaxLength(160)
-  bio?: string;
+  bio: string | null;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     example: ['https://example.com', 'https://github.com/johndoe'],
     type: [String],
   })
-  @IsOptional()
   @IsArray()
   @IsUrl({}, { each: true })
-  urls?: string[];
+  urls: string[];
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Avatar key from storage (e.g. avatars/123.webp)',
     example: 'avatars/123.webp',
   })
-  @IsOptional()
+  @ValidateIf((o) => o.avatar !== null)
   @IsString()
-  avatar?: string;
+  avatar: string | null;
 }

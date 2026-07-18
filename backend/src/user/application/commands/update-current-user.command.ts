@@ -1,5 +1,6 @@
 export class UpdateCurrentUserCommand {
   userId: string;
+  email?: string;
   firstName?: string;
   lastName?: string;
   dob?: string;

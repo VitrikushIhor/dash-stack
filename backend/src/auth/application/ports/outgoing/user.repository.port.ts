@@ -31,8 +31,9 @@ export interface UserRepositoryPort {
   updateEmailVerified(email: string, date: Date): Promise<UserSummary>;
   updatePassword(email: string, hashedPassword: string): Promise<UserSummary>;
   updateProfile(
-    id: string,
+    userId: string,
     data: {
+      email?: string;
       firstName?: string;
       lastName?: string;
       dob?: Date;

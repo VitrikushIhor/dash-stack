@@ -1,7 +1,8 @@
 import type { UseFormReturn } from 'react-hook-form'
 import { User, Mail, Link as LinkIcon, FileText } from 'lucide-react'
+import { getFileUrl } from '@/shared/api'
 import { cn } from '@/shared/lib/utils'
-import { DatePicker, FormAvatarUpload } from '@/shared/ui'
+import { DatePicker, AvatarUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   FormControl,
@@ -19,12 +20,14 @@ interface ProfileFormElementsProps {
   form: UseFormReturn<ProfileFormValues>
   fields: Record<'id', string>[]
   append: (value: { value: string }) => void
+  remove: (index: number) => void
 }
 
 export function ProfileFormElements({
   form,
   fields,
   append,
+  remove,
 }: ProfileFormElementsProps) {
   return (
     <div className='grid grid-cols-1 gap-12 lg:grid-cols-2'>
@@ -32,10 +35,43 @@ export function ProfileFormElements({
       <div className='space-y-8'>
         {/* Avatar Section */}
         <div className='bg-muted/20 flex flex-col items-center justify-center space-y-4 rounded-xl border border-dashed p-6'>
-          <FormAvatarUpload
+          <FormField
+            control={form.control}
             name='avatar'
-            label='Profile Picture'
-            maxSize={1024 * 1024 * 5}
+            render={({ field }) => (
+              <FormItem className='flex flex-col items-center'>
+                <FormLabel className='block text-center'>
+                  Profile Picture
+                </FormLabel>
+                <FormControl>
+                  <AvatarUpload
+                    value={
+                      field.value.kind === 'file' ? field.value.value : null
+                    }
+                    defaultPreview={
+                      field.value.kind === 'key'
+                        ? getFileUrl(field.value.value)
+                        : undefined
+                    }
+                    onValueChange={(f) => {
+                      form.clearErrors('avatar')
+                      field.onChange(
+                        f ? { kind: 'file', value: f } : { kind: 'none' }
+                      )
+                    }}
+                    onFileReject={(_, message) => {
+                      form.setError('avatar', {
+                        type: 'manual',
+                        message,
+                      })
+                    }}
+                    maxSize={1024 * 1024 * 5}
+                    className='mx-auto'
+                  />
+                </FormControl>
+                <FormMessage className='text-center' />
+              </FormItem>
+            )}
           />
           <p className='text-muted-foreground max-w-sm text-center text-xs'>
             Allowed formats: JPG, PNG, GIF. Max file size: 5MB.
@@ -182,7 +218,20 @@ export function ProfileFormElements({
                       Add links to your website or blog.
                     </FormDescription>
                     <FormControl className={cn(index !== 0 && 'mt-1.5')}>
-                      <Input placeholder='https://example.com' {...field} />
+                      <div className='flex items-center gap-2'>
+                        <Input placeholder='https://example.com' {...field} />
+                        {fields.length > 1 && (
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => remove(index)}
+                            className='shrink-0'
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

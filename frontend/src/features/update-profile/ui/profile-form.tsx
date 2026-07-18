@@ -1,22 +1,32 @@
-import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { Button } from '@/shared/ui/core/button'
 import { Form } from '@/shared/ui/core/form'
-import { useProfileForm } from '../lib/use-profile-form'
-import type { ProfileFormValues } from '../model/profile.schema'
+import { type User } from '@/entities/user'
+import { useProfileForm } from '../model/use-profile-form'
 import { ProfileFormElements } from './profile-form-elements'
 
-export function UpdateProfileForm() {
-  const { form, fields, append } = useProfileForm()
+interface UpdateProfileFormProps {
+  user?: User
+}
 
-  function onSubmit(data: ProfileFormValues) {
-    showSubmittedData(data)
-  }
+export function UpdateProfileForm({ user }: UpdateProfileFormProps) {
+  const { form, fields, append, remove, onSubmit, isLoading } = useProfileForm({
+    user,
+  })
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <ProfileFormElements form={form} fields={fields} append={append} />
-        <Button type='submit'>Update profile</Button>
+        <ProfileFormElements
+          form={form}
+          fields={fields}
+          append={append}
+          remove={remove}
+        />
+        <div className='flex justify-end'>
+          <Button type='submit' disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Update profile'}
+          </Button>
+        </div>
       </form>
     </Form>
   )

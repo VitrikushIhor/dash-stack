@@ -1,4 +1,3 @@
-// Public API for settings page
 export { Settings } from './ui/settings'
 export { SettingsAppearance } from './appearance'
 export { SettingsDisplay } from './display'
