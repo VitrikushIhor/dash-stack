@@ -13,6 +13,7 @@ interface FormLogoUploadProps {
   label?: string
   className?: string
   maxSize?: number
+  defaultPreview?: string
 }
 
 export function FormLogoUpload({
@@ -20,6 +21,7 @@ export function FormLogoUpload({
   label,
   className,
   maxSize,
+  defaultPreview,
 }: FormLogoUploadProps) {
   const { control, setError, clearErrors } = useFormContext()
 
@@ -46,6 +48,7 @@ export function FormLogoUpload({
                 })
               }}
               maxSize={maxSize}
+              defaultPreview={defaultPreview}
               className='mx-auto'
             />
           </FormControl>

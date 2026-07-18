@@ -8,11 +8,15 @@ import {
 // Auth API functions
 export const authApi = {
   signup: (input: SignupInput): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/auth/signup', input)
+    return api.post<{ message: string }>('/auth/signup', input, {
+      skipAuth: true,
+    })
   },
 
   login: async (input: LoginInput): Promise<AuthTokens> => {
-    const data = await api.post<AuthTokens>('/auth/login', input)
+    const data = await api.post<AuthTokens>('/auth/login', input, {
+      skipAuth: true,
+    })
     setTokens(data.accessToken, data.refreshToken)
     return data
   },
@@ -51,17 +55,25 @@ export const authApi = {
   },
 
   forgotPassword: (email: string): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/auth/forgot-password', { email })
+    return api.post<{ message: string }>(
+      '/auth/forgot-password',
+      { email },
+      { skipAuth: true }
+    )
   },
 
   resetPassword: (
     token: string,
     password: string
   ): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/auth/reset-password', {
-      token,
-      password,
-    })
+    return api.post<{ message: string }>(
+      '/auth/reset-password',
+      {
+        token,
+        password,
+      },
+      { skipAuth: true }
+    )
   },
 
   oauthExchange: async (token: string): Promise<AuthTokens> => {

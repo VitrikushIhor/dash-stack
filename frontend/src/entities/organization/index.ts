@@ -15,3 +15,6 @@ export { useDeleteOrganization } from './api/mutations/use-delete-organization'
 
 // Store
 export { useOrgStore } from './model/store/organization-store'
+
+// Hooks
+export { useActiveOrganization } from './model/hooks/use-active-organization'

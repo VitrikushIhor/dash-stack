@@ -14,12 +14,6 @@ import {
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'user',
-    email: 'user@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-
   navGroups: [
     {
       title: 'General',

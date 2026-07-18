@@ -54,6 +54,7 @@ export const OrganizationSettingsForm = ({
         <FormLogoUpload
           name='logoFile'
           label='Organization Logo'
+          defaultPreview={organization.logo || undefined}
           className='w-full'
         />
         <Button type='submit' disabled={isPending}>

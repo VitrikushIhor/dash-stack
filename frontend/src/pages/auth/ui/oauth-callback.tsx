@@ -4,6 +4,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Loader2 } from 'lucide-react'
 import { clearTokens } from '@/shared/api'
+import { organizationKeys } from '@/entities/organization/api/organization-query-keys'
+import { userApi } from '@/entities/user/api/user-api'
 import { authKeys, authApi } from '@/features/auth'
 
 export function OAuthCallback() {
@@ -27,24 +29,37 @@ export function OAuthCallback() {
 
       if (isAuthenticated && user) {
         try {
-          // Get Auth0 access token
           const auth0Token = await getAccessTokenSilently()
-
-          // Exchange Auth0 token for our own JWT via backend
           await authApi.oauthExchange(auth0Token)
-
-          // Invalidate user query to fetch fresh user data
           await queryClient.invalidateQueries({ queryKey: authKeys.user })
-
-          // Redirect to dashboard
-          navigate({ to: '/', replace: true })
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error('Failed to exchange token:', err)
           clearTokens()
           queryClient.removeQueries({ queryKey: authKeys.user })
           navigate({ to: '/sign-in', replace: true })
+          return
         }
+
+        try {
+          const memberships = await queryClient.fetchQuery({
+            queryKey: organizationKeys.lists(),
+            queryFn: userApi.getMyMemberships,
+          })
+
+          if (memberships.length === 0) {
+            navigate({ to: '/create-organization', replace: true })
+            return
+          }
+        } catch (membershipErr) {
+          // eslint-disable-next-line no-console
+          console.error(
+            'Failed to fetch memberships during bootstrap:',
+            membershipErr
+          )
+        }
+
+        navigate({ to: '/', replace: true })
       } else if (!isLoading && !isAuthenticated) {
         navigate({ to: '/sign-in', replace: true })
       }
