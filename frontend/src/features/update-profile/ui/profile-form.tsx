@@ -5,7 +5,7 @@ import { useProfileForm } from '../model/use-profile-form'
 import { ProfileFormElements } from './profile-form-elements'
 
 interface UpdateProfileFormProps {
-  user?: User
+  user: User
 }
 
 export function UpdateProfileForm({ user }: UpdateProfileFormProps) {

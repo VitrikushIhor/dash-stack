@@ -17,45 +17,46 @@ export class UpdateProfileDto {
   @IsEmail()
   email?: string;
 
-  @ApiProperty({ example: 'John' })
-  @ValidateIf((o) => o.firstName !== null)
+  @ApiPropertyOptional({ example: 'John' })
+  @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(30)
-  firstName: string | null;
+  firstName?: string | null;
 
-  @ApiProperty({ example: 'Doe' })
-  @ValidateIf((o) => o.lastName !== null)
+  @ApiPropertyOptional({ example: 'Doe' })
+  @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(30)
-  lastName: string | null;
+  lastName?: string | null;
 
-  @ApiProperty({ example: '1990-01-01' })
-  @ValidateIf((o) => o.dob !== null)
+  @ApiPropertyOptional({ example: '1990-01-01' })
+  @IsOptional()
   @IsDateString()
-  dob: string | null;
+  dob?: string | null;
 
-  @ApiProperty({ example: 'I am a backend developer.' })
-  @ValidateIf((o) => o.bio !== null)
+  @ApiPropertyOptional({ example: 'I am a backend developer.' })
+  @IsOptional()
   @IsString()
   @MinLength(4)
   @MaxLength(160)
-  bio: string | null;
+  bio?: string | null;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: ['https://example.com', 'https://github.com/johndoe'],
     type: [String],
   })
+  @IsOptional()
   @IsArray()
   @IsUrl({}, { each: true })
-  urls: string[];
+  urls?: string[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Avatar key from storage (e.g. avatars/123.webp)',
     example: 'avatars/123.webp',
   })
-  @ValidateIf((o) => o.avatar !== null)
+  @IsOptional()
   @IsString()
-  avatar: string | null;
+  avatar?: string | null;
 }

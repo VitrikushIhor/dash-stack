@@ -52,10 +52,7 @@ export const defaultProfileValues: Partial<ProfileFormValues> = {
   firstName: '',
   lastName: '',
   email: '',
-  bio: 'I own a computer.',
+  bio: '',
   avatar: { kind: 'none' },
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
+  urls: [],
 }

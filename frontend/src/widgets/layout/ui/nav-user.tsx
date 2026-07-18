@@ -1,12 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react'
+import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
 import { getFileUrl } from '@/shared/api'
 import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
@@ -98,21 +91,9 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to='/settings/account'>
-                  <BadgeCheck />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link to='/settings'>
-                  <CreditCard />
-                  Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to='/settings/notifications'>
-                  <Bell />
-                  Notifications
+                  <BadgeCheck />
+                  Profile
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

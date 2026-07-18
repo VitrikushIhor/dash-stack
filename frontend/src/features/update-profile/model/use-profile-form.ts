@@ -69,9 +69,9 @@ export function useProfileForm({ user }: UseProfileFormProps = {}) {
         lastName: data.lastName,
         email: data.email,
         bio: data.bio,
-        dob: data.dob ? format(data.dob, 'yyyy-MM-dd') : undefined,
+        dob: data.dob ? format(data.dob, 'yyyy-MM-dd') : null,
         urls: data.urls?.map((u) => u.value) ?? [],
-        avatar: avatarKey ?? undefined,
+        avatar: avatarKey,
       })
 
       toast.success('Profile updated successfully.')

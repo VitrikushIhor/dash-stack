@@ -66,12 +66,13 @@ describe('UpdateCurrentUserUseCase', () => {
 
     expect(userRepository.findById).toHaveBeenCalledWith('1');
     expect(userRepository.updateProfile).toHaveBeenCalledWith('1', {
+      email: undefined,
       firstName: 'Updated',
       lastName: 'Name',
-      dob: undefined,
+      dob: null,
       bio: 'New bio',
       urls: ['https://example.com'],
-      avatar: undefined,
+      avatar: null,
     });
 
     expect(result).toBeInstanceOf(UserReadModel);
