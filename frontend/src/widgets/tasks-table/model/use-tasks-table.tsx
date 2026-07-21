@@ -1,5 +1,6 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
-import { getRouteApi } from '@tanstack/react-router'
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,7 +27,6 @@ interface UseTasksTableProps {
   orgId: string
   data: Task[]
 }
-const route = getRouteApi('/_authenticated/task/')
 
 export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   // Local UI-only states
@@ -44,8 +44,6 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     onPaginationChange,
     ensurePageInRange,
   } = useTableUrlState({
-    search: route.useSearch(),
-    navigate: route.useNavigate(),
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: true, key: 'filter' },
     columnFilters: [
@@ -58,20 +56,23 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
         type: 'array',
         serialize: (value: unknown) => {
           if (!Array.isArray(value)) return undefined
-          const filtered = value.filter(Boolean)
-          return filtered.length > 0 ? filtered : undefined
+          return value.map((d) => (d instanceof Date ? d.getTime() : Number(d)))
         },
         deserialize: (value: unknown) => {
-          if (!Array.isArray(value)) return []
-          return value.filter((v) => typeof v === 'string' && v)
+          const arr = Array.isArray(value) ? value : value ? [value] : []
+          return arr.map((d) => {
+            if (d instanceof Date) return d
+            const num = Number(d)
+            return !isNaN(num) ? new Date(num) : new Date(String(d))
+          })
         },
       },
     ],
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // Table Instance
   const table = useReactTable({
-    data: data || [],
+    data,
     columns: tasksColumns,
     state: {
       sorting,
@@ -81,63 +82,65 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       globalFilter,
       pagination,
     },
-    enableRowSelection: true,
+
+    // Handlers
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    manualFiltering: true,
-    globalFilterFn: (row, _columnId, filterValue) => {
-      const desc = String(row.getValue('description')).toLowerCase()
-      const title = String(row.getValue('title')).toLowerCase()
-      const searchValue = String(filterValue).toLowerCase()
 
-      return desc.includes(searchValue) || title.includes(searchValue)
-    },
-    filterFns: {
-      dateFilter: dateFilterFn,
-      dateRangeFilter: dateRangeFilterFn,
-    },
+    // Synced handlers
+    onColumnFiltersChange,
+    onGlobalFilterChange,
+    onPaginationChange,
+
+    // Row models
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange,
-    onGlobalFilterChange,
-    onColumnFiltersChange,
+
+    // Custom Filters
+    filterFns: {
+      dateFilter: dateFilterFn,
+      dateRangeFilter: dateRangeFilterFn,
+    },
   })
 
+  // Ensure current page is in valid range
   const pageCount = table.getPageCount()
   useEffect(() => {
     ensurePageInRange(pageCount)
   }, [pageCount, ensurePageInRange])
 
-  const { data: orgMembers = [] } = useGetMembers(orgId)
+  // Faceted filter options
+  const { data: members = [] } = useGetMembers(orgId)
 
-  // Memoize filter options to avoid unnecessary recalculations
-  const filterOptions = useMemo(() => {
-    const statuses = Object.values(TaskStatusEnum).map((status) => ({
-      label: STATUS_CONFIG[status].label,
-      value: status,
-      icon: STATUS_CONFIG[status].icon,
-    }))
+  const memberOptions = useMemo(
+    () =>
+      members.map((m) => {
+        const name = m.user.firstName || m.user.email
+        return { label: name, value: m.user.id }
+      }),
+    [members]
+  )
 
-    const labels = mockAvailableLabels.map((l) => ({
-      label: l.name.charAt(0).toUpperCase() + l.name.slice(1).toLowerCase(),
-      value: l.name,
-    }))
+  const filterOptions = useMemo(
+    () => ({
+      status: (Object.keys(TaskStatusEnum) as TaskStatusEnum[]).map((st) => ({
+        label: STATUS_CONFIG[st].label,
+        value: st,
+        icon: STATUS_CONFIG[st].icon,
+      })),
+      labels: mockAvailableLabels.map((lbl) => ({
+        label: lbl,
+        value: lbl,
+      })),
+      members: memberOptions,
+    }),
+    [memberOptions]
+  )
 
-    const members = orgMembers.map((member) => ({
-      label: member.user?.firstName || 'User',
-      value: member.id,
-    }))
-
-    return { statuses, labels, members }
-  }, [orgMembers])
-
-  return {
-    table,
-    filterOptions,
-  }
+  return { table, filterOptions }
 }

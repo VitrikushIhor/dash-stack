@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui'
 import { useOrgStore } from '@/entities/organization'
