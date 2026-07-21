@@ -1,7 +1,9 @@
+'use client'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Loader2, CheckCircle2, KeyRound } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -28,9 +30,9 @@ import {
 } from '@/features/auth'
 
 export function ResetPassword() {
-  const searchParams = useSearch({ strict: false }) as { token?: string }
-  const token = searchParams.token
-  const navigate = useNavigate()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+  const router = useRouter()
   const resetMutation = useResetPassword()
 
   const form = useForm<TResetPasswordSchema>({
@@ -58,7 +60,7 @@ export function ResetPassword() {
           <CardContent className='flex justify-center'>
             <Button
               variant='outline'
-              onClick={() => navigate({ to: '/forgot-password' })}
+              onClick={() => router.push('/forgot-password')}
             >
               Request New Link
             </Button>
@@ -82,9 +84,7 @@ export function ResetPassword() {
           </CardHeader>
           <CardContent className='flex flex-col items-center gap-4'>
             <CheckCircle2 className='h-12 w-12 text-green-500' />
-            <Button onClick={() => navigate({ to: '/sign-in' })}>
-              Sign In
-            </Button>
+            <Button onClick={() => router.push('/sign-in')}>Sign In</Button>
           </CardContent>
         </Card>
       </AuthLayout>

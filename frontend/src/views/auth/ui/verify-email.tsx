@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getErrorMessage } from '@/shared/api'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -15,8 +17,9 @@ import { AuthLayout, useVerifyEmail, VerificationStatus } from '@/features/auth'
 const REDIRECT_DELAY_MS = 3000
 
 export function VerifyEmail() {
-  const { token } = useSearch({ strict: false }) as { token?: string }
-  const navigate = useNavigate()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+  const router = useRouter()
   const { mutate, isSuccess, isError, error } = useVerifyEmail()
   const hasTriedRef = useRef<string | null>(null)
 
@@ -29,10 +32,10 @@ export function VerifyEmail() {
   useEffect(() => {
     if (!isSuccess) return
     const timeoutId = setTimeout(() => {
-      navigate({ to: '/sign-in', replace: true })
+      router.replace('/sign-in')
     }, REDIRECT_DELAY_MS)
     return () => clearTimeout(timeoutId)
-  }, [isSuccess, navigate])
+  }, [isSuccess, router])
 
   const status: VerificationStatus = !token
     ? VerificationStatus.MISSING_TOKEN
@@ -66,15 +69,13 @@ export function VerifyEmail() {
         <CardContent className='flex flex-col items-center gap-4'>
           {status === VerificationStatus.LOADING && <LoadingState />}
           {status === VerificationStatus.SUCCESS && (
-            <SuccessState
-              onContinue={() => navigate({ to: '/sign-in', replace: true })}
-            />
+            <SuccessState onContinue={() => router.replace('/sign-in')} />
           )}
           {(status === VerificationStatus.ERROR ||
             status === VerificationStatus.MISSING_TOKEN) && (
             <ErrorState
               message={errorMessage}
-              onBack={() => navigate({ to: '/sign-in', replace: true })}
+              onBack={() => router.replace('/sign-in')}
             />
           )}
         </CardContent>

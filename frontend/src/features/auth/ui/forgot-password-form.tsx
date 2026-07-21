@@ -1,7 +1,9 @@
+'use client'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -24,7 +26,7 @@ export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const navigate = useNavigate()
+  const router = useRouter()
   const forgotPasswordMutation = useForgotPassword()
 
   const form = useForm<TForgotPasswordSchema>({
@@ -48,7 +50,7 @@ export function ForgotPasswordForm({
         <Button
           variant='outline'
           className='mt-4'
-          onClick={() => navigate({ to: '/sign-in' })}
+          onClick={() => router.push('/sign-in')}
         >
           Back to Sign In
         </Button>

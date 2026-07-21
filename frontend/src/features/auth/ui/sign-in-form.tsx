@@ -1,7 +1,9 @@
+'use client'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
 import { Loader2, LogIn } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
 import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
@@ -76,7 +78,7 @@ export function SignInForm({
               </FormControl>
               <FormMessage />
               <Link
-                to='/forgot-password'
+                href='/forgot-password'
                 className='text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75'
               >
                 Forgot password?

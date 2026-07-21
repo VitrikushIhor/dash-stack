@@ -1,80 +1,61 @@
+'use client'
+
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { useAuth0 } from '@auth0/auth0-react'
 import { Loader2 } from 'lucide-react'
-import { clearTokens } from '@/shared/api'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { tokenStorage } from '@/shared/api'
 import { organizationKeys } from '@/entities/organization/api/organization-query-keys'
 import { userApi } from '@/entities/user/api/user-api'
 import { authKeys, authApi } from '@/features/auth'
 
 export function OAuthCallback() {
-  const navigate = useNavigate()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const queryClient = useQueryClient()
-  const { isAuthenticated, isLoading, getAccessTokenSilently, user, error } =
-    useAuth0()
+  const code = searchParams.get('code')
+  const error = searchParams.get('error')
 
   useEffect(() => {
     const handleAuth = async () => {
-      if (isLoading) return
-
       if (error) {
         // eslint-disable-next-line no-console
-        console.error('Auth0 error:', error)
-        clearTokens()
+        console.error('OAuth error:', error)
+        await tokenStorage.clearTokens()
         queryClient.removeQueries({ queryKey: authKeys.user })
-        navigate({ to: '/sign-in', replace: true })
+        router.replace('/sign-in')
         return
       }
 
-      if (isAuthenticated && user) {
+      if (code) {
         try {
-          const auth0Token = await getAccessTokenSilently()
-          await authApi.oauthExchange(auth0Token)
+          await authApi.oauthExchange(code)
           await queryClient.invalidateQueries({ queryKey: authKeys.user })
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error('Failed to exchange token:', err)
-          clearTokens()
-          queryClient.removeQueries({ queryKey: authKeys.user })
-          navigate({ to: '/sign-in', replace: true })
-          return
-        }
 
-        try {
           const memberships = await queryClient.fetchQuery({
             queryKey: organizationKeys.lists(),
             queryFn: userApi.getMyMemberships,
           })
 
           if (memberships.length === 0) {
-            navigate({ to: '/create-organization', replace: true })
+            router.replace('/create-organization')
             return
           }
-        } catch (membershipErr) {
+          router.replace('/dashboard')
+        } catch (err) {
           // eslint-disable-next-line no-console
-          console.error(
-            'Failed to fetch memberships during bootstrap:',
-            membershipErr
-          )
+          console.error('Failed to exchange token:', err)
+          await tokenStorage.clearTokens()
+          queryClient.removeQueries({ queryKey: authKeys.user })
+          router.replace('/sign-in')
         }
-
-        navigate({ to: '/', replace: true })
-      } else if (!isLoading && !isAuthenticated) {
-        navigate({ to: '/sign-in', replace: true })
+      } else {
+        router.replace('/sign-in')
       }
     }
 
     handleAuth()
-  }, [
-    isAuthenticated,
-    isLoading,
-    user,
-    error,
-    getAccessTokenSilently,
-    navigate,
-    queryClient,
-  ])
+  }, [code, error, router, queryClient])
 
   return (
     <div className='flex min-h-screen items-center justify-center'>

@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -13,7 +16,7 @@ import { AuthLayout, SignUpForm } from '@/features/auth'
 
 export function SignUp() {
   const [isSuccess, setIsSuccess] = useState(false)
-  const navigate = useNavigate()
+  const router = useRouter()
 
   if (isSuccess) {
     return (
@@ -31,7 +34,7 @@ export function SignUp() {
               <Button
                 variant='outline'
                 className='mt-4'
-                onClick={() => navigate({ to: '/sign-in' })}
+                onClick={() => router.push('/sign-in')}
               >
                 Back to Sign In
               </Button>
@@ -50,22 +53,25 @@ export function SignUp() {
             Create an account
           </CardTitle>
           <CardDescription>
-            Enter your email and password to create an account. <br />
-            Already have an account?{' '}
-            <Link
-              to='/sign-in'
-              className='hover:text-primary underline underline-offset-4'
-            >
-              Sign In
-            </Link>
+            Enter your email and password below to <br />
+            create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <SignUpForm onSuccess={() => setIsSuccess(true)} />
         </CardContent>
-        <CardFooter>
+        <CardFooter className='flex flex-col gap-4'>
+          <p className='text-muted-foreground text-center text-sm'>
+            Already have an account?{' '}
+            <Link
+              href='/sign-in'
+              className='text-primary underline-offset-4 hover:underline'
+            >
+              Sign in
+            </Link>
+          </p>
           <p className='text-muted-foreground px-8 text-center text-sm'>
-            By creating an account, you agree to our{' '}
+            By clicking create account, you agree to our{' '}
             <a
               href='/terms'
               className='hover:text-primary underline underline-offset-4'

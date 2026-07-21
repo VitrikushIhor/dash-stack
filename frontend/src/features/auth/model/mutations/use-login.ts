@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/shared/api'
 import { organizationKeys } from '@/entities/organization/api/organization-query-keys'
@@ -9,7 +9,7 @@ import { authApi } from '../../api/auth-api'
 
 export function useLogin(options?: { redirectTo?: string }) {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return useMutation({
     mutationFn: authApi.login,
@@ -30,12 +30,12 @@ export function useLogin(options?: { redirectTo?: string }) {
       toast.success(`Welcome back, ${variables.email}!`)
 
       if (memberships !== null && memberships.length === 0) {
-        navigate({ to: '/create-organization', replace: true })
+        router.replace('/create-organization')
         return
       }
 
-      const targetPath = options?.redirectTo || '/'
-      navigate({ to: targetPath, replace: true })
+      const targetPath = options?.redirectTo || '/dashboard'
+      router.replace(targetPath)
     },
     onError: (error) => {
       toast.error(getErrorMessage(error))

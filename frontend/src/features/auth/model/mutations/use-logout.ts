@@ -1,24 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { clearTokens } from '@/shared/api'
 import { authApi } from '../../api/auth-api'
 
 export function useLogout() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
       queryClient.clear()
       toast.success('Logged out successfully')
-      navigate({ to: '/sign-in', replace: true })
+      router.replace('/sign-in')
     },
     onError: () => {
       clearTokens()
       queryClient.clear()
-      navigate({ to: '/sign-in', replace: true })
+      router.replace('/sign-in')
     },
   })
 }

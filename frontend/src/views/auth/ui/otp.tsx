@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import {
   Card,
   CardContent,
@@ -27,9 +29,9 @@ export function Otp() {
         </CardContent>
         <CardFooter>
           <p className='text-muted-foreground px-8 text-center text-sm'>
-            Haven't received it?{' '}
+            Haven&apos;t received it?{' '}
             <Link
-              to='/sign-in'
+              href='/sign-in'
               className='hover:text-primary underline underline-offset-4'
             >
               Resend a new code.

@@ -1,4 +1,7 @@
-import { useSearch, Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -10,7 +13,8 @@ import {
 import { AuthLayout, SignInForm } from '@/features/auth'
 
 export function SignIn() {
-  const { redirect } = useSearch({ from: '/(auth)/sign-in' })
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect') ?? undefined
 
   return (
     <AuthLayout>
@@ -29,7 +33,7 @@ export function SignIn() {
           <p className='text-muted-foreground text-center text-sm'>
             Don&apos;t have an account?{' '}
             <Link
-              to='/sign-up'
+              href='/sign-up'
               className='text-primary underline-offset-4 hover:underline'
             >
               Sign up

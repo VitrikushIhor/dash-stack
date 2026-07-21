@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import {
   Card,
   CardContent,
@@ -27,9 +29,9 @@ export function ForgotPassword() {
         </CardContent>
         <CardFooter>
           <p className='text-muted-foreground mx-auto px-8 text-center text-sm text-balance'>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
-              to='/sign-up'
+              href='/sign-up'
               className='hover:text-primary underline underline-offset-4'
             >
               Sign up
