@@ -1,5 +1,7 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
 import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 import { getFileUrl } from '@/shared/api'
 import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
@@ -91,7 +93,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to='/settings'>
+                <Link href='/settings'>
                   <BadgeCheck />
                   Profile
                 </Link>

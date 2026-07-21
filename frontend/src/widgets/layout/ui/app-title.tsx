@@ -1,11 +1,13 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { SidebarMenu, useSidebar } from '@/shared/ui/core/sidebar'
 
 export function AppTitle() {
   const { setOpenMobile, open } = useSidebar()
   return (
     <SidebarMenu>
-      <Link to='/' onClick={() => setOpenMobile(false)}>
+      <Link href='/' onClick={() => setOpenMobile(false)}>
         {open && (
           <div className='text-lg'>
             <span className='text-primary font-bold'>Dash</span>

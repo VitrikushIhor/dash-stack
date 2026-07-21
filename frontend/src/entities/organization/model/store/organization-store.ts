@@ -15,6 +15,7 @@ export const useOrgStore = create<OrganizationState>()(
     {
       name: 'org-storage',
       storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
     }
   )
 )

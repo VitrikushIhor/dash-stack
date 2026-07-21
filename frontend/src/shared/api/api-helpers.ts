@@ -1,3 +1,5 @@
+import { tokenStorage } from './token-storage'
+
 // Token storage keys
 export const ACCESS_TOKEN_KEY = 'accessToken'
 export const REFRESH_TOKEN_KEY = 'refreshToken'
@@ -12,23 +14,16 @@ export const getErrorMessage = (error: unknown): string => {
   return 'An unexpected error occurred'
 }
 
-// Token helpers
-export const getAccessToken = (): string | null => {
-  return localStorage.getItem(ACCESS_TOKEN_KEY)
-}
+export const getAccessToken = (): string | null => null
+export const getRefreshToken = (): string | null => null
 
-export const getRefreshToken = (): string | null => {
-  return localStorage.getItem(REFRESH_TOKEN_KEY)
-}
-
+// Token helpers (delegating to tokenStorage Route Handlers)
 export const setTokens = (accessToken: string, refreshToken: string): void => {
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  tokenStorage.setTokens(accessToken, refreshToken)
 }
 
 export const clearTokens = (): void => {
-  localStorage.removeItem(ACCESS_TOKEN_KEY)
-  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  tokenStorage.clearTokens()
 }
 
 // Custom error class for API errors
@@ -48,6 +43,6 @@ export const getFileUrl = (
 ): string | undefined => {
   if (!key) return undefined
   if (key.startsWith('http')) return key
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
   return `${baseUrl}/uploads/${key}`
 }

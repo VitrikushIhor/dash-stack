@@ -1,5 +1,7 @@
-import { useNavigate } from '@tanstack/react-router'
+'use client'
+
 import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +21,7 @@ import { useActiveOrganization } from '@/entities/organization'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const { activeOrg, memberships, isLoading, setActiveOrgId } =
     useActiveOrganization()
@@ -45,7 +47,7 @@ export function TeamSwitcher() {
         <SidebarMenuItem>
           <SidebarMenuButton
             size='lg'
-            onClick={() => navigate({ to: '/organizations' })}
+            onClick={() => router.push('/organizations')}
             className='text-muted-foreground'
           >
             <div className='bg-sidebar-accent flex aspect-square size-8 items-center justify-center rounded-lg'>
@@ -104,10 +106,7 @@ export function TeamSwitcher() {
                 key={membership.organization.id}
                 onClick={() => {
                   setActiveOrgId(membership.organization.id)
-                  navigate({
-                    to: '/organizations/$orgId',
-                    params: { orgId: membership.organization.id },
-                  })
+                  router.push(`/organizations/${membership.organization.id}`)
                 }}
                 className='gap-2 p-2'
               >
@@ -130,7 +129,7 @@ export function TeamSwitcher() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className='gap-2 p-2'
-              onClick={() => navigate({ to: '/organizations' })}
+              onClick={() => router.push('/organizations')}
             >
               <div className='bg-background flex size-6 items-center justify-center rounded-md border'>
                 <Plus className='size-4' />

@@ -1,11 +1,9 @@
 import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
-  ignore: [
-    'src/shared/ui/components/ui/**',
-    'src/routeTree.gen.ts',
-  ],
+  entry: ['src/app/**/page.tsx', 'src/app/layout.tsx', 'src/middleware.ts'],
+  ignore: ['src/shared/ui/components/ui/**'],
   ignoreDependencies: ['tailwindcss', 'tw-animate-css'],
-}
+};
 
 export default config;
