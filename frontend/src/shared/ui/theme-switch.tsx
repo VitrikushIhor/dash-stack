@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 import { Check, Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/shared/lib/context'

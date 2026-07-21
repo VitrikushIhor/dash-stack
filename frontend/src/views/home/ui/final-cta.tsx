@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { Button } from '@/shared/ui/core/button'
 import { Reveal } from '@/shared/ui/reveal'
 
@@ -16,7 +18,7 @@ export function FinalCta() {
           className='mb-4 rounded-xl bg-emerald-500 px-8 py-7 text-base font-bold text-white hover:bg-emerald-600'
           asChild
         >
-          <Link to='/sign-up'>Start for free &rarr;</Link>
+          <Link href='/sign-up'>Start for free &rarr;</Link>
         </Button>
         <p className='font-inter text-muted-foreground m-0 text-[13px]'>
           No credit card required

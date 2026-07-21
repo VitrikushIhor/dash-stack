@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { Separator } from '@/shared/ui/core/separator'

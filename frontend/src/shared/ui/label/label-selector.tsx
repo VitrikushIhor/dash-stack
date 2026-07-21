@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useCallback, useMemo, memo } from 'react'
 import { Plus, Check, Tag } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'

@@ -1,6 +1,8 @@
+'use client'
+
 import { format } from 'date-fns'
-import { Link } from '@tanstack/react-router'
 import { type ColumnDef } from '@tanstack/react-table'
+import Link from 'next/link'
 import { getInitials } from '@/shared/lib/utils'
 import { getMemberDisplayName, getRoleVariant } from '@/shared/model'
 import { DataTableColumnHeader } from '@/shared/ui'
@@ -22,8 +24,7 @@ export const columns: ColumnDef<Membership>[] = [
 
       return (
         <Link
-          to='/organizations/$orgId/members/$userId'
-          params={{ orgId: orgId || '', userId }}
+          href={`/organizations/${orgId || ''}/members/${userId}`}
           className='flex items-center gap-3 hover:underline'
         >
           <Avatar className='h-8 w-8'>
@@ -49,19 +50,17 @@ export const columns: ColumnDef<Membership>[] = [
       const role = row.getValue('role') as OrgRole
       return <Badge variant={getRoleVariant(role)}>{role}</Badge>
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
   },
   {
-    accessorKey: 'joinedAt',
+    accessorKey: 'createdAt',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Joined' />
+      <DataTableColumnHeader column={column} title='Joined Date' />
     ),
     cell: ({ row }) => {
+      const date = row.getValue('createdAt') as string
       return (
         <span className='text-muted-foreground text-sm'>
-          {format(new Date(row.getValue('joinedAt')), 'MMM d, yyyy')}
+          {format(new Date(date), 'MMM d, yyyy')}
         </span>
       )
     },

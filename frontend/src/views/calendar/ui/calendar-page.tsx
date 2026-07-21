@@ -1,5 +1,7 @@
+'use client'
+
 import { useMemo } from 'react'
-import { getRouteApi } from '@tanstack/react-router'
+import { useSearchParams } from 'next/navigation'
 import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { useGetMembers, useOrgStore } from '@/entities/organization'
@@ -10,13 +12,14 @@ import { Header, Main, NavUser } from '@/widgets/layout'
 import { getVisibleRange } from '../lib/get-visible-range'
 
 export function CalendarPage() {
-  const route = getRouteApi('/_authenticated/calendar')
-  const search = route.useSearch()
+  const searchParams = useSearchParams()
+  const viewParam = searchParams.get('view')
+  const dateParam = searchParams.get('date')
 
-  const initialView = (search.view as TCalendarView) || 'month'
+  const initialView = (viewParam as TCalendarView) || 'month'
   const initialDate = useMemo(
-    () => (search.date ? new Date(search.date) : new Date()),
-    [search.date]
+    () => (dateParam ? new Date(dateParam) : new Date()),
+    [dateParam]
   )
 
   const { activeOrgId } = useOrgStore()

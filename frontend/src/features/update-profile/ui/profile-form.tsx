@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/shared/ui/core/button'
 import { Form } from '@/shared/ui/core/form'
 import { type User } from '@/entities/user'

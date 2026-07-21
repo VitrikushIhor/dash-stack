@@ -1,5 +1,16 @@
-import { VerifyEmailPage } from '@/views/auth'
+import { Suspense } from 'react'
+import { VerifyEmail } from '@/views/auth'
+
+export const dynamic = 'force-dynamic'
 
 export default function VerifyEmailRoute() {
-  return <VerifyEmailPage />
+  return (
+    <Suspense
+      fallback={
+        <div className='text-muted-foreground p-6 text-center'>Loading...</div>
+      }
+    >
+      <VerifyEmail />
+    </Suspense>
+  )
 }

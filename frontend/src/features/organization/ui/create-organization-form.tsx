@@ -1,3 +1,5 @@
+'use client'
+
 import { FormLogoUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {

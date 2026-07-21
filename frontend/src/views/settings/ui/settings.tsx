@@ -1,4 +1,5 @@
-import { Outlet } from '@tanstack/react-router'
+'use client'
+
 import { Monitor, Bell, Palette, UserCog } from 'lucide-react'
 import { ConfigDrawer, Search, SidebarNav, ThemeSwitch } from '@/shared/ui'
 import { Separator } from '@/shared/ui/core/separator'
@@ -27,10 +28,9 @@ const sidebarNavItems = [
   },
 ]
 
-export function Settings() {
+export function Settings({ children }: { children?: React.ReactNode }) {
   return (
     <>
-      {/* ===== Top Heading ===== */}
       <Header>
         <Search />
         <div className='ms-auto flex items-center space-x-4'>
@@ -54,9 +54,7 @@ export function Settings() {
           <aside className='top-0 lg:sticky lg:w-1/5'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
-          <div className='flex w-full overflow-y-hidden p-1'>
-            <Outlet />
-          </div>
+          <div className='flex w-full overflow-y-hidden p-1'>{children}</div>
         </div>
       </Main>
     </>

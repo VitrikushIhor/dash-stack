@@ -1,18 +1,18 @@
 import { Suspense } from 'react'
-import { OAuthCallback } from '@/views/auth'
+import { AcceptInvitePage } from '@/features/invitation'
 
 export const dynamic = 'force-dynamic'
 
-export default function OAuthCallbackRoute() {
+export default function AcceptInviteRoute() {
   return (
     <Suspense
       fallback={
         <div className='text-muted-foreground p-6 text-center'>
-          Authenticating...
+          Loading invitation...
         </div>
       }
     >
-      <OAuthCallback />
+      <AcceptInvitePage />
     </Suspense>
   )
 }

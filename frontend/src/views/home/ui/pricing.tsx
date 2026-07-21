@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -99,7 +101,7 @@ export function Pricing() {
                     variant={tier.highlighted ? 'default' : 'outline'}
                     asChild
                   >
-                    <Link to='/sign-up'>{tier.cta}</Link>
+                    <Link href='/sign-up'>{tier.cta}</Link>
                   </Button>
                 )}
               </CardFooter>

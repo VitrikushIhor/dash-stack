@@ -1,3 +1,5 @@
+'use client'
+
 import { LandingFooter } from '@/widgets/landing-footer'
 import { LandingNavbar } from '@/widgets/landing-navbar'
 import { Features } from './features'

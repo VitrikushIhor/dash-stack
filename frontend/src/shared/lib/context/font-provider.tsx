@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useEffect, useState } from 'react'
 import { fonts } from '@/shared/config'
 import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
@@ -48,7 +50,6 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useFont = () => {
   const context = useContext(FontContext)
   if (!context) {

@@ -1,5 +1,7 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
 import { Users, Briefcase } from 'lucide-react'
+import Link from 'next/link'
 import {
   Card,
   CardDescription,
@@ -10,15 +12,22 @@ import { useOrgStore, type OrganizationSummary } from '@/entities/organization'
 
 interface OrganizationCardProps {
   organization: OrganizationSummary
+  role?: string
+  memberCount?: number
 }
 
-export const OrganizationCard = ({ organization }: OrganizationCardProps) => {
+export const OrganizationCard = ({
+  organization,
+  role,
+  memberCount,
+}: OrganizationCardProps) => {
   const { setActiveOrgId } = useOrgStore()
+  const members = memberCount ?? organization.stats?.members ?? 0
+  const displayRole = role || 'Member'
 
   return (
     <Link
-      to='/organizations/$orgId'
-      params={{ orgId: organization.id }}
+      href={`/organizations/${organization.id}`}
       onClick={() => setActiveOrgId(organization.id)}
       className='block transition-transform hover:scale-[1.02]'
     >
@@ -38,19 +47,16 @@ export const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             )}
             <div>
               <CardTitle className='text-lg'>{organization.name}</CardTitle>
-              <CardDescription className='line-clamp-1'>
-                {organization.description || 'No description'}
+              <CardDescription className='mt-1 flex items-center gap-4'>
+                <span className='flex items-center gap-1 text-xs'>
+                  <Users className='h-3.5 w-3.5' />
+                  {members} {members === 1 ? 'member' : 'members'}
+                </span>
+                <span className='flex items-center gap-1 text-xs capitalize'>
+                  <Briefcase className='h-3.5 w-3.5' />
+                  {displayRole.toLowerCase()}
+                </span>
               </CardDescription>
-            </div>
-          </div>
-          <div className='text-muted-foreground mt-4 flex gap-4 text-sm'>
-            <div className='flex items-center gap-1'>
-              <Users className='h-4 w-4' />
-              <span>{organization.stats?.members || 0} members</span>
-            </div>
-            <div className='flex items-center gap-1'>
-              <Briefcase className='h-4 w-4' />
-              <span>{organization.stats?.projects || 0} projects</span>
             </div>
           </div>
         </CardHeader>

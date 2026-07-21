@@ -78,7 +78,6 @@ export function CalendarProvider({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useCalendar(): ICalendarContext {
   const context = useContext(CalendarContext)
   if (!context)

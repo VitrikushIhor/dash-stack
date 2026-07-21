@@ -1,3 +1,5 @@
+'use client'
+
 import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {

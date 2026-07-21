@@ -62,7 +62,6 @@ export function DataTableDateRangeFilter<TData, TValue>({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const dateRangeFilterFn: FilterFn<any> = (
   row: Row<any>,
   columnId: string,

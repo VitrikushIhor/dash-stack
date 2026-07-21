@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useCallback, memo } from 'react'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'

@@ -51,7 +51,7 @@ export function DataTableDateFilter<TData, TValue>({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const dateFilterFn: FilterFn<any> = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   row: Row<any>,

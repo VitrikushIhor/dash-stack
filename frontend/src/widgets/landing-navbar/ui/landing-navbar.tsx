@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { Link } from '@tanstack/react-router'
 import { LogOut } from 'lucide-react'
+import Link from 'next/link'
 import { getUserDisplayName, getUserInitials } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Button } from '@/shared/ui/core/button'
@@ -59,7 +61,7 @@ export function LandingNavbar() {
     >
       <nav className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6'>
         <Link
-          to='/'
+          href='/'
           className='flex items-center gap-2.5 no-underline'
           aria-label='Dash Stack home'
         >
@@ -89,7 +91,7 @@ export function LandingNavbar() {
                 className='border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700'
                 asChild
               >
-                <Link to={dashboardLink}>Go to App</Link>
+                <Link href={dashboardLink}>Go to App</Link>
               </Button>
 
               <DropdownMenu>
@@ -130,13 +132,13 @@ export function LandingNavbar() {
           ) : (
             <>
               <Button variant='outline' asChild>
-                <Link to='/sign-in'>Sign In</Link>
+                <Link href='/sign-in'>Sign In</Link>
               </Button>
               <Button
                 className='bg-emerald-500 text-white hover:bg-emerald-600'
                 asChild
               >
-                <Link to='/sign-up'>Start Free</Link>
+                <Link href='/sign-up'>Start Free</Link>
               </Button>
             </>
           )}
@@ -236,7 +238,7 @@ export function LandingNavbar() {
                   </div>
                 </div>
                 <Button className='w-full' asChild>
-                  <Link to={dashboardLink}>Go to App</Link>
+                  <Link href={dashboardLink}>Go to App</Link>
                 </Button>
                 <Button
                   variant='destructive'
@@ -251,13 +253,13 @@ export function LandingNavbar() {
             ) : (
               <div className='flex gap-3'>
                 <Button variant='outline' className='flex-1' asChild>
-                  <Link to='/sign-in'>Sign In</Link>
+                  <Link href='/sign-in'>Sign In</Link>
                 </Button>
                 <Button
                   className='flex-1 bg-emerald-500 text-white hover:bg-emerald-600'
                   asChild
                 >
-                  <Link to='/sign-up'>Start Free</Link>
+                  <Link href='/sign-up'>Start Free</Link>
                 </Button>
               </div>
             )}

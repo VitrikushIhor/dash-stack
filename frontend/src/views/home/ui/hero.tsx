@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { Button } from '@/shared/ui/core/button'
 import { Reveal } from '@/shared/ui/reveal'
 import { DashboardMock } from './dashboard-mock'
@@ -36,26 +38,28 @@ export function Hero() {
               className='rounded-xl bg-emerald-500 px-6 py-6 text-[15px] text-white hover:bg-emerald-600'
               asChild
             >
-              <Link to='/sign-up'>Start for free &rarr;</Link>
+              <Link href='/sign-up'>Start for free &rarr;</Link>
             </Button>
             <Button
               variant='outline'
-              className='border-border hover:border-foreground text-muted-foreground hover:text-foreground rounded-xl px-6 py-6 text-[15px]'
+              className='rounded-xl px-6 py-6 text-[15px]'
               asChild
             >
-              <a href='#demo'>See live demo</a>
+              <Link href='#demo'>Live Demo</Link>
             </Button>
           </div>
-          <p className='font-inter text-muted-foreground text-[13px]'>
-            No credit card required &middot; Takes 2 minutes to set up
+        </Reveal>
+
+        <Reveal delay={320}>
+          <p className='font-inter text-muted-foreground text-xs'>
+            No credit card required &middot; 14-day free trial &middot; Cancel
+            anytime
           </p>
         </Reveal>
       </div>
 
-      <div id='demo' className='w-full min-w-0 flex-1'>
-        <Reveal delay={300}>
-          <DashboardMock />
-        </Reveal>
+      <div className='w-full flex-1 md:w-1/2'>
+        <DashboardMock />
       </div>
     </section>
   )

@@ -1428,8 +1428,6 @@ export {
   FileUploadItemProgress as ItemProgress,
   FileUploadItemDelete as ItemDelete,
   FileUploadClear as Clear,
-  //
-  // eslint-disable-next-line react-refresh/only-export-components
   useStore as useFileUpload,
   //
   type FileUploadRootProps as FileUploadProps,

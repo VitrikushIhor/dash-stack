@@ -1,4 +1,6 @@
-import { useNavigate } from '@tanstack/react-router'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -12,7 +14,7 @@ import { LandingFooter } from '@/widgets/landing-footer'
 import { LandingNavbar } from '@/widgets/landing-navbar'
 
 export function CreateOrganizationPage() {
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return (
     <div className='flex min-h-screen flex-col'>
@@ -94,7 +96,7 @@ export function CreateOrganizationPage() {
               <CardContent>
                 <CreateOrganizationForm
                   submitLabel='Get Started &rarr;'
-                  onSuccess={() => navigate({ to: '/organizations' })}
+                  onSuccess={() => router.push('/organizations')}
                 />
               </CardContent>
             </Card>

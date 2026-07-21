@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useEffect, useState } from 'react'
 
 type SearchContextType = {
@@ -28,7 +30,6 @@ export function SearchProvider({ children }: SearchProviderProps) {
   return <SearchContext value={{ open, setOpen }}>{children}</SearchContext>
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useSearch = () => {
   const searchContext = useContext(SearchContext)
 

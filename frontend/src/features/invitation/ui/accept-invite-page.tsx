@@ -1,18 +1,24 @@
+'use client'
+
 import { useEffect } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import { useAcceptInvite } from '../model/mutations/use-accept-invite'
 
 interface AcceptInvitePageProps {
-  token: string
+  token?: string
 }
 
 const REDIRECT_DELAY = 2000
 
-export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
+export const AcceptInvitePage = ({
+  token: tokenProp,
+}: AcceptInvitePageProps) => {
+  const searchParams = useSearchParams()
+  const token = tokenProp || searchParams.get('token') || ''
   const { mutate: acceptInvite, isPending, isError, error } = useAcceptInvite()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -21,7 +27,7 @@ export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
       acceptInvite(token, {
         onSuccess: () => {
           timeoutId = setTimeout(() => {
-            navigate({ to: '/organizations' })
+            router.push('/organizations')
           }, REDIRECT_DELAY)
         },
       })
@@ -32,43 +38,48 @@ export const AcceptInvitePage = ({ token }: AcceptInvitePageProps) => {
         clearTimeout(timeoutId)
       }
     }
-  }, [token, acceptInvite, navigate])
+  }, [acceptInvite, router, token])
+
+  if (!token) {
+    return (
+      <div className='flex min-h-screen items-center justify-center p-4'>
+        <Card className='w-full max-w-md'>
+          <CardHeader>
+            <CardTitle className='text-destructive text-center text-xl'>
+              Invalid Invitation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className='text-muted-foreground text-center'>
+            No invitation token provided.
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
-    <div className='flex min-h-[60vh] items-center justify-center'>
+    <div className='flex min-h-screen items-center justify-center p-4'>
       <Card className='w-full max-w-md'>
-        <CardHeader className='text-center'>
-          <CardTitle>Accepting Invitation</CardTitle>
+        <CardHeader>
+          <CardTitle className='text-center text-xl'>
+            {isPending && 'Accepting Invitation...'}
+            {isError && 'Invitation Failed'}
+            {!isPending && !isError && 'Invitation Accepted!'}
+          </CardTitle>
         </CardHeader>
-        <CardContent className='flex flex-col items-center justify-center gap-4 py-10'>
+        <CardContent className='flex flex-col items-center gap-4 text-center'>
           {isPending && (
-            <>
-              <Loader2 className='text-primary h-10 w-10 animate-spin' />
-              <p className='text-muted-foreground text-center'>
-                Please wait while we process your invitation...
-              </p>
-            </>
-          )}
-          {!isPending && !isError && (
-            <div className='text-center text-green-600'>
-              <p className='text-lg font-semibold'>Success!</p>
-              <p>
-                Invitation accepted. Redirecting you to your organizations...
-              </p>
-            </div>
+            <Loader2 className='text-primary h-8 w-8 animate-spin' />
           )}
           {isError && (
-            <div className='text-destructive text-center'>
-              <p className='text-lg font-semibold'>Error</p>
-              <p>
-                {error instanceof Error
-                  ? error.message
-                  : 'Failed to accept invitation'}
-              </p>
-              <p className='text-muted-foreground mt-4 text-sm'>
-                The link might be expired or invalid.
-              </p>
-            </div>
+            <p className='text-destructive text-sm'>
+              {error?.message || 'Failed to accept invitation'}
+            </p>
+          )}
+          {!isPending && !isError && (
+            <p className='text-muted-foreground text-sm'>
+              Redirecting you to dashboard...
+            </p>
           )}
         </CardContent>
       </Card>

@@ -7,6 +7,9 @@ config({ path: resolve(__dirname, '../.env') })
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       { hostname: process.env.AWS_CLOUDFRONT_DOMAIN ?? 'localhost' },

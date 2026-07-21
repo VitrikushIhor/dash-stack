@@ -1,5 +1,7 @@
-import { useNavigate } from '@tanstack/react-router'
+'use client'
+
 import { Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +24,12 @@ export const DeleteOrganizationButton = ({
   orgId,
 }: DeleteOrganizationButtonProps) => {
   const { mutate: deleteOrg, isPending } = useDeleteOrganization()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const handleDelete = () => {
     deleteOrg(orgId, {
       onSuccess: () => {
-        navigate({ to: '/organizations' })
+        router.push('/organizations')
       },
     })
   }
@@ -44,18 +46,19 @@ export const DeleteOrganizationButton = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            organization and remove all associated data.
+            This action cannot be undone. This will permanently delete your
+            organization and remove all associated data including members,
+            projects, and tasks.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             disabled={isPending}
+            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
           >
-            {isPending ? 'Deleting...' : 'Delete'}
+            {isPending ? 'Deleting...' : 'Delete Organization'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

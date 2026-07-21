@@ -6,10 +6,10 @@ import { type Label } from '@/shared/ui'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TaskCardKanban } from './task-card'
 
-// Mock the Link component from @tanstack/react-router
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children: ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
+// Mock Next.js Link component
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
   ),
 }))
 
