@@ -7,6 +7,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { toast } from 'sonner'
 import {
   DirectionProvider,
@@ -65,19 +66,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <FontProvider>
-          <DirectionProvider>
-            <TooltipProvider>
-              {children}
-              <Toaster duration={5000} />
-              {process.env.NODE_ENV === 'development' && (
-                <ReactQueryDevtools buttonPosition='bottom-left' />
-              )}
-            </TooltipProvider>
-          </DirectionProvider>
-        </FontProvider>
-      </ThemeProvider>
+      <NuqsAdapter>
+        <ThemeProvider>
+          <FontProvider>
+            <DirectionProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster duration={5000} />
+                {process.env.NODE_ENV === 'development' && (
+                  <ReactQueryDevtools buttonPosition='bottom-left' />
+                )}
+              </TooltipProvider>
+            </DirectionProvider>
+          </FontProvider>
+        </ThemeProvider>
+      </NuqsAdapter>
     </QueryClientProvider>
   )
 }

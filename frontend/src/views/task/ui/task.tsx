@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { LayoutGrid, List, Plus } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { LayoutGrid, List, Table as TableIcon, Plus } from 'lucide-react'
+import { useTasksTableSearchParams } from '@/shared/lib'
 import {
   ConfigDrawer,
   DataTableToolbar,
@@ -24,18 +24,10 @@ export function TaskPage() {
   )
 
   const { activeOrgId } = useOrgStore()
-  const searchParams = useSearchParams()
+  const [tableSearchParams] = useTasksTableSearchParams()
   const { openCreate } = useTaskModalStore()
 
-  const searchString = searchParams.toString()
-
   const filters = useMemo(() => {
-    const filter = searchParams.get('filter') ?? undefined
-    const status = searchParams.getAll('status')
-    const members = searchParams.getAll('members')
-    const labels = searchParams.getAll('labels')
-    const dueDate = searchParams.getAll('dueDate')
-
     const parseDate = (val: string | undefined): string | undefined => {
       if (!val) return undefined
       const num = Number(val)
@@ -44,14 +36,23 @@ export function TaskPage() {
     }
 
     return {
-      search: filter,
-      status: status.length > 0 ? (status as TaskStatusEnum[]) : undefined,
-      assigneeIds: members.length > 0 ? members : undefined,
-      labelNames: labels.length > 0 ? labels : undefined,
-      dueDateFrom: parseDate(dueDate[0]),
-      dueDateTo: parseDate(dueDate[1]),
+      search: tableSearchParams.filter || undefined,
+      status:
+        tableSearchParams.status.length > 0
+          ? (tableSearchParams.status as TaskStatusEnum[])
+          : undefined,
+      assigneeIds:
+        tableSearchParams.members.length > 0
+          ? tableSearchParams.members
+          : undefined,
+      labelNames:
+        tableSearchParams.labels.length > 0
+          ? tableSearchParams.labels
+          : undefined,
+      dueDateFrom: parseDate(tableSearchParams.dueDate[0]),
+      dueDateTo: parseDate(tableSearchParams.dueDate[1]),
     }
-  }, [searchParams, searchString])
+  }, [tableSearchParams])
 
   const { data: tasks } = useTasksQuery(activeOrgId || '', filters)
 
@@ -93,8 +94,11 @@ export function TaskPage() {
                 <TabsTrigger value={KanbanViewMode.Kanban}>
                   <LayoutGrid className='h-4 w-4' />
                 </TabsTrigger>
-                <TabsTrigger value={KanbanViewMode.Table}>
+                <TabsTrigger value={KanbanViewMode.List}>
                   <List className='h-4 w-4' />
+                </TabsTrigger>
+                <TabsTrigger value={KanbanViewMode.Table}>
+                  <TableIcon className='h-4 w-4' />
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -109,10 +113,10 @@ export function TaskPage() {
             <DataTableToolbar table={table} />
           </div>
 
-          {viewMode === KanbanViewMode.Kanban ? (
-            <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
-          ) : (
+          {viewMode === KanbanViewMode.Table ? (
             <TasksTable table={table} />
+          ) : (
+            <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
           )}
         </div>
       </Main>

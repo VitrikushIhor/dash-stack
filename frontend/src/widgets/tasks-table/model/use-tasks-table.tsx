@@ -12,8 +12,11 @@ import {
   type SortingState,
   type VisibilityState,
   type RowSelectionState,
+  type ColumnFiltersState,
+  type PaginationState,
+  type OnChangeFn,
 } from '@tanstack/react-table'
-import { useTableUrlState } from '@/shared/lib'
+import { useTasksTableSearchParams } from '@/shared/lib'
 import {
   dateFilterFn,
   dateRangeFilterFn,
@@ -34,41 +37,92 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Synced with URL states
-  const {
-    globalFilter,
-    onGlobalFilterChange,
-    columnFilters,
-    onColumnFiltersChange,
-    pagination,
-    onPaginationChange,
-    ensurePageInRange,
-  } = useTableUrlState({
-    pagination: { defaultPage: 1, defaultPageSize: 10 },
-    globalFilter: { enabled: true, key: 'filter' },
-    columnFilters: [
-      { columnId: 'status', searchKey: 'status', type: 'array' },
-      { columnId: 'label', searchKey: 'labels', type: 'array' },
-      { columnId: 'assignees', searchKey: 'members', type: 'array' },
-      {
-        columnId: 'dueDate',
-        searchKey: 'dueDate',
-        type: 'array',
-        serialize: (value: unknown) => {
-          if (!Array.isArray(value)) return undefined
-          return value.map((d) => (d instanceof Date ? d.getTime() : Number(d)))
-        },
-        deserialize: (value: unknown) => {
-          const arr = Array.isArray(value) ? value : value ? [value] : []
-          return arr.map((d) => {
-            if (d instanceof Date) return d
-            const num = Number(d)
-            return !isNaN(num) ? new Date(num) : new Date(String(d))
-          })
-        },
-      },
-    ],
-  })
+  // Synced with URL states via nuqs
+  const [searchParams, setSearchParams] = useTasksTableSearchParams()
+
+  const columnFilters: ColumnFiltersState = useMemo(() => {
+    const filters: ColumnFiltersState = []
+    if (searchParams.status.length > 0) {
+      filters.push({ id: 'status', value: searchParams.status })
+    }
+    if (searchParams.labels.length > 0) {
+      filters.push({ id: 'label', value: searchParams.labels })
+    }
+    if (searchParams.members.length > 0) {
+      filters.push({ id: 'assignees', value: searchParams.members })
+    }
+    if (searchParams.dueDate.length > 0) {
+      const dates = searchParams.dueDate.map((d) => {
+        const num = Number(d)
+        return !isNaN(num) ? new Date(num) : new Date(d)
+      })
+      filters.push({ id: 'dueDate', value: dates })
+    }
+    return filters
+  }, [
+    searchParams.status,
+    searchParams.labels,
+    searchParams.members,
+    searchParams.dueDate,
+  ])
+
+  const pagination: PaginationState = useMemo(
+    () => ({
+      pageIndex: Math.max(0, searchParams.page - 1),
+      pageSize: searchParams.perPage,
+    }),
+    [searchParams.page, searchParams.perPage]
+  )
+
+  const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updater) => {
+    const next =
+      typeof updater === 'function' ? updater(columnFilters) : updater
+
+    const statusFilter = next.find((f) => f.id === 'status')?.value as
+      | string[]
+      | undefined
+    const labelFilter = next.find((f) => f.id === 'label')?.value as
+      | string[]
+      | undefined
+    const membersFilter = next.find((f) => f.id === 'assignees')?.value as
+      | string[]
+      | undefined
+    const dueDateFilter = next.find((f) => f.id === 'dueDate')?.value as
+      | unknown[]
+      | undefined
+
+    let dueDateStrings: string[] = []
+    if (Array.isArray(dueDateFilter)) {
+      dueDateStrings = dueDateFilter.map((d) =>
+        d instanceof Date ? String(d.getTime()) : String(d)
+      )
+    }
+
+    setSearchParams({
+      page: 1,
+      status: statusFilter && statusFilter.length > 0 ? statusFilter : null,
+      labels: labelFilter && labelFilter.length > 0 ? labelFilter : null,
+      members: membersFilter && membersFilter.length > 0 ? membersFilter : null,
+      dueDate: dueDateStrings.length > 0 ? dueDateStrings : null,
+    })
+  }
+
+  const onGlobalFilterChange: OnChangeFn<string> = (updater) => {
+    const next =
+      typeof updater === 'function' ? updater(searchParams.filter) : updater
+    setSearchParams({
+      filter: next ? next.trim() : null,
+      page: 1,
+    })
+  }
+
+  const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
+    const next = typeof updater === 'function' ? updater(pagination) : updater
+    setSearchParams({
+      page: next.pageIndex + 1,
+      perPage: next.pageSize === 10 ? null : next.pageSize,
+    })
+  }
 
   // Table Instance
   const table = useReactTable({
@@ -79,7 +133,7 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       columnVisibility,
       rowSelection,
       columnFilters,
-      globalFilter,
+      globalFilter: searchParams.filter,
       pagination,
     },
 
@@ -111,8 +165,10 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   // Ensure current page is in valid range
   const pageCount = table.getPageCount()
   useEffect(() => {
-    ensurePageInRange(pageCount)
-  }, [pageCount, ensurePageInRange])
+    if (pageCount > 0 && searchParams.page > pageCount) {
+      setSearchParams({ page: 1 })
+    }
+  }, [pageCount, searchParams.page, setSearchParams])
 
   // Faceted filter options
   const { data: members = [] } = useGetMembers(orgId)
