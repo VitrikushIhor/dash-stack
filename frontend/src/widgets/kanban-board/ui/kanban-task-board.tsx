@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui'
+import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui/kanban'
 import { useOrgStore } from '@/entities/organization'
 import { type Task, type TaskStatusEnum, useUpdateTask } from '@/entities/task'
 import { KanbanViewMode } from '../model/types/kanban-types'
@@ -90,6 +90,7 @@ export function KanbanTaskBoard({
     <>
       {viewMode === KanbanViewMode.Kanban && (
         <Kanban
+          data-testid='kanban-root'
           value={columns}
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}
@@ -136,6 +137,7 @@ export function KanbanTaskBoard({
 
       {viewMode === KanbanViewMode.List && (
         <Kanban
+          data-testid='kanban-root'
           value={columns}
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}

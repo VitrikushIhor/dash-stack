@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { DataTableBulkActions } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
+import { DataTableBulkActions } from '@/shared/ui/data-table'
 import { useOrgStore } from '@/entities/organization'
 import {
   type TaskStatusEnum,

@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, UserPlus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -15,6 +14,7 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
+import { PasswordInput } from '@/shared/ui/password-input'
 import { useSignup } from '../model/mutations/use-signup'
 import {
   signUpDefaultValues,

@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
-import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -16,6 +15,7 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
+import { PasswordInput } from '@/shared/ui/password-input'
 import { useLogin } from '../model/mutations/use-login'
 import {
   signInDefaultValues,

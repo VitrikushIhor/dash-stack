@@ -1,5 +1,5 @@
 import { toast } from 'sonner'
-import { ConfirmDialog } from '@/shared/ui'
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { useOrgStore } from '@/entities/organization'
 import { useDeleteTask } from '@/entities/task'
 import { useTaskModalStore, TaskModalMode } from '../model/use-task-modal-store'

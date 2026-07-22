@@ -1,6 +1,6 @@
 'use client'
 
-import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
+import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -10,6 +10,8 @@ import {
   CardTitle,
 } from '@/shared/ui/core/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
+import { Search } from '@/shared/ui/search'
+import { ThemeSwitch } from '@/shared/ui/theme-switch'
 import { Header, Main, NavUser } from '@/widgets/layout'
 import { Analytics } from './analytics'
 import { Overview } from './overview'

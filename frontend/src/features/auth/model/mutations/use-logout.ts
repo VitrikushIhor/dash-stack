@@ -15,8 +15,8 @@ export function useLogout() {
       toast.success('Logged out successfully')
       router.replace('/sign-in')
     },
-    onError: () => {
-      clearTokens()
+    onError: async () => {
+      await clearTokens()
       queryClient.clear()
       router.replace('/sign-in')
     },

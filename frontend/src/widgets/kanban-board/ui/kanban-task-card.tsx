@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { KanbanItem } from '@/shared/ui'
+import { KanbanItem } from '@/shared/ui/kanban'
 import { type Task } from '@/entities/task'
 import { TaskCard } from '@/features/task'
 import { type KanbanViewMode } from '@/widgets/kanban-board'

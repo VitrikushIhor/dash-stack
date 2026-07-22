@@ -1,5 +1,5 @@
 import { type FileWithServerData } from '@/shared/api'
-import { type LabelColor } from '@/shared/ui'
+import { type LabelColor } from '@/shared/ui/label'
 import { type CreateTaskDto, type UpdateTaskDto } from '@/entities/task'
 import { type TaskFormValues } from './create-task-schema'
 import { TaskModalMode } from './use-task-modal-store'

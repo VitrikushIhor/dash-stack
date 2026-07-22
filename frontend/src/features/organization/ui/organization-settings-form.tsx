@@ -1,5 +1,4 @@
 import { getFileUrl } from '@/shared/api'
-import { FormLogoUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -11,6 +10,7 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { FormLogoUpload } from '@/shared/ui/form-fields'
 import { type Organization } from '@/entities/organization'
 import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
 

@@ -17,13 +17,13 @@ export const authApi = {
     const data = await api.post<AuthTokens>('/auth/login', input, {
       skipAuth: true,
     })
-    setTokens(data.accessToken, data.refreshToken)
+    await setTokens(data.accessToken, data.refreshToken)
     return data
   },
 
   verifyEmail: async (token: string): Promise<AuthTokens> => {
     const data = await api.post<AuthTokens>('/auth/verify-email', { token })
-    setTokens(data.accessToken, data.refreshToken)
+    await setTokens(data.accessToken, data.refreshToken)
     return data
   },
 
@@ -44,13 +44,13 @@ export const authApi = {
         // Ignore errors, clear tokens anyway
       }
     }
-    clearTokens()
+    await clearTokens()
     return { message: 'Logged out successfully' }
   },
 
   logoutAll: async (): Promise<{ message: string }> => {
     const data = await api.post<{ message: string }>('/auth/logout-all')
-    clearTokens()
+    await clearTokens()
     return data
   },
 
@@ -78,7 +78,7 @@ export const authApi = {
 
   oauthExchange: async (token: string): Promise<AuthTokens> => {
     const data = await api.post<AuthTokens>('/auth/oauth/exchange', { token })
-    setTokens(data.accessToken, data.refreshToken)
+    await setTokens(data.accessToken, data.refreshToken)
     return data
   },
 }

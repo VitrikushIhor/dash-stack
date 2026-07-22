@@ -12,7 +12,6 @@ export default defineConfig(
       '.next/**',
       'out/**',
       'node_modules/**',
-      'src/shared/ui/components/ui/**',
       'next-env.d.ts',
     ],
   },

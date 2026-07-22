@@ -1,6 +1,5 @@
-// Public API for error components
-export { ForbiddenError } from './forbidden'
-export { GeneralError } from './general-error'
-export { MaintenanceError } from './maintenance-error'
-export { NotFoundError } from './not-found-error'
-export { UnauthorisedError } from './unauthorized-error'
+export * from './forbidden'
+export * from './general-error'
+export * from './maintenance-error'
+export * from './not-found-error'
+export * from './unauthorized-error'

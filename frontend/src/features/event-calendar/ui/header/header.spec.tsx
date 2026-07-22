@@ -225,7 +225,7 @@ describe('UserSelect', () => {
   it('displays user first letter as avatar fallback', () => {
     renderWithProvider(<UserSelect />)
     // Alice → A, Bob → B
-    expect(screen.getByText('A')).toBeInTheDocument()
-    expect(screen.getByText('B')).toBeInTheDocument()
+    expect(screen.getAllByText('A')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('B')[0]).toBeInTheDocument()
   })
 })

@@ -1,10 +1,5 @@
 import { type UseFormReturn } from 'react-hook-form'
 import { type Membership } from '@/shared/model'
-import {
-  mockAvailableLabels,
-  FormFileUpload,
-  FormLabelSelector,
-} from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -26,6 +21,8 @@ import {
 } from '@/shared/ui/core/select'
 import { Separator } from '@/shared/ui/core/separator'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { FormFileUpload, FormLabelSelector } from '@/shared/ui/form-fields'
+import { mockAvailableLabels } from '@/shared/ui/label'
 import { TaskStatusEnum, FormChecklist } from '@/entities/task'
 import { FormMemberPicker } from '@/entities/team'
 import { type TaskFormValues } from '../model/create-task-schema'

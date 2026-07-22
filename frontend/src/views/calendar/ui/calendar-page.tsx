@@ -2,8 +2,10 @@
 
 import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { ConfigDrawer, Search, ThemeSwitch } from '@/shared/ui'
+import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Skeleton } from '@/shared/ui/core/skeleton'
+import { Search } from '@/shared/ui/search'
+import { ThemeSwitch } from '@/shared/ui/theme-switch'
 import { useGetMembers, useOrgStore } from '@/entities/organization'
 import { useTasksQuery } from '@/entities/task'
 import { type TCalendarView } from '@/features/event-calendar'

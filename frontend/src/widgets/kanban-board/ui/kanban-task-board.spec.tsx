@@ -44,7 +44,7 @@ vi.mock('@/features/manage-task', () => ({
   }),
 }))
 
-vi.mock('@/shared/ui', () => {
+vi.mock('@/shared/ui/kanban', () => {
   return {
     Kanban: ({
       children,

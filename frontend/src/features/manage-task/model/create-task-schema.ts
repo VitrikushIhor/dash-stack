@@ -1,5 +1,5 @@
 import z from 'zod'
-import { labelColorNames } from '@/shared/ui'
+import { labelColorNames } from '@/shared/ui/label'
 import { TaskStatusEnum } from '@/entities/task'
 import { membershipSchema } from '@/entities/team'
 

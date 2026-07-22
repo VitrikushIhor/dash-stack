@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
-import { ConfirmDialog } from '@/shared/ui'
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/core/alert'
 import { Input } from '@/shared/ui/core/input'
 import { Label } from '@/shared/ui/core/label'

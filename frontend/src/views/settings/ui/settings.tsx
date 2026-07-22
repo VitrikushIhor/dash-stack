@@ -1,8 +1,11 @@
 'use client'
 
 import { Monitor, Bell, Palette, UserCog } from 'lucide-react'
-import { ConfigDrawer, Search, SidebarNav, ThemeSwitch } from '@/shared/ui'
+import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Separator } from '@/shared/ui/core/separator'
+import { Search } from '@/shared/ui/search'
+import { SidebarNav } from '@/shared/ui/sidebar-nav'
+import { ThemeSwitch } from '@/shared/ui/theme-switch'
 import { Header, Main, NavUser } from '@/widgets/layout'
 
 const sidebarNavItems = [

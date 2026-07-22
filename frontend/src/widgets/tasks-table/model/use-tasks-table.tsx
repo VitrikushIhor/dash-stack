@@ -17,11 +17,8 @@ import {
   type OnChangeFn,
 } from '@tanstack/react-table'
 import { useTasksTableSearchParams } from '@/shared/lib'
-import {
-  dateFilterFn,
-  dateRangeFilterFn,
-  mockAvailableLabels,
-} from '@/shared/ui'
+import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
+import { mockAvailableLabels } from '@/shared/ui/label'
 import { useGetMembers } from '@/entities/organization'
 import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
 import { tasksColumns } from '../ui/tasks-columns'

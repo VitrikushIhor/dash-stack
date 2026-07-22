@@ -1,6 +1,5 @@
 'use client'
 
-import { FormLogoUpload } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -12,6 +11,7 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { FormLogoUpload } from '@/shared/ui/form-fields'
 import { useCreateOrganizationForm } from '../model/forms/use-create-organization-form'
 
 interface CreateOrganizationFormProps {

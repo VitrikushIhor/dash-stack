@@ -3,8 +3,8 @@
 import { LayoutProvider, SearchProvider } from '@/shared/lib/context'
 import { getCookie } from '@/shared/lib/cookies'
 import { cn } from '@/shared/lib/utils'
-import { SkipToMain } from '@/shared/ui'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
+import { SkipToMain } from '@/shared/ui/skip-to-main'
 import { ManageTaskModal } from '@/features/manage-task'
 import { AppSidebar, CommandMenu } from '@/widgets/layout'
 

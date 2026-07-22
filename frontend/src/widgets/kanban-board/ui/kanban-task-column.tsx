@@ -1,6 +1,5 @@
 import { memo } from 'react'
 import { GripVertical, Plus } from 'lucide-react'
-import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui'
 import {
   Accordion,
   AccordionContent,
@@ -9,6 +8,7 @@ import {
 } from '@/shared/ui/core/accordion'
 import { Button } from '@/shared/ui/core/button'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
+import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui/kanban'
 import { type Task, TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
 import { KanbanViewMode } from '../model/types/kanban-types'

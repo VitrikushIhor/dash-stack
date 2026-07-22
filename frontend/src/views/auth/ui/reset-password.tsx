@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, CheckCircle2, KeyRound } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -21,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/shared/ui/core/form'
+import { PasswordInput } from '@/shared/ui/password-input'
 import {
   AuthLayout,
   useResetPassword,

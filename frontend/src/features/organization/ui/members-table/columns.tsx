@@ -5,9 +5,9 @@ import { type ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import { getInitials } from '@/shared/lib/utils'
 import { getMemberDisplayName, getRoleVariant } from '@/shared/model'
-import { DataTableColumnHeader } from '@/shared/ui'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'
+import { DataTableColumnHeader } from '@/shared/ui/data-table'
 import { type Membership, type OrgRole } from '@/entities/organization'
 
 export const columns: ColumnDef<Membership>[] = [

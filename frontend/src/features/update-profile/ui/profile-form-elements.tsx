@@ -2,7 +2,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import { User, Mail, Link as LinkIcon, FileText } from 'lucide-react'
 import { getFileUrl } from '@/shared/api'
 import { cn } from '@/shared/lib/utils'
-import { DatePicker, AvatarUpload } from '@/shared/ui'
+import { AvatarUpload } from '@/shared/ui/avatar-upload'
 import { Button } from '@/shared/ui/core/button'
 import {
   FormControl,
@@ -14,6 +14,7 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
+import { DatePicker } from '@/shared/ui/date-picker'
 import type { ProfileFormValues } from '../model/profile.schema'
 
 interface ProfileFormElementsProps {

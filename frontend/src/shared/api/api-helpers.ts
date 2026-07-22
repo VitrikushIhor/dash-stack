@@ -18,12 +18,15 @@ export const getAccessToken = (): string | null => null
 export const getRefreshToken = (): string | null => null
 
 // Token helpers (delegating to tokenStorage Route Handlers)
-export const setTokens = (accessToken: string, refreshToken: string): void => {
-  tokenStorage.setTokens(accessToken, refreshToken)
+export const setTokens = (
+  accessToken: string,
+  refreshToken: string
+): Promise<void> => {
+  return tokenStorage.setTokens(accessToken, refreshToken)
 }
 
-export const clearTokens = (): void => {
-  tokenStorage.clearTokens()
+export const clearTokens = (): Promise<void> => {
+  return tokenStorage.clearTokens()
 }
 
 // Custom error class for API errors

@@ -2,14 +2,14 @@ import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Calendar, ListTodo, Paperclip, Tag, Users } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { AvatarGroup } from '@/shared/ui/avatar-group'
+import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
-  AvatarGroup,
   DataTableColumnHeader,
   dateRangeFilterFn,
   TablePlaceholder,
-  LabelBadge,
-} from '@/shared/ui'
-import { Checkbox } from '@/shared/ui/core/checkbox'
+} from '@/shared/ui/data-table'
+import { LabelBadge } from '@/shared/ui/label'
 import {
   type TaskStatusEnum,
   type Task,

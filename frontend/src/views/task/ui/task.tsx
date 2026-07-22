@@ -3,14 +3,12 @@
 import { useState, useMemo } from 'react'
 import { LayoutGrid, List, Table as TableIcon, Plus } from 'lucide-react'
 import { useTasksTableSearchParams } from '@/shared/lib'
-import {
-  ConfigDrawer,
-  DataTableToolbar,
-  Search,
-  ThemeSwitch,
-} from '@/shared/ui'
+import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
+import { DataTableToolbar } from '@/shared/ui/data-table'
+import { Search } from '@/shared/ui/search'
+import { ThemeSwitch } from '@/shared/ui/theme-switch'
 import { useOrgStore } from '@/entities/organization'
 import { useTasksQuery, type TaskStatusEnum } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'

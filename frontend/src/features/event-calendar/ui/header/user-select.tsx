@@ -1,4 +1,4 @@
-import { AvatarGroup } from '@/shared/ui'
+import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
   Select,
