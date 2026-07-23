@@ -1,3 +1,5 @@
+'use client'
+
 import { SettingsProfile } from '@/views/settings'
 
 export const dynamic = 'force-dynamic'

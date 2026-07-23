@@ -7,6 +7,7 @@ config({ path: resolve(__dirname, '../.env') })
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  outputFileTracingRoot: resolve(__dirname, '../'),
   experimental: {
     optimizePackageImports: [
       'lucide-react',

@@ -1,3 +1,5 @@
+'use client'
+
 import { CreateOrganizationPage } from '@/views/create-organization'
 
 export const dynamic = 'force-dynamic'

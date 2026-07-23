@@ -1,3 +1,5 @@
+'use client'
+
 import { ContentSection } from '../ui/content-section'
 import { NotificationsForm } from './notifications-form'
 

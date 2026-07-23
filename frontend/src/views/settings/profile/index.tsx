@@ -1,3 +1,5 @@
+'use client'
+
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { useCurrentUser } from '@/entities/user'
 import { UpdateProfileForm } from '@/features/update-profile'
