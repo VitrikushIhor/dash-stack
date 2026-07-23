@@ -26,8 +26,10 @@ vi.mock('@/entities/organization', async (importOriginal) => {
     await importOriginal<typeof import('@/entities/organization')>()
   return {
     ...actual,
-    useOrgStore: () => ({
-      activeOrgId: mockActiveOrgId.value,
+    useActiveOrganization: () => ({
+      activeOrg: mockActiveOrgId.value
+        ? { id: mockActiveOrgId.value, name: 'Test Org' }
+        : null,
     }),
   }
 })

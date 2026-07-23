@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui/kanban'
-import { useOrgStore } from '@/entities/organization'
+import { useActiveOrganization } from '@/entities/organization'
 import { type Task, type TaskStatusEnum, useUpdateTask } from '@/entities/task'
 import { KanbanViewMode } from '../model/types/kanban-types'
 import { groupTasksByStatus } from '../model/utils'
@@ -25,12 +25,13 @@ export function KanbanTaskBoard({
   useEffect(() => {
     if (prevColumnsRef.current !== groupedTask) {
       prevColumnsRef.current = groupedTask
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setColumns(groupedTask)
     }
   }, [groupedTask])
 
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
 
   const handleTaskMove = useCallback(

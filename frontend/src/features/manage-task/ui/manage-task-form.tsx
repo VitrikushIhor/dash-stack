@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { useAttachments } from '@/shared/lib'
 import { logger } from '@/shared/lib/logger'
-import { useGetMembers, useOrgStore } from '@/entities/organization'
+import { useGetMembers, useActiveOrganization } from '@/entities/organization'
 import { type Task, useCreateTask, useUpdateTask } from '@/entities/task'
 import { type TaskFormValues } from '../model/create-task-schema'
 import { mapTaskFormToDto } from '../model/map-form-to-dto'
@@ -21,7 +21,8 @@ export function ManageTaskForm({
   selectedTask,
   close,
 }: ManageTaskFormProps) {
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const createTaskMutation = useCreateTask(activeOrgId || '')
   const updateTaskMutation = useUpdateTask(activeOrgId || '')
 

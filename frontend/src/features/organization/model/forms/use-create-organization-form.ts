@@ -2,7 +2,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useUploadImage } from '@/shared/api'
 import { handleServerError } from '@/shared/lib/handle-server-error'
-import { useCreateOrganization, useOrgStore } from '@/entities/organization'
+import {
+  useCreateOrganization,
+  useActiveOrganization,
+} from '@/entities/organization'
 import {
   CreateOrgSchema,
   type CreateOrgFormValues,
@@ -16,7 +19,7 @@ export const useCreateOrganizationForm = ({
   onSuccess,
 }: UseCreateOrganizationFormProps = {}) => {
   const { mutate: createOrg, isPending: isCreating } = useCreateOrganization()
-  const { setActiveOrgId } = useOrgStore()
+  const { setActiveOrgId } = useActiveOrganization()
   const uploadImage = useUploadImage()
 
   const form = useForm<CreateOrgFormValues>({

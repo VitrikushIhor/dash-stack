@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
 import { DataTableToolbar } from '@/shared/ui/data-table'
 import { Search } from '@/shared/ui/search'
 import { ThemeSwitch } from '@/shared/ui/theme-switch'
-import { useOrgStore } from '@/entities/organization'
+import { useActiveOrganization } from '@/entities/organization'
 import { useTasksQuery, type TaskStatusEnum } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
@@ -21,7 +21,8 @@ export function TaskPage() {
     KanbanViewMode.Kanban
   )
 
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const [tableSearchParams] = useTasksTableSearchParams()
   const { openCreate } = useTaskModalStore()
 

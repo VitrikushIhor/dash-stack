@@ -1,4 +1,3 @@
-// src/shared/ui/components/ui/label-badge.tsx
 import { memo } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'

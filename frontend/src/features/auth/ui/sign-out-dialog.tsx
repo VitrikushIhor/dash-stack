@@ -1,8 +1,7 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
-import { useAuthStore } from '@/features/auth'
+import { useLogout } from '../model/mutations/use-logout'
 
 interface SignOutDialogProps {
   open: boolean
@@ -10,14 +9,10 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { logout } = useAuthStore()
+  const { mutate: logout } = useLogout()
 
   const handleSignOut = () => {
     logout()
-    const redirect = encodeURIComponent(pathname)
-    router.replace(`/sign-in?redirect=${redirect}`)
   }
 
   return (

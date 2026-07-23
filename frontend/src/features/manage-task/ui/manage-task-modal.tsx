@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
-import { useOrgStore } from '@/entities/organization'
+import { useActiveOrganization } from '@/entities/organization'
 import { useDeleteTask } from '@/entities/task'
 import { useTaskModalStore, TaskModalMode } from '../model/use-task-modal-store'
 import { ManageTaskForm } from './manage-task-form'
@@ -8,7 +8,8 @@ import { TaskModalView } from './task-modal-view'
 
 export const ManageTaskModal = () => {
   const { isOpen, mode, selectedTask, close } = useTaskModalStore()
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const deleteTaskMutation = useDeleteTask(activeOrgId || '')
 
   const handleDelete = async () => {

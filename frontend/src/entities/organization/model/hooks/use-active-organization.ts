@@ -1,24 +1,28 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useCallback } from 'react'
+import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
 import { useGetOrganizations } from '../../api/queries/use-get-organizations'
-import { useOrgStore } from '../store/organization-store'
+
+const COOKIE_NAME = 'active_org_id'
 
 export function useActiveOrganization() {
   const { data: memberships, isLoading } = useGetOrganizations()
-  const { activeOrgId, setActiveOrgId } = useOrgStore()
+
+  const cookieOrgId = getCookie(COOKIE_NAME)
 
   const activeOrg = useMemo(() => {
     if (!memberships?.length) return null
 
-    const selected = memberships.find((m) => m.organization.id === activeOrgId)
+    const selected = memberships.find((m) => m.organization.id === cookieOrgId)
     return selected?.organization ?? memberships[0].organization
-  }, [memberships, activeOrgId])
+  }, [memberships, cookieOrgId])
 
-  useEffect(() => {
-    const resolvedOrgId = activeOrg?.id
-    if (resolvedOrgId && resolvedOrgId !== activeOrgId) {
-      setActiveOrgId(resolvedOrgId)
+  const setActiveOrgId = useCallback((id: string | null) => {
+    if (id) {
+      setCookie(COOKIE_NAME, id)
+    } else {
+      removeCookie(COOKIE_NAME)
     }
-  }, [activeOrg?.id, activeOrgId, setActiveOrgId])
+  }, [])
 
   return {
     activeOrg,

@@ -8,7 +8,7 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
-import { useOrgStore } from '@/entities/organization'
+import { useActiveOrganization } from '@/entities/organization'
 import {
   type Task,
   useUpdateTask,
@@ -21,7 +21,8 @@ interface DndProviderWrapperProps {
 }
 
 export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
 
   const sensors = useSensors(

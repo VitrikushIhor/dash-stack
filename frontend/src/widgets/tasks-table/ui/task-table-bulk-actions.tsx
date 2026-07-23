@@ -15,7 +15,7 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
 import { DataTableBulkActions } from '@/shared/ui/data-table'
-import { useOrgStore } from '@/entities/organization'
+import { useActiveOrganization } from '@/entities/organization'
 import {
   type TaskStatusEnum,
   type Task,
@@ -35,7 +35,8 @@ export function TaskTableBulkActions<TData>({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
   const { mutateAsync: bulkUpdate } = useBulkUpdateTasks(activeOrgId || '')
   const { mutateAsync: bulkDelete } = useBulkDeleteTasks(activeOrgId || '')
 

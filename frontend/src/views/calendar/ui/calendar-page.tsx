@@ -6,7 +6,7 @@ import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { Search } from '@/shared/ui/search'
 import { ThemeSwitch } from '@/shared/ui/theme-switch'
-import { useGetMembers, useOrgStore } from '@/entities/organization'
+import { useGetMembers, useActiveOrganization } from '@/entities/organization'
 import { useTasksQuery } from '@/entities/task'
 import { type TCalendarView } from '@/features/event-calendar'
 import { CalendarView } from '@/widgets/calendar-view'
@@ -24,7 +24,8 @@ export function CalendarPage() {
     [dateParam]
   )
 
-  const { activeOrgId } = useOrgStore()
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id
 
   const range = useMemo(
     () => getVisibleRange(initialView, initialDate),

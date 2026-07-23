@@ -8,7 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { useOrgStore, type OrganizationSummary } from '@/entities/organization'
+import {
+  useActiveOrganization,
+  type OrganizationSummary,
+} from '@/entities/organization'
 
 interface OrganizationCardProps {
   organization: OrganizationSummary
@@ -21,7 +24,7 @@ export const OrganizationCard = ({
   role,
   memberCount,
 }: OrganizationCardProps) => {
-  const { setActiveOrgId } = useOrgStore()
+  const { setActiveOrgId } = useActiveOrganization()
   const members = memberCount ?? organization.stats?.members ?? 0
   const displayRole = role || 'Member'
 

@@ -18,9 +18,6 @@ export * from './model/schema/sign-up.schema'
 export * from './model/schema/forgot-password.schema'
 export * from './model/schema/reset-password.schema'
 
-// Store
-export { useAuthStore } from './model/store/auth-store'
-
 // UI
 export { SignInForm } from './ui/sign-in-form'
 export { SignUpForm } from './ui/sign-up-form'
