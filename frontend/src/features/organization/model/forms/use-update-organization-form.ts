@@ -1,7 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type FileWithServerData, useUploadImage } from '@/shared/api'
-import { handleServerError } from '@/shared/lib/handle-server-error'
+import {
+  type FileWithServerData,
+  useUploadImage,
+  handleServerError,
+} from '@/shared/api'
 import {
   useUpdateOrganization,
   type Organization,

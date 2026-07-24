@@ -9,6 +9,8 @@ export function Toaster({ ...props }: ToasterProps) {
   return (
     <Sonner
       theme={theme as ToasterProps['theme']}
+      richColors
+      closeButton
       className='toaster group [&_div[data-content]]:w-full'
       style={
         {

@@ -14,7 +14,7 @@ export function OAuthButtons({ disabled }: OAuthButtonsProps) {
   const handleOAuthRedirect = (connection: string) => {
     if (typeof window === 'undefined') return
     const redirectUri = `${window.location.origin}/oauth/callback`
-    const authUrl = `https://${domain}/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
+    const authUrl = `https://${domain}/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&connection=${connection}&scope=openid%20profile%20email`
     window.location.href = authUrl

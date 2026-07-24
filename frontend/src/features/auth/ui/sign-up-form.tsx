@@ -1,100 +1,31 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, UserPlus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/ui/core/form'
-import { Input } from '@/shared/ui/core/input'
-import { PasswordInput } from '@/shared/ui/password-input'
-import { useSignup } from '../model/mutations/use-signup'
-import {
-  signUpDefaultValues,
-  signUpSchema,
-  type TSignUpSchema,
-} from '../model/schema/sign-up.schema'
+import { Form } from '@/shared/ui/core/form'
+import { useSignUpForm } from '../model/hooks/use-sign-up-form'
 import { OAuthButtons } from './oauth-buttons'
+import { SignUpFields } from './sign-up-fields'
 
 export function SignUpForm({
   className,
   onSuccess,
   ...props
 }: React.HTMLAttributes<HTMLFormElement> & { onSuccess?: () => void }) {
-  const signupMutation = useSignup()
-
-  const form = useForm<TSignUpSchema>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: signUpDefaultValues,
-  })
-
-  function onSubmit(data: TSignUpSchema) {
-    signupMutation.mutate(
-      {
-        email: data.email,
-        password: data.password,
-      },
-      {
-        onSuccess: () => onSuccess?.(),
-      }
-    )
-  }
+  const { form, onSubmit, isPending } = useSignUpForm({ onSuccess })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-3', className)}
         {...props}
       >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='confirmPassword'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={signupMutation.isPending}>
-          {signupMutation.isPending ? (
+        <SignUpFields control={form.control} />
+
+        <Button className='mt-2' disabled={isPending}>
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
             <UserPlus className='h-4 w-4' />
@@ -113,7 +44,7 @@ export function SignUpForm({
           </div>
         </div>
 
-        <OAuthButtons disabled={signupMutation.isPending} />
+        <OAuthButtons disabled={isPending} />
       </form>
     </Form>
   )

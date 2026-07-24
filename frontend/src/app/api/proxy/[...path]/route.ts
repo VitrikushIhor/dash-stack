@@ -1,45 +1,35 @@
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL =
-  process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
+const BASE_URL =
+  process.env.API_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
   'http://localhost:8000'
 
-async function handleProxy(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  const targetPath = resolvedParams.path.join('/')
+async function forward(req: NextRequest, path: string[]) {
+  const store = await cookies()
+  const token = store.get('access_token')?.value
+  const refreshToken = store.get('refresh_token')?.value
   const search = req.nextUrl.search
 
-  const cookieStore = await cookies()
-  let accessToken = cookieStore.get('access_token')?.value
-  const refreshToken = cookieStore.get('refresh_token')?.value
-
-  const headers = new Headers(req.headers)
-  headers.delete('host')
-  headers.delete('connection')
-
-  if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`)
+  const headers: Record<string, string> = {
+    'Content-Type': req.headers.get('content-type') ?? 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
   }
 
-  let body: BodyInit | null = null
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    body = await req.arrayBuffer()
-  }
+  const body = ['GET', 'HEAD'].includes(req.method)
+    ? undefined
+    : await req.text()
 
-  let backendRes = await fetch(`${API_BASE_URL}/api/${targetPath}${search}`, {
+  let res = await fetch(`${BASE_URL}/api/${path.join('/')}${search}`, {
     method: req.method,
     headers,
     body,
   })
 
   // Handle 401 - Token refresh attempt
-  if (backendRes.status === 401 && refreshToken) {
-    const refreshRes = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+  if (res.status === 401 && refreshToken) {
+    const refreshRes = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: refreshToken }),
@@ -47,43 +37,73 @@ async function handleProxy(
 
     if (refreshRes.ok) {
       const refreshData = await refreshRes.json()
-      accessToken = refreshData.accessToken
-
-      // Update cookie
-      cookieStore.set('access_token', accessToken!, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 15,
-        path: '/',
-      })
-
-      headers.set('Authorization', `Bearer ${accessToken}`)
-      backendRes = await fetch(`${API_BASE_URL}/api/${targetPath}${search}`, {
-        method: req.method,
-        headers,
-        body,
-      })
+      const newAccessToken = refreshData.accessToken
+      if (newAccessToken) {
+        store.set('access_token', newAccessToken, {
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 60 * 15,
+          path: '/',
+        })
+        headers['Authorization'] = `Bearer ${newAccessToken}`
+        res = await fetch(`${BASE_URL}/api/${path.join('/')}${search}`, {
+          method: req.method,
+          headers,
+          body,
+        })
+      }
     } else {
-      cookieStore.delete('access_token')
-      cookieStore.delete('refresh_token')
+      store.delete('access_token')
+      store.delete('refresh_token')
     }
   }
 
-  const resHeaders = new Headers(backendRes.headers)
-  resHeaders.delete('transfer-encoding')
+  const resHeaders = new Headers()
+  resHeaders.set(
+    'Content-Type',
+    res.headers.get('content-type') ?? 'application/json'
+  )
 
-  return new NextResponse(backendRes.body, {
-    status: backendRes.status,
-    statusText: backendRes.statusText,
+  const setCookie = res.headers.get('set-cookie')
+  if (setCookie) {
+    resHeaders.set('set-cookie', setCookie)
+  }
+
+  const data = await res.text()
+  return new NextResponse(data, {
+    status: res.status,
     headers: resHeaders,
   })
 }
 
-export {
-  handleProxy as GET,
-  handleProxy as POST,
-  handleProxy as PUT,
-  handleProxy as PATCH,
-  handleProxy as DELETE,
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  return forward(req, (await params).path)
+}
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  return forward(req, (await params).path)
+}
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  return forward(req, (await params).path)
+}
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  return forward(req, (await params).path)
+}
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  return forward(req, (await params).path)
 }

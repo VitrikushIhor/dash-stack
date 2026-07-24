@@ -2,12 +2,13 @@ import {
   Controller,
   Post,
   Body,
-  Get,
   UseGuards,
   Request,
+  Res,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import type { Response, Request as ExpressRequest } from 'express';
 import { SignupUseCase } from '../../application/use-cases/commands/signup.use-case';
 import { LoginUseCase } from '../../application/use-cases/commands/login.use-case';
 import { VerifyEmailUseCase } from '../../application/use-cases/commands/verify-email.use-case';
@@ -26,6 +27,8 @@ import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { OAuthExchangeDto } from '../dto/oauth-exchange.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { AuthCookieHelper } from '../helpers/auth-cookie.helper';
+import { AUTH_COOKIE_NAMES } from '../../domain/constants/auth.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -53,32 +56,66 @@ export class AuthController {
 
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
-  async verifyEmail(@Body() { token }: VerifyEmailDto) {
-    return this.verifyEmailUseCase.execute({ token });
+  async verifyEmail(
+    @Body() { token }: VerifyEmailDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.verifyEmailUseCase.execute({ token });
+    AuthCookieHelper.setAuthCookies(res, tokens);
+    return tokens;
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() { email, password }: LoginDto) {
-    return this.loginUseCase.execute({ email, password });
+  async login(
+    @Body() { email, password }: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.loginUseCase.execute({ email, password });
+    AuthCookieHelper.setAuthCookies(res, tokens);
+    return tokens;
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(@Body() { token }: RefreshTokenDto) {
-    return this.refreshTokenUseCase.execute({ token });
+  async refreshToken(
+    @Body() body: RefreshTokenDto,
+    @Request() req: ExpressRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken =
+      body?.token || req?.cookies?.[AUTH_COOKIE_NAMES.REFRESH_TOKEN];
+    const tokens = await this.refreshTokenUseCase.execute({
+      token: refreshToken,
+    });
+    AuthCookieHelper.setAuthCookies(res, tokens);
+    return tokens;
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Body() { refreshToken }: LogoutDto) {
-    return this.logoutUseCase.execute({ refreshToken });
+  async logout(
+    @Body() body: LogoutDto,
+    @Request() req: ExpressRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken =
+      body?.refreshToken || req?.cookies?.[AUTH_COOKIE_NAMES.REFRESH_TOKEN];
+    AuthCookieHelper.clearAuthCookies(res);
+    if (refreshToken) {
+      return this.logoutUseCase.execute({ refreshToken });
+    }
+    return { message: 'Logged out successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout-all')
   @HttpCode(HttpStatus.OK)
-  async logoutAll(@Request() req) {
+  async logoutAll(
+    @Request() req: ExpressRequest & { user: { id: string } },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    AuthCookieHelper.clearAuthCookies(res);
     return this.logoutAllUseCase.execute({ userId: req.user.id });
   }
 
@@ -96,7 +133,14 @@ export class AuthController {
 
   @Post('oauth/exchange')
   @HttpCode(HttpStatus.OK)
-  async oauthExchange(@Body() { token }: OAuthExchangeDto) {
-    return this.oauthExchangeUseCase.execute({ auth0Token: token });
+  async oauthExchange(
+    @Body() { token }: OAuthExchangeDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.oauthExchangeUseCase.execute({
+      auth0Token: token,
+    });
+    AuthCookieHelper.setAuthCookies(res, tokens);
+    return tokens;
   }
 }

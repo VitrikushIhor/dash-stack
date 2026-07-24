@@ -1,44 +1,21 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/ui/core/form'
-import { Input } from '@/shared/ui/core/input'
-import { useForgotPassword } from '../model/mutations/use-forgot-password'
-import {
-  forgotPasswordDefaultValues,
-  forgotPasswordSchema,
-  type TForgotPasswordSchema,
-} from '../model/schema/forgot-password.schema'
+import { Form } from '@/shared/ui/core/form'
+import { useForgotPasswordForm } from '../model/hooks/use-forgot-password-form'
+import { ForgotPasswordFields } from './forgot-password-fields'
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
   const router = useRouter()
-  const forgotPasswordMutation = useForgotPassword()
+  const { form, onSubmit, isPending, isSent } = useForgotPasswordForm()
 
-  const form = useForm<TForgotPasswordSchema>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: forgotPasswordDefaultValues,
-  })
-
-  function onSubmit(data: TForgotPasswordSchema) {
-    forgotPasswordMutation.mutate(data.email)
-  }
-
-  if (forgotPasswordMutation.isSuccess || forgotPasswordMutation.isError) {
+  if (isSent) {
     return (
       <div className='space-y-4 text-center'>
         <div className='text-4xl'>📧</div>
@@ -61,29 +38,17 @@ export function ForgotPasswordForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-2', className)}
         {...props}
       >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={forgotPasswordMutation.isPending}>
+        <ForgotPasswordFields control={form.control} />
+        <Button className='mt-2' disabled={isPending}>
           Continue
-          {forgotPasswordMutation.isPending ? (
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
-            <ArrowRight />
+            <ArrowRight className='h-4 w-4' />
           )}
         </Button>
       </form>

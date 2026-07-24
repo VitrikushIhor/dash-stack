@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { buttonVariants } from '@/shared/ui/core/button'
+import { Button } from '@/shared/ui/core/button'
 
 export default function NotFound() {
   return (
@@ -8,9 +8,9 @@ export default function NotFound() {
       <p className='text-muted-foreground'>
         The page you are looking for does not exist.
       </p>
-      <Link href='/' className={buttonVariants({ variant: 'outline' })}>
-        Return Home
-      </Link>
+      <Button variant='outline' asChild>
+        <Link href='/'>Return Home</Link>
+      </Button>
     </div>
   )
 }

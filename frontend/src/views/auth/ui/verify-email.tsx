@@ -1,9 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { getErrorMessage } from '@/shared/api'
+import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -14,41 +12,10 @@ import {
 } from '@/shared/ui/core/card'
 import { AuthLayout, useVerifyEmail, VerificationStatus } from '@/features/auth'
 
-const REDIRECT_DELAY_MS = 3000
-
 export function VerifyEmail() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-  const router = useRouter()
-  const { mutate, isSuccess, isError, error } = useVerifyEmail()
-  const hasTriedRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (!token || hasTriedRef.current === token) return
-    hasTriedRef.current = token
-    mutate(token)
-  }, [token, mutate])
-
-  useEffect(() => {
-    if (!isSuccess) return
-    const timeoutId = setTimeout(() => {
-      router.replace('/sign-in')
-    }, REDIRECT_DELAY_MS)
-    return () => clearTimeout(timeoutId)
-  }, [isSuccess, router])
-
-  const status: VerificationStatus = !token
-    ? VerificationStatus.MISSING_TOKEN
-    : isSuccess
-      ? VerificationStatus.SUCCESS
-      : isError
-        ? VerificationStatus.ERROR
-        : VerificationStatus.LOADING
-
-  const errorMessage =
-    status === VerificationStatus.MISSING_TOKEN
-      ? 'Verification link is invalid: no token provided'
-      : getErrorMessage(error)
+  const { status, errorMessage, handleContinue } = useVerifyEmail(token)
 
   return (
     <AuthLayout>
@@ -69,14 +36,11 @@ export function VerifyEmail() {
         <CardContent className='flex flex-col items-center gap-4'>
           {status === VerificationStatus.LOADING && <LoadingState />}
           {status === VerificationStatus.SUCCESS && (
-            <SuccessState onContinue={() => router.replace('/sign-in')} />
+            <SuccessState onContinue={handleContinue} />
           )}
           {(status === VerificationStatus.ERROR ||
             status === VerificationStatus.MISSING_TOKEN) && (
-            <ErrorState
-              message={errorMessage}
-              onBack={() => router.replace('/sign-in')}
-            />
+            <ErrorState message={errorMessage} onBack={handleContinue} />
           )}
         </CardContent>
       </Card>

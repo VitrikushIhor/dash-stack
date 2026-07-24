@@ -1,8 +1,7 @@
-import { tokenStorage } from './token-storage'
+import { toast } from 'sonner'
+import { ApiError } from './api-error'
 
-// Token storage keys
-export const ACCESS_TOKEN_KEY = 'accessToken'
-export const REFRESH_TOKEN_KEY = 'refreshToken'
+export { ApiError, extractErrorMessage } from './api-error'
 
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof ApiError) {
@@ -14,31 +13,25 @@ export const getErrorMessage = (error: unknown): string => {
   return 'An unexpected error occurred'
 }
 
-export const getAccessToken = (): string | null => null
-export const getRefreshToken = (): string | null => null
+export function handleServerError(error: unknown): void {
+  // eslint-disable-next-line no-console
+  console.log(error)
 
-// Token helpers (delegating to tokenStorage Route Handlers)
-export const setTokens = (
-  accessToken: string,
-  refreshToken: string
-): Promise<void> => {
-  return tokenStorage.setTokens(accessToken, refreshToken)
-}
-
-export const clearTokens = (): Promise<void> => {
-  return tokenStorage.clearTokens()
-}
-
-// Custom error class for API errors
-export class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string,
-    public data?: unknown
-  ) {
-    super(message)
-    this.name = 'ApiError'
+  if (error instanceof ApiError) {
+    if (error.isValidationError && error.validationMessages.length > 0) {
+      toast.error(error.validationMessages[0])
+      return
+    }
+    toast.error(error.message)
+    return
   }
+
+  if (error instanceof Error) {
+    toast.error(error.message)
+    return
+  }
+
+  toast.error('Something went wrong!')
 }
 
 export const getFileUrl = (

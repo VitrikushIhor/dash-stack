@@ -1,28 +1,12 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, LogIn } from 'lucide-react'
-import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/ui/core/form'
-import { Input } from '@/shared/ui/core/input'
-import { PasswordInput } from '@/shared/ui/password-input'
-import { useLogin } from '../model/mutations/use-login'
-import {
-  signInDefaultValues,
-  signInSchema,
-  type TSignInSchema,
-} from '../model/schema/sign-in.schema'
+import { Form } from '@/shared/ui/core/form'
+import { useSignInForm } from '../model/hooks/use-sign-in-form'
 import { OAuthButtons } from './oauth-buttons'
+import { SignInFields } from './sign-in-fields'
 
 interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
@@ -33,67 +17,26 @@ export function SignInForm({
   redirectTo,
   ...props
 }: SignInFormProps) {
-  const loginMutation = useLogin({ redirectTo })
-
-  const form = useForm<TSignInSchema>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: signInDefaultValues,
-  })
-
-  function onSubmit(data: TSignInSchema) {
-    loginMutation.mutate({
-      email: data.email,
-      password: data.password,
-    })
-  }
+  const { form, onSubmit, isPending } = useSignInForm({ redirectTo })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-3', className)}
         {...props}
       >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-              <Link
-                href='/forgot-password'
-                className='text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75'
-              >
-                Forgot password?
-              </Link>
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={loginMutation.isPending}>
-          {loginMutation.isPending ? (
+        <SignInFields control={form.control} />
+
+        <Button className='mt-2' disabled={isPending}>
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
-            <LogIn />
+            <LogIn className='h-4 w-4' />
           )}
           Sign in
         </Button>
+
         <div className='relative my-2'>
           <div className='absolute inset-0 flex items-center'>
             <span className='w-full border-t' />
@@ -105,7 +48,7 @@ export function SignInForm({
           </div>
         </div>
 
-        <OAuthButtons disabled={loginMutation.isPending} />
+        <OAuthButtons disabled={isPending} />
       </form>
     </Form>
   )
