@@ -10,7 +10,7 @@ import {
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
-import { FormLogoUpload } from '@/shared/ui/form-fields'
+import { FormImageUpload } from '@/shared/ui/form-fields'
 import { type Organization } from '@/entities/organization'
 import { useUpdateOrganizationForm } from '../model/forms/use-update-organization-form'
 
@@ -52,8 +52,9 @@ export const OrganizationSettingsForm = ({
             </FormItem>
           )}
         />
-        <FormLogoUpload
+        <FormImageUpload
           name='logoFile'
+          preset='logo'
           label='Organization Logo'
           defaultPreview={getFileUrl(organization.logo)}
           className='w-full'
