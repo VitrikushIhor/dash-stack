@@ -26,6 +26,7 @@ export function KanbanTaskBoard({
     if (prevColumnsRef.current !== groupedTask) {
       prevColumnsRef.current = groupedTask
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setColumns(groupedTask)
     }
   }, [groupedTask])

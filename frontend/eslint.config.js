@@ -8,12 +8,7 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig(
   {
-    ignores: [
-      '.next/**',
-      'out/**',
-      'node_modules/**',
-      'next-env.d.ts',
-    ],
+    ignores: ['.next/**', 'out/**', 'node_modules/**', 'next-env.d.ts'],
   },
   {
     extends: [

@@ -74,13 +74,17 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       typeof updater === 'function' ? updater(columnFilters) : updater
 
     const statusFilter = next.find((f) => f.id === 'status')?.value as
-      string[] | undefined
+      | string[]
+      | undefined
     const labelFilter = next.find((f) => f.id === 'label')?.value as
-      string[] | undefined
+      | string[]
+      | undefined
     const membersFilter = next.find((f) => f.id === 'assignees')?.value as
-      string[] | undefined
+      | string[]
+      | undefined
     const dueDateFilter = next.find((f) => f.id === 'dueDate')?.value as
-      unknown[] | undefined
+      | unknown[]
+      | undefined
 
     let dueDateStrings: string[] = []
     if (Array.isArray(dueDateFilter)) {
