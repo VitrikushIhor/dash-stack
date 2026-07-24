@@ -1,11 +1,13 @@
 'use client'
 
 import { Plus, Building2 } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/shared/ui/core/button'
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { useGetOrganizations } from '@/entities/organization'
-import { OrganizationCard } from '@/features/organization'
+import {
+  OrganizationCard,
+  CreateOrganizationDialog,
+} from '@/features/organization'
 import { Header, Main } from '@/widgets/layout'
 
 export function OrganizationsPage() {
@@ -19,12 +21,12 @@ export function OrganizationsPage() {
             <Building2 className='h-6 w-6' />
             <h1 className='text-xl font-bold'>Organizations</h1>
           </div>
-          <Button asChild size='sm'>
-            <Link href='/create-organization'>
+          <CreateOrganizationDialog>
+            <Button size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               Create Organization
-            </Link>
-          </Button>
+            </Button>
+          </CreateOrganizationDialog>
         </div>
       </Header>
       <Main>
@@ -47,12 +49,12 @@ export function OrganizationsPage() {
             <p className='text-muted-foreground mt-1 mb-4 text-sm'>
               Get started by creating your first organization.
             </p>
-            <Button asChild>
-              <Link href='/create-organization'>
+            <CreateOrganizationDialog>
+              <Button>
                 <Plus className='mr-2 h-4 w-4' />
                 Create Organization
-              </Link>
-            </Button>
+              </Button>
+            </CreateOrganizationDialog>
           </div>
         ) : (
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>

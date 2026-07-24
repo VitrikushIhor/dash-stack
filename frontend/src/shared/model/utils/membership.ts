@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import { OrgRole } from '../types/org-role'
 
 /**
@@ -36,21 +37,16 @@ export const getRoleVariant = (
 }
 
 /**
- * Formats a date string or object into a human-readable "Member since" format
+ * Formats a date string or object into a human-readable "MMM d, yyyy" format
  */
-export const formatJoinedDate = (date?: string | Date) => {
-  if (!date) return 'Unknown date'
+export const formatJoinedDate = (date?: string | Date, fallback = '—') => {
+  if (!date) return fallback
   try {
-    const d = new Date(date)
-    if (isNaN(d.getTime())) return 'Unknown date'
-
-    return d.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    const d = typeof date === 'string' ? new Date(date) : date
+    if (isNaN(d.getTime())) return fallback
+    return format(d, 'MMM d, yyyy')
   } catch {
-    return 'Unknown date'
+    return fallback
   }
 }
 

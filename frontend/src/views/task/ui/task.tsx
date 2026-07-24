@@ -55,7 +55,7 @@ export function TaskPage() {
 
   const { data: tasks } = useTasksQuery(activeOrgId || '', filters)
 
-  const { table } = useTasksTable({
+  const { table, filterOptions } = useTasksTable({
     orgId: activeOrgId || '',
     data: tasks || [],
   })
@@ -109,7 +109,38 @@ export function TaskPage() {
 
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
           <div className='mb-4'>
-            <DataTableToolbar table={table} />
+            <DataTableToolbar
+              filterVariant={
+                viewMode !== KanbanViewMode.Table ? 'compact' : 'default'
+              }
+              table={table}
+              searchPlaceholder='Filter by title or desc...'
+              filters={[
+                {
+                  columnId: 'status',
+                  title: 'Status',
+                  options: filterOptions.status,
+                },
+                {
+                  columnId: 'label',
+                  title: 'Label',
+                  options: filterOptions.labels,
+                },
+                {
+                  columnId: 'assignees',
+                  title: 'Members',
+                  options: filterOptions.members,
+                },
+              ]}
+              dateFilters={[
+                {
+                  columnId: 'dueDate',
+                  title: 'Due Date',
+                  type: 'range',
+                },
+              ]}
+              hideTableViewOptions={viewMode !== KanbanViewMode.Table}
+            />
           </div>
 
           {viewMode === KanbanViewMode.Table ? (

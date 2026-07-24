@@ -15,6 +15,7 @@ dist
 dist-ssr
 build
 .next
+*.tsbuildinfo
 *.local
 
 # Environment variables

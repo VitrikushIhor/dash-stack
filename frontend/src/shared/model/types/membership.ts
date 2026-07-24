@@ -15,7 +15,8 @@ export interface Membership {
   orgId: string
   role: OrgRole
   position?: TeamPosition
-  joinedAt: string
+  joinedAt?: string
+  createdAt?: string
   user: {
     id: string
     email: string

@@ -29,12 +29,10 @@ interface UseTasksTableProps {
 }
 
 export function useTasksTable({ orgId, data }: UseTasksTableProps) {
-  // Local UI-only states
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Synced with URL states via nuqs
   const [searchParams, setSearchParams] = useTasksTableSearchParams()
 
   const columnFilters: ColumnFiltersState = useMemo(() => {
@@ -76,17 +74,13 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       typeof updater === 'function' ? updater(columnFilters) : updater
 
     const statusFilter = next.find((f) => f.id === 'status')?.value as
-      | string[]
-      | undefined
+      string[] | undefined
     const labelFilter = next.find((f) => f.id === 'label')?.value as
-      | string[]
-      | undefined
+      string[] | undefined
     const membersFilter = next.find((f) => f.id === 'assignees')?.value as
-      | string[]
-      | undefined
+      string[] | undefined
     const dueDateFilter = next.find((f) => f.id === 'dueDate')?.value as
-      | unknown[]
-      | undefined
+      unknown[] | undefined
 
     let dueDateStrings: string[] = []
     if (Array.isArray(dueDateFilter)) {
@@ -121,7 +115,6 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     })
   }
 
-  // Table Instance
   const table = useReactTable({
     data,
     columns: tasksColumns,
@@ -134,17 +127,14 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       pagination,
     },
 
-    // Handlers
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
 
-    // Synced handlers
     onColumnFiltersChange,
     onGlobalFilterChange,
     onPaginationChange,
 
-    // Row models
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -152,14 +142,12 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
 
-    // Custom Filters
     filterFns: {
       dateFilter: dateFilterFn,
       dateRangeFilter: dateRangeFilterFn,
     },
   })
 
-  // Ensure current page is in valid range
   const pageCount = table.getPageCount()
   useEffect(() => {
     if (pageCount > 0 && searchParams.page > pageCount) {
@@ -167,7 +155,6 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     }
   }, [pageCount, searchParams.page, setSearchParams])
 
-  // Faceted filter options
   const { data: members = [] } = useGetMembers(orgId)
 
   const memberOptions = useMemo(
@@ -187,8 +174,8 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
         icon: STATUS_CONFIG[st].icon,
       })),
       labels: mockAvailableLabels.map((lbl) => ({
-        label: lbl,
-        value: lbl,
+        label: lbl.name,
+        value: lbl.name,
       })),
       members: memberOptions,
     }),

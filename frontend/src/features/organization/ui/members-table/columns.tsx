@@ -1,10 +1,13 @@
 'use client'
 
-import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import { getInitials } from '@/shared/lib/utils'
-import { getMemberDisplayName, getRoleVariant } from '@/shared/model'
+import {
+  formatJoinedDate,
+  getMemberDisplayName,
+  getRoleVariant,
+} from '@/shared/model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'
 import { DataTableColumnHeader } from '@/shared/ui/data-table'
@@ -52,15 +55,16 @@ export const columns: ColumnDef<Membership>[] = [
     },
   },
   {
-    accessorKey: 'createdAt',
+    accessorFn: (row) => row.joinedAt || row.createdAt,
+    id: 'joinedAt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Joined Date' />
     ),
     cell: ({ row }) => {
-      const date = row.getValue('createdAt') as string
+      const date = row.original.joinedAt || row.original.createdAt
       return (
         <span className='text-muted-foreground text-sm'>
-          {format(new Date(date), 'MMM d, yyyy')}
+          {formatJoinedDate(date)}
         </span>
       )
     },
