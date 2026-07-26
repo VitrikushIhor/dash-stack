@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { cn, getInitials, getPageNumbers, stringToColor } from './utils'
+import {
+  cn,
+  getInitials,
+  getPageNumbers,
+  sanitizeRedirectUrl,
+  stringToColor,
+} from './utils'
 
 describe('cn (className merge utility)', () => {
   it('should merge class names', () => {
@@ -85,5 +91,31 @@ describe('getPageNumbers', () => {
     const result = getPageNumbers(5, 20)
     expect(result[0]).toBe(1)
     expect(result[result.length - 1]).toBe(20)
+  })
+})
+
+describe('sanitizeRedirectUrl', () => {
+  it('should return valid relative redirect path', () => {
+    expect(sanitizeRedirectUrl('/dashboard')).toBe('/dashboard')
+    expect(sanitizeRedirectUrl('/settings/profile')).toBe('/settings/profile')
+  })
+
+  it('should fallback to default for external URLs (preventing Open Redirect)', () => {
+    expect(sanitizeRedirectUrl('https://evil-phishing-site.com')).toBe(
+      '/dashboard'
+    )
+    expect(sanitizeRedirectUrl('http://evil.com')).toBe('/dashboard')
+    expect(sanitizeRedirectUrl('//evil.com')).toBe('/dashboard')
+    expect(sanitizeRedirectUrl('/\\evil.com')).toBe('/dashboard')
+  })
+
+  it('should fallback to default for null, undefined, or empty values', () => {
+    expect(sanitizeRedirectUrl(undefined)).toBe('/dashboard')
+    expect(sanitizeRedirectUrl(null)).toBe('/dashboard')
+    expect(sanitizeRedirectUrl('')).toBe('/dashboard')
+  })
+
+  it('should use custom fallback when specified', () => {
+    expect(sanitizeRedirectUrl('https://evil.com', '/sign-in')).toBe('/sign-in')
   })
 })

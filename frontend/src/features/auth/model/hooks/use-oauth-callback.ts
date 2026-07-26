@@ -42,11 +42,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
         try {
           memberships = await userApi.getMyMemberships()
         } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error(
-            'Failed to fetch memberships during OAuth callback:',
-            err
-          )
+          handleServerError(err)
         }
 
         if (memberships !== null && memberships.length === 0) {
@@ -57,7 +53,6 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
         router.replace('/dashboard')
       } catch (err) {
         handleServerError(err)
-        router.replace('/sign-in')
       }
     })
   }, [code, error, router])

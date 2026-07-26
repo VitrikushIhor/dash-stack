@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
+import { sanitizeRedirectUrl } from '@/shared/lib/utils'
 import { userApi } from '@/entities/user/api/user-api'
 import { signInAction } from '../mutations/auth-actions'
 import {
@@ -39,8 +40,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
         try {
           memberships = await userApi.getMyMemberships()
         } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error('Failed to fetch memberships during login:', err)
+          handleServerError(err)
         }
 
         if (memberships !== null && memberships.length === 0) {
@@ -48,7 +48,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
           return
         }
 
-        const targetPath = options?.redirectTo || '/dashboard'
+        const targetPath = sanitizeRedirectUrl(options?.redirectTo)
         router.replace(targetPath)
       } catch (error) {
         handleServerError(error)

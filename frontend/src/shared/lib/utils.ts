@@ -100,3 +100,19 @@ export function getUserDisplayName(
   if (email) return email
   return 'User'
 }
+
+export function sanitizeRedirectUrl(
+  url: string | undefined | null,
+  fallback: string = '/dashboard'
+): string {
+  if (!url || typeof url !== 'string') return fallback
+  const trimmed = url.trim()
+  if (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.startsWith('/\\')
+  ) {
+    return trimmed
+  }
+  return fallback
+}
