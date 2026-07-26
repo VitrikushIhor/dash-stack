@@ -1,20 +1,13 @@
-'use client'
-
-import { Suspense } from 'react'
 import { OAuthCallback } from '@/views/auth'
 
-export const dynamic = 'force-dynamic'
+interface OAuthCallbackPageProps {
+  searchParams: Promise<{ code?: string; error?: string }>
+}
 
-export default function OAuthCallbackRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6 text-center'>
-          Authenticating...
-        </div>
-      }
-    >
-      <OAuthCallback />
-    </Suspense>
-  )
+export default async function OAuthCallbackRoute({
+  searchParams,
+}: OAuthCallbackPageProps) {
+  const { code, error } = await searchParams
+
+  return <OAuthCallback code={code} error={error} />
 }
