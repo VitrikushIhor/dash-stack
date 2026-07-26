@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Response, Request as ExpressRequest } from 'express';
 import { SignupUseCase } from '../../application/use-cases/commands/signup.use-case';
 import { LoginUseCase } from '../../application/use-cases/commands/login.use-case';
@@ -28,7 +29,7 @@ import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { OAuthExchangeDto } from '../dto/oauth-exchange.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthCookieHelper } from '../helpers/auth-cookie.helper';
-import { AUTH_COOKIE_NAMES } from '../../domain/constants/auth.constants';
+import { RefreshToken } from '../decorators/refresh-token.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -44,6 +45,7 @@ export class AuthController {
     private readonly oauthExchangeUseCase: OAuthExchangeUseCase,
   ) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('signup')
   async signup(@Body() data: SignupDto) {
     return this.signupUseCase.execute({
@@ -65,6 +67,7 @@ export class AuthController {
     return tokens;
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -79,14 +82,11 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(
-    @Body() body: RefreshTokenDto,
-    @Request() req: ExpressRequest,
+    @RefreshToken() token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken =
-      body?.token || req?.cookies?.[AUTH_COOKIE_NAMES.REFRESH_TOKEN];
     const tokens = await this.refreshTokenUseCase.execute({
-      token: refreshToken,
+      token,
     });
     AuthCookieHelper.setAuthCookies(res, tokens);
     return tokens;
@@ -95,12 +95,9 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(
-    @Body() body: LogoutDto,
-    @Request() req: ExpressRequest,
+    @RefreshToken() refreshToken: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken =
-      body?.refreshToken || req?.cookies?.[AUTH_COOKIE_NAMES.REFRESH_TOKEN];
     AuthCookieHelper.clearAuthCookies(res);
     if (refreshToken) {
       return this.logoutUseCase.execute({ refreshToken });
@@ -119,12 +116,14 @@ export class AuthController {
     return this.logoutAllUseCase.execute({ userId: req.user.id });
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() { email }: ForgotPasswordDto) {
     return this.forgotPasswordUseCase.execute({ email });
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() { token, password }: ResetPasswordDto) {

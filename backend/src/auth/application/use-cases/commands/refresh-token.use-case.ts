@@ -3,7 +3,7 @@ import { UnauthorizedException } from '../../../../common/exceptions/domain.exce
 import { RefreshTokenRepositoryPort } from '../../ports/outgoing/refresh-token.repository.port';
 import { TokenGeneratorPort } from '../../ports/outgoing/token-generator.port';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
-
+import { AuthTokens } from '../../../shared/types/token.type';
 import { RefreshTokenCommand } from '../../commands/refresh-token.command';
 
 @Injectable()
@@ -15,9 +15,7 @@ export class RefreshTokenUseCase {
     private readonly tokenGenerator: TokenGeneratorPort,
   ) {}
 
-  async execute(
-    command: RefreshTokenCommand,
-  ): Promise<{ accessToken: string }> {
+  async execute(command: RefreshTokenCommand): Promise<AuthTokens> {
     const refreshToken = await this.refreshTokenRepo.findByToken(command.token);
 
     if (!refreshToken) {
@@ -29,10 +27,8 @@ export class RefreshTokenUseCase {
       throw new UnauthorizedException(AUTH_ERRORS.REFRESH_TOKEN_EXPIRED);
     }
 
-    const accessToken = this.tokenGenerator.generateAccessToken(
-      refreshToken.userId,
-    );
+    await this.refreshTokenRepo.deleteById(refreshToken.id);
 
-    return { accessToken };
+    return this.tokenGenerator.generateTokens(refreshToken.userId);
   }
 }
