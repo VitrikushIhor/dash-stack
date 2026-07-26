@@ -1,6 +1,4 @@
-'use client'
-
-import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -11,11 +9,11 @@ import {
 } from '@/shared/ui/core/card'
 import { ResetPasswordForm } from '@/features/auth'
 
-export function ResetPassword() {
-  const searchParams = useSearchParams()
-  const token = searchParams.get('token')
-  const router = useRouter()
+interface ResetPasswordProps {
+  token?: string
+}
 
+export function ResetPassword({ token }: ResetPasswordProps) {
   if (!token) {
     return (
       <Card className='gap-4'>
@@ -26,11 +24,8 @@ export function ResetPassword() {
           </CardDescription>
         </CardHeader>
         <CardContent className='flex justify-center'>
-          <Button
-            variant='outline'
-            onClick={() => router.push('/forgot-password')}
-          >
-            Request New Link
+          <Button variant='outline' asChild>
+            <Link href='/forgot-password'>Request New Link</Link>
           </Button>
         </CardContent>
       </Card>

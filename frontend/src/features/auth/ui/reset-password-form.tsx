@@ -1,12 +1,19 @@
 'use client'
 
 import { CheckCircle2, KeyRound, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import { Form } from '@/shared/ui/core/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared/ui/core/form'
+import { PasswordInput } from '@/shared/ui/password-input'
 import { useResetPasswordForm } from '../model/hooks/use-reset-password-form'
-import { ResetPasswordFields } from './reset-password-fields'
 
 interface ResetPasswordFormProps extends React.HTMLAttributes<HTMLFormElement> {
   token: string
@@ -17,7 +24,6 @@ export function ResetPasswordForm({
   token,
   ...props
 }: ResetPasswordFormProps) {
-  const router = useRouter()
   const { form, onSubmit, isPending, isSuccess } = useResetPasswordForm({
     token,
   })
@@ -30,7 +36,9 @@ export function ResetPasswordForm({
         <p className='text-muted-foreground text-sm'>
           Your password has been successfully reset.
         </p>
-        <Button onClick={() => router.push('/sign-in')}>Sign In</Button>
+        <Button asChild>
+          <Link href='/sign-in'>Sign In</Link>
+        </Button>
       </div>
     )
   }
@@ -42,7 +50,32 @@ export function ResetPasswordForm({
         className={cn('grid gap-3', className)}
         {...props}
       >
-        <ResetPasswordFields control={form.control} />
+        <FormField
+          control={form.control}
+          name='password'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <PasswordInput placeholder='********' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='confirmPassword'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <PasswordInput placeholder='********' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button className='mt-2' disabled={isPending}>
           {isPending ? (
             <Loader2 className='animate-spin' />

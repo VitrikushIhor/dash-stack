@@ -1,16 +1,13 @@
-import { Suspense } from 'react'
 import { ResetPassword } from '@/views/auth'
 
-export const dynamic = 'force-dynamic'
+interface ResetPasswordPageProps {
+  searchParams: Promise<{ token?: string }>
+}
 
-export default function ResetPasswordRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6 text-center'>Loading...</div>
-      }
-    >
-      <ResetPassword />
-    </Suspense>
-  )
+export default async function ResetPasswordRoute({
+  searchParams,
+}: ResetPasswordPageProps) {
+  const { token } = await searchParams
+
+  return <ResetPassword token={token} />
 }
