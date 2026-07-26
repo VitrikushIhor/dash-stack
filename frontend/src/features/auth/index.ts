@@ -1,7 +1,5 @@
 export * from './model/types/auth.types'
 
-// Queries
-
 // Hooks
 export { useSignInForm } from './model/hooks/use-sign-in-form'
 export { useSignUpForm } from './model/hooks/use-sign-up-form'
@@ -21,10 +19,7 @@ export * from './model/schema/reset-password.schema'
 export { SignInForm } from './ui/sign-in-form'
 export { SignUpForm } from './ui/sign-up-form'
 export { ForgotPasswordForm } from './ui/forgot-password-form'
-export { ForgotPasswordFields } from './ui/forgot-password-fields'
 export { ResetPasswordForm } from './ui/reset-password-form'
 export { ResetPasswordFields } from './ui/reset-password-fields'
-export { OtpForm } from './ui/otp-form'
 export { OAuthButtons } from './ui/oauth-buttons'
-export { AuthLayout } from './ui/auth-layout'
 export { SignOutDialog } from './ui/sign-out-dialog'

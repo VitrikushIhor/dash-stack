@@ -1,18 +1,24 @@
 'use client'
 
 import { ArrowRight, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import { Form } from '@/shared/ui/core/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
 import { useForgotPasswordForm } from '../model/hooks/use-forgot-password-form'
-import { ForgotPasswordFields } from './forgot-password-fields'
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const router = useRouter()
   const { form, onSubmit, isPending, isSent } = useForgotPasswordForm()
 
   if (isSent) {
@@ -21,15 +27,11 @@ export function ForgotPasswordForm({
         <div className='text-4xl'>📧</div>
         <h3 className='text-lg font-semibold'>Check your email</h3>
         <p className='text-muted-foreground text-sm'>
-          If an account exists with that email, we've sent a password reset
+          If an account exists with that email, we&apos;ve sent a password reset
           link.
         </p>
-        <Button
-          variant='outline'
-          className='mt-4'
-          onClick={() => router.push('/sign-in')}
-        >
-          Back to Sign In
+        <Button variant='outline' className='mt-4' asChild>
+          <Link href='/sign-in'>Back to Sign In</Link>
         </Button>
       </div>
     )
@@ -42,7 +44,19 @@ export function ForgotPasswordForm({
         className={cn('grid gap-2', className)}
         {...props}
       >
-        <ForgotPasswordFields control={form.control} />
+        <FormField
+          control={form.control}
+          name='email'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder='name@example.com' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button className='mt-2' disabled={isPending}>
           Continue
           {isPending ? (

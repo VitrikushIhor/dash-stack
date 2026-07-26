@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { AuthLayout, useOAuthCallback } from '@/features/auth'
+import { useOAuthCallback } from '@/features/auth'
 
 export function OAuthCallback() {
   const searchParams = useSearchParams()
@@ -19,18 +19,16 @@ export function OAuthCallback() {
   useOAuthCallback({ code, error })
 
   return (
-    <AuthLayout>
-      <Card className='gap-4 text-center'>
-        <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>
-            Authenticating...
-          </CardTitle>
-          <CardDescription>Completing sign in, please wait.</CardDescription>
-        </CardHeader>
-        <CardContent className='flex justify-center'>
-          <Loader2 className='text-primary h-12 w-12 animate-spin' />
-        </CardContent>
-      </Card>
-    </AuthLayout>
+    <Card className='gap-4 text-center'>
+      <CardHeader>
+        <CardTitle className='text-lg tracking-tight'>
+          Authenticating...
+        </CardTitle>
+        <CardDescription>Completing sign in, please wait.</CardDescription>
+      </CardHeader>
+      <CardContent className='flex justify-center'>
+        <Loader2 className='text-primary h-12 w-12 animate-spin' />
+      </CardContent>
+    </Card>
   )
 }

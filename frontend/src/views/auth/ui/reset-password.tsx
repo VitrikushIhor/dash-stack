@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { AuthLayout, ResetPasswordForm } from '@/features/auth'
+import { ResetPasswordForm } from '@/features/auth'
 
 export function ResetPassword() {
   const searchParams = useSearchParams()
@@ -18,42 +18,34 @@ export function ResetPassword() {
 
   if (!token) {
     return (
-      <AuthLayout>
-        <Card className='gap-4'>
-          <CardHeader className='text-center'>
-            <CardTitle className='text-lg tracking-tight'>
-              Invalid Link
-            </CardTitle>
-            <CardDescription>
-              This password reset link is invalid or has expired.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className='flex justify-center'>
-            <Button
-              variant='outline'
-              onClick={() => router.push('/forgot-password')}
-            >
-              Request New Link
-            </Button>
-          </CardContent>
-        </Card>
-      </AuthLayout>
+      <Card className='gap-4'>
+        <CardHeader className='text-center'>
+          <CardTitle className='text-lg tracking-tight'>Invalid Link</CardTitle>
+          <CardDescription>
+            This password reset link is invalid or has expired.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='flex justify-center'>
+          <Button
+            variant='outline'
+            onClick={() => router.push('/forgot-password')}
+          >
+            Request New Link
+          </Button>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-    <AuthLayout>
-      <Card className='gap-4'>
-        <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>
-            Reset Password
-          </CardTitle>
-          <CardDescription>Enter your new password below.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResetPasswordForm token={token} />
-        </CardContent>
-      </Card>
-    </AuthLayout>
+    <Card className='gap-4'>
+      <CardHeader>
+        <CardTitle className='text-lg tracking-tight'>Reset Password</CardTitle>
+        <CardDescription>Enter your new password below.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ResetPasswordForm token={token} />
+      </CardContent>
+    </Card>
   )
 }

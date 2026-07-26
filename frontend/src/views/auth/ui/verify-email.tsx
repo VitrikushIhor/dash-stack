@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { AuthLayout, useVerifyEmail, VerificationStatus } from '@/features/auth'
+import { useVerifyEmail, VerificationStatus } from '@/features/auth'
 
 export function VerifyEmail() {
   const searchParams = useSearchParams()
@@ -18,33 +18,31 @@ export function VerifyEmail() {
   const { status, errorMessage, handleContinue } = useVerifyEmail(token)
 
   return (
-    <AuthLayout>
-      <Card className='gap-4'>
-        <CardHeader className='text-center'>
-          <CardTitle className='text-lg tracking-tight'>
-            Email Verification
-          </CardTitle>
-          <CardDescription>
-            {status === VerificationStatus.LOADING && 'Verifying your email...'}
-            {status === VerificationStatus.SUCCESS &&
-              'Your email has been verified!'}
-            {(status === VerificationStatus.ERROR ||
-              status === VerificationStatus.MISSING_TOKEN) &&
-              'Verification failed'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='flex flex-col items-center gap-4'>
-          {status === VerificationStatus.LOADING && <LoadingState />}
-          {status === VerificationStatus.SUCCESS && (
-            <SuccessState onContinue={handleContinue} />
-          )}
+    <Card className='gap-4'>
+      <CardHeader className='text-center'>
+        <CardTitle className='text-lg tracking-tight'>
+          Email Verification
+        </CardTitle>
+        <CardDescription>
+          {status === VerificationStatus.LOADING && 'Verifying your email...'}
+          {status === VerificationStatus.SUCCESS &&
+            'Your email has been verified!'}
           {(status === VerificationStatus.ERROR ||
-            status === VerificationStatus.MISSING_TOKEN) && (
-            <ErrorState message={errorMessage} onBack={handleContinue} />
-          )}
-        </CardContent>
-      </Card>
-    </AuthLayout>
+            status === VerificationStatus.MISSING_TOKEN) &&
+            'Verification failed'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className='flex flex-col items-center gap-4'>
+        {status === VerificationStatus.LOADING && <LoadingState />}
+        {status === VerificationStatus.SUCCESS && (
+          <SuccessState onContinue={handleContinue} />
+        )}
+        {(status === VerificationStatus.ERROR ||
+          status === VerificationStatus.MISSING_TOKEN) && (
+          <ErrorState message={errorMessage} onBack={handleContinue} />
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
