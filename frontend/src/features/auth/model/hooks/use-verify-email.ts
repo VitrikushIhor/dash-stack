@@ -44,8 +44,17 @@ export function useVerifyEmail(token: string | null) {
     router.replace('/sign-in')
   }
 
+  const isLoading = status === VerificationStatus.LOADING
+  const isSuccess = status === VerificationStatus.SUCCESS
+  const isFailed =
+    status === VerificationStatus.ERROR ||
+    status === VerificationStatus.MISSING_TOKEN
+
   return {
     status,
+    isLoading,
+    isSuccess,
+    isFailed,
     errorMessage,
     handleContinue,
   }

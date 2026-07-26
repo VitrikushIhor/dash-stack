@@ -1,16 +1,13 @@
-import { Suspense } from 'react'
 import { VerifyEmail } from '@/views/auth'
 
-export const dynamic = 'force-dynamic'
+interface VerifyEmailPageProps {
+  searchParams: Promise<{ token?: string }>
+}
 
-export default function VerifyEmailRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6 text-center'>Loading...</div>
-      }
-    >
-      <VerifyEmail />
-    </Suspense>
-  )
+export default async function VerifyEmailRoute({
+  searchParams,
+}: VerifyEmailPageProps) {
+  const { token } = await searchParams
+
+  return <VerifyEmail token={token} />
 }
