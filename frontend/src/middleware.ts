@@ -6,19 +6,38 @@ const PROTECTED_PATHS = [
   '/calendar',
   '/settings',
   '/organizations',
-  '/invite',
+  '/accept-invite',
   '/create-organization',
 ]
 
-export function middleware(req: NextRequest) {
-  const token = req.cookies.get('access_token')?.value
-  const pathname = req.nextUrl.pathname
-  const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p))
+const AUTH_PATHS = [
+  '/sign-in',
+  '/sign-up',
+  '/forgot-password',
+  '/reset-password',
+]
 
-  if (isProtected && !token) {
+export function middleware(req: NextRequest) {
+  const accessToken = req.cookies.get('access_token')?.value
+  const refreshToken = req.cookies.get('refresh_token')?.value
+  const isAuthenticated = Boolean(accessToken || refreshToken)
+  const pathname = req.nextUrl.pathname
+
+  const isProtected = PROTECTED_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`)
+  )
+  const isAuthPage = AUTH_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`)
+  )
+
+  if (isProtected && !isAuthenticated) {
     const signInUrl = new URL('/sign-in', req.url)
     signInUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(signInUrl)
+  }
+
+  if (isAuthPage && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
   return NextResponse.next()

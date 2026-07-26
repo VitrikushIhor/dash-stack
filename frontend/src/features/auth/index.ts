@@ -1,5 +1,4 @@
 export * from './model/types/auth.types'
-export { authKeys } from './api/auth-query-keys'
 
 // Queries
 

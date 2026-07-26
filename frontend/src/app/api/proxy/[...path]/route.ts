@@ -1,5 +1,9 @@
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
+import {
+  AUTH_COOKIE_CONFIG,
+  getCookieOptions,
+} from '@/shared/lib/session-cookies'
 
 const BASE_URL =
   process.env.API_URL ??
@@ -8,8 +12,8 @@ const BASE_URL =
 
 async function forward(req: NextRequest, path: string[]) {
   const store = await cookies()
-  const token = store.get('access_token')?.value
-  const refreshToken = store.get('refresh_token')?.value
+  const token = store.get(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name)?.value
+  const refreshToken = store.get(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name)?.value
   const search = req.nextUrl.search
 
   const headers: Record<string, string> = {
@@ -27,7 +31,6 @@ async function forward(req: NextRequest, path: string[]) {
     body,
   })
 
-  // Handle 401 - Token refresh attempt
   if (res.status === 401 && refreshToken) {
     const refreshRes = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: 'POST',
@@ -38,14 +41,20 @@ async function forward(req: NextRequest, path: string[]) {
     if (refreshRes.ok) {
       const refreshData = await refreshRes.json()
       const newAccessToken = refreshData.accessToken
+      const newRefreshToken = refreshData.refreshToken
       if (newAccessToken) {
-        store.set('access_token', newAccessToken, {
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 60 * 15,
-          path: '/',
-        })
+        store.set(
+          AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name,
+          newAccessToken,
+          getCookieOptions(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.maxAge)
+        )
+        if (newRefreshToken) {
+          store.set(
+            AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name,
+            newRefreshToken,
+            getCookieOptions(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.maxAge)
+          )
+        }
         headers['Authorization'] = `Bearer ${newAccessToken}`
         res = await fetch(`${BASE_URL}/api/${path.join('/')}${search}`, {
           method: req.method,
@@ -54,8 +63,8 @@ async function forward(req: NextRequest, path: string[]) {
         })
       }
     } else {
-      store.delete('access_token')
-      store.delete('refresh_token')
+      store.delete(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name)
+      store.delete(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name)
     }
   }
 
