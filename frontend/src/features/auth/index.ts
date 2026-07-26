@@ -19,7 +19,6 @@ export * from './model/schema/reset-password.schema'
 
 // UI
 export { SignInForm } from './ui/sign-in-form'
-export { SignInFields } from './ui/sign-in-fields'
 export { SignUpForm } from './ui/sign-up-form'
 export { SignUpFields } from './ui/sign-up-fields'
 export { ForgotPasswordForm } from './ui/forgot-password-form'

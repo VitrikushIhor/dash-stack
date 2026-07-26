@@ -1,7 +1,4 @@
-'use client'
-
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -12,10 +9,11 @@ import {
 } from '@/shared/ui/core/card'
 import { AuthLayout, SignInForm } from '@/features/auth'
 
-export function SignIn() {
-  const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') ?? undefined
+interface SignInProps {
+  redirectTo?: string
+}
 
+export function SignIn({ redirectTo }: SignInProps) {
   return (
     <AuthLayout>
       <Card className='gap-4'>
@@ -27,7 +25,7 @@ export function SignIn() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignInForm redirectTo={redirect} />
+          <SignInForm redirectTo={redirectTo} />
         </CardContent>
         <CardFooter className='flex flex-col gap-4'>
           <p className='text-muted-foreground text-center text-sm'>

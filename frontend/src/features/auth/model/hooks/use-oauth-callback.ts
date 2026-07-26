@@ -3,8 +3,8 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
 import { userApi } from '@/entities/user/api/user-api'
-import { oauthExchangeAction } from '../../actions/auth-actions'
 import { extractOAuthToken } from '../../lib/oauth-token-extractor'
+import { oauthExchangeAction } from '../mutations/auth-actions'
 
 interface UseOAuthCallbackProps {
   code: string | null

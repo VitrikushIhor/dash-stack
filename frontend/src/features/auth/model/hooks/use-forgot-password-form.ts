@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
-import { forgotPasswordAction } from '../../actions/auth-actions'
+import { forgotPasswordAction } from '../mutations/auth-actions'
 import {
   forgotPasswordDefaultValues,
   forgotPasswordSchema,

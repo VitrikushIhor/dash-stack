@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
 import { userApi } from '@/entities/user/api/user-api'
-import { signInAction } from '../../actions/auth-actions'
+import { signInAction } from '../mutations/auth-actions'
 import {
   signInDefaultValues,
   signInSchema,

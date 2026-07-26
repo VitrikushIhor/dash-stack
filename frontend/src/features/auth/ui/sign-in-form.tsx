@@ -1,12 +1,21 @@
 'use client'
 
 import { Loader2, LogIn } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
-import { Form } from '@/shared/ui/core/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
+import { PasswordInput } from '@/shared/ui/password-input'
 import { useSignInForm } from '../model/hooks/use-sign-in-form'
 import { OAuthButtons } from './oauth-buttons'
-import { SignInFields } from './sign-in-fields'
 
 interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
@@ -26,7 +35,39 @@ export function SignInForm({
         className={cn('grid gap-3', className)}
         {...props}
       >
-        <SignInFields control={form.control} />
+        <FormField
+          control={form.control}
+          name='email'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder='name@example.com' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='password'
+          render={({ field }) => (
+            <FormItem className='relative'>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <PasswordInput placeholder='********' {...field} />
+              </FormControl>
+              <FormMessage />
+              <Link
+                href='/forgot-password'
+                className='text-muted-foreground inset-e-0 absolute -top-0.5 text-sm font-medium hover:opacity-75'
+              >
+                Forgot password?
+              </Link>
+            </FormItem>
+          )}
+        />
 
         <Button className='mt-2' disabled={isPending}>
           {isPending ? (

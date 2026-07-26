@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { getErrorMessage } from '@/shared/api'
-import { verifyEmailAction } from '../../actions/auth-actions'
+import { verifyEmailAction } from '../mutations/auth-actions'
 import { VerificationStatus } from '../types/auth.types'
 
 const REDIRECT_DELAY_MS = 3000

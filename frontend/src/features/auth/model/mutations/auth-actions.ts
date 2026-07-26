@@ -7,11 +7,7 @@ import {
   clearAuthCookies,
   AUTH_COOKIE_CONFIG,
 } from '@/shared/lib/session-cookies'
-import type {
-  AuthTokens,
-  SignInInput,
-  SignUpInput,
-} from '../model/types/auth.types'
+import type { AuthTokens, SignInInput, SignUpInput } from '../types/auth.types'
 
 export async function signInAction(input: SignInInput): Promise<AuthTokens> {
   const tokens = await serverApi.post<AuthTokens, SignInInput>(

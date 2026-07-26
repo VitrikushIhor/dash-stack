@@ -1,16 +1,11 @@
-import { Suspense } from 'react'
 import { SignIn } from '@/views/auth'
 
-export const dynamic = 'force-dynamic'
+interface SignInRouteProps {
+  searchParams: Promise<{ redirect?: string }>
+}
 
-export default function SignInRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6 text-center'>Loading...</div>
-      }
-    >
-      <SignIn />
-    </Suspense>
-  )
+export default async function SignInRoute({ searchParams }: SignInRouteProps) {
+  const { redirect } = await searchParams
+
+  return <SignIn redirectTo={redirect} />
 }
