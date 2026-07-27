@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { ROUTES } from '@/shared/config/constants/routes'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -103,7 +104,7 @@ export function getUserDisplayName(
 
 export function sanitizeRedirectUrl(
   url: string | undefined | null,
-  fallback: string = '/dashboard'
+  fallback: string = ROUTES.dashboard
 ): string {
   if (!url || typeof url !== 'string') return fallback
   const trimmed = url.trim()

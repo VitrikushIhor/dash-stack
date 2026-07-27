@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import { useAcceptInvite } from '../model/mutations/use-accept-invite'
 
@@ -27,7 +28,7 @@ export const AcceptInvitePage = ({
       acceptInvite(token, {
         onSuccess: () => {
           timeoutId = setTimeout(() => {
-            router.push('/organizations')
+            router.push(ROUTES.organizations)
           }, REDIRECT_DELAY)
         },
       })

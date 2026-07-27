@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { createHttpClient } from './http-core'
 
 /**
@@ -11,10 +12,10 @@ export const api = createHttpClient({
   onUnauthorized: () => {
     if (
       typeof window !== 'undefined' &&
-      !window.location.pathname.startsWith('/sign-in')
+      !window.location.pathname.startsWith(ROUTES.signIn)
     ) {
       toast.error('Session expired!')
-      window.location.href = '/sign-in'
+      window.location.href = ROUTES.signIn
     }
   },
 })

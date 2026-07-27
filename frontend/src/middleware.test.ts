@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { middleware } from './middleware'
 
 function createNextRequest(
@@ -16,7 +17,7 @@ function createNextRequest(
 describe('Next.js Route Protection Middleware', () => {
   describe('Protected Routes', () => {
     it('redirects unauthenticated user from protected path to sign-in with redirect query param', () => {
-      const req = createNextRequest('/dashboard')
+      const req = createNextRequest(ROUTES.dashboard)
 
       const res = middleware(req)
 
@@ -27,7 +28,7 @@ describe('Next.js Route Protection Middleware', () => {
     })
 
     it('allows access to protected route when access_token is present', () => {
-      const req = createNextRequest('/dashboard', {
+      const req = createNextRequest(ROUTES.dashboard, {
         access_token: 'valid-access-token',
       })
 
@@ -37,7 +38,7 @@ describe('Next.js Route Protection Middleware', () => {
     })
 
     it('allows access to protected route when ONLY refresh_token is present (Silent Refresh path)', () => {
-      const req = createNextRequest('/settings', {
+      const req = createNextRequest(ROUTES.settings, {
         refresh_token: 'valid-refresh-token',
       })
 
@@ -60,7 +61,7 @@ describe('Next.js Route Protection Middleware', () => {
 
   describe('Auth Routes (Login/Signup)', () => {
     it('redirects authenticated user accessing sign-in page to dashboard', () => {
-      const req = createNextRequest('/sign-in', {
+      const req = createNextRequest(ROUTES.signIn, {
         access_token: 'valid-access-token',
       })
 
@@ -73,7 +74,7 @@ describe('Next.js Route Protection Middleware', () => {
     })
 
     it('redirects user with only refresh_token accessing sign-up page to dashboard', () => {
-      const req = createNextRequest('/sign-up', {
+      const req = createNextRequest(ROUTES.signUp, {
         refresh_token: 'valid-refresh-token',
       })
 
@@ -86,7 +87,7 @@ describe('Next.js Route Protection Middleware', () => {
     })
 
     it('allows unauthenticated user to access sign-in page', () => {
-      const req = createNextRequest('/sign-in')
+      const req = createNextRequest(ROUTES.signIn)
 
       const res = middleware(req)
 
@@ -96,7 +97,7 @@ describe('Next.js Route Protection Middleware', () => {
 
   describe('Public Unprotected Routes', () => {
     it('allows any user to access public pages like verify-email', () => {
-      const req = createNextRequest('/verify-email')
+      const req = createNextRequest(ROUTES.verifyEmail)
 
       const res = middleware(req)
 

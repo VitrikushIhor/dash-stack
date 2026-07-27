@@ -3,6 +3,7 @@
 import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { getFileUrl } from '@/shared/api'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
@@ -93,7 +94,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href='/settings'>
+                <Link href={ROUTES.settings}>
                   <BadgeCheck />
                   Profile
                 </Link>

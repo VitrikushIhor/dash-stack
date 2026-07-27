@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import { ForgotPassword } from './forgot-password'
 
@@ -28,7 +29,7 @@ describe('ForgotPassword Page View', () => {
 
     const signUpLink = screen.getByRole('link', { name: /sign up/i })
     expect(signUpLink).toBeInTheDocument()
-    expect(signUpLink).toHaveAttribute('href', '/sign-up')
+    expect(signUpLink).toHaveAttribute('href', ROUTES.signUp)
   })
 
   it('renders ForgotPasswordForm component inside card content', () => {

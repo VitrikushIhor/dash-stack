@@ -2,6 +2,7 @@
 
 import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,7 +48,7 @@ export function TeamSwitcher() {
         <SidebarMenuItem>
           <SidebarMenuButton
             size='lg'
-            onClick={() => router.push('/organizations')}
+            onClick={() => router.push(ROUTES.organizations)}
             className='text-muted-foreground'
           >
             <div className='bg-sidebar-accent flex aspect-square size-8 items-center justify-center rounded-lg'>
@@ -106,7 +107,9 @@ export function TeamSwitcher() {
                 key={membership.organization.id}
                 onClick={() => {
                   setActiveOrgId(membership.organization.id)
-                  router.push(`/organizations/${membership.organization.id}`)
+                  router.push(
+                    `${ROUTES.organizations}/${membership.organization.id}`
+                  )
                 }}
                 className='gap-2 p-2'
               >
@@ -129,7 +132,7 @@ export function TeamSwitcher() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className='gap-2 p-2'
-              onClick={() => router.push('/organizations')}
+              onClick={() => router.push(ROUTES.organizations)}
             >
               <div className='bg-background flex size-6 items-center justify-center rounded-md border'>
                 <Plus className='size-4' />

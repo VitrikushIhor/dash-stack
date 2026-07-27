@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { logoutAction } from './auth-actions'
 
 export function useLogout() {
@@ -14,12 +15,12 @@ export function useLogout() {
     onSuccess: () => {
       queryClient.clear()
       toast.success('Logged out successfully')
-      router.replace('/sign-in')
+      router.replace(ROUTES.signIn)
       router.refresh()
     },
     onError: () => {
       queryClient.clear()
-      router.replace('/sign-in')
+      router.replace(ROUTES.signIn)
       router.refresh()
     },
   })

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import {
   cn,
   getInitials,
@@ -95,24 +96,28 @@ describe('getPageNumbers', () => {
 })
 
 describe('sanitizeRedirectUrl', () => {
-  it('should return valid relative redirect path', () => {
-    expect(sanitizeRedirectUrl('/dashboard')).toBe('/dashboard')
+  it('returns a valid relative path as-is', () => {
+    expect(sanitizeRedirectUrl(ROUTES.dashboard)).toBe(ROUTES.dashboard)
     expect(sanitizeRedirectUrl('/settings/profile')).toBe('/settings/profile')
   })
 
-  it('should fallback to default for external URLs (preventing Open Redirect)', () => {
-    expect(sanitizeRedirectUrl('https://evil-phishing-site.com')).toBe(
-      '/dashboard'
+  it('defaults to ROUTES.dashboard for absolute URLs or invalid paths', () => {
+    const defaultValue = ROUTES.dashboard
+    expect(
+      sanitizeRedirectUrl('https://evil-phishing-site.com', defaultValue)
+    ).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('http://evil.com', defaultValue)).toBe(
+      defaultValue
     )
-    expect(sanitizeRedirectUrl('http://evil.com')).toBe('/dashboard')
-    expect(sanitizeRedirectUrl('//evil.com')).toBe('/dashboard')
-    expect(sanitizeRedirectUrl('/\\evil.com')).toBe('/dashboard')
+    expect(sanitizeRedirectUrl('//evil.com', defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('/\\evil.com', defaultValue)).toBe(defaultValue)
   })
 
-  it('should fallback to default for null, undefined, or empty values', () => {
-    expect(sanitizeRedirectUrl(undefined)).toBe('/dashboard')
-    expect(sanitizeRedirectUrl(null)).toBe('/dashboard')
-    expect(sanitizeRedirectUrl('')).toBe('/dashboard')
+  it('defaults to ROUTES.dashboard when URL is empty/null/undefined', () => {
+    const defaultValue = ROUTES.dashboard
+    expect(sanitizeRedirectUrl(undefined, defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl(null, defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('', defaultValue)).toBe(defaultValue)
   })
 
   it('should use custom fallback when specified', () => {

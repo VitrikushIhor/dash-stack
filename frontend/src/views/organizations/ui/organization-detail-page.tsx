@@ -18,6 +18,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
@@ -97,7 +98,7 @@ export function OrganizationDetailPage({ orgId }: OrganizationDetailPageProps) {
               have permission to view it.
             </p>
             <Button asChild>
-              <Link href='/organizations'>
+              <Link href={ROUTES.organizations}>
                 <ArrowLeft className='mr-2 h-4 w-4' />
                 Back to Organizations
               </Link>
@@ -145,7 +146,7 @@ export function OrganizationDetailPage({ orgId }: OrganizationDetailPageProps) {
       <Main>
         <div className='mb-6 flex items-center gap-4'>
           <Button asChild variant='ghost' size='icon'>
-            <Link href='/organizations'>
+            <Link href={ROUTES.organizations}>
               <ArrowLeft className='h-4 w-4' />
             </Link>
           </Button>

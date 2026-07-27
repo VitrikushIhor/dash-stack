@@ -2,6 +2,7 @@
 
 import { type ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { getInitials } from '@/shared/lib/utils'
 import {
   formatJoinedDate,
@@ -27,7 +28,7 @@ export const columns: ColumnDef<Membership>[] = [
 
       return (
         <Link
-          href={`/organizations/${orgId || ''}/members/${userId}`}
+          href={`${ROUTES.organizations}/${orgId || ''}/members/${userId}`}
           className='flex items-center gap-3 hover:underline'
         >
           <Avatar className='h-8 w-8'>

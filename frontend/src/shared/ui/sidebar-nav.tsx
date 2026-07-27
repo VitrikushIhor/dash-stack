@@ -3,6 +3,7 @@
 import { useState, type JSX } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { cn } from '@/shared/lib/utils'
 import { buttonVariants } from '@/shared/ui/core/button'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
@@ -25,7 +26,7 @@ type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const [val, setVal] = useState(pathname ?? '/settings')
+  const [val, setVal] = useState(pathname ?? ROUTES.settings)
 
   const handleSelect = (e: string) => {
     setVal(e)

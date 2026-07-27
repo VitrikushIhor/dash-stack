@@ -2,6 +2,7 @@
 
 import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'
 import { Search } from '@/shared/ui/search'
@@ -42,7 +43,7 @@ export function MemberDetailPage({ orgId, userId }: MemberDetailPageProps) {
               organization.
             </p>
             <Button asChild>
-              <Link href={`/organizations/${orgId}`}>
+              <Link href={`${ROUTES.organizations}/${orgId}`}>
                 <ArrowLeft className='mr-2 h-4 w-4' />
                 Back to Organization
               </Link>

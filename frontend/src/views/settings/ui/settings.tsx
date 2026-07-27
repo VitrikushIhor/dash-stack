@@ -1,6 +1,7 @@
 'use client'
 
 import { Monitor, Bell, Palette, UserCog } from 'lucide-react'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Separator } from '@/shared/ui/core/separator'
 import { Search } from '@/shared/ui/search'
@@ -11,7 +12,7 @@ import { Header, Main, NavUser } from '@/widgets/layout'
 const sidebarNavItems = [
   {
     title: 'Profile',
-    href: '/settings',
+    href: ROUTES.settings,
     icon: <UserCog size={18} />,
   },
   {

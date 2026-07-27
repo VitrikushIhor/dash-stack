@@ -12,8 +12,10 @@ export const ROUTES = {
   organizations: '/organizations',
   createOrganization: '/create-organization',
   dashboard: '/dashboard',
+  task: '/task',
   calendar: '/calendar',
   settings: '/settings',
+  acceptInvite: '/accept-invite',
 
   // Legal
   terms: '/terms',

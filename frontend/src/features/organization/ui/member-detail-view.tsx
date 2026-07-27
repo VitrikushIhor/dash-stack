@@ -2,6 +2,7 @@
 
 import { Mail, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { getInitials } from '@/shared/lib/utils'
 import {
   formatPosition,
@@ -32,7 +33,7 @@ export const MemberDetailView = ({
   return (
     <div className='space-y-6'>
       <div className='flex items-center gap-4'>
-        <Link href={`/organizations/${orgId}`}>
+        <Link href={`${ROUTES.organizations}/${orgId}`}>
           <Button variant='ghost' size='icon'>
             <ArrowLeft className='h-4 w-4' />
           </Button>

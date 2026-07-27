@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import { ResetPassword } from './reset-password'
 
@@ -23,7 +24,7 @@ describe('ResetPassword Page View', () => {
 
     const link = screen.getByRole('link', { name: /request new link/i })
     expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', '/forgot-password')
+    expect(link).toHaveAttribute('href', ROUTES.forgotPassword)
   })
 
   it('renders ResetPasswordForm when valid token is provided', () => {

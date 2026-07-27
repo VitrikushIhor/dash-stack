@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { Button } from '@/shared/ui/core/button'
 import { Checkbox } from '@/shared/ui/core/checkbox'
@@ -204,7 +205,7 @@ export function NotificationsForm() {
                 <FormDescription>
                   You can manage your mobile notifications in the{' '}
                   <Link
-                    href='/settings'
+                    href={ROUTES.settings}
                     className='underline decoration-dashed underline-offset-4 hover:decoration-solid'
                   >
                     mobile settings

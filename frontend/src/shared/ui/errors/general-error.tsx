@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 
@@ -28,7 +29,7 @@ export function GeneralError({
             <Button variant='outline' onClick={() => router.back()}>
               Go Back
             </Button>
-            <Button onClick={() => router.push('/dashboard')}>
+            <Button onClick={() => router.push(ROUTES.dashboard)}>
               Back to Home
             </Button>
           </div>

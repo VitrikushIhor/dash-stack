@@ -2,6 +2,7 @@
 
 import { Mail } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { getInitials } from '@/shared/lib/utils'
 import {
   type Membership,
@@ -26,7 +27,7 @@ export const TeamMemberCard = ({ membership, orgId }: TeamMemberCardProps) => {
 
   return (
     <Link
-      href={`/organizations/${targetOrgId}/members/${user.id}`}
+      href={`${ROUTES.organizations}/${targetOrgId}/members/${user.id}`}
       className='block no-underline'
     >
       <Card className='group relative overflow-hidden transition-all duration-300 hover:shadow-lg'>

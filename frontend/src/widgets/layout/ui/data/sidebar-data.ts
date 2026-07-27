@@ -11,6 +11,7 @@ import {
   ClipboardList,
   Calendar,
 } from 'lucide-react'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -20,22 +21,22 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/dashboard',
+          url: ROUTES.dashboard,
           icon: LayoutDashboard,
         },
         {
           title: 'Organizations',
-          url: '/organizations',
+          url: ROUTES.organizations,
           icon: UsersRound,
         },
         {
           title: 'Tasks',
-          url: '/task',
+          url: ROUTES.task,
           icon: ClipboardList,
         },
         {
           title: 'Calendar',
-          url: '/calendar',
+          url: ROUTES.calendar,
           icon: Calendar,
         },
       ],
@@ -50,15 +51,15 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Sign In',
-              url: '/sign-in',
+              url: ROUTES.signIn,
             },
             {
               title: 'Sign Up',
-              url: '/sign-up',
+              url: ROUTES.signUp,
             },
             {
               title: 'Forgot Password',
-              url: '/forgot-password',
+              url: ROUTES.forgotPassword,
             },
             {
               title: 'OTP',
@@ -77,7 +78,7 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Profile',
-              url: '/settings',
+              url: ROUTES.settings,
               icon: UserCog,
             },
             {

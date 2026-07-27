@@ -1,5 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
 import { SignInForm } from './sign-in-form'
 
@@ -76,7 +77,7 @@ describe('SignInForm Component', () => {
     })
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/dashboard')
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.dashboard)
     })
   })
 
@@ -110,7 +111,7 @@ describe('SignInForm Component', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/create-organization')
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.createOrganization)
     })
   })
 })

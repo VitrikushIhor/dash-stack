@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { Button } from '@/shared/ui/core/button'
 
 export function UnauthorisedError() {
@@ -18,7 +19,7 @@ export function UnauthorisedError() {
           <Button variant='outline' onClick={() => router.back()}>
             Go Back
           </Button>
-          <Button onClick={() => router.push('/sign-in')}>Sign In</Button>
+          <Button onClick={() => router.push(ROUTES.signIn)}>Sign In</Button>
         </div>
       </div>
     </div>

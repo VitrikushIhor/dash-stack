@@ -6,8 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { sanitizeRedirectUrl } from '@/shared/lib/utils'
-import { userApi } from '@/entities/user/api/user-api'
 import { signInAction } from '../mutations/auth-actions'
 import {
   signInDefaultValues,
@@ -38,19 +38,10 @@ export function useSignInForm(options?: UseSignInFormProps) {
 
         toast.success(`Welcome back, ${data.email}!`)
 
-        let memberships: { organization: { id: string } }[] | null = null
-        try {
-          memberships = await userApi.getMyMemberships()
-        } catch (err) {
-          handleServerError(err)
-        }
-
-        if (memberships !== null && memberships.length === 0) {
-          router.replace('/create-organization')
-          return
-        }
-
-        const targetPath = sanitizeRedirectUrl(options?.redirectTo)
+        const targetPath = sanitizeRedirectUrl(
+          options?.redirectTo,
+          ROUTES.createOrganization
+        )
         router.replace(targetPath)
       } catch (error) {
         handleServerError(error)

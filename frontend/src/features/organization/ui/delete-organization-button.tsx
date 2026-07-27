@@ -2,6 +2,7 @@
 
 import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/shared/config/constants/routes'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,7 @@ export const DeleteOrganizationButton = ({
   const handleDelete = () => {
     deleteOrg(orgId, {
       onSuccess: () => {
-        router.push('/organizations')
+        router.push(ROUTES.organizations)
       },
     })
   }

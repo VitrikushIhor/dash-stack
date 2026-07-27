@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { getErrorMessage, ApiError } from '@/shared/api/api-helpers'
 import { serverApi } from '@/shared/api/server-api-client'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { COOKIE_CONFIG, getCookieOptions } from '@/shared/lib/session-cookies'
 
 interface CreateOrgPayload {
@@ -21,7 +22,7 @@ export async function createOrganizationAction(
 ): Promise<ActionState<{ id: string }>> {
   try {
     const result = await serverApi.post<{ id: string }, CreateOrgPayload>(
-      '/organizations',
+      ROUTES.organizations,
       input
     )
 
@@ -31,7 +32,7 @@ export async function createOrganizationAction(
       httpOnly: false,
     })
 
-    revalidatePath('/organizations')
+    revalidatePath(ROUTES.organizations)
     return { success: true, data: result }
   } catch (error) {
     if (error instanceof ApiError) {

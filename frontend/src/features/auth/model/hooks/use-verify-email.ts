@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { getErrorMessage } from '@/shared/api'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { verifyEmailAction } from '../mutations/auth-actions'
 import { VerificationStatus } from '../types/auth.types'
 
@@ -37,13 +38,13 @@ export function useVerifyEmail(token: string | null) {
   useEffect(() => {
     if (status !== VerificationStatus.SUCCESS) return
     const timeoutId = setTimeout(() => {
-      router.replace('/sign-in')
+      router.replace(ROUTES.signIn)
     }, REDIRECT_DELAY_MS)
     return () => clearTimeout(timeoutId)
   }, [status, router])
 
   const handleContinue = () => {
-    router.replace('/sign-in')
+    router.replace(ROUTES.signIn)
   }
 
   const isLoading = status === VerificationStatus.LOADING

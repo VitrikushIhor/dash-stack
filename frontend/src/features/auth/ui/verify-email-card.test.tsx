@@ -1,5 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
 import { VerifyEmailCard } from './verify-email-card'
 
@@ -58,6 +59,6 @@ describe('VerifyEmailCard Component', () => {
 
     await user.click(screen.getByRole('button', { name: /back to sign in/i }))
 
-    expect(mockReplace).toHaveBeenCalledWith('/sign-in')
+    expect(mockReplace).toHaveBeenCalledWith(ROUTES.signIn)
   })
 })

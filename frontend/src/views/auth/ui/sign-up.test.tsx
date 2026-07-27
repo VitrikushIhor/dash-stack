@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import { SignUp } from './sign-up'
 
@@ -27,7 +28,7 @@ describe('SignUp Page View', () => {
 
     const signInLink = screen.getByRole('link', { name: /sign in/i })
     expect(signInLink).toBeInTheDocument()
-    expect(signInLink).toHaveAttribute('href', '/sign-in')
+    expect(signInLink).toHaveAttribute('href', ROUTES.signIn)
 
     const termsLink = screen.getByRole('link', { name: /terms of service/i })
     expect(termsLink).toBeInTheDocument()

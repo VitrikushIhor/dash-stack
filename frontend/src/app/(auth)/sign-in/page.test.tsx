@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config/constants/routes'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import SignInRoute from './page'
 
@@ -12,14 +13,14 @@ vi.mock('@/views/auth', () => ({
 
 describe('SignInRoute App Page', () => {
   it('awaits searchParams and renders SignIn view with redirect property', async () => {
-    const searchParamsPromise = Promise.resolve({ redirect: '/settings' })
+    const searchParamsPromise = Promise.resolve({ redirect: ROUTES.settings })
 
     const pageElement = await SignInRoute({ searchParams: searchParamsPromise })
     render(pageElement)
 
     const view = screen.getByTestId('sign-in-view')
     expect(view).toBeInTheDocument()
-    expect(view).toHaveAttribute('data-redirect-to', '/settings')
+    expect(view).toHaveAttribute('data-redirect-to', ROUTES.settings)
   })
 
   it('renders SignIn view without redirect when searchParams does not contain redirect', async () => {
