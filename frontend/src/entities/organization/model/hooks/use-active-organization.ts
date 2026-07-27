@@ -1,8 +1,10 @@
 import { useMemo, useCallback } from 'react'
+import { COOKIE_CONFIG } from '@/shared/lib/cookie-config'
 import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
 import { useGetOrganizations } from '../../api/queries/use-get-organizations'
 
-const COOKIE_NAME = 'active_org_id'
+const COOKIE_NAME = COOKIE_CONFIG.ACTIVE_ORG_ID.name
+const COOKIE_MAX_AGE = COOKIE_CONFIG.ACTIVE_ORG_ID.maxAge
 
 export function useActiveOrganization() {
   const { data: memberships, isLoading } = useGetOrganizations()
@@ -18,7 +20,7 @@ export function useActiveOrganization() {
 
   const setActiveOrgId = useCallback((id: string | null) => {
     if (id) {
-      setCookie(COOKIE_NAME, id)
+      setCookie(COOKIE_NAME, id, COOKIE_MAX_AGE)
     } else {
       removeCookie(COOKIE_NAME)
     }

@@ -5,7 +5,7 @@ import { serverApi } from '@/shared/api/server-api-client'
 import {
   setAuthCookies,
   clearAuthCookies,
-  AUTH_COOKIE_CONFIG,
+  COOKIE_CONFIG,
 } from '@/shared/lib/session-cookies'
 import type { AuthTokens, SignInInput, SignUpInput } from '../types/auth.types'
 
@@ -41,9 +41,7 @@ export async function verifyEmailAction(token: string): Promise<AuthTokens> {
 
 export async function logoutAction(): Promise<{ message: string }> {
   const cookieStore = await cookies()
-  const refreshToken = cookieStore.get(
-    AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name
-  )?.value
+  const refreshToken = cookieStore.get(COOKIE_CONFIG.REFRESH_TOKEN.name)?.value
 
   if (refreshToken) {
     try {

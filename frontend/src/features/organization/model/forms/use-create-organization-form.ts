@@ -1,10 +1,12 @@
+'use client'
+
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { useUploadImage, handleServerError } from '@/shared/api'
-import {
-  useCreateOrganization,
-  useActiveOrganization,
-} from '@/entities/organization'
+import { createOrganizationAction } from '../../api/actions/create-organization.action'
 import {
   CreateOrgSchema,
   type CreateOrgFormValues,
@@ -17,8 +19,8 @@ interface UseCreateOrganizationFormProps {
 export const useCreateOrganizationForm = ({
   onSuccess,
 }: UseCreateOrganizationFormProps = {}) => {
-  const { mutate: createOrg, isPending: isCreating } = useCreateOrganization()
-  const { setActiveOrgId } = useActiveOrganization()
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
   const uploadImage = useUploadImage()
 
   const form = useForm<CreateOrgFormValues>({
@@ -44,27 +46,34 @@ export const useCreateOrganizationForm = ({
       }
     }
 
-    const payload = {
-      name: values.name,
-      description: values.description,
-      logo: logoUrl,
-    }
+    startTransition(async () => {
+      const payload = {
+        name: values.name,
+        description: values.description,
+        logo: logoUrl,
+      }
 
-    createOrg(payload, {
-      onSuccess: (org) => {
-        setActiveOrgId(org.id)
-        form.reset()
-        onSuccess?.()
-      },
-      onError: (err) => {
-        handleServerError(err)
-      },
+      const orgResult = await createOrganizationAction(payload)
+
+      if (!orgResult.success) {
+        if (orgResult.validationMessages?.length) {
+          toast.error(orgResult.validationMessages[0])
+        } else {
+          toast.error(orgResult.error)
+        }
+        return
+      }
+
+      form.reset()
+      toast.success(`Organization ${values.name} created successfully!`)
+      onSuccess?.()
+      router.replace('/organizations')
     })
   }
 
   return {
     form,
-    onSubmit,
-    isPending: isCreating || uploadImage.isPending,
+    onSubmit: form.handleSubmit(onSubmit),
+    isPending: isPending || uploadImage.isPending,
   }
 }

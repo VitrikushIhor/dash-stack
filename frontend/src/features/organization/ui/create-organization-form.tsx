@@ -23,16 +23,13 @@ interface CreateOrganizationFormProps {
 export const CreateOrganizationForm = ({
   onSuccess,
   submitLabel = 'Create',
-  className,
+  className = '',
 }: CreateOrganizationFormProps) => {
   const { form, onSubmit, isPending } = useCreateOrganizationForm({ onSuccess })
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={`space-y-4 ${className || ''}`}
-      >
+      <form onSubmit={onSubmit} className={`space-y-4 ${className}`}>
         <FormField
           control={form.control}
           name='name'

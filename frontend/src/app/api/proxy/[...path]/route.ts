@@ -1,9 +1,6 @@
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
-import {
-  AUTH_COOKIE_CONFIG,
-  getCookieOptions,
-} from '@/shared/lib/session-cookies'
+import { COOKIE_CONFIG, getCookieOptions } from '@/shared/lib/session-cookies'
 
 const BASE_URL =
   process.env.API_URL ??
@@ -11,9 +8,9 @@ const BASE_URL =
   'http://localhost:8000'
 
 async function forward(req: NextRequest, path: string[]) {
-  const store = await cookies()
-  const token = store.get(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name)?.value
-  const refreshToken = store.get(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name)?.value
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_CONFIG.ACCESS_TOKEN.name)?.value
+  const refreshToken = cookieStore.get(COOKIE_CONFIG.REFRESH_TOKEN.name)?.value
   const search = req.nextUrl.search
 
   const headers: Record<string, string> = {
@@ -43,16 +40,16 @@ async function forward(req: NextRequest, path: string[]) {
       const newAccessToken = refreshData.accessToken
       const newRefreshToken = refreshData.refreshToken
       if (newAccessToken) {
-        store.set(
-          AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name,
+        cookieStore.set(
+          COOKIE_CONFIG.ACCESS_TOKEN.name,
           newAccessToken,
-          getCookieOptions(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.maxAge)
+          getCookieOptions(COOKIE_CONFIG.ACCESS_TOKEN.maxAge)
         )
         if (newRefreshToken) {
-          store.set(
-            AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name,
+          cookieStore.set(
+            COOKIE_CONFIG.REFRESH_TOKEN.name,
             newRefreshToken,
-            getCookieOptions(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.maxAge)
+            getCookieOptions(COOKIE_CONFIG.REFRESH_TOKEN.maxAge)
           )
         }
         headers['Authorization'] = `Bearer ${newAccessToken}`
@@ -63,8 +60,8 @@ async function forward(req: NextRequest, path: string[]) {
         })
       }
     } else {
-      store.delete(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name)
-      store.delete(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name)
+      cookieStore.delete(COOKIE_CONFIG.ACCESS_TOKEN.name)
+      cookieStore.delete(COOKIE_CONFIG.REFRESH_TOKEN.name)
     }
   }
 

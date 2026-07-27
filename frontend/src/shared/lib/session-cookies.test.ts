@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  AUTH_COOKIE_CONFIG,
+  COOKIE_CONFIG,
   clearAuthCookies,
   getCookieOptions,
   setAuthCookies,
@@ -67,7 +67,7 @@ describe('session-cookies', () => {
       await setAuthCookies({ accessToken: 'test-access-token' })
 
       expect(mockSet).toHaveBeenCalledWith(
-        AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name,
+        COOKIE_CONFIG.ACCESS_TOKEN.name,
         'test-access-token',
         expect.objectContaining({
           httpOnly: true,
@@ -87,7 +87,7 @@ describe('session-cookies', () => {
       await setAuthCookies({ refreshToken: 'test-refresh-token' })
 
       expect(mockSet).toHaveBeenCalledWith(
-        AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name,
+        COOKIE_CONFIG.REFRESH_TOKEN.name,
         'test-refresh-token',
         expect.objectContaining({
           httpOnly: true,

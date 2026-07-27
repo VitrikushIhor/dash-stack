@@ -1,1 +1,1 @@
-export { CreateOrganizationPage } from './ui/create-organization-page'
+export { CreateOrganization } from './ui/create-organization'

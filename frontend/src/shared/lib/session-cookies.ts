@@ -1,15 +1,7 @@
 import { cookies } from 'next/headers'
+import { COOKIE_CONFIG } from './cookie-config'
 
-export const AUTH_COOKIE_CONFIG = {
-  ACCESS_TOKEN: {
-    name: 'access_token',
-    maxAge: 60 * 15, // 15 minutes
-  },
-  REFRESH_TOKEN: {
-    name: 'refresh_token',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  },
-} as const
+export { COOKIE_CONFIG }
 
 export function getCookieOptions(maxAge: number) {
   const isProduction = process.env.NODE_ENV === 'production'
@@ -32,23 +24,23 @@ export async function setAuthCookies(tokens: {
 
   if (tokens.accessToken) {
     cookieStore.set(
-      AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name,
+      COOKIE_CONFIG.ACCESS_TOKEN.name,
       tokens.accessToken,
-      getCookieOptions(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.maxAge)
+      getCookieOptions(COOKIE_CONFIG.ACCESS_TOKEN.maxAge)
     )
   }
 
   if (tokens.refreshToken) {
     cookieStore.set(
-      AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name,
+      COOKIE_CONFIG.REFRESH_TOKEN.name,
       tokens.refreshToken,
-      getCookieOptions(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.maxAge)
+      getCookieOptions(COOKIE_CONFIG.REFRESH_TOKEN.maxAge)
     )
   }
 }
 
 export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.delete(AUTH_COOKIE_CONFIG.ACCESS_TOKEN.name)
-  cookieStore.delete(AUTH_COOKIE_CONFIG.REFRESH_TOKEN.name)
+  cookieStore.delete(COOKIE_CONFIG.ACCESS_TOKEN.name)
+  cookieStore.delete(COOKIE_CONFIG.REFRESH_TOKEN.name)
 }

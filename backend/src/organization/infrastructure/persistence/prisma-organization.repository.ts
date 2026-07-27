@@ -52,6 +52,12 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
     return rawOrgs.map((org) => PrismaOrganizationMapper.toReadModel(org));
   }
 
+  async countByUserId(userId: string): Promise<number> {
+    return this.prisma.membership.count({
+      where: { userId },
+    });
+  }
+
   async findById(
     id: string,
     requesterId: string,
