@@ -16,12 +16,15 @@ describe('useIsAuthenticated', () => {
     const mockUser = {
       id: 'usr-1',
       email: 'user@example.com',
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
     }
     vi.mocked(useCurrentUser).mockReturnValue({
       data: mockUser,
       isLoading: false,
-    } as ReturnType<typeof useCurrentUser>)
+    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
+      typeof useCurrentUser
+    >)
 
     const { result } = renderHook(() => useIsAuthenticated())
 
@@ -34,7 +37,9 @@ describe('useIsAuthenticated', () => {
     vi.mocked(useCurrentUser).mockReturnValue({
       data: undefined,
       isLoading: false,
-    } as ReturnType<typeof useCurrentUser>)
+    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
+      typeof useCurrentUser
+    >)
 
     const { result } = renderHook(() => useIsAuthenticated())
 
@@ -47,7 +52,9 @@ describe('useIsAuthenticated', () => {
     vi.mocked(useCurrentUser).mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as ReturnType<typeof useCurrentUser>)
+    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
+      typeof useCurrentUser
+    >)
 
     const { result } = renderHook(() => useIsAuthenticated())
 

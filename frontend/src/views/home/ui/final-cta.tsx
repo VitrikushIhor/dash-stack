@@ -1,6 +1,5 @@
-'use client'
-
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { Reveal } from '@/shared/ui/reveal'
 
@@ -15,10 +14,10 @@ export function FinalCta() {
           Join thousands of teams who replaced spreadsheets with Dash Stack.
         </p>
         <Button
-          className='mb-4 rounded-xl bg-emerald-500 px-8 py-7 text-base font-bold text-white hover:bg-emerald-600'
+          className='bg-primary text-primary-foreground hover:bg-primary/90 mb-4 rounded-xl px-8 py-7 text-base font-bold'
           asChild
         >
-          <Link href='/sign-up'>Start for free &rarr;</Link>
+          <Link href={ROUTES.signUp}>Start for free &rarr;</Link>
         </Button>
         <p className='font-inter text-muted-foreground m-0 text-[13px]'>
           No credit card required

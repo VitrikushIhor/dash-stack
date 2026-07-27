@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import {
   Card,
   CardContent,
@@ -28,7 +29,7 @@ export function SignUp() {
         <p className='text-muted-foreground text-center text-sm'>
           Already have an account?{' '}
           <Link
-            href='/sign-in'
+            href={ROUTES.signIn}
             className='text-primary underline-offset-4 hover:underline'
           >
             Sign in
@@ -37,14 +38,14 @@ export function SignUp() {
         <p className='text-muted-foreground px-8 text-center text-sm'>
           By clicking create account, you agree to our{' '}
           <a
-            href='/terms'
+            href={ROUTES.terms}
             className='hover:text-primary underline underline-offset-4'
           >
             Terms of Service
           </a>{' '}
           and{' '}
           <a
-            href='/privacy'
+            href={ROUTES.privacy}
             className='hover:text-primary underline underline-offset-4'
           >
             Privacy Policy

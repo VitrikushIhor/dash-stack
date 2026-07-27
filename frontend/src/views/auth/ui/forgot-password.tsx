@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import {
   Card,
   CardContent,
@@ -28,7 +29,7 @@ export function ForgotPassword() {
         <p className='text-muted-foreground mx-auto px-8 text-center text-sm text-balance'>
           Don&apos;t have an account?{' '}
           <Link
-            href='/sign-up'
+            href={ROUTES.signUp}
             className='hover:text-primary underline underline-offset-4'
           >
             Sign up

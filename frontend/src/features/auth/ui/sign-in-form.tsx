@@ -2,6 +2,7 @@
 
 import { Loader2, LogIn } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -60,7 +61,7 @@ export function SignInForm({
               </FormControl>
               <FormMessage />
               <Link
-                href='/forgot-password'
+                href={ROUTES.forgotPassword}
                 className='text-muted-foreground inset-e-0 absolute -top-0.5 text-sm font-medium hover:opacity-75'
               >
                 Forgot password?

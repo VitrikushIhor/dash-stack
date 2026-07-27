@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import {
   Card,
   CardContent,
@@ -30,7 +31,7 @@ export function SignIn({ redirectTo }: SignInProps) {
         <p className='text-muted-foreground text-center text-sm'>
           Don&apos;t have an account?{' '}
           <Link
-            href='/sign-up'
+            href={ROUTES.signUp}
             className='text-primary underline-offset-4 hover:underline'
           >
             Sign up
@@ -39,14 +40,14 @@ export function SignIn({ redirectTo }: SignInProps) {
         <p className='text-muted-foreground px-8 text-center text-sm'>
           By clicking sign in, you agree to our{' '}
           <a
-            href='/terms'
+            href={ROUTES.terms}
             className='hover:text-primary underline underline-offset-4'
           >
             Terms of Service
           </a>{' '}
           and{' '}
           <a
-            href='/privacy'
+            href={ROUTES.privacy}
             className='hover:text-primary underline underline-offset-4'
           >
             Privacy Policy

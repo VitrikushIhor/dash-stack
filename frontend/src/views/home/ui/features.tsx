@@ -19,7 +19,7 @@ export function Features() {
     <section id='features' className='mx-auto max-w-7xl px-6 py-24'>
       <Reveal>
         <div className='mb-14'>
-          <p className='font-inter mb-3 text-xs font-semibold tracking-widest text-emerald-500 uppercase'>
+          <p className='font-inter text-primary mb-3 text-xs font-semibold tracking-widest uppercase'>
             Features
           </p>
           <h2 className='font-inter text-foreground m-0 text-[clamp(28px,3.5vw,44px)] font-extrabold tracking-tight'>
@@ -32,7 +32,7 @@ export function Features() {
         <Reveal delay={0} className='md:col-span-2'>
           <Card className='bg-card border-border flex h-full flex-col items-center gap-10 rounded-2xl p-9 !shadow-none md:flex-row'>
             <div className='max-w-[400px] flex-none'>
-              <div className='mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+              <div className='bg-primary/10 mb-5 flex h-10 w-10 items-center justify-center rounded-lg'>
                 <ChartLineIcon />
               </div>
               <h3 className='font-inter text-foreground mb-2.5 text-xl font-bold tracking-tight'>
@@ -56,7 +56,7 @@ export function Features() {
                     <div className='font-inter text-foreground mb-1 text-xl font-bold'>
                       {k.value}
                     </div>
-                    <div className='font-inter text-[11px] text-emerald-500'>
+                    <div className='font-inter text-primary text-[11px]'>
                       {k.trend}
                     </div>
                   </div>
@@ -68,7 +68,7 @@ export function Features() {
 
         <Reveal delay={80}>
           <Card className='bg-card border-border h-full rounded-2xl p-9 !shadow-none'>
-            <div className='mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+            <div className='bg-primary/10 mb-5 flex h-10 w-10 items-center justify-center rounded-lg'>
               <BarChartIcon />
             </div>
             <h3 className='font-inter text-foreground mb-2.5 text-xl font-bold tracking-tight'>
@@ -83,7 +83,7 @@ export function Features() {
 
         <Reveal delay={160}>
           <Card className='bg-card border-border h-full rounded-2xl p-9 !shadow-none'>
-            <div className='mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+            <div className='bg-primary/10 mb-5 flex h-10 w-10 items-center justify-center rounded-lg'>
               <ActivityIcon />
             </div>
             <h3 className='font-inter text-foreground mb-2.5 text-xl font-bold tracking-tight'>
@@ -98,7 +98,7 @@ export function Features() {
 
         <Reveal delay={240} className='md:col-span-2'>
           <Card className='bg-card border-border rounded-2xl p-9 !shadow-none'>
-            <div className='mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+            <div className='bg-primary/10 mb-5 flex h-10 w-10 items-center justify-center rounded-lg'>
               <AnalyticsIcon />
             </div>
             <h3 className='font-inter text-foreground mb-2.5 text-xl font-bold tracking-tight'>

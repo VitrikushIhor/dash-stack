@@ -1,6 +1,5 @@
-'use client'
-
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -19,7 +18,7 @@ export function Pricing() {
     <section id='pricing' className='mx-auto max-w-7xl px-6 py-24'>
       <Reveal>
         <div className='mb-14 text-left'>
-          <p className='font-inter mb-3 text-xs font-semibold tracking-widest text-emerald-500 uppercase'>
+          <p className='font-inter text-primary mb-3 text-xs font-semibold tracking-widest uppercase'>
             Pricing
           </p>
           <h2 className='font-inter text-foreground m-0 mb-3 text-[clamp(28px,3.5vw,44px)] font-extrabold tracking-tight'>
@@ -37,12 +36,12 @@ export function Pricing() {
             <Card
               className={`relative flex h-full flex-col rounded-2xl p-8 ${
                 tier.highlighted
-                  ? 'border-emerald-500/35 bg-emerald-500/5 !shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]'
+                  ? 'border-primary/35 bg-primary/5 !shadow-[0_0_40px_-10px_rgba(72,128,255,0.2)]'
                   : 'bg-card border-border !shadow-none'
               }`}
             >
               {tier.badge && (
-                <Badge className='font-inter absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border-none bg-emerald-500 px-3.5 py-1 text-[11px] font-bold whitespace-nowrap text-white hover:bg-emerald-500'>
+                <Badge className='font-inter bg-primary text-primary-foreground hover:bg-primary absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border-none px-3.5 py-1 text-[11px] font-bold whitespace-nowrap'>
                   {tier.badge}
                 </Badge>
               )}
@@ -71,7 +70,7 @@ export function Pricing() {
                 <div className='mb-7 flex flex-col gap-2.5'>
                   {tier.features.map((f) => (
                     <div key={f} className='flex items-center gap-2.5'>
-                      <div className='flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/10'>
+                      <div className='bg-primary/10 flex h-4 w-4 shrink-0 items-center justify-center rounded-full'>
                         <CheckIcon />
                       </div>
                       <span className='font-inter text-muted-foreground text-sm'>
@@ -95,13 +94,13 @@ export function Pricing() {
                   <Button
                     className={`w-full rounded-xl py-6 text-sm font-semibold ${
                       tier.highlighted
-                        ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                         : 'border-border hover:border-foreground text-muted-foreground hover:text-foreground bg-transparent'
                     }`}
                     variant={tier.highlighted ? 'default' : 'outline'}
                     asChild
                   >
-                    <Link href='/sign-up'>{tier.cta}</Link>
+                    <Link href={ROUTES.signUp}>{tier.cta}</Link>
                   </Button>
                 )}
               </CardFooter>

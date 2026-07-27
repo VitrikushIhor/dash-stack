@@ -27,7 +27,7 @@ export function HowItWorks() {
     <section className='mx-auto max-w-7xl px-6 py-24'>
       <Reveal>
         <div className='mb-14'>
-          <p className='font-inter mb-3 text-xs font-semibold tracking-widest text-emerald-500 uppercase'>
+          <p className='font-inter text-primary mb-3 text-xs font-semibold tracking-widest uppercase'>
             How it works
           </p>
           <h2 className='font-inter text-foreground m-0 text-[clamp(28px,3.5vw,44px)] font-extrabold tracking-tight'>
@@ -40,7 +40,7 @@ export function HowItWorks() {
         {STEPS.map((step, i) => (
           <Reveal key={step.number} delay={i * 100}>
             <Card className='bg-card border-border relative rounded-2xl p-8 !shadow-none'>
-              <div className='font-inter mb-4 text-5xl leading-none font-black tracking-tighter text-emerald-500/10'>
+              <div className='font-inter text-primary/10 mb-4 text-5xl leading-none font-black tracking-tighter'>
                 {step.number}
               </div>
               <h3 className='font-inter text-foreground mb-2.5 text-lg font-bold tracking-tight'>

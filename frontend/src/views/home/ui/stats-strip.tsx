@@ -13,7 +13,7 @@ export function StatsStrip() {
         <div className='mx-auto grid max-w-7xl grid-cols-1 gap-8 text-center md:grid-cols-3'>
           {STATS.map((s, i) => (
             <div key={i}>
-              <div className='font-inter mb-2 text-[clamp(32px,4vw,52px)] font-extrabold tracking-tight text-emerald-500'>
+              <div className='font-inter text-primary mb-2 text-[clamp(32px,4vw,52px)] font-extrabold tracking-tight'>
                 {s.value}
               </div>
               <div className='font-inter text-muted-foreground text-[15px]'>

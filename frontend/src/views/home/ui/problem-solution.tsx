@@ -36,8 +36,8 @@ export function ProblemSolution() {
             </div>
           </Card>
 
-          <Card className='rounded-2xl border-emerald-500/15 bg-emerald-500/5 p-9 !shadow-none'>
-            <div className='font-inter mb-5 text-[11px] font-semibold tracking-widest text-emerald-500 uppercase'>
+          <Card className='border-primary/15 bg-primary/5 rounded-2xl p-9 !shadow-none'>
+            <div className='font-inter text-primary mb-5 text-[11px] font-semibold tracking-widest uppercase'>
               With Dash Stack
             </div>
             <div className='flex flex-col gap-3.5'>

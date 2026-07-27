@@ -2,6 +2,7 @@
 
 import { CheckCircle2, KeyRound, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -37,7 +38,7 @@ export function ResetPasswordForm({
           Your password has been successfully reset.
         </p>
         <Button asChild>
-          <Link href='/sign-in'>Sign In</Link>
+          <Link href={ROUTES.signIn}>Sign In</Link>
         </Button>
       </div>
     )

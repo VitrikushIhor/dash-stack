@@ -25,7 +25,7 @@ describe('session-cookies', () => {
 
   describe('getCookieOptions', () => {
     it('returns default cookie options for development environment', () => {
-      process.env.NODE_ENV = 'development'
+      vi.stubEnv('NODE_ENV', 'development')
       delete process.env.COOKIE_SECURE
 
       const options = getCookieOptions(900)
@@ -40,7 +40,7 @@ describe('session-cookies', () => {
     })
 
     it('enforces secure cookies when NODE_ENV is production', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
 
       const options = getCookieOptions(900)
 
@@ -48,7 +48,7 @@ describe('session-cookies', () => {
     })
 
     it('enforces secure cookies when COOKIE_SECURE env variable is true', () => {
-      process.env.NODE_ENV = 'development'
+      vi.stubEnv('NODE_ENV', 'development')
       process.env.COOKIE_SECURE = 'true'
 
       const options = getCookieOptions(900)

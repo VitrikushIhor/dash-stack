@@ -1,6 +1,5 @@
-'use client'
-
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { Reveal } from '@/shared/ui/reveal'
 import { DashboardMock } from './dashboard-mock'
@@ -10,9 +9,9 @@ export function Hero() {
     <section className='mx-auto flex min-h-screen max-w-7xl flex-col items-center gap-[60px] px-6 pt-[100px] pb-[80px] md:flex-row md:pt-[120px]'>
       <div className='w-full flex-none md:w-1/2 md:max-w-[520px]'>
         <Reveal>
-          <div className='mb-7 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5'>
-            <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500' />
-            <span className='font-inter text-xs font-medium tracking-wider text-emerald-500 uppercase'>
+          <div className='border-primary/30 bg-primary/10 mb-7 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5'>
+            <div className='bg-primary h-1.5 w-1.5 animate-pulse rounded-full' />
+            <span className='font-inter text-primary text-xs font-medium tracking-wider uppercase'>
               Real-time Business Intelligence
             </span>
           </div>
@@ -20,8 +19,7 @@ export function Hero() {
 
         <Reveal delay={80}>
           <h1 className='font-inter text-foreground mb-5 text-[clamp(38px,5vw,60px)] leading-[1.1] font-extrabold tracking-tight'>
-            Your business,{' '}
-            <span className='text-emerald-500'>on one screen.</span>
+            Your business, <span className='text-primary'>on one screen.</span>
           </h1>
         </Reveal>
 
@@ -35,10 +33,10 @@ export function Hero() {
         <Reveal delay={240}>
           <div className='mb-5 flex flex-wrap gap-3'>
             <Button
-              className='rounded-xl bg-emerald-500 px-6 py-6 text-[15px] text-white hover:bg-emerald-600'
+              className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 py-6 text-[15px]'
               asChild
             >
-              <Link href='/sign-up'>Start for free &rarr;</Link>
+              <Link href={ROUTES.signUp}>Start for free &rarr;</Link>
             </Button>
             <Button
               variant='outline'

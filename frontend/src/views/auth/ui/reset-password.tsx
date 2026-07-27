@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import {
   Card,
@@ -25,7 +26,7 @@ export function ResetPassword({ token }: ResetPasswordProps) {
         </CardHeader>
         <CardContent className='flex justify-center'>
           <Button variant='outline' asChild>
-            <Link href='/forgot-password'>Request New Link</Link>
+            <Link href={ROUTES.forgotPassword}>Request New Link</Link>
           </Button>
         </CardContent>
       </Card>

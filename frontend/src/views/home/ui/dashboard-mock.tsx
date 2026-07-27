@@ -49,7 +49,7 @@ export function DashboardMock() {
               <div className='text-foreground mb-0.5 text-base font-bold'>
                 {kpi.value}
               </div>
-              <div className='text-[9px] text-emerald-500'>{kpi.change}</div>
+              <div className='text-primary text-[9px]'>{kpi.change}</div>
             </CardContent>
           </Card>
         ))}
@@ -70,7 +70,7 @@ export function DashboardMock() {
                   className='flex h-full flex-1 flex-col items-center justify-end'
                 >
                   <div
-                    className='w-full rounded-t-[2px] bg-emerald-500'
+                    className='bg-primary w-full rounded-t-[2px]'
                     style={{ height: `${h}%`, opacity: 0.7 + (h / 100) * 0.3 }}
                   />
                   <div className='text-muted-foreground mt-[2px] text-[6px]'>
@@ -92,7 +92,7 @@ export function DashboardMock() {
             <div className='flex flex-col gap-1.5'>
               {SALES_DATA.map((sale) => (
                 <div key={sale.initials} className='flex items-center gap-1.5'>
-                  <div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-[7px] font-bold text-white'>
+                  <div className='from-primary/80 to-primary text-primary-foreground flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[7px] font-bold'>
                     {sale.initials}
                   </div>
                   <div className='min-w-0 flex-1'>
@@ -100,7 +100,7 @@ export function DashboardMock() {
                       {sale.name}
                     </div>
                   </div>
-                  <div className='shrink-0 text-[9px] font-bold text-emerald-500'>
+                  <div className='text-primary shrink-0 text-[9px] font-bold'>
                     {sale.amount}
                   </div>
                 </div>

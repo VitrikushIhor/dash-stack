@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2, UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -46,7 +47,7 @@ export function SignUpForm({
           Please click the link to verify your account.
         </p>
         <Button variant='outline' className='mt-4' asChild>
-          <Link href='/sign-in'>Back to Sign In</Link>
+          <Link href={ROUTES.signIn}>Back to Sign In</Link>
         </Button>
       </div>
     )
