@@ -172,13 +172,13 @@ function RadioGroupItem({
 }
 
 function ThemeConfig() {
-  const { defaultTheme, theme, setTheme } = useTheme()
+  const { defaultTheme, theme, setTheme, resetTheme } = useTheme()
   return (
     <div>
       <SectionTitle
         title='Theme'
         showReset={theme !== defaultTheme}
-        onReset={() => setTheme(defaultTheme)}
+        onReset={resetTheme}
       />
       <Radio
         value={theme}

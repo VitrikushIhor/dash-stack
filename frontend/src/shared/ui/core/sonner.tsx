@@ -1,14 +1,15 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 import { useTheme } from '@/shared/lib/context'
 
 export function Toaster({ ...props }: ToasterProps) {
-  const { theme = 'system' } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
+      theme={resolvedTheme}
       richColors
       closeButton
       className='toaster group [&_div[data-content]]:w-full'
@@ -17,7 +18,7 @@ export function Toaster({ ...props }: ToasterProps) {
           '--normal-bg': 'var(--popover)',
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
-        } as React.CSSProperties
+        } as CSSProperties
       }
       {...props}
     />

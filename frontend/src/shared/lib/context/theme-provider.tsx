@@ -1,112 +1,76 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
-import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
+import React from 'react'
+import {
+  ThemeProvider as NextThemesProvider,
+  useTheme as useNextTheme,
+  type ThemeProviderProps as NextThemesProviderProps,
+} from 'next-themes'
+import {
+  DEFAULT_THEME,
+  isResolvedTheme,
+  isTheme,
+  type ResolvedTheme,
+  type Theme,
+} from './theme-utils'
 
-type Theme = 'dark' | 'light' | 'system'
-type ResolvedTheme = Exclude<Theme, 'system'>
+export type { Theme, ResolvedTheme }
+export { DEFAULT_THEME }
 
-const DEFAULT_THEME = 'system'
-const THEME_COOKIE_NAME = 'vite-ui-theme'
-const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year
+export type ThemeProviderProps = NextThemesProviderProps
 
-type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
-}
-
-type ThemeProviderState = {
-  defaultTheme: Theme
-  resolvedTheme: ResolvedTheme
-  theme: Theme
-  setTheme: (theme: Theme) => void
-  resetTheme: () => void
-}
-
-const initialState: ThemeProviderState = {
-  defaultTheme: DEFAULT_THEME,
-  resolvedTheme: 'light',
-  theme: DEFAULT_THEME,
-  setTheme: () => null,
-  resetTheme: () => null,
-}
-
-const ThemeContext = createContext<ThemeProviderState>(initialState)
-
-export function ThemeProvider({
-  children,
-  defaultTheme = DEFAULT_THEME,
-  storageKey = THEME_COOKIE_NAME,
-  ...props
-}: ThemeProviderProps) {
-  const [theme, _setTheme] = useState<Theme>(
-    () => (getCookie(storageKey) as Theme) || defaultTheme
-  )
-
-  // Optimized: Memoize the resolved theme calculation to prevent unnecessary re-computations
-  const resolvedTheme = useMemo((): ResolvedTheme => {
-    if (theme === 'system') {
-      if (typeof window === 'undefined') return 'light'
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-    }
-    return theme as ResolvedTheme
-  }, [theme])
-
-  useEffect(() => {
-    const root = window.document.documentElement
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-    const applyTheme = (currentResolvedTheme: ResolvedTheme) => {
-      root.classList.remove('light', 'dark') // Remove existing theme classes
-      root.classList.add(currentResolvedTheme) // Add the new theme class
-    }
-
-    const handleChange = () => {
-      if (theme === 'system') {
-        const systemTheme = mediaQuery.matches ? 'dark' : 'light'
-        applyTheme(systemTheme)
-      }
-    }
-
-    applyTheme(resolvedTheme)
-
-    mediaQuery.addEventListener('change', handleChange)
-
-    return () => mediaQuery.removeEventListener('change', handleChange)
-  }, [theme, resolvedTheme])
-
-  const setTheme = (theme: Theme) => {
-    setCookie(storageKey, theme, THEME_COOKIE_MAX_AGE)
-    _setTheme(theme)
-  }
-
-  const resetTheme = () => {
-    removeCookie(storageKey)
-    _setTheme(DEFAULT_THEME)
-  }
-
-  const contextValue = {
-    defaultTheme,
-    resolvedTheme,
-    resetTheme,
-    theme,
-    setTheme,
-  }
-
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <ThemeContext value={contextValue} {...props}>
+    <NextThemesProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      disableTransitionOnChange
+      {...props}
+    >
       {children}
-    </ThemeContext>
+    </NextThemesProvider>
   )
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext)
+export function useTheme() {
+  const {
+    setTheme,
+    theme: rawTheme,
+    resolvedTheme: rawResolvedTheme,
+    systemTheme,
+    themes,
+    forcedTheme,
+  } = useNextTheme()
 
-  if (!context) throw new Error('useTheme must be used within a ThemeProvider')
+  const resetTheme = React.useCallback(() => {
+    setTheme(DEFAULT_THEME)
+  }, [setTheme])
 
-  return context
+  const theme: Theme = isTheme(rawTheme) ? rawTheme : DEFAULT_THEME
+  const resolvedTheme: ResolvedTheme = isResolvedTheme(rawResolvedTheme)
+    ? rawResolvedTheme
+    : 'light'
+
+  return React.useMemo(
+    () => ({
+      setTheme,
+      defaultTheme: DEFAULT_THEME,
+      theme,
+      resolvedTheme,
+      resetTheme,
+      systemTheme,
+      themes,
+      forcedTheme,
+    }),
+    [
+      setTheme,
+      theme,
+      resolvedTheme,
+      resetTheme,
+      systemTheme,
+      themes,
+      forcedTheme,
+    ]
+  )
 }

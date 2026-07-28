@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
@@ -21,7 +22,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 
 const appearanceFormSchema = z.object({
-  theme: z.enum(['light', 'dark']),
+  theme: z.enum(['light', 'dark', 'system']),
   font: z.enum(fonts),
 })
 
@@ -31,9 +32,8 @@ export function AppearanceForm() {
   const { font, setFont } = useFont()
   const { theme, setTheme } = useTheme()
 
-  // This can come from your database or API.
-  const defaultValues: Partial<AppearanceFormValues> = {
-    theme: theme as 'light' | 'dark',
+  const defaultValues: AppearanceFormValues = {
+    theme,
     font,
   }
 
@@ -42,9 +42,13 @@ export function AppearanceForm() {
     defaultValues,
   })
 
+  React.useEffect(() => {
+    form.reset({ theme, font })
+  }, [theme, font, form])
+
   function onSubmit(data: AppearanceFormValues) {
-    if (data.font != font) setFont(data.font)
-    if (data.theme != theme) setTheme(data.theme)
+    if (data.font !== font) setFont(data.font)
+    if (data.theme !== theme) setTheme(data.theme)
 
     showSubmittedData(data)
   }
@@ -96,8 +100,8 @@ export function AppearanceForm() {
               <FormMessage />
               <RadioGroup
                 onValueChange={field.onChange}
-                defaultValue={field.value}
-                className='grid max-w-md grid-cols-2 gap-8 pt-2'
+                value={field.value}
+                className='grid max-w-md grid-cols-3 gap-4 pt-2'
               >
                 <FormItem>
                   <FormLabel className='[&:has([data-state=checked])>div]:border-primary'>
@@ -148,6 +152,28 @@ export function AppearanceForm() {
                     </div>
                     <span className='block w-full p-2 text-center font-normal'>
                       Dark
+                    </span>
+                  </FormLabel>
+                </FormItem>
+                <FormItem>
+                  <FormLabel className='[&:has([data-state=checked])>div]:border-primary'>
+                    <FormControl>
+                      <RadioGroupItem value='system' className='sr-only' />
+                    </FormControl>
+                    <div className='border-muted bg-popover hover:bg-accent hover:text-accent-foreground items-center rounded-md border-2 p-1'>
+                      <div className='space-y-2 rounded-sm bg-slate-900 p-2'>
+                        <div className='flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-xs'>
+                          <div className='h-4 w-4 rounded-full bg-slate-400' />
+                          <div className='h-2 w-[60px] rounded-lg bg-slate-400' />
+                        </div>
+                        <div className='flex items-center space-x-2 rounded-md bg-white p-2 shadow-xs'>
+                          <div className='h-4 w-4 rounded-full bg-slate-300' />
+                          <div className='h-2 w-[60px] rounded-lg bg-slate-300' />
+                        </div>
+                      </div>
+                    </div>
+                    <span className='block w-full p-2 text-center font-normal'>
+                      System
                     </span>
                   </FormLabel>
                 </FormItem>
