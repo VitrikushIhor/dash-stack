@@ -1,7 +1,7 @@
 'use client'
 
-import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import {
   DropdownMenu,

@@ -1,7 +1,7 @@
 'use client'
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
 import { getFileUrl } from '@/shared/api'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'

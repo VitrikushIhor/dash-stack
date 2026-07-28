@@ -1,7 +1,7 @@
 'use client'
 
-import { LogOut } from 'lucide-react'
 import Link from 'next/link'
+import { LogOut } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Button } from '@/shared/ui/core/button'

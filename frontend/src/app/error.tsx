@@ -1,29 +1,37 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
+import { ErrorState } from '@/shared/ui/error-state'
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
+type ErrorPageProps = {
   error: Error & { digest?: string }
   reset: () => void
-}) {
+}
+
+export default function Error({ error, reset }: ErrorPageProps) {
   useEffect(() => {
+    // TODO: Send to observability platform Sentry
     // eslint-disable-next-line no-console
-    console.error('Global Error Boundary caught:', error)
+    console.error('[ErrorBoundary]', error.message, error.digest)
   }, [error])
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center gap-4 text-center'>
-      <h1 className='text-destructive text-4xl font-bold'>
-        Something went wrong!
-      </h1>
-      <p className='text-muted-foreground'>
-        {error.message || 'An unexpected error occurred.'}
-      </p>
-      <Button onClick={() => reset()}>Try again</Button>
-    </div>
+    <ErrorState
+      statusCode='500'
+      title="Oops! Something went wrong :')"
+      description={
+        <>
+          We apologize for the inconvenience. <br /> Please try again later.
+        </>
+      }
+    >
+      <Button onClick={() => reset()}>Try Again</Button>
+      <Button variant='outline' asChild>
+        <Link href={ROUTES.dashboard}>Back to Home</Link>
+      </Button>
+    </ErrorState>
   )
 }

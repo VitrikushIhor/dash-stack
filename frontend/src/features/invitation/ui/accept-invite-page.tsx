@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import { useAcceptInvite } from '../model/mutations/use-accept-invite'

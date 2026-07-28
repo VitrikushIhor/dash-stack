@@ -3,19 +3,19 @@ import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { ErrorState } from '@/shared/ui/error-state'
 
-export default function NotFound() {
+export default function Forbidden() {
   return (
     <ErrorState
-      statusCode='404'
-      title='Oops! Page Not Found!'
+      statusCode='403'
+      title='Access Forbidden'
       description={
         <>
-          It seems like the page you&apos;re looking for <br />
-          does not exist or might have been removed.
+          You don&apos;t have the necessary permission <br />
+          to view this resource.
         </>
       }
     >
-      <Button asChild>
+      <Button variant='outline' asChild>
         <Link href={ROUTES.dashboard}>Back to Home</Link>
       </Button>
     </ErrorState>

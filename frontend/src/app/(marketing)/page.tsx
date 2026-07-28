@@ -1,5 +1,5 @@
-import { HomePage } from '@/views/home'
 import type { Metadata } from 'next'
+import { HomePage } from '@/views/home'
 
 export const metadata: Metadata = {
   title: 'Dash Stack — Real-time Business Intelligence Dashboard',

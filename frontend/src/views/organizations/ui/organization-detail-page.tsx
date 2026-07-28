@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import Link from 'next/link'
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -17,7 +18,6 @@ import {
   Building2,
   ArrowLeft,
 } from 'lucide-react'
-import Link from 'next/link'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'

@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
 import { useSearch, useTheme } from '@/shared/lib/context'
 import {
   CommandDialog,

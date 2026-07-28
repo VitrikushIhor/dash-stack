@@ -17,13 +17,6 @@ vi.mock('../model/mutations/auth-actions', () => ({
   signInAction: (...args: unknown[]) => mockSignInAction(...args),
 }))
 
-const mockGetMyMemberships = vi.fn()
-vi.mock('@/entities/user/api/user-api', () => ({
-  userApi: {
-    getMyMemberships: () => mockGetMyMemberships(),
-  },
-}))
-
 describe('SignInForm Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -56,12 +49,9 @@ describe('SignInForm Component', () => {
     expect(mockSignInAction).not.toHaveBeenCalled()
   })
 
-  it('submits form with valid user credentials and redirects to default dashboard', async () => {
+  it('submits form with valid user credentials and redirects to create-organization by default', async () => {
     const user = userEvent.setup()
     mockSignInAction.mockResolvedValueOnce({ success: true })
-    mockGetMyMemberships.mockResolvedValueOnce([
-      { organization: { id: 'org-1' } },
-    ])
 
     render(<SignInForm />)
 
@@ -77,16 +67,13 @@ describe('SignInForm Component', () => {
     })
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(ROUTES.dashboard)
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.createOrganization)
     })
   })
 
   it('redirects to custom target URL when redirectTo prop is specified', async () => {
     const user = userEvent.setup()
     mockSignInAction.mockResolvedValueOnce({ success: true })
-    mockGetMyMemberships.mockResolvedValueOnce([
-      { organization: { id: 'org-1' } },
-    ])
 
     render(<SignInForm redirectTo='/analytics' />)
 
@@ -96,22 +83,6 @@ describe('SignInForm Component', () => {
 
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith('/analytics')
-    })
-  })
-
-  it('redirects user to create-organization page when user has no active memberships', async () => {
-    const user = userEvent.setup()
-    mockSignInAction.mockResolvedValueOnce({ success: true })
-    mockGetMyMemberships.mockResolvedValueOnce([])
-
-    render(<SignInForm />)
-
-    await user.type(screen.getByLabelText(/email/i), 'newuser@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'Password123!')
-    await user.click(screen.getByRole('button', { name: /sign in/i }))
-
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(ROUTES.createOrganization)
     })
   })
 })

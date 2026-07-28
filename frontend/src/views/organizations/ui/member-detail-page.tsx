@@ -1,7 +1,7 @@
 'use client'
 
-import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Loader2, ArrowLeft } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Button } from '@/shared/ui/core/button'

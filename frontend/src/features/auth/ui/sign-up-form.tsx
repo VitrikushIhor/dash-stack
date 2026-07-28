@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { Loader2, UserPlus } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'

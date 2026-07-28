@@ -1,9 +1,9 @@
 'use client'
 
 import { type ReactNode } from 'react'
-import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronRight } from 'lucide-react'
 import { Badge } from '@/shared/ui/core/badge'
 import {
   Collapsible,

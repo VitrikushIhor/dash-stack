@@ -1,7 +1,7 @@
 'use client'
 
-import { CheckCircle2, KeyRound, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { CheckCircle2, KeyRound, Loader2 } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'

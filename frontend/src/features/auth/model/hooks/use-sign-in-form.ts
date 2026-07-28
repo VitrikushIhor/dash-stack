@@ -1,9 +1,9 @@
 'use client'
 
 import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
 import { ROUTES } from '@/shared/config/constants/routes'

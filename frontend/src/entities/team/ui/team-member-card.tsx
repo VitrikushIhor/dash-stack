@@ -1,7 +1,7 @@
 'use client'
 
-import { Mail } from 'lucide-react'
 import Link from 'next/link'
+import { Mail } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { getInitials } from '@/shared/lib/utils'
 import {

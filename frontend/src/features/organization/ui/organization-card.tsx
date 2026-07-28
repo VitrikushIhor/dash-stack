@@ -1,7 +1,7 @@
 'use client'
 
-import { Users, Briefcase } from 'lucide-react'
 import Link from 'next/link'
+import { Users, Briefcase } from 'lucide-react'
 import {
   Card,
   CardDescription,

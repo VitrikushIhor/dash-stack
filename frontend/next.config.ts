@@ -1,6 +1,7 @@
 import { config } from 'dotenv'
 import { resolve } from 'path'
 import type { NextConfig } from 'next'
+import { env } from './src/shared/config/env'
 
 // Load .env from root monorepo
 config({ path: resolve(__dirname, '../.env') })
@@ -9,6 +10,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: resolve(__dirname, '../'),
   experimental: {
+    authInterrupts: true,
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',
@@ -36,13 +38,15 @@ const nextConfig: NextConfig = {
       '@dnd-kit/utilities',
     ],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
-    remotePatterns: [
-      { hostname: process.env.AWS_CLOUDFRONT_DOMAIN ?? 'localhost' },
-    ],
+    remotePatterns: env.AWS_CLOUDFRONT_DOMAIN
+      ? [
+          {
+            protocol: 'https',
+            hostname: env.AWS_CLOUDFRONT_DOMAIN,
+          },
+        ]
+      : [],
   },
 }
 

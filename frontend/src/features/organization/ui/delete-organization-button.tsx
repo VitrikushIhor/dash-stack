@@ -1,7 +1,7 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Trash2 } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import {
   AlertDialog,
