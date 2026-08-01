@@ -1,7 +1,7 @@
 'use client'
 
 import { Moon, Sun } from 'lucide-react'
-import { isTheme, useTheme } from '@/shared/lib/context'
+import { isTheme, useTheme } from '@/shared/lib/providers'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,

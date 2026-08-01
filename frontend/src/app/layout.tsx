@@ -3,13 +3,12 @@ import { Inter } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import {
   DirectionProvider,
-  FontProvider,
   QueryProvider,
   ThemeProvider,
-} from '@/shared/lib/context'
+  DirectionScript,
+} from '@/shared/lib/providers'
 import '@/shared/styles/index.css'
 import { Toaster } from '@/shared/ui/core/sonner'
-import { TooltipProvider } from '@/shared/ui/core/tooltip'
 
 const inter = Inter({ subsets: ['latin', 'latin-ext'] })
 
@@ -26,17 +25,14 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={inter.className}>
+        <DirectionScript />
         <QueryProvider>
           <NuqsAdapter>
             <ThemeProvider>
-              <FontProvider>
-                <DirectionProvider>
-                  <TooltipProvider>
-                    {children}
-                    <Toaster duration={5000} />
-                  </TooltipProvider>
-                </DirectionProvider>
-              </FontProvider>
+              <DirectionProvider>
+                {children}
+                <Toaster duration={5000} />
+              </DirectionProvider>
             </ThemeProvider>
           </NuqsAdapter>
         </QueryProvider>

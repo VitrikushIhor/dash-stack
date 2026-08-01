@@ -1,5 +1,5 @@
 import { type SVGProps } from 'react'
-import { type Direction } from '@/shared/lib/context'
+import { type Direction } from '@/shared/lib/providers'
 import { cn } from '@/shared/lib/utils'
 
 type IconDirProps = SVGProps<SVGSVGElement> & {

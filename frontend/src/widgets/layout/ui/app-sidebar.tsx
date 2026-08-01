@@ -1,6 +1,6 @@
 'use client'
 
-import { useLayout } from '@/shared/lib/context'
+import { useLayout } from '@/shared/lib/providers'
 import {
   Sidebar,
   SidebarContent,

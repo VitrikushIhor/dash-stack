@@ -3,13 +3,10 @@
 import React from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { fonts } from '@/shared/config'
-import { useFont, useTheme } from '@/shared/lib/context'
+import { useTheme } from '@/shared/lib/providers'
 import { showSubmittedData } from '@/shared/lib/show-submitted-data'
-import { cn } from '@/shared/lib/utils'
-import { Button, buttonVariants } from '@/shared/ui/core/button'
+import { Button } from '@/shared/ui/core/button'
 import {
   Form,
   FormControl,
@@ -23,18 +20,15 @@ import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 
 const appearanceFormSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']),
-  font: z.enum(fonts),
 })
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>
 
 export function AppearanceForm() {
-  const { font, setFont } = useFont()
   const { theme, setTheme } = useTheme()
 
   const defaultValues: AppearanceFormValues = {
     theme,
-    font,
   }
 
   const form = useForm<AppearanceFormValues>({
@@ -43,11 +37,10 @@ export function AppearanceForm() {
   })
 
   React.useEffect(() => {
-    form.reset({ theme, font })
-  }, [theme, font, form])
+    form.reset({ theme })
+  }, [theme, form])
 
   function onSubmit(data: AppearanceFormValues) {
-    if (data.font !== font) setFont(data.font)
     if (data.theme !== theme) setTheme(data.theme)
 
     showSubmittedData(data)
@@ -56,38 +49,6 @@ export function AppearanceForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='font'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Font</FormLabel>
-              <div className='relative w-max'>
-                <FormControl>
-                  <select
-                    className={cn(
-                      buttonVariants({ variant: 'outline' }),
-                      'w-[200px] appearance-none font-normal capitalize',
-                      'dark:bg-background dark:hover:bg-background'
-                    )}
-                    {...field}
-                  >
-                    {fonts.map((font) => (
-                      <option key={font} value={font}>
-                        {font}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <ChevronDownIcon className='absolute end-3 top-2.5 h-4 w-4 opacity-50' />
-              </div>
-              <FormDescription className='font-manrope'>
-                Set the font you want to use in the dashboard.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name='theme'

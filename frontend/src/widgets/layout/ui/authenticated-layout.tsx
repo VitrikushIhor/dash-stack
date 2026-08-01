@@ -1,7 +1,7 @@
 'use client'
 
-import { LayoutProvider, SearchProvider } from '@/shared/lib/context'
 import { getCookie } from '@/shared/lib/cookies'
+import { LayoutProvider, SearchProvider } from '@/shared/lib/providers'
 import { cn } from '@/shared/lib/utils'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
 import { SkipToMain } from '@/shared/ui/skip-to-main'

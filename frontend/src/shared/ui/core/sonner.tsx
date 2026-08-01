@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
-import { useTheme } from '@/shared/lib/context'
+import { useTheme } from '@/shared/lib/providers'
 
 export function Toaster({ ...props }: ToasterProps) {
   const { resolvedTheme } = useTheme()

@@ -16,7 +16,7 @@ import {
   type Collapsible,
   useLayout,
   useTheme,
-} from '@/shared/lib/context'
+} from '@/shared/lib/providers'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {

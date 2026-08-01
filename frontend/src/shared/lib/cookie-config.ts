@@ -11,4 +11,8 @@ export const COOKIE_CONFIG = {
     name: 'active_org_id',
     maxAge: 60 * 60 * 24 * 365, // 1 year
   },
+  DIRECTION: {
+    name: 'dir',
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+  },
 } as const

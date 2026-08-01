@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { ThemeProvider, useTheme } from '@/shared/lib/context'
+import { ThemeProvider, useTheme } from '@/shared/lib/providers'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import { ThemeSwitch } from './theme-switch'
 

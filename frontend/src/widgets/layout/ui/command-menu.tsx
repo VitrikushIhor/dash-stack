@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
-import { useSearch, useTheme } from '@/shared/lib/context'
+import { useSearch, useTheme } from '@/shared/lib/providers'
 import {
   CommandDialog,
   CommandEmpty,
