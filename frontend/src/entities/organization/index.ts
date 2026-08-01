@@ -15,3 +15,4 @@ export { useDeleteOrganization } from './api/mutations/use-delete-organization'
 
 // Hooks
 export { useActiveOrganization } from './model/hooks/use-active-organization'
+export { OrganizationLogo } from './ui/organization-logo'

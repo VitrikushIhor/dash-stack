@@ -1,9 +1,3 @@
-type User = {
-  name: string
-  email: string
-  avatar: string
-}
-
 type BaseNavItem = {
   title: string
   badge?: string
@@ -31,4 +25,4 @@ type SidebarData = {
   navGroups: NavGroup[]
 }
 
-export type { SidebarData, User, NavGroup, NavItem, NavCollapsible, NavLink }
+export type { SidebarData, NavGroup, NavItem, NavCollapsible, NavLink }

@@ -1,19 +1,15 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
-import { getCookie, setCookie } from '@/shared/lib/cookies'
+import { COOKIE_CONFIG } from '@/shared/lib/cookie-config'
+import { setCookie } from '@/shared/lib/cookies'
 
 export type Collapsible = 'offcanvas' | 'icon' | 'none'
 export type Variant = 'inset' | 'sidebar' | 'floating'
 
-// Cookie constants following the pattern from sidebar.tsx
-const LAYOUT_COLLAPSIBLE_COOKIE_NAME = 'layout_collapsible'
-const LAYOUT_VARIANT_COOKIE_NAME = 'layout_variant'
-const LAYOUT_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
-
 // Default values
-const DEFAULT_VARIANT = 'inset'
-const DEFAULT_COLLAPSIBLE = 'icon'
+export const DEFAULT_VARIANT = 'inset'
+export const DEFAULT_COLLAPSIBLE = 'icon'
 
 type LayoutContextType = {
   resetLayout: () => void
@@ -31,31 +27,39 @@ const LayoutContext = createContext<LayoutContextType | null>(null)
 
 type LayoutProviderProps = {
   children: React.ReactNode
+  initialCollapsible?: Collapsible
+  initialVariant?: Variant
 }
 
-export function LayoutProvider({ children }: LayoutProviderProps) {
-  const [collapsible, _setCollapsible] = useState<Collapsible>(() => {
-    const saved = getCookie(LAYOUT_COLLAPSIBLE_COOKIE_NAME)
-    return (saved as Collapsible) || DEFAULT_COLLAPSIBLE
-  })
+export function LayoutProvider({
+  children,
+  initialCollapsible,
+  initialVariant,
+}: LayoutProviderProps) {
+  const [collapsible, _setCollapsible] = useState<Collapsible>(
+    initialCollapsible ?? DEFAULT_COLLAPSIBLE
+  )
 
-  const [variant, _setVariant] = useState<Variant>(() => {
-    const saved = getCookie(LAYOUT_VARIANT_COOKIE_NAME)
-    return (saved as Variant) || DEFAULT_VARIANT
-  })
+  const [variant, _setVariant] = useState<Variant>(
+    initialVariant ?? DEFAULT_VARIANT
+  )
 
   const setCollapsible = (newCollapsible: Collapsible) => {
     _setCollapsible(newCollapsible)
     setCookie(
-      LAYOUT_COLLAPSIBLE_COOKIE_NAME,
+      COOKIE_CONFIG.LAYOUT_COLLAPSIBLE.name,
       newCollapsible,
-      LAYOUT_COOKIE_MAX_AGE
+      COOKIE_CONFIG.LAYOUT_COLLAPSIBLE.maxAge
     )
   }
 
   const setVariant = (newVariant: Variant) => {
     _setVariant(newVariant)
-    setCookie(LAYOUT_VARIANT_COOKIE_NAME, newVariant, LAYOUT_COOKIE_MAX_AGE)
+    setCookie(
+      COOKIE_CONFIG.LAYOUT_VARIANT.name,
+      newVariant,
+      COOKIE_CONFIG.LAYOUT_VARIANT.maxAge
+    )
   }
 
   const resetLayout = () => {
