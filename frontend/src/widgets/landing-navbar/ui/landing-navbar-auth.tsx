@@ -60,7 +60,7 @@ export function LandingNavbarAuth({
             </div>
           </div>
           <Button className='w-full' asChild>
-            <Link href={ROUTES.createOrganization}>Go to App</Link>
+            <Link href={ROUTES.organizations}>Go to App</Link>
           </Button>
           <Button
             variant='destructive'
@@ -98,7 +98,7 @@ export function LandingNavbarAuth({
           className='border-primary/20 text-primary hover:bg-primary/10'
           asChild
         >
-          <Link href={ROUTES.createOrganization}>Go to App</Link>
+          <Link href={ROUTES.organizations}>Go to App</Link>
         </Button>
 
         <DropdownMenu>

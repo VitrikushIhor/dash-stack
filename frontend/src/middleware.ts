@@ -38,7 +38,7 @@ export function middleware(req: NextRequest) {
   }
 
   if (isAuthPage && isAuthenticated) {
-    return NextResponse.redirect(new URL(ROUTES.createOrganization, req.url))
+    return NextResponse.redirect(new URL(ROUTES.organizations, req.url))
   }
 
   return NextResponse.next()

@@ -60,7 +60,7 @@ describe('Next.js Route Protection Middleware', () => {
   })
 
   describe('Auth Routes (Login/Signup)', () => {
-    it('redirects authenticated user accessing sign-in page to create-organization', () => {
+    it('redirects authenticated user accessing sign-in page to organizations', () => {
       const req = createNextRequest(ROUTES.signIn, {
         access_token: 'valid-access-token',
       })
@@ -69,11 +69,11 @@ describe('Next.js Route Protection Middleware', () => {
 
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toBe(
-        'http://localhost:3000/create-organization'
+        'http://localhost:3000/organizations'
       )
     })
 
-    it('redirects user with only refresh_token accessing sign-up page to create-organization', () => {
+    it('redirects user with only refresh_token accessing sign-up page to organizations', () => {
       const req = createNextRequest(ROUTES.signUp, {
         refresh_token: 'valid-refresh-token',
       })
@@ -82,7 +82,7 @@ describe('Next.js Route Protection Middleware', () => {
 
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toBe(
-        'http://localhost:3000/create-organization'
+        'http://localhost:3000/organizations'
       )
     })
 

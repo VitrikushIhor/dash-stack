@@ -67,7 +67,7 @@ describe('SignInForm Component', () => {
     })
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(ROUTES.createOrganization)
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.organizations)
     })
   })
 

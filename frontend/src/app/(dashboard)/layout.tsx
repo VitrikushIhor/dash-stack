@@ -4,6 +4,7 @@ import type {
   Collapsible,
   Variant,
 } from '@/shared/lib/providers/layout-provider'
+import { ensureHasOrganization } from '@/entities/organization/server'
 import { AuthenticatedLayout } from '@/widgets/layout'
 
 export default async function DashboardGroupLayout({
@@ -11,6 +12,8 @@ export default async function DashboardGroupLayout({
 }: {
   children: React.ReactNode
 }) {
+  await ensureHasOrganization()
+
   const cookieStore = await cookies()
   const defaultOpen =
     cookieStore.get(COOKIE_CONFIG.SIDEBAR_STATE.name)?.value !== 'false'

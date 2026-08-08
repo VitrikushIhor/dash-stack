@@ -40,7 +40,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
 
         const targetPath = sanitizeRedirectUrl(
           options?.redirectTo,
-          ROUTES.createOrganization
+          ROUTES.organizations
         )
         router.replace(targetPath)
       } catch (error) {

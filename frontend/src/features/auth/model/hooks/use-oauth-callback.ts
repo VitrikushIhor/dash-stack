@@ -40,7 +40,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
         await oauthExchangeAction(token)
         toast.success('Successfully signed in!')
 
-        router.replace(ROUTES.createOrganization)
+        router.replace(ROUTES.organizations)
       } catch (err) {
         handleServerError(err)
       }
