@@ -13,14 +13,19 @@ async function forward(req: NextRequest, path: string[]) {
   const refreshToken = cookieStore.get(COOKIE_CONFIG.REFRESH_TOKEN.name)?.value
   const search = req.nextUrl.search
 
+  const contentType = req.headers.get('content-type')
   const headers: Record<string, string> = {
-    'Content-Type': req.headers.get('content-type') ?? 'application/json',
+    ...(contentType && { 'Content-Type': contentType }),
     ...(token && { Authorization: `Bearer ${token}` }),
   }
 
-  const body = ['GET', 'HEAD'].includes(req.method)
-    ? undefined
-    : await req.text()
+  let body: ArrayBuffer | undefined = undefined
+  if (!['GET', 'HEAD'].includes(req.method)) {
+    const buffer = await req.arrayBuffer()
+    if (buffer.byteLength > 0) {
+      body = buffer
+    }
+  }
 
   let res = await fetch(`${BASE_URL}/api/${path.join('/')}${search}`, {
     method: req.method,
@@ -66,17 +71,17 @@ async function forward(req: NextRequest, path: string[]) {
   }
 
   const resHeaders = new Headers()
-  resHeaders.set(
-    'Content-Type',
-    res.headers.get('content-type') ?? 'application/json'
-  )
+  const resContentType = res.headers.get('content-type')
+  if (resContentType) {
+    resHeaders.set('Content-Type', resContentType)
+  }
 
   const setCookie = res.headers.get('set-cookie')
   if (setCookie) {
     resHeaders.set('set-cookie', setCookie)
   }
 
-  const data = await res.text()
+  const data = await res.arrayBuffer()
   return new NextResponse(data, {
     status: res.status,
     headers: resHeaders,

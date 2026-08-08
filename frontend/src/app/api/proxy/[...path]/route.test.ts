@@ -148,4 +148,46 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     expect(mockDelete).toHaveBeenCalledWith('access_token')
     expect(mockDelete).toHaveBeenCalledWith('refresh_token')
   })
+
+  it('forwards POST request with binary buffer without corrupting data', async () => {
+    setupCookieMock({ access_token: 'test-token' })
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ key: 'img.webp', url: 'http://localhost/img.webp' }),
+        {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    )
+
+    const binaryData = new Uint8Array([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ])
+    const req = new NextRequest(
+      'http://localhost:3000/api/proxy/storage/image',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'image/png' },
+        body: binaryData,
+      }
+    )
+    const params = Promise.resolve({ path: ['storage', 'image'] })
+
+    const res = await POST(req, { params })
+    const body = await res.json()
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'http://localhost:8000/api/storage/image',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Content-Type': 'image/png',
+          Authorization: 'Bearer test-token',
+        }),
+        body: expect.any(ArrayBuffer),
+      })
+    )
+    expect(body).toEqual({ key: 'img.webp', url: 'http://localhost/img.webp' })
+  })
 })
