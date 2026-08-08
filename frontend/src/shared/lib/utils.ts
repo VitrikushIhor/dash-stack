@@ -1,3 +1,4 @@
+import { format, isValid, parseISO } from 'date-fns'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { ROUTES } from '@/shared/config/constants/routes'
@@ -116,4 +117,18 @@ export function sanitizeRedirectUrl(
     return trimmed
   }
   return fallback
+}
+
+/**
+ * Formats an ISO date string or Date instance using date-fns.
+ * Returns null if the date is invalid, null, or undefined.
+ */
+export function formatDate(
+  dateValue?: string | Date | null,
+  formatStr: string = 'MMM d, yyyy'
+): string | null {
+  if (!dateValue) return null
+  const date = typeof dateValue === 'string' ? parseISO(dateValue) : dateValue
+  if (!isValid(date)) return null
+  return format(date, formatStr)
 }

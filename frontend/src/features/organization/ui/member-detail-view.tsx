@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { Mail, ArrowLeft } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
@@ -33,11 +31,14 @@ export const MemberDetailView = ({
   return (
     <div className='space-y-6'>
       <div className='flex items-center gap-4'>
-        <Link href={`${ROUTES.organizations}/${orgId}`}>
-          <Button variant='ghost' size='icon'>
+        <Button asChild variant='ghost' size='icon' className='rounded-lg'>
+          <Link
+            href={`${ROUTES.organizations}/${orgId}`}
+            aria-label='Back to organization'
+          >
             <ArrowLeft className='h-4 w-4' />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <h2 className='text-2xl font-bold tracking-tight'>Member Details</h2>
       </div>
 
@@ -45,20 +46,22 @@ export const MemberDetailView = ({
         <CardHeader>
           <div className='flex items-start gap-4'>
             <Avatar className='h-16 w-16'>
-              <AvatarImage src={user.avatar} />
-              <AvatarFallback className='text-lg'>{initials}</AvatarFallback>
+              <AvatarImage src={user.avatar} alt={displayName} />
+              <AvatarFallback className='text-lg font-semibold'>
+                {initials}
+              </AvatarFallback>
             </Avatar>
             <div className='space-y-1'>
               <CardTitle className='text-xl'>{displayName}</CardTitle>
               <div className='text-muted-foreground flex items-center gap-2 text-sm'>
-                <Mail className='h-4 w-4' />
-                {user.email}
+                <Mail className='h-4 w-4 shrink-0' />
+                <span>{user.email}</span>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <div className='grid grid-cols-2 gap-4 border-t pt-4'>
+          <div className='grid grid-cols-1 gap-4 border-t pt-4 sm:grid-cols-2'>
             <div>
               <p className='text-muted-foreground text-sm font-medium'>Role</p>
               <Badge variant={getRoleVariant(role)} className='mt-1'>

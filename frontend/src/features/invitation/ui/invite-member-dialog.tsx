@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { OrgRole } from '@/shared/model'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -11,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/shared/ui/core/dialog'
 import {
   Form,
@@ -30,27 +28,30 @@ import {
   SelectValue,
 } from '@/shared/ui/core/select'
 import { useInviteMemberForm } from '../model/forms/use-invite-member-form'
+import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
 
 interface InviteMemberDialogProps {
-  orgId: string
+  orgId?: string
 }
 
-export const InviteMemberDialog = ({ orgId }: InviteMemberDialogProps) => {
-  const [open, setOpen] = useState(false)
+export const InviteMemberDialog = ({
+  orgId: propOrgId,
+}: InviteMemberDialogProps = {}) => {
+  const { isOpen, orgId: storeOrgId, close } = useInviteMemberModalStore()
+  const activeOrgId = propOrgId || storeOrgId || ''
+  const router = useRouter()
+
   const { form, onSubmit, isPending } = useInviteMemberForm({
-    orgId,
-    onSuccess: () => setOpen(false),
+    orgId: activeOrgId,
+    onSuccess: () => {
+      close()
+      router.refresh()
+    },
   })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className='gap-2'>
-          <Plus className='h-4 w-4' />
-          Invite Member
-        </Button>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]'>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+      <DialogContent className='sm:max-w-106.25'>
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>
           <DialogDescription>

@@ -1,3 +1,5 @@
+'use client'
+
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { useActiveOrganization } from '@/entities/organization'

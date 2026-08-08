@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { useAttachments } from '@/shared/lib'

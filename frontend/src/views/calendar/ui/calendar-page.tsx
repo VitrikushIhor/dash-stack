@@ -2,15 +2,12 @@
 
 import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { ConfigDrawer } from '@/shared/ui/config-drawer'
 import { Skeleton } from '@/shared/ui/core/skeleton'
-import { Search } from '@/shared/ui/search'
-import { ThemeSwitch } from '@/shared/ui/theme-switch'
 import { useGetMembers, useActiveOrganization } from '@/entities/organization'
 import { useTasksQuery } from '@/entities/task'
 import { type TCalendarView } from '@/features/event-calendar'
 import { CalendarView } from '@/widgets/calendar-view'
-import { Header, Main, NavUser } from '@/widgets/layout'
+import { Main } from '@/widgets/layout'
 import { getVisibleRange } from '../lib/get-visible-range'
 
 export function CalendarPage() {
@@ -43,31 +40,21 @@ export function CalendarPage() {
 
   if (isLoading || membersLoading) {
     return (
-      <div className='flex flex-col gap-4'>
+      <Main className='flex flex-col gap-4'>
         <Skeleton className='h-20 w-full' />
         <Skeleton className='h-[600px] w-full' />
-      </div>
+      </Main>
     )
   }
 
   return (
-    <>
-      <Header>
-        <Search />
-        <div className='ms-auto flex items-center space-x-4'>
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <NavUser />
-        </div>
-      </Header>
-      <Main>
-        <CalendarView
-          tasks={tasks}
-          members={members}
-          initialView={initialView}
-          initialDate={initialDate}
-        />
-      </Main>
-    </>
+    <Main>
+      <CalendarView
+        tasks={tasks}
+        members={members}
+        initialView={initialView}
+        initialDate={initialDate}
+      />
+    </Main>
   )
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import {
   type Collapsible,
   LayoutProvider,
@@ -9,6 +11,7 @@ import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
 import { SkipToMain } from '@/shared/ui/skip-to-main'
 import { ManageTaskModal } from '@/features/manage-task'
 import { AppSidebar, CommandMenu } from '@/widgets/layout'
+import { AppHeader } from './app-header'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -39,6 +42,7 @@ export function AuthenticatedLayout({
               'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
             )}
           >
+            <AppHeader />
             {children}
             <ManageTaskModal />
             <CommandMenu />

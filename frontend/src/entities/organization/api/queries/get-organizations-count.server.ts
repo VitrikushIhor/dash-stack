@@ -1,5 +1,4 @@
-'use server'
-
+import 'server-only'
 import { serverApi } from '@/shared/api/server-api-client'
 
 export async function getOrganizationCount() {

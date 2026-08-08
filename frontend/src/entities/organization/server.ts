@@ -1,2 +1,6 @@
 export * from './api/queries/get-organizations-count.server'
+export * from './api/queries/get-user-organizations.server'
+export * from './api/queries/get-organization.server'
+export * from './api/queries/get-member.server'
+export * from './api/queries/get-members.server'
 export * from './model/guards/organization-guards.server'

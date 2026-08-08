@@ -4,10 +4,13 @@ import {
   type Organization,
   type CreateOrganizationDto,
   type UpdateOrganizationDto,
+  type UserMembership,
 } from '../model/types/organization.types'
 
 export const organizationApi = {
   getAll: () => api.get<Organization[]>('/organizations'),
+
+  getMyMemberships: () => api.get<UserMembership[]>('/me/memberships'),
 
   getById: (orgId: string) => api.get<Organization>(`/organizations/${orgId}`),
 

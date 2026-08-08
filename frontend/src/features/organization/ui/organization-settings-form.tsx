@@ -1,3 +1,5 @@
+'use client'
+
 import { getFileUrl } from '@/shared/api'
 import { Button } from '@/shared/ui/core/button'
 import {

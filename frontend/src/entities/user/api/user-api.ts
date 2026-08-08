@@ -1,5 +1,4 @@
 import { api } from '@/shared/api'
-import { type UserMembership } from '@/entities/organization'
 import { type User } from '../model/types'
 
 export const userApi = {
@@ -9,5 +8,4 @@ export const userApi = {
   updateMe: (data: Partial<User> & { urls?: string[] }): Promise<User> => {
     return api.patch<User>('/me', data)
   },
-  getMyMemberships: () => api.get<UserMembership[]>('/me/memberships'),
 }

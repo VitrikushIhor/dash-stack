@@ -14,8 +14,9 @@ export { useAcceptInvite } from './model/mutations/use-accept-invite'
 export { useRevokeInvite } from './model/mutations/use-revoke-invite'
 export { useSendInvite } from './model/mutations/use-send-invite'
 
-// Hooks
+// Hooks & Stores
 export { useAcceptInviteFlow } from './model/hooks/use-accept-invite-flow'
+export { useInviteMemberModalStore } from './model/use-invite-member-modal-store'
 
 // Forms
 export { useInviteMemberForm } from './model/forms/use-invite-member-form'

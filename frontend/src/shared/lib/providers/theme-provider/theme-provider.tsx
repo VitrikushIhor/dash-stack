@@ -14,9 +14,6 @@ import {
   type Theme,
 } from './theme-utils'
 
-export type { Theme, ResolvedTheme }
-export { DEFAULT_THEME }
-
 export type ThemeProviderProps = NextThemesProviderProps
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {

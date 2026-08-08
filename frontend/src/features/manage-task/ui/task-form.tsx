@@ -1,3 +1,5 @@
+'use client'
+
 import { type UseFormReturn } from 'react-hook-form'
 import { type Membership } from '@/shared/model'
 import { Button } from '@/shared/ui/core/button'

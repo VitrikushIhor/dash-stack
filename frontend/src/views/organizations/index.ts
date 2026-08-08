@@ -1,3 +1,4 @@
 export { OrganizationsPage } from './ui/organizations-page'
-export { OrganizationDetailPage } from './ui/organization-detail-page'
 export { MemberDetailPage } from './ui/member-detail-page'
+export { MemberNotFoundState } from './ui/member-not-found-state'
+export { OrganizationDetailHeader } from './ui/organization-detail-header'

@@ -6,6 +6,7 @@ import {
   getPageNumbers,
   sanitizeRedirectUrl,
   stringToColor,
+  formatDate,
 } from './utils'
 
 describe('cn (className merge utility)', () => {
@@ -122,5 +123,32 @@ describe('sanitizeRedirectUrl', () => {
 
   it('should use custom fallback when specified', () => {
     expect(sanitizeRedirectUrl('https://evil.com', '/sign-in')).toBe('/sign-in')
+  })
+})
+
+describe('formatDate', () => {
+  it('returns formatted date string for valid ISO date string', () => {
+    const result = formatDate('2026-08-02T12:00:00Z')
+    expect(result).toBe('Aug 2, 2026')
+  })
+
+  it('supports custom date-fns format string', () => {
+    const result = formatDate('2026-08-02T12:00:00Z', 'yyyy-MM-dd')
+    expect(result).toBe('2026-08-02')
+  })
+
+  it('supports Date instance input', () => {
+    const date = new Date('2026-08-02T12:00:00Z')
+    expect(formatDate(date)).toBe('Aug 2, 2026')
+  })
+
+  it('returns null for null, undefined, or empty values', () => {
+    expect(formatDate(null)).toBeNull()
+    expect(formatDate(undefined)).toBeNull()
+    expect(formatDate('')).toBeNull()
+  })
+
+  it('returns null for invalid date string', () => {
+    expect(formatDate('invalid-date-string')).toBeNull()
   })
 })
