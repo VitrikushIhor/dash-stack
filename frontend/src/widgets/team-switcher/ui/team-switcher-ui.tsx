@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ChevronsUpDown, Plus } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,21 +17,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/core/sidebar'
-import { Skeleton } from '@/shared/ui/core/skeleton'
 import {
   OrganizationLogo,
-  useActiveOrganization,
+  type UserMembership,
+  type OrganizationSummary,
 } from '@/entities/organization'
-import { NoOrganizationFallback } from './no-organization-fallback'
+import { setActiveOrganizationAction } from '@/features/organization/api/actions/set-active-organization.action'
 
-export function TeamSwitcher() {
-  const { isMobile } = useSidebar()
+type Props = {
+  activeOrg: OrganizationSummary
+  memberships: UserMembership[] | undefined
+}
+
+export function TeamSwitcherUI({ activeOrg, memberships }: Props) {
   const router = useRouter()
-  const { activeOrg, memberships, isLoading, setActiveOrgId } =
-    useActiveOrganization()
+  const { isMobile } = useSidebar()
 
-  const handleOrgSelect = (orgId: string) => {
-    setActiveOrgId(orgId)
+  const handleOrgSelect = async (orgId: string) => {
+    await setActiveOrganizationAction(orgId)
     router.push(`${ROUTES.organizations}/${orgId}`)
   }
 
@@ -39,19 +42,30 @@ export function TeamSwitcher() {
     router.push(ROUTES.organizations)
   }
 
-  if (isLoading) {
-    return <TeamSwitcherSkeleton />
-  }
-
-  if (!activeOrg) {
-    return <NoOrganizationFallback />
-  }
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <TeamSwitcherTrigger activeOrg={activeOrg} />
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size='lg'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+            >
+              <OrganizationLogo
+                name={activeOrg.name}
+                logo={activeOrg.logo}
+                size={32}
+                className='bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-lg text-xs'
+              />
+              <div className='grid flex-1 text-start text-sm leading-tight'>
+                <span className='truncate font-semibold'>{activeOrg.name}</span>
+                <span className='text-sidebar-foreground/70 truncate text-xs'>
+                  {activeOrg.slug}
+                </span>
+              </div>
+              <ChevronsUpDown className='ml-auto' />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
           <TeamSwitcherList
             memberships={memberships}
             isMobile={isMobile}
@@ -64,58 +78,13 @@ export function TeamSwitcher() {
   )
 }
 
-function TeamSwitcherSkeleton() {
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <div className='flex items-center gap-2 p-2'>
-          <Skeleton className='size-8 rounded-lg' />
-          <div className='flex flex-col gap-1'>
-            <Skeleton className='h-3 w-24' />
-            <Skeleton className='h-2 w-16' />
-          </div>
-        </div>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  )
-}
-
-function TeamSwitcherTrigger({
-  activeOrg,
-}: {
-  activeOrg: NonNullable<ReturnType<typeof useActiveOrganization>['activeOrg']>
-}) {
-  return (
-    <DropdownMenuTrigger asChild>
-      <SidebarMenuButton
-        size='lg'
-        className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
-      >
-        <OrganizationLogo
-          name={activeOrg.name}
-          logo={activeOrg.logo}
-          size={32}
-          className='bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-lg text-xs'
-        />
-        <div className='grid flex-1 text-start text-sm leading-tight'>
-          <span className='truncate font-semibold'>{activeOrg.name}</span>
-          <span className='text-sidebar-foreground/70 truncate text-xs'>
-            {activeOrg.slug}
-          </span>
-        </div>
-        <ChevronsUpDown className='ml-auto' />
-      </SidebarMenuButton>
-    </DropdownMenuTrigger>
-  )
-}
-
 function TeamSwitcherList({
   memberships,
   isMobile,
   onSelect,
   onCreate,
 }: {
-  memberships: ReturnType<typeof useActiveOrganization>['memberships']
+  memberships: UserMembership[] | undefined
   isMobile: boolean
   onSelect: (id: string) => void
   onCreate: () => void

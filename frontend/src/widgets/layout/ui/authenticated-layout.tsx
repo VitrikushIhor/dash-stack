@@ -15,6 +15,7 @@ import { AppHeader } from './app-header'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
+  teamSwitcher?: React.ReactNode
   defaultOpen?: boolean
   defaultCollapsible?: Collapsible
   defaultVariant?: Variant
@@ -22,6 +23,7 @@ type AuthenticatedLayoutProps = {
 
 export function AuthenticatedLayout({
   children,
+  teamSwitcher,
   defaultOpen = true,
   defaultCollapsible,
   defaultVariant,
@@ -34,7 +36,7 @@ export function AuthenticatedLayout({
       >
         <SidebarProvider defaultOpen={defaultOpen}>
           <SkipToMain />
-          <AppSidebar />
+          <AppSidebar teamSwitcher={teamSwitcher} />
           <SidebarInset
             className={cn(
               '@container/content',

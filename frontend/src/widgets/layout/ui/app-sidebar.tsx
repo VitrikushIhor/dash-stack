@@ -10,15 +10,16 @@ import {
 } from '@/shared/ui/core/sidebar'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
-import { TeamSwitcher } from './team-switcher'
 
-export function AppSidebar() {
+export function AppSidebar({
+  teamSwitcher,
+}: {
+  teamSwitcher?: React.ReactNode
+}) {
   const { collapsible, variant } = useLayout()
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
-      <SidebarHeader>
-        <TeamSwitcher />
-      </SidebarHeader>
+      <SidebarHeader>{teamSwitcher}</SidebarHeader>
       <SidebarContent>
         {sidebarData.navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />

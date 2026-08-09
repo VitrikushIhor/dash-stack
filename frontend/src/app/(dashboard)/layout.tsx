@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { cookies } from 'next/headers'
 import { COOKIE_CONFIG } from '@/shared/lib/cookie-config'
 import type {
@@ -6,6 +7,7 @@ import type {
 } from '@/shared/lib/providers/layout-provider'
 import { ensureHasOrganization } from '@/entities/organization/server'
 import { AuthenticatedLayout } from '@/widgets/layout'
+import { TeamSwitcher, TeamSwitcherSkeleton } from '@/widgets/team-switcher'
 
 export default async function DashboardGroupLayout({
   children,
@@ -28,6 +30,11 @@ export default async function DashboardGroupLayout({
       defaultOpen={defaultOpen}
       defaultCollapsible={defaultCollapsible}
       defaultVariant={defaultVariant}
+      teamSwitcher={
+        <Suspense fallback={<TeamSwitcherSkeleton />}>
+          <TeamSwitcher />
+        </Suspense>
+      }
     >
       {children}
     </AuthenticatedLayout>

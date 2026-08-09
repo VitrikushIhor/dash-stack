@@ -15,7 +15,9 @@ export function useActiveOrganization() {
     if (!memberships?.length) return null
 
     const selected = memberships.find((m) => m.organization.id === cookieOrgId)
-    return selected?.organization ?? memberships[0].organization
+    if (selected) return selected.organization
+
+    return memberships[0].organization
   }, [memberships, cookieOrgId])
 
   const setActiveOrgId = useCallback((id: string | null) => {
@@ -33,3 +35,5 @@ export function useActiveOrganization() {
     setActiveOrgId,
   }
 }
+
+// !TODO CHANGE TO SERVER getActiveOrganization !!!
