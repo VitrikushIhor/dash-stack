@@ -1,5 +1,5 @@
 import { type UserMembership } from '@/entities/organization'
-import { OrganizationCard } from '@/features/organization'
+import { OrganizationCard } from '@/features/switch-organization'
 
 export interface OrganizationGridProps {
   memberships: readonly UserMembership[]

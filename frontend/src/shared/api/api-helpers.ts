@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { logger } from '@/shared/lib'
 import { ApiError } from './api-error'
 
 export { ApiError, extractErrorMessage } from './api-error'
@@ -14,12 +15,23 @@ export const getErrorMessage = (error: unknown): string => {
 }
 
 export function handleServerError(error: unknown): void {
-  // eslint-disable-next-line no-console
-  console.log(error)
+  logger.error('[Server Error]:', error)
+
+  if (Array.isArray(error)) {
+    error.forEach((msg) => {
+      if (typeof msg === 'string') toast.error(msg)
+    })
+    return
+  }
+
+  if (typeof error === 'string') {
+    toast.error(error)
+    return
+  }
 
   if (error instanceof ApiError) {
     if (error.isValidationError && error.validationMessages.length > 0) {
-      toast.error(error.validationMessages[0])
+      error.validationMessages.forEach((msg) => toast.error(msg))
       return
     }
     toast.error(error.message)

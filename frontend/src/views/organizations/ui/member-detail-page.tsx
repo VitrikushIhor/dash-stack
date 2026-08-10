@@ -1,6 +1,6 @@
 import { WidgetErrorState } from '@/shared/ui/feedback'
+import { MemberDetailView } from '@/entities/organization'
 import { getMember } from '@/entities/organization/server'
-import { MemberDetailView } from '@/features/organization'
 import { Main } from '@/widgets/layout'
 import { MemberNotFoundState } from './member-not-found-state'
 

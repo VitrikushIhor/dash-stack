@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { CreateOrganizationForm } from '@/features/organization'
+import { CreateOrganizationForm } from '@/features/create-organization'
 import { CreateOrganizationInfo } from './create-organization-info'
 
 export function CreateOrganization() {

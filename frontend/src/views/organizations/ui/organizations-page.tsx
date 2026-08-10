@@ -3,7 +3,7 @@ import { Building2 } from 'lucide-react'
 import {
   CreateOrganizationButton,
   CreateOrganizationDialog,
-} from '@/features/organization'
+} from '@/features/create-organization'
 import { Main } from '@/widgets/layout'
 import {
   OrganizationListSkeleton,

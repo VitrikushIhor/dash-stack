@@ -1,7 +1,7 @@
 import 'server-only'
 import { getErrorMessage } from '@/shared/api'
-import { serverApi } from '@/shared/api/server-api-client'
 import { type UserMembership } from '../../model/types/organization.types'
+import { organizationServerApi } from '../organization-api.server'
 
 type GetOrganizationsResponse = {
   data: UserMembership[] | null
@@ -10,7 +10,7 @@ type GetOrganizationsResponse = {
 
 export async function getUserOrganizations(): Promise<GetOrganizationsResponse> {
   try {
-    const data = await serverApi.get<UserMembership[]>('/me/memberships')
+    const data = await organizationServerApi.getMyMemberships()
     return { data, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

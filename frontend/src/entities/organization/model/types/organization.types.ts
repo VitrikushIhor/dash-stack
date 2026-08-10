@@ -1,6 +1,6 @@
-import { type Membership, type TeamPosition, OrgRole } from '@/shared/model'
+import { type Membership, OrgRole } from '@/shared/model'
 
-export { OrgRole, type Membership, type TeamPosition }
+export { OrgRole, type Membership }
 
 export interface Organization {
   id: string
@@ -33,6 +33,7 @@ export interface UserMembership {
 export interface CreateOrganizationDto {
   name: string
   description?: string
+  logo?: string
 }
 
 export interface UpdateOrganizationDto {

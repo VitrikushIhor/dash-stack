@@ -11,13 +11,16 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import { DataTable } from '@/shared/ui/data-table'
 import { WidgetErrorState } from '@/shared/ui/feedback'
-import type { Membership, Organization } from '@/entities/organization'
+import {
+  type Membership,
+  type Organization,
+  membersTableColumns,
+  useOrganizationPermission,
+} from '@/entities/organization'
 import {
   InviteMemberDialog,
   useInviteMemberModalStore,
 } from '@/features/invitation'
-import { membersTableColumns } from '@/features/organization'
-import { useOrganizationPermission } from '@/features/organization/model/hooks/use-organization-permission'
 
 interface MembersTabContentProps {
   organization: Organization

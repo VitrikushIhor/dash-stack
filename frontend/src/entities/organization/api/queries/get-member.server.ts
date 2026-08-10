@@ -1,7 +1,11 @@
 import 'server-only'
 import { getErrorMessage } from '@/shared/api'
-import serverApi from '@/shared/api/server-api-client'
 import { type Membership } from '@/shared/model'
+import {
+  OrganizationIdSchema,
+  OrganizationUserIdSchema,
+} from '../../model/schemas/organization.schema'
+import { organizationServerApi } from '../organization-api.server'
 
 type GetMemberResponse = {
   data: Membership | null
@@ -14,9 +18,13 @@ type Params = {
 }
 
 export async function getMember(params: Params): Promise<GetMemberResponse> {
-  const url = `/organizations/${params.orgId}/members/${params.userId}`
   try {
-    const data = await serverApi.get<Membership>(url)
+    const validOrgId = OrganizationIdSchema.parse(params.orgId)
+    const validUserId = OrganizationUserIdSchema.parse(params.userId)
+    const data = await organizationServerApi.getMember({
+      orgId: validOrgId,
+      userId: validUserId,
+    })
     return { data, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

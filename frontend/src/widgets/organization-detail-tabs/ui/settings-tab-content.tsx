@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import type { Organization } from '@/entities/organization'
-import {
-  OrganizationSettingsForm,
-  DeleteOrganizationButton,
-} from '@/features/organization'
+import { DeleteOrganizationButton } from '@/features/delete-organization'
+import { OrganizationSettingsForm } from '@/features/update-organization'
 
 interface SettingsTabContentProps {
   organization: Organization

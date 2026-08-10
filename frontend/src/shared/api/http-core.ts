@@ -114,3 +114,5 @@ export function createHttpClient(config: HttpClientConfig) {
       request<T>(endpoint, { ...options, method: 'DELETE' }),
   }
 }
+
+export type HttpClient = ReturnType<typeof createHttpClient>

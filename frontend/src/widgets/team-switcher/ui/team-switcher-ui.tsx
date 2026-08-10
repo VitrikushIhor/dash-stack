@@ -22,7 +22,7 @@ import {
   type UserMembership,
   type OrganizationSummary,
 } from '@/entities/organization'
-import { setActiveOrganizationAction } from '@/features/organization/api/actions/set-active-organization.action'
+import { setActiveOrganizationAction } from '@/features/switch-organization/server'
 
 type Props = {
   activeOrg: OrganizationSummary

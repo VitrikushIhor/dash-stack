@@ -1,5 +1,5 @@
 import { Building2 } from 'lucide-react'
-import { CreateOrganizationButton } from '@/features/organization'
+import { CreateOrganizationButton } from '@/features/create-organization'
 
 export function OrganizationEmptyState() {
   return (

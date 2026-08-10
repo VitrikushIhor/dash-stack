@@ -3,14 +3,13 @@ export { organizationApi } from './api/organization-api'
 export { organizationKeys } from './api/organization-query-keys'
 
 // Queries
-export { useGetOrganizations } from './api/queries/use-get-organizations'
-export { useGetMembers } from './api/queries/use-get-members'
-
-// Mutations
-export { useCreateOrganization } from './api/mutations/use-create-organization'
-export { useUpdateOrganization } from './api/mutations/use-update-organization'
-export { useDeleteOrganization } from './api/mutations/use-delete-organization'
+export { useGetOrganizations } from './model/queries/use-get-organizations'
+export { useGetMembers } from './model/queries/use-get-members'
 
 // Hooks
 export { useActiveOrganization } from './model/hooks/use-active-organization'
+export { useOrganizationPermission } from './model/hooks/use-organization-permission'
 export { OrganizationLogo } from './ui/organization-logo'
+export { MemberDetailView } from './ui/member-detail-view'
+export * from './model/schemas/organization.schema'
+export { membersTableColumns } from './ui/members-table/columns'

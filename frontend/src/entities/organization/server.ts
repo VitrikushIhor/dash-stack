@@ -1,3 +1,4 @@
+export { organizationServerApi } from './api/organization-api.server'
 export * from './api/queries/get-organizations-count.server'
 export * from './api/queries/get-user-organizations.server'
 export * from './api/queries/get-organization.server'
