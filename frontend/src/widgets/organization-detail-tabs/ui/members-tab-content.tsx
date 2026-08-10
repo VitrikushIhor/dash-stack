@@ -20,7 +20,7 @@ import {
 import {
   InviteMemberDialog,
   useInviteMemberModalStore,
-} from '@/features/invitation'
+} from '@/features/organization-invite'
 
 interface MembersTabContentProps {
   organization: Organization

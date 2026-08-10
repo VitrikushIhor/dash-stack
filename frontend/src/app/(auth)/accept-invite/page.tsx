@@ -1,4 +1,4 @@
-import { AcceptInviteCard } from '@/features/invitation'
+import { AcceptInviteCard } from '@/features/organization-invite'
 
 interface AcceptInviteRouteProps {
   searchParams: Promise<{ token?: string }>

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@/shared/lib/test/test-utils'
 import AcceptInviteRoute from './page'
 
-vi.mock('@/features/invitation', () => ({
+vi.mock('@/features/organization-invite', () => ({
   AcceptInviteCard: ({ token }: { token?: string }) => (
     <div data-testid='accept-invite-card'>Token: {token ?? 'none'}</div>
   ),

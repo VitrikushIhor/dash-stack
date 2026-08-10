@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { OrgRole } from '@/shared/model'
 
 export const BaseOrgSchema = z.object({
   name: z.string().min(2).max(50),
@@ -23,4 +24,12 @@ export const CreateOrganizationDtoSchema = z.object({
   name: z.string().min(2).max(50),
   description: z.string().max(200).optional(),
   logo: z.string().url().optional(),
+})
+
+export const InvitationTokenSchema = z.string().min(1, 'Token is required')
+export const InvitationIdSchema = z.string().cuid('Invalid invitation ID')
+
+export const SendInviteDtoSchema = z.object({
+  email: z.string().email(),
+  role: z.nativeEnum(OrgRole),
 })

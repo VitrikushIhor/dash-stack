@@ -1,5 +1,4 @@
 import { type ReactElement } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ROUTES } from '@/shared/config/constants/routes'
@@ -9,7 +8,7 @@ import { AcceptInviteCard } from './accept-invite-card'
 const mockAcceptInviteAction = vi.fn()
 const mockReplace = vi.fn()
 
-vi.mock('../api/accept-invite.action', () => ({
+vi.mock('../api/actions/accept-invite.action', () => ({
   acceptInviteAction: (...args: unknown[]) => mockAcceptInviteAction(...args),
 }))
 
@@ -20,13 +19,8 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
-function renderWithQuery(ui: ReactElement) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  })
-  return render(
-    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-  )
+function renderComponent(ui: ReactElement) {
+  return render(ui)
 }
 
 describe('AcceptInviteCard Component', () => {
@@ -35,7 +29,7 @@ describe('AcceptInviteCard Component', () => {
   })
 
   it('renders missing token error when no token is provided', () => {
-    renderWithQuery(<AcceptInviteCard />)
+    renderComponent(<AcceptInviteCard />)
 
     expect(
       screen.getByText('Invitation could not be accepted')
@@ -49,9 +43,12 @@ describe('AcceptInviteCard Component', () => {
   })
 
   it('renders success state when invitation acceptance succeeds', async () => {
-    mockAcceptInviteAction.mockResolvedValueOnce({ id: 'membership-1' })
+    mockAcceptInviteAction.mockResolvedValueOnce({
+      success: true,
+      data: { id: 'membership-1' },
+    })
 
-    renderWithQuery(<AcceptInviteCard token='valid-invite-token' />)
+    renderComponent(<AcceptInviteCard token='valid-invite-token' />)
 
     await waitFor(() => {
       expect(mockAcceptInviteAction).toHaveBeenCalledWith('valid-invite-token')
@@ -69,11 +66,12 @@ describe('AcceptInviteCard Component', () => {
   })
 
   it('renders error state with retry button when invitation acceptance fails', async () => {
-    mockAcceptInviteAction.mockRejectedValueOnce(
-      new Error('Invitation has expired')
-    )
+    mockAcceptInviteAction.mockResolvedValueOnce({
+      success: false,
+      error: 'Invitation has expired',
+    })
 
-    renderWithQuery(<AcceptInviteCard token='expired-token' />)
+    renderComponent(<AcceptInviteCard token='expired-token' />)
 
     await waitFor(() => {
       expect(mockAcceptInviteAction).toHaveBeenCalledWith('expired-token')
@@ -94,10 +92,10 @@ describe('AcceptInviteCard Component', () => {
   it('allows retrying when clicking try again button', async () => {
     const user = userEvent.setup()
     mockAcceptInviteAction
-      .mockRejectedValueOnce(new Error('Network error'))
-      .mockResolvedValueOnce({ id: 'membership-1' })
+      .mockResolvedValueOnce({ success: false, error: 'Network error' })
+      .mockResolvedValueOnce({ success: true, data: { id: 'membership-1' } })
 
-    renderWithQuery(<AcceptInviteCard token='valid-token' />)
+    renderComponent(<AcceptInviteCard token='valid-token' />)
 
     await waitFor(() => {
       expect(
@@ -117,7 +115,7 @@ describe('AcceptInviteCard Component', () => {
 
   it('navigates to sign-in when clicking back button on missing token', async () => {
     const user = userEvent.setup()
-    renderWithQuery(<AcceptInviteCard />)
+    renderComponent(<AcceptInviteCard />)
 
     await user.click(screen.getByRole('button', { name: /back to sign in/i }))
 
@@ -126,9 +124,12 @@ describe('AcceptInviteCard Component', () => {
 
   it('navigates to organizations when clicking continue on success', async () => {
     const user = userEvent.setup()
-    mockAcceptInviteAction.mockResolvedValueOnce({ id: 'membership-1' })
+    mockAcceptInviteAction.mockResolvedValueOnce({
+      success: true,
+      data: { id: 'membership-1' },
+    })
 
-    renderWithQuery(<AcceptInviteCard token='valid-invite-token' />)
+    renderComponent(<AcceptInviteCard token='valid-invite-token' />)
 
     await waitFor(() => {
       expect(

@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { OrgRole } from '@/shared/model'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -27,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/core/select'
-import { useInviteMemberForm } from '../model/forms/use-invite-member-form'
+import { useInviteMemberForm } from '../model/use-invite-member-form'
 import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
 
 interface InviteMemberDialogProps {
@@ -39,13 +38,11 @@ export const InviteMemberDialog = ({
 }: InviteMemberDialogProps = {}) => {
   const { isOpen, orgId: storeOrgId, close } = useInviteMemberModalStore()
   const activeOrgId = propOrgId || storeOrgId || ''
-  const router = useRouter()
 
   const { form, onSubmit, isPending } = useInviteMemberForm({
     orgId: activeOrgId,
     onSuccess: () => {
       close()
-      router.refresh()
     },
   })
 

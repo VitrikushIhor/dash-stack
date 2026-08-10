@@ -9,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/core/card'
-import { useAcceptInviteFlow } from '../model/hooks/use-accept-invite-flow'
-import { AcceptInviteStatus } from '../model/types/accept-invite.types'
+import {
+  useAcceptInviteFlow,
+  type AcceptInviteFlowStatus,
+} from '../model/use-accept-invite-flow'
 
 interface AcceptInviteCardProps {
   token?: string
@@ -59,7 +61,7 @@ export function AcceptInviteCard({ token }: AcceptInviteCardProps) {
               {errorMessage}
             </p>
             <div className='mt-2 flex items-center gap-2'>
-              {status === AcceptInviteStatus.ERROR && handleRetry && (
+              {handleRetry && (
                 <Button onClick={handleRetry} className='gap-2'>
                   <RotateCcw className='h-4 w-4' />
                   Try again
@@ -76,14 +78,13 @@ export function AcceptInviteCard({ token }: AcceptInviteCardProps) {
   )
 }
 
-function getDescription(status: AcceptInviteStatus): string {
+function getDescription(status: AcceptInviteFlowStatus): string {
   switch (status) {
-    case AcceptInviteStatus.LOADING:
+    case 'loading':
       return 'Accepting your invitation...'
-    case AcceptInviteStatus.SUCCESS:
+    case 'success':
       return 'Your invitation has been accepted!'
-    case AcceptInviteStatus.ERROR:
-    case AcceptInviteStatus.MISSING_TOKEN:
+    case 'error':
     default:
       return 'Invitation could not be accepted'
   }
