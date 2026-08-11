@@ -14,7 +14,7 @@ interface PrismaChecklist {
   items: PrismaChecklistItem[];
 }
 
-interface PrismaTaskWithRelations {
+export interface PrismaTaskWithRelations {
   id: string;
   organizationId: string;
   title: string;

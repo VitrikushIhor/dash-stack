@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,56 +15,44 @@ import {
   type ColumnFiltersState,
   type PaginationState,
   type OnChangeFn,
+  type ColumnDef,
 } from '@tanstack/react-table'
 import { useTasksTableSearchParams } from '@/shared/lib'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
-import { useGetLabels } from '@/entities/label'
-import { useGetMembers } from '@/entities/organization'
-import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
-import { tasksColumns } from '../ui/tasks-columns'
+import { type Task } from '@/entities/task'
+import {
+  mapSearchParamsToColumnFilters,
+  mapColumnFiltersToSearchParams,
+} from '../lib/filters'
 
-interface UseTasksTableProps {
-  orgId: string
+interface UseTasksTableStateProps {
   data: Task[]
+  columns: ColumnDef<Task, unknown>[]
+  pageCount?: number
 }
 
-export function useTasksTable({ orgId, data }: UseTasksTableProps) {
+const DEFAULT_PAGE_SIZE = 10
+
+export function useTasksTableState({
+  data,
+  columns,
+  pageCount = -1,
+}: UseTasksTableStateProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   const [searchParams, setSearchParams] = useTasksTableSearchParams()
 
-  const columnFilters: ColumnFiltersState = useMemo(() => {
-    const filters: ColumnFiltersState = []
-    if (searchParams.status.length > 0) {
-      filters.push({ id: 'status', value: searchParams.status })
-    }
-    if (searchParams.labels.length > 0) {
-      filters.push({ id: 'label', value: searchParams.labels })
-    }
-    if (searchParams.members.length > 0) {
-      filters.push({ id: 'assignees', value: searchParams.members })
-    }
-    if (searchParams.dueDate.length > 0) {
-      const dates = searchParams.dueDate.map((d) => {
-        const num = Number(d)
-        return !isNaN(num) ? new Date(num) : new Date(d)
-      })
-      filters.push({ id: 'dueDate', value: dates })
-    }
-    return filters
-  }, [
-    searchParams.status,
-    searchParams.labels,
-    searchParams.members,
-    searchParams.dueDate,
-  ])
+  const columnFilters: ColumnFiltersState = useMemo(
+    () => mapSearchParamsToColumnFilters(searchParams),
+    [searchParams]
+  )
 
   const pagination: PaginationState = useMemo(
     () => ({
       pageIndex: Math.max(0, searchParams.page - 1),
-      pageSize: searchParams.perPage,
+      pageSize: searchParams.perPage || DEFAULT_PAGE_SIZE,
     }),
     [searchParams.page, searchParams.perPage]
   )
@@ -72,33 +60,14 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updater) => {
     const next =
       typeof updater === 'function' ? updater(columnFilters) : updater
-
-    const statusFilter = next.find((f) => f.id === 'status')?.value as
-      | string[]
-      | undefined
-    const labelFilter = next.find((f) => f.id === 'label')?.value as
-      | string[]
-      | undefined
-    const membersFilter = next.find((f) => f.id === 'assignees')?.value as
-      | string[]
-      | undefined
-    const dueDateFilter = next.find((f) => f.id === 'dueDate')?.value as
-      | unknown[]
-      | undefined
-
-    let dueDateStrings: string[] = []
-    if (Array.isArray(dueDateFilter)) {
-      dueDateStrings = dueDateFilter.map((d) =>
-        d instanceof Date ? String(d.getTime()) : String(d)
-      )
-    }
+    const mapped = mapColumnFiltersToSearchParams(next)
 
     setSearchParams({
       page: 1,
-      status: statusFilter && statusFilter.length > 0 ? statusFilter : null,
-      labels: labelFilter && labelFilter.length > 0 ? labelFilter : null,
-      members: membersFilter && membersFilter.length > 0 ? membersFilter : null,
-      dueDate: dueDateStrings.length > 0 ? dueDateStrings : null,
+      status: mapped.status,
+      labels: mapped.labels,
+      members: mapped.members,
+      dueDate: mapped.dueDate,
     })
   }
 
@@ -115,13 +84,13 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     const next = typeof updater === 'function' ? updater(pagination) : updater
     setSearchParams({
       page: next.pageIndex + 1,
-      perPage: next.pageSize === 10 ? null : next.pageSize,
+      perPage: next.pageSize === DEFAULT_PAGE_SIZE ? null : next.pageSize,
     })
   }
 
   const table = useReactTable({
     data,
-    columns: tasksColumns,
+    columns,
     state: {
       sorting,
       columnVisibility,
@@ -130,6 +99,9 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
       globalFilter: searchParams.filter,
       pagination,
     },
+    pageCount,
+    manualPagination: true,
+    manualFiltering: true,
 
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -152,40 +124,13 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
     },
   })
 
-  const pageCount = table.getPageCount()
+  // Optionally ensure that page is bounded to pageCount
+  const actualPageCount = table.getPageCount()
   useEffect(() => {
-    if (pageCount > 0 && searchParams.page > pageCount) {
-      setSearchParams({ page: 1 })
+    if (actualPageCount > 0 && searchParams.page > actualPageCount) {
+      setSearchParams({ page: Math.max(1, actualPageCount) })
     }
-  }, [pageCount, searchParams.page, setSearchParams])
+  }, [actualPageCount, searchParams.page, setSearchParams])
 
-  const { data: members = [] } = useGetMembers(orgId)
-  const { data: availableLabels = [] } = useGetLabels(orgId)
-
-  const memberOptions = useMemo(
-    () =>
-      members.map((m) => {
-        const name = m.user.firstName || m.user.email
-        return { label: name, value: m.user.id }
-      }),
-    [members]
-  )
-
-  const filterOptions = useMemo(
-    () => ({
-      status: Object.values(TaskStatusEnum).map((st) => ({
-        label: STATUS_CONFIG[st].label,
-        value: st,
-        icon: STATUS_CONFIG[st].icon,
-      })),
-      labels: availableLabels.map((lbl) => ({
-        label: lbl.name,
-        value: lbl.name,
-      })),
-      members: memberOptions,
-    }),
-    [memberOptions, availableLabels]
-  )
-
-  return { table, filterOptions }
+  return table
 }

@@ -6,12 +6,19 @@ import { useTasksTableSearchParams } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/core/tabs'
 import { DataTableToolbar } from '@/shared/ui/data-table'
-import { useActiveOrganization } from '@/entities/organization'
+import { useGetLabels } from '@/entities/label'
+import { useActiveOrganization, useGetMembers } from '@/entities/organization'
 import { useTasksQuery, type TaskStatusEnum } from '@/entities/task'
 import { useTaskModalStore } from '@/features/manage-task'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
 import { Main } from '@/widgets/layout'
-import { TasksTable, useTasksTable } from '@/widgets/tasks-table'
+import {
+  TasksTable,
+  useTasksTableState,
+  tasksColumns,
+  generateFilterOptions,
+} from '@/widgets/tasks-table'
+import { parseDateSafe } from '@/widgets/tasks-table/lib/filters'
 
 export function TaskPage() {
   const [viewMode, setViewMode] = useState<KanbanViewMode>(
@@ -24,13 +31,6 @@ export function TaskPage() {
   const { openCreate } = useTaskModalStore()
 
   const filters = useMemo(() => {
-    const parseDate = (val: string | undefined): string | undefined => {
-      if (!val) return undefined
-      const num = Number(val)
-      const date = !isNaN(num) ? new Date(num) : new Date(val)
-      return isNaN(date.getTime()) ? undefined : date.toISOString()
-    }
-
     return {
       search: tableSearchParams.filter || undefined,
       status:
@@ -45,17 +45,31 @@ export function TaskPage() {
         tableSearchParams.labels.length > 0
           ? tableSearchParams.labels
           : undefined,
-      dueDateFrom: parseDate(tableSearchParams.dueDate[0]),
-      dueDateTo: parseDate(tableSearchParams.dueDate[1]),
+      dueDateFrom: parseDateSafe(tableSearchParams.dueDate[0]),
+      dueDateTo: parseDateSafe(tableSearchParams.dueDate[1]),
+      page: viewMode === KanbanViewMode.Table ? tableSearchParams.page : 1,
+      perPage:
+        viewMode === KanbanViewMode.Table ? tableSearchParams.perPage : 100,
     }
-  }, [tableSearchParams])
+  }, [tableSearchParams, viewMode])
 
-  const { data: tasks } = useTasksQuery(activeOrgId || '', filters)
+  const { data: paginatedTasks } = useTasksQuery(activeOrgId || '', filters)
+  const tasks = paginatedTasks?.data || []
 
-  const { table, filterOptions } = useTasksTable({
-    orgId: activeOrgId || '',
-    data: tasks || [],
+  // Parallel data fetching for table metadata (waterfall removed)
+  const { data: members = [] } = useGetMembers(activeOrgId || '')
+  const { data: availableLabels = [] } = useGetLabels(activeOrgId || '')
+
+  const table = useTasksTableState({
+    data: tasks,
+    columns: tasksColumns,
+    pageCount: paginatedTasks?.meta?.lastPage ?? -1,
   })
+
+  const filterOptions = useMemo(
+    () => generateFilterOptions(members, availableLabels),
+    [members, availableLabels]
+  )
 
   const filteredTasks = table
     .getFilteredRowModel()

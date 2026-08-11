@@ -7,8 +7,14 @@ import {
   UpdateTaskData,
 } from '../../application/ports/task.repository.port';
 import { TaskReadModel } from '../../application/read-models/task.read-model';
-import { PrismaTaskMapper } from './prisma-task.mapper';
+import {
+  PrismaTaskMapper,
+  PrismaTaskWithRelations,
+} from './prisma-task.mapper';
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
+import { paginate } from '../../../common/pagination/paginate';
+import { PaginatedResult } from '../../../common/pagination/pagination.models';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaTaskRepository
@@ -73,7 +79,7 @@ export class PrismaTaskRepository
   async findAll(
     organizationId: string,
     filters: FindAllTasksFilters = {},
-  ): Promise<TaskReadModel[]> {
+  ): Promise<PaginatedResult<TaskReadModel>> {
     const {
       search,
       status,
@@ -83,48 +89,69 @@ export class PrismaTaskRepository
       dueDateTo,
       startDateFrom,
       startDateTo,
+      page,
+      perPage,
     } = filters;
 
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        organizationId,
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { description: { contains: search, mode: 'insensitive' } },
-                ],
-              }
-            : {},
-          status?.length ? { status: { in: status } } : {},
-          assigneeIds?.length
-            ? { assignees: { some: { id: { in: assigneeIds } } } }
-            : {},
-          labelNames?.length ? { label: { name: { in: labelNames } } } : {},
-          dueDateFrom || dueDateTo
-            ? {
-                dueDate: {
-                  gte: dueDateFrom,
-                  lte: dueDateTo,
-                },
-              }
-            : {},
-          startDateFrom || startDateTo
-            ? {
-                startDate: {
-                  gte: startDateFrom,
-                  lte: startDateTo,
-                },
-              }
-            : {},
+    const paginated = await paginate(
+      this.prisma.task,
+      {
+        where: {
+          organizationId,
+          AND: [
+            search
+              ? {
+                  OR: [
+                    {
+                      title: { contains: search, mode: 'insensitive' as const },
+                    },
+                    {
+                      description: {
+                        contains: search,
+                        mode: 'insensitive' as const,
+                      },
+                    },
+                  ],
+                }
+              : {},
+            status?.length ? { status: { in: status } } : {},
+            assigneeIds?.length
+              ? { assignees: { some: { id: { in: assigneeIds } } } }
+              : {},
+            labelNames?.length ? { label: { name: { in: labelNames } } } : {},
+            dueDateFrom || dueDateTo
+              ? {
+                  dueDate: {
+                    gte: dueDateFrom,
+                    lte: dueDateTo,
+                  },
+                }
+              : {},
+            startDateFrom || startDateTo
+              ? {
+                  startDate: {
+                    gte: startDateFrom,
+                    lte: startDateTo,
+                  },
+                }
+              : {},
+          ],
+        },
+        include: this.taskInclude,
+        orderBy: [
+          { createdAt: 'desc' as const },
+          { updatedAt: 'desc' as const },
         ],
       },
-      include: this.taskInclude,
-      orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
-    });
+      { page, perPage },
+    );
 
-    return tasks.map((task) => PrismaTaskMapper.toDomain(task));
+    return {
+      ...paginated,
+      data: paginated.data.map((task) =>
+        PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
+      ),
+    };
   }
 
   async findById(

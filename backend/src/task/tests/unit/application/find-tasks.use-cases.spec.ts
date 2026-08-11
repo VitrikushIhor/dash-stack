@@ -77,18 +77,40 @@ describe('Find Tasks Use Cases', () => {
         mockTask({ id: 'task-1' }),
         mockTask({ id: 'task-2' }),
       ];
-      taskRepository.findAll.mockResolvedValue(expectedTasks);
+      const paginatedResult = {
+        data: expectedTasks,
+        meta: {
+          total: 2,
+          lastPage: 1,
+          currentPage: 1,
+          perPage: 10,
+          prev: null,
+          next: null,
+        },
+      };
+      taskRepository.findAll.mockResolvedValue(paginatedResult);
 
       const filters = { search: 'Test', status: [TaskStatus.PLANNED] };
       const result = await useCase.execute('org-1', filters);
 
-      expect(result).toEqual(expectedTasks);
+      expect(result).toEqual(paginatedResult);
       expect(taskRepository.findAll).toHaveBeenCalledWith('org-1', filters);
     });
 
     it('should pass startDate filters to task repository', async () => {
       const expectedTasks = [mockTask({ id: 'task-1' })];
-      taskRepository.findAll.mockResolvedValue(expectedTasks);
+      const paginatedResult = {
+        data: expectedTasks,
+        meta: {
+          total: 1,
+          lastPage: 1,
+          currentPage: 1,
+          perPage: 10,
+          prev: null,
+          next: null,
+        },
+      };
+      taskRepository.findAll.mockResolvedValue(paginatedResult);
 
       const startDateFrom = new Date('2026-06-01T00:00:00.000Z');
       const startDateTo = new Date('2026-06-30T23:59:59.999Z');
@@ -96,7 +118,7 @@ describe('Find Tasks Use Cases', () => {
 
       const result = await useCase.execute('org-1', filters);
 
-      expect(result).toEqual(expectedTasks);
+      expect(result).toEqual(paginatedResult);
       expect(taskRepository.findAll).toHaveBeenCalledWith('org-1', {
         startDateFrom,
         startDateTo,
@@ -104,7 +126,17 @@ describe('Find Tasks Use Cases', () => {
     });
 
     it('should use default empty filters if none are provided', async () => {
-      taskRepository.findAll.mockResolvedValue([]);
+      taskRepository.findAll.mockResolvedValue({
+        data: [],
+        meta: {
+          total: 0,
+          lastPage: 1,
+          currentPage: 1,
+          perPage: 10,
+          prev: null,
+          next: null,
+        },
+      });
 
       await useCase.execute('org-1');
 

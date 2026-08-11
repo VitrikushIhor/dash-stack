@@ -1,5 +1,6 @@
 import { TaskStatus } from '../../domain/enums/task-status.enum';
 import { TaskReadModel } from '../read-models/task.read-model';
+import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
 export interface ChecklistItemInput {
   text: string;
@@ -47,6 +48,8 @@ export interface FindAllTasksFilters {
   dueDateTo?: Date;
   startDateFrom?: Date;
   startDateTo?: Date;
+  page?: number;
+  perPage?: number;
 }
 
 export interface TaskRepositoryPort {
@@ -54,7 +57,7 @@ export interface TaskRepositoryPort {
   findAll(
     organizationId: string,
     filters: FindAllTasksFilters,
-  ): Promise<TaskReadModel[]>;
+  ): Promise<PaginatedResult<TaskReadModel>>;
   findById(id: string, organizationId: string): Promise<TaskReadModel | null>;
   update(
     id: string,
