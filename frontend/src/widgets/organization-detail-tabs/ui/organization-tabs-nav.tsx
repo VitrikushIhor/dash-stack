@@ -24,6 +24,11 @@ const tabs = [
     label: 'Settings',
     href: (orgId: string) => `/organizations/${orgId}/settings`,
   },
+  {
+    value: 'labels',
+    label: 'Labels',
+    href: (orgId: string) => `/organizations/${orgId}/labels`,
+  },
 ] as const
 
 export function OrganizationTabsNav({ orgId }: OrganizationTabsNavProps) {

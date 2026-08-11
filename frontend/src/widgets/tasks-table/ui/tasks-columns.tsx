@@ -9,7 +9,7 @@ import {
   dateRangeFilterFn,
   TablePlaceholder,
 } from '@/shared/ui/data-table'
-import { LabelBadge } from '@/shared/ui/label'
+import { LabelBadge } from '@/entities/label'
 import {
   type TaskStatusEnum,
   type Task,

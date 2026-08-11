@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { type Label, labelColorStyles } from './types.label'
+import { type Label, labelColorStyles } from '../model/types'
 
 interface LabelBadgeProps {
   label: Label

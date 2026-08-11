@@ -1,5 +1,5 @@
 import { type OrgRole } from '@/shared/model'
-import { type LabelColor } from '@/shared/ui/label'
+import { type LabelColor } from '@/entities/label'
 
 export enum TaskStatusEnum {
   PLANNED = 'PLANNED',

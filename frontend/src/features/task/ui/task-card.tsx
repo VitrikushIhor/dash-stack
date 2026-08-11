@@ -6,7 +6,7 @@ import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Badge } from '@/shared/ui/core/badge'
 import { Card, CardContent, CardHeader } from '@/shared/ui/core/card'
 import { Checkbox } from '@/shared/ui/core/checkbox'
-import { LabelBadge } from '@/shared/ui/label'
+import { LabelBadge } from '@/entities/label'
 import {
   type Task,
   TaskStatusEnum,

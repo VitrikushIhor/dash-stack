@@ -4,4 +4,5 @@ export const SERVER_CACHE_TAGS = {
   orgMembers: (orgId: string) => `organization-members-${orgId}`,
   tasks: 'tasks',
   taskDetail: (id: string) => `task-${id}`,
+  labels: (orgId: string) => `labels-${orgId}`,
 } as const

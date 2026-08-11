@@ -117,6 +117,7 @@ import { join } from 'node:path';
     TaskModule,
     StorageModule,
     UserModule,
+    LabelModule,
   ],
   controllers: [AppController],
   providers: [

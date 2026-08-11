@@ -24,7 +24,8 @@ import {
 import { Separator } from '@/shared/ui/core/separator'
 import { Textarea } from '@/shared/ui/core/textarea'
 import { FormFileUpload, FormLabelSelector } from '@/shared/ui/form-fields'
-import { mockAvailableLabels } from '@/shared/ui/label'
+import { useGetLabels } from '@/entities/label'
+import { useActiveOrganization } from '@/entities/organization'
 import { TaskStatusEnum, FormChecklist } from '@/entities/task'
 import { FormMemberPicker } from '@/entities/team'
 import { type TaskFormValues } from '../model/create-task-schema'
@@ -56,6 +57,9 @@ export function TaskForm({
   allMembers,
   submitText = 'Create',
 }: TaskFormProps) {
+  const { activeOrg } = useActiveOrganization()
+  const { data: availableLabels = [] } = useGetLabels(activeOrg?.id ?? '')
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
@@ -139,17 +143,7 @@ export function TaskForm({
 
         <Separator />
 
-        <FormLabelSelector
-          name='label'
-          availableLabels={mockAvailableLabels}
-          onCreateLabel={(name, color) => {
-            form.setValue('label', {
-              id: crypto.randomUUID(),
-              name,
-              color,
-            })
-          }}
-        />
+        <FormLabelSelector name='label' availableLabels={availableLabels} />
 
         <Separator />
 

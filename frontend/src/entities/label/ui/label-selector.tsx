@@ -11,7 +11,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from '@/shared/ui/core/command'
 import {
   Popover,
@@ -19,14 +18,13 @@ import {
   PopoverTrigger,
 } from '@/shared/ui/core/popover'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
+import { labelColorStyles, type Label } from '../model/types'
 import { LabelBadge } from './label-badge'
-import { labelColorStyles, type Label } from './types.label'
 
 interface LabelSelectorProps {
   selectedLabel: Label | null
   availableLabels: Label[]
   onLabelChange: (label: Label | null) => void
-  onCreateLabel?: (name: string, color: string) => void
   className?: string
 }
 
@@ -34,7 +32,6 @@ export const LabelSelector = memo(function LabelSelector({
   selectedLabel,
   availableLabels,
   onLabelChange,
-  onCreateLabel,
   className,
 }: LabelSelectorProps) {
   const [open, setOpen] = useState(false)
@@ -125,26 +122,6 @@ export const LabelSelector = memo(function LabelSelector({
                     })}
                   </ScrollArea>
                 </CommandGroup>
-
-                {onCreateLabel &&
-                  searchQuery &&
-                  filteredLabels.length === 0 && (
-                    <>
-                      <CommandSeparator />
-                      <CommandGroup>
-                        <CommandItem
-                          onSelect={() => {
-                            onCreateLabel(searchQuery, 'gray')
-                            setSearchQuery('')
-                          }}
-                          className='cursor-pointer'
-                        >
-                          <Plus className='mr-2 h-4 w-4' />
-                          Create "{searchQuery}"
-                        </CommandItem>
-                      </CommandGroup>
-                    </>
-                  )}
               </CommandList>
             </Command>
           </PopoverContent>

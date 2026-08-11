@@ -18,7 +18,7 @@ import {
 } from '@tanstack/react-table'
 import { useTasksTableSearchParams } from '@/shared/lib'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
-import { mockAvailableLabels } from '@/shared/ui/label'
+import { useGetLabels } from '@/entities/label'
 import { useGetMembers } from '@/entities/organization'
 import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
 import { tasksColumns } from '../ui/tasks-columns'
@@ -160,6 +160,7 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
   }, [pageCount, searchParams.page, setSearchParams])
 
   const { data: members = [] } = useGetMembers(orgId)
+  const { data: availableLabels = [] } = useGetLabels(orgId)
 
   const memberOptions = useMemo(
     () =>
@@ -172,18 +173,18 @@ export function useTasksTable({ orgId, data }: UseTasksTableProps) {
 
   const filterOptions = useMemo(
     () => ({
-      status: (Object.keys(TaskStatusEnum) as TaskStatusEnum[]).map((st) => ({
+      status: Object.values(TaskStatusEnum).map((st) => ({
         label: STATUS_CONFIG[st].label,
         value: st,
         icon: STATUS_CONFIG[st].icon,
       })),
-      labels: mockAvailableLabels.map((lbl) => ({
+      labels: availableLabels.map((lbl) => ({
         label: lbl.name,
         value: lbl.name,
       })),
       members: memberOptions,
     }),
-    [memberOptions]
+    [memberOptions, availableLabels]
   )
 
   return { table, filterOptions }
