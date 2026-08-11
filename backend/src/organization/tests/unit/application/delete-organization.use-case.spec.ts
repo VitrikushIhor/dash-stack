@@ -16,6 +16,7 @@ describe('DeleteOrganizationUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
     };
 
     useCase = new DeleteOrganizationUseCase(repository);
