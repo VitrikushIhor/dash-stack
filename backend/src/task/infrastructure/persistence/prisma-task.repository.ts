@@ -38,7 +38,7 @@ export class PrismaTaskRepository
   } as const;
 
   async create(data: CreateTaskData): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+    const { assigneeIds, checklists, ...rest } = data;
 
     const createdTask = await this.prisma.task.create({
       data: {
@@ -49,14 +49,7 @@ export class PrismaTaskRepository
               connect: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        label: label
-          ? {
-              create: {
-                name: label.name,
-                color: label.color ?? null,
-              },
-            }
-          : undefined,
+
         checklists: checklists?.length
           ? {
               create: checklists.map((cl) => ({
@@ -151,15 +144,9 @@ export class PrismaTaskRepository
     organizationId: string,
     data: UpdateTaskData,
   ): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+    const { assigneeIds, checklists, ...rest } = data;
 
     const updatedTask = await this.prisma.$transaction(async (tx) => {
-      if (label !== undefined) {
-        await tx.taskLabel.deleteMany({
-          where: { taskId: id },
-        });
-      }
-
       if (checklists !== undefined) {
         await tx.checklist.deleteMany({
           where: { taskId: id },
@@ -175,17 +162,7 @@ export class PrismaTaskRepository
                 set: assigneeIds.map((membershipId) => ({ id: membershipId })),
               }
             : undefined,
-          label:
-            label === undefined
-              ? undefined
-              : label === null
-                ? undefined
-                : {
-                    create: {
-                      name: label.name,
-                      color: label.color ?? null,
-                    },
-                  },
+
           checklists:
             checklists === undefined
               ? undefined

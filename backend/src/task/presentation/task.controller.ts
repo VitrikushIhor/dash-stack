@@ -59,7 +59,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({
@@ -133,7 +133,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({

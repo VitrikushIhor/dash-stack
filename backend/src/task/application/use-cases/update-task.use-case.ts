@@ -64,7 +64,7 @@ export class UpdateTaskUseCase {
         previousStatus: existingTask.status,
         nextStatus: command.status,
       }),
-      label: command.label,
+      labelId: command.labelId,
       checklists: command.checklists,
     });
   }

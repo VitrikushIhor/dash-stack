@@ -11,11 +11,6 @@ export interface ChecklistInput {
   items: ChecklistItemInput[];
 }
 
-export interface LabelInput {
-  name: string;
-  color?: string | null;
-}
-
 export interface CreateTaskData {
   organizationId: string;
   title: string;
@@ -26,7 +21,7 @@ export interface CreateTaskData {
   startDate?: Date;
   dueDate?: Date;
   completedAt?: Date;
-  label?: LabelInput | null;
+  labelId?: string | null;
   checklists?: ChecklistInput[];
 }
 
@@ -39,7 +34,7 @@ export interface UpdateTaskData {
   startDate?: Date | null;
   dueDate?: Date | null;
   completedAt?: Date | null;
-  label?: LabelInput | null;
+  labelId?: string | null;
   checklists?: ChecklistInput[];
 }
 
@@ -71,7 +66,7 @@ export interface TaskRepositoryPort {
   updateMany(
     organizationId: string,
     ids: string[],
-    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'label' | 'checklists'>>,
+    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'checklists'>>,
     additionalWhere?: Record<string, unknown>,
   ): Promise<{ count: number }>;
 }

@@ -8,7 +8,7 @@ export interface CreateTaskCommand {
   attachments?: string[];
   startDate?: string | Date;
   dueDate?: string | Date;
-  label?: { name: string; color: string } | null;
+  labelId?: string | null;
   checklists?: Array<{
     name: string;
     items: Array<{ text: string; completed?: boolean }>;

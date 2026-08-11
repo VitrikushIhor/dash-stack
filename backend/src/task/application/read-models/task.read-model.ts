@@ -16,7 +16,6 @@ export interface TaskLabelRecord {
   id: string;
   name: string;
   color: string | null;
-  taskId: string;
 }
 
 export interface TaskChecklistItemRecord {
