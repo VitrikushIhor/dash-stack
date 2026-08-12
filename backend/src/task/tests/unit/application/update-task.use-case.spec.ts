@@ -92,7 +92,7 @@ describe('UpdateTaskUseCase', () => {
       startDate: undefined,
       dueDate: undefined,
       completedAt: undefined,
-      label: undefined,
+      labelId: undefined,
       checklists: undefined,
     });
   });

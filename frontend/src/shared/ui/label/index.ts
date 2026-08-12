@@ -1,5 +1,0 @@
-export * from './label-badge'
-export * from './label-manager'
-export * from './label-selector'
-export * from './mock-labels'
-export * from './types.label'

@@ -16,6 +16,7 @@ import { InvitationModule } from './invitation/invitation.module';
 import { TaskModule } from './task/task.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './user/user.module';
+import { LabelModule } from './label/label.module';
 import config from './common/configs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
@@ -116,6 +117,7 @@ import { join } from 'node:path';
     TaskModule,
     StorageModule,
     UserModule,
+    LabelModule,
   ],
   controllers: [AppController],
   providers: [

@@ -7,20 +7,17 @@ import {
   FormItem,
   FormMessage,
 } from '@/shared/ui/core/form'
-import { LabelSelector } from '../label/label-selector'
-import { type Label } from '../label/types.label'
+import { LabelSelector, type Label } from '@/entities/label'
 
 interface FormLabelSelectorProps {
   name: string
   availableLabels: Label[]
-  onCreateLabel?: (name: string, color: string) => void
   className?: string
 }
 
 export function FormLabelSelector({
   name,
   availableLabels,
-  onCreateLabel,
   className,
 }: FormLabelSelectorProps) {
   const { control } = useFormContext()
@@ -36,7 +33,6 @@ export function FormLabelSelector({
               selectedLabel={field.value}
               availableLabels={availableLabels}
               onLabelChange={field.onChange}
-              onCreateLabel={onCreateLabel}
             />
           </FormControl>
           <FormMessage />

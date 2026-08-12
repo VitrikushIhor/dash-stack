@@ -49,4 +49,14 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsDueDateAfterStartDate()
   @Transform(({ value }) => (value === null ? null : value))
   declare dueDate?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Set to null to clear the label',
+  })
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @Transform(({ value }) => (value === null ? null : value))
+  declare labelId?: string | null;
 }

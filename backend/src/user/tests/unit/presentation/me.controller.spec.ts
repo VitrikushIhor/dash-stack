@@ -3,12 +3,14 @@ import { MeController } from '../../../presentation/controllers/me.controller';
 import { GetCurrentUserUseCase } from '../../../application/use-cases/get-current-user.use-case';
 import { UpdateCurrentUserUseCase } from '../../../application/use-cases/update-current-user.use-case';
 import { FindUserMembershipsUseCase } from '../../../../organization/application/use-cases/find-user-memberships.use-case';
+import { CountUserOrganizationsUseCase } from '../../../../organization/application/use-cases/count-user-organizations.use-case';
 
 describe('MeController', () => {
   let controller: MeController;
   let getCurrentUserUseCase: jest.Mocked<GetCurrentUserUseCase>;
   let updateCurrentUserUseCase: jest.Mocked<UpdateCurrentUserUseCase>;
   let findUserMembershipsUseCase: jest.Mocked<FindUserMembershipsUseCase>;
+  let countUserOrganizationsUseCase: jest.Mocked<CountUserOrganizationsUseCase>;
 
   beforeEach(async () => {
     getCurrentUserUseCase = {
@@ -23,9 +25,17 @@ describe('MeController', () => {
       execute: jest.fn(),
     } as unknown as jest.Mocked<FindUserMembershipsUseCase>;
 
+    countUserOrganizationsUseCase = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<CountUserOrganizationsUseCase>;
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MeController],
       providers: [
+        {
+          provide: FindUserMembershipsUseCase,
+          useValue: findUserMembershipsUseCase,
+        },
         {
           provide: GetCurrentUserUseCase,
           useValue: getCurrentUserUseCase,
@@ -35,8 +45,8 @@ describe('MeController', () => {
           useValue: updateCurrentUserUseCase,
         },
         {
-          provide: FindUserMembershipsUseCase,
-          useValue: findUserMembershipsUseCase,
+          provide: CountUserOrganizationsUseCase,
+          useValue: countUserOrganizationsUseCase,
         },
       ],
     }).compile();

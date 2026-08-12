@@ -29,10 +29,12 @@ export function CalendarPage() {
     [initialView, initialDate]
   )
 
-  const { data: tasks = [], isLoading } = useTasksQuery(
-    activeOrgId || '',
-    range
-  )
+  const { data: paginatedTasks, isLoading } = useTasksQuery(activeOrgId || '', {
+    ...range,
+    page: 1,
+    perPage: 100,
+  })
+  const tasks = paginatedTasks?.data || []
 
   const { data: members = [], isLoading: membersLoading } = useGetMembers(
     activeOrgId || ''

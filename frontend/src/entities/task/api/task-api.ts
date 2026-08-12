@@ -1,4 +1,4 @@
-import { api } from '@/shared/api'
+import { api, type PaginatedResult } from '@/shared/api'
 import {
   type Task,
   type CreateTaskDto,
@@ -15,10 +15,15 @@ export interface TaskFilters {
   dueDateTo?: string
   startDateFrom?: string
   startDateTo?: string
+  page?: number
+  perPage?: number
 }
 
 export const taskApi = {
-  findAll: (orgId: string, filters?: TaskFilters): Promise<Task[]> => {
+  findAll: (
+    orgId: string,
+    filters?: TaskFilters
+  ): Promise<PaginatedResult<Task>> => {
     const params: Record<string, string | undefined> = {
       search: filters?.search,
       dueDateFrom: filters?.dueDateFrom,
@@ -28,9 +33,11 @@ export const taskApi = {
       status: filters?.status?.join(','),
       assigneeIds: filters?.assigneeIds?.join(','),
       labelNames: filters?.labelNames?.join(','),
+      page: filters?.page?.toString(),
+      perPage: filters?.perPage?.toString(),
     }
 
-    return api.get<Task[]>(`/organizations/${orgId}/tasks`, {
+    return api.get<PaginatedResult<Task>>(`/organizations/${orgId}/tasks`, {
       params,
     })
   },

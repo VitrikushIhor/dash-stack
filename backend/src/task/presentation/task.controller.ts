@@ -59,7 +59,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({
@@ -73,7 +73,7 @@ export class TaskController {
 
   @Get()
   @RequireOrgRole(OrgRole.GUEST)
-  @ApiOperation({ summary: 'List all tasks for an organization' })
+  @ApiOperation({ summary: 'List all tasks for an organization (paginated)' })
   findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
     return this.findAllTasksUseCase.execute(orgId, {
       search: dto.search,
@@ -84,6 +84,8 @@ export class TaskController {
       dueDateTo: dto.dueDateTo,
       startDateFrom: dto.startDateFrom,
       startDateTo: dto.startDateTo,
+      page: dto.page,
+      perPage: dto.perPage,
     });
   }
 
@@ -133,7 +135,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({

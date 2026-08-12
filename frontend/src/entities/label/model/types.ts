@@ -1,54 +1,4 @@
-export interface Label {
-  id: string
-  name: string
-  color: LabelColor
-}
-
-export type LabelColor =
-  | 'red'
-  | 'orange'
-  | 'amber'
-  | 'yellow'
-  | 'lime'
-  | 'green'
-  | 'emerald'
-  | 'teal'
-  | 'cyan'
-  | 'sky'
-  | 'blue'
-  | 'indigo'
-  | 'violet'
-  | 'purple'
-  | 'fuchsia'
-  | 'pink'
-  | 'rose'
-  | 'gray'
-
-export const labelColorNames = [
-  'red',
-  'orange',
-  'amber',
-  'yellow',
-  'lime',
-  'green',
-  'emerald',
-  'teal',
-  'cyan',
-  'sky',
-  'blue',
-  'indigo',
-  'violet',
-  'purple',
-  'fuchsia',
-  'pink',
-  'rose',
-  'gray',
-]
-
-export const labelColorStyles: Record<
-  LabelColor,
-  { bg: string; text: string; border: string }
-> = {
+export const labelColorStyles = {
   red: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
   orange: {
     bg: 'bg-orange-50',
@@ -103,4 +53,17 @@ export const labelColorStyles: Record<
   pink: { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200' },
   rose: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
   gray: { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' },
+} as const
+
+export type LabelColor = keyof typeof labelColorStyles
+
+export const labelColorNames = Object.keys(labelColorStyles) as [
+  LabelColor,
+  ...LabelColor[],
+]
+
+export interface Label {
+  id: string
+  name: string
+  color: LabelColor
 }

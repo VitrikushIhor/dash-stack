@@ -2,8 +2,9 @@ import { IsOptional, IsString, IsEnum, IsArray, IsDate } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { TaskStatus } from '../../domain/enums/task-status.enum';
+import { PaginationDto } from '../../../common/pagination/pagination.dto';
 
-export class FindAllTasksDto {
+export class FindAllTasksDto extends PaginationDto {
   @ApiPropertyOptional({ description: 'Search by title or description' })
   @IsOptional()
   @IsString()

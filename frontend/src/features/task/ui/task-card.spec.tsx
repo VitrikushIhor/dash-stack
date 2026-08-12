@@ -2,7 +2,7 @@ import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { OrgRole } from '@/shared/model'
-import { type Label } from '@/shared/ui/label'
+import { type Label } from '@/entities/label'
 import { TaskStatusEnum, type Task } from '@/entities/task'
 import { TaskCardKanban } from './task-card'
 
@@ -13,10 +13,20 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-// Mock UI components that might cause issues
-vi.mock('@/shared/ui', () => ({
+// Mock FSD entity components
+vi.mock('@/entities/label', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/entities/label')>()
+  return {
+    ...actual,
+    LabelBadge: ({ label }: { label: Label }) => (
+      <span data-testid='label-badge'>{label.name}</span>
+    ),
+  }
+})
+
+// Mock UI components
+vi.mock('@/shared/ui/avatar-group', () => ({
   AvatarGroup: () => <div data-testid='avatar-group'>Avatars</div>,
-  LabelBadge: ({ label }: { label: Label }) => <span>{label.name}</span>,
 }))
 
 vi.mock('@/shared/ui/core/badge', () => ({
@@ -80,27 +90,29 @@ describe('TaskCardKanban', () => {
   it('should render task title', () => {
     render(<TaskCardKanban task={mockTask} />)
 
-    expect(screen.getByText('Test Task')).toBeDefined()
+    expect(screen.getByText('Test Task')).toBeInTheDocument()
   })
 
   it('should display progress text', () => {
     render(<TaskCardKanban task={mockTask} />)
 
     // 1 out of 2 items completed = 1/2
-    expect(screen.getByText('1/2')).toBeDefined()
+    expect(screen.getByText('1/2')).toBeInTheDocument()
   })
 
   it('should show red text for deadline if task is overdue', () => {
     vi.useFakeTimers()
-    // Mock date to be after deadline
-    vi.setSystemTime(new Date('2026-04-26T12:00:00Z'))
+    try {
+      // Mock date to be after deadline
+      vi.setSystemTime(new Date('2026-04-26T12:00:00Z'))
 
-    const { container } = render(<TaskCardKanban task={mockTask} />)
+      const { container } = render(<TaskCardKanban task={mockTask} />)
 
-    // Check if there is an element with text-red-600 class
-    const overdueElement = container.querySelector('.text-red-600')
-    expect(overdueElement).toBeDefined()
-
-    vi.useRealTimers()
+      // Check if there is an element with text-red-600 class
+      const overdueElement = container.querySelector('.text-red-600')
+      expect(overdueElement).not.toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

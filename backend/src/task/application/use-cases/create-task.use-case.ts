@@ -36,7 +36,7 @@ export class CreateTaskUseCase {
       startDate,
       dueDate,
       completedAt: TaskStatusPolicy.resolveCompletedAtOnCreate(status),
-      label: command.label ?? null,
+      labelId: command.labelId ?? null,
       checklists: command.checklists,
     });
   }
