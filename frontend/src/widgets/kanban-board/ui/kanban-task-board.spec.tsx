@@ -2,22 +2,18 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { TaskStatusEnum, type Task } from '@/entities/task'
+import type { updateTaskAction } from '@/features/manage-task/server'
 import { KanbanViewMode } from '../model/types/kanban-types'
 import { KanbanTaskBoard } from './kanban-task-board'
 
 // --- Mocks ---
 
-const mockUpdateTaskMutate = vi.fn()
+const mockUpdateTaskAction = vi.fn().mockResolvedValue({ id: 'task-1' })
 
-vi.mock('@/entities/task', async (importOriginal) => {
-  const original = await importOriginal<typeof import('@/entities/task')>()
-  return {
-    ...original,
-    useUpdateTask: () => ({
-      mutate: mockUpdateTaskMutate,
-    }),
-  }
-})
+vi.mock('@/features/manage-task/server', () => ({
+  updateTaskAction: (...args: Parameters<typeof updateTaskAction>) =>
+    mockUpdateTaskAction(...args),
+}))
 
 const mockActiveOrgId = { value: 'org-1' as string | null }
 
@@ -34,16 +30,10 @@ vi.mock('@/entities/organization', async (importOriginal) => {
   }
 })
 
-const mockOpenCreate = vi.fn()
-const mockOpenEdit = vi.fn()
-const mockOpenDelete = vi.fn()
+const mockSetTaskParams = vi.fn()
 
-vi.mock('@/features/manage-task', () => ({
-  useTaskModalStore: () => ({
-    openCreate: mockOpenCreate,
-    openEdit: mockOpenEdit,
-    openDelete: mockOpenDelete,
-  }),
+vi.mock('@/features/manage-task/model/task-search-params', () => ({
+  useTaskSearchParams: () => [{}, mockSetTaskParams],
 }))
 
 vi.mock('@/shared/ui/kanban', () => {
@@ -159,8 +149,7 @@ vi.mock('@/shared/ui/kanban', () => {
     }: {
       children: React.ReactNode
       value: string
-      [key: string]: unknown
-    }) => (
+    } & React.HTMLAttributes<HTMLDivElement>) => (
       <div data-testid={`kanban-item-${value}`} {...props}>
         {children}
       </div>
@@ -394,9 +383,10 @@ describe('KanbanTaskBoard', () => {
 
       await user.click(plannedCreateBtn)
 
-      expect(mockOpenCreate).toHaveBeenCalledTimes(1)
-      expect(mockOpenCreate).toHaveBeenCalledWith({
-        status: TaskStatusEnum.PLANNED,
+      expect(mockSetTaskParams).toHaveBeenCalledTimes(1)
+      expect(mockSetTaskParams).toHaveBeenCalledWith({
+        'create-task': true,
+        'task-status': TaskStatusEnum.PLANNED,
       })
     })
 
@@ -409,8 +399,10 @@ describe('KanbanTaskBoard', () => {
       const editBtn = screen.getByTestId('edit-task-task-1')
       await user.click(editBtn)
 
-      expect(mockOpenEdit).toHaveBeenCalledTimes(1)
-      expect(mockOpenEdit).toHaveBeenCalledWith(mockTasks[0])
+      expect(mockSetTaskParams).toHaveBeenCalledTimes(1)
+      expect(mockSetTaskParams).toHaveBeenCalledWith({
+        'update-task': mockTasks[0].id,
+      })
     })
 
     it('triggers openDelete when clicking delete on Task Card', async () => {
@@ -422,8 +414,10 @@ describe('KanbanTaskBoard', () => {
       const deleteBtn = screen.getByTestId('delete-task-task-2')
       await user.click(deleteBtn)
 
-      expect(mockOpenDelete).toHaveBeenCalledTimes(1)
-      expect(mockOpenDelete).toHaveBeenCalledWith(mockTasks[1])
+      expect(mockSetTaskParams).toHaveBeenCalledTimes(1)
+      expect(mockSetTaskParams).toHaveBeenCalledWith({
+        'delete-task': mockTasks[1].id,
+      })
     })
   })
 
@@ -450,8 +444,8 @@ describe('KanbanTaskBoard', () => {
       await user.click(screen.getByTestId('trigger-drag-end'))
 
       // Check mutation call details
-      expect(mockUpdateTaskMutate).toHaveBeenCalledTimes(1)
-      expect(mockUpdateTaskMutate).toHaveBeenCalledWith({
+      expect(mockUpdateTaskAction).toHaveBeenCalledTimes(1)
+      expect(mockUpdateTaskAction).toHaveBeenCalledWith({
         id: 'task-1',
         data: { status: TaskStatusEnum.UPCOMING },
       })
@@ -481,7 +475,7 @@ describe('KanbanTaskBoard', () => {
       expect(upcomingColumn).not.toHaveTextContent('Task 1')
 
       // No mutation should be triggered
-      expect(mockUpdateTaskMutate).not.toHaveBeenCalled()
+      expect(mockUpdateTaskAction).not.toHaveBeenCalled()
     })
 
     it('does not trigger mutation if a task is reordered within the same column', async () => {
@@ -499,29 +493,8 @@ describe('KanbanTaskBoard', () => {
       // 3. Drag End
       await user.click(screen.getByTestId('trigger-drag-end'))
 
-      // Reordering within the same column should not trigger updateTask mutation (since status did not change)
-      expect(mockUpdateTaskMutate).not.toHaveBeenCalled()
-    })
-
-    it('does not call updateTask if activeOrgId is not set', async () => {
-      mockActiveOrgId.value = null // Simulates missing organization context
-
-      const user = userEvent.setup()
-      render(
-        <KanbanTaskBoard viewMode={KanbanViewMode.Kanban} tasks={mockTasks} />
-      )
-
-      // 1. Drag Start
-      await user.click(screen.getByTestId('trigger-drag-start'))
-
-      // 2. Move task-1 to UPCOMING
-      await user.click(screen.getByTestId('trigger-value-change'))
-
-      // 3. Drag End
-      await user.click(screen.getByTestId('trigger-drag-end'))
-
-      // Since activeOrgId was null, handleTaskMove returns early without mutating
-      expect(mockUpdateTaskMutate).not.toHaveBeenCalled()
+      // Reordering within the same column should not trigger updateTask action (since status did not change)
+      expect(mockUpdateTaskAction).not.toHaveBeenCalled()
     })
   })
 })

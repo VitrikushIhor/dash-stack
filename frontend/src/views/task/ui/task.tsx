@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { LayoutGrid, List, Table as TableIcon, Plus } from 'lucide-react'
 import { useTasksTableSearchParams } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
@@ -9,7 +10,7 @@ import { DataTableToolbar } from '@/shared/ui/data-table'
 import { useGetLabels } from '@/entities/label'
 import { useActiveOrganization, useGetMembers } from '@/entities/organization'
 import { useTasksQuery, type TaskStatusEnum } from '@/entities/task'
-import { useTaskModalStore } from '@/features/manage-task'
+import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { KanbanTaskBoard, KanbanViewMode } from '@/widgets/kanban-board'
 import { Main } from '@/widgets/layout'
 import {
@@ -20,6 +21,15 @@ import {
 } from '@/widgets/tasks-table'
 import { parseDateSafe } from '@/widgets/tasks-table/lib/filters'
 
+const ManageTaskModal = dynamic(
+  () => import('@/features/manage-task').then((mod) => mod.ManageTaskModal),
+  { ssr: false }
+)
+const DeleteTaskModal = dynamic(
+  () => import('@/features/manage-task').then((mod) => mod.DeleteTaskModal),
+  { ssr: false }
+)
+
 export function TaskPage() {
   const [viewMode, setViewMode] = useState<KanbanViewMode>(
     KanbanViewMode.Kanban
@@ -28,7 +38,7 @@ export function TaskPage() {
   const { activeOrg } = useActiveOrganization()
   const activeOrgId = activeOrg?.id
   const [tableSearchParams] = useTasksTableSearchParams()
-  const { openCreate } = useTaskModalStore()
+  const [, setTaskParams] = useTaskSearchParams()
 
   const filters = useMemo(() => {
     return {
@@ -102,7 +112,10 @@ export function TaskPage() {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button onClick={() => openCreate()} size='sm'>
+          <Button
+            onClick={() => setTaskParams({ 'create-task': true })}
+            size='sm'
+          >
             <Plus className='mr-2 h-4 w-4' /> Add task
           </Button>
         </div>
@@ -150,6 +163,12 @@ export function TaskPage() {
           <KanbanTaskBoard viewMode={viewMode} tasks={filteredTasks} />
         )}
       </div>
+      <ManageTaskModal
+        tasks={tasks}
+        labels={availableLabels}
+        members={members}
+      />
+      <DeleteTaskModal tasks={tasks} />
     </Main>
   )
 }

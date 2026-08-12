@@ -24,8 +24,7 @@ import {
 import { Separator } from '@/shared/ui/core/separator'
 import { Textarea } from '@/shared/ui/core/textarea'
 import { FormFileUpload, FormLabelSelector } from '@/shared/ui/form-fields'
-import { useGetLabels } from '@/entities/label'
-import { useActiveOrganization } from '@/entities/organization'
+import { type Label } from '@/entities/label'
 import { TaskStatusEnum, FormChecklist } from '@/entities/task'
 import { FormMemberPicker } from '@/entities/team'
 import { type TaskFormValues } from '../model/create-task-schema'
@@ -36,6 +35,7 @@ type TaskFormProps = {
   onCancel: () => void
   form: UseFormReturn<TaskFormValues>
   allMembers: Membership[]
+  availableLabels: Label[]
   onFileReject: (file: File, message: string) => void
   onUpload: (
     files: File[],
@@ -55,11 +55,9 @@ export function TaskForm({
   onFileReject,
   onUpload,
   allMembers,
+  availableLabels,
   submitText = 'Create',
 }: TaskFormProps) {
-  const { activeOrg } = useActiveOrganization()
-  const { data: availableLabels = [] } = useGetLabels(activeOrg?.id ?? '')
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>

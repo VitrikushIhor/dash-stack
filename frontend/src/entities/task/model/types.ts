@@ -1,11 +1,14 @@
 import { type OrgRole } from '@/shared/model'
 import { type LabelColor } from '@/entities/label'
 
-export enum TaskStatusEnum {
-  PLANNED = 'PLANNED',
-  UPCOMING = 'UPCOMING',
-  COMPLETED = 'COMPLETED',
-}
+export const TaskStatusEnum = {
+  PLANNED: 'PLANNED',
+  UPCOMING: 'UPCOMING',
+  COMPLETED: 'COMPLETED',
+} as const
+
+export type TaskStatusEnum =
+  (typeof TaskStatusEnum)[keyof typeof TaskStatusEnum]
 
 export interface TaskAssignee {
   id: string // Membership ID

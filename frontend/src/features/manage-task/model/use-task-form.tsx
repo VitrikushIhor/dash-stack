@@ -10,11 +10,15 @@ function hydrateAttachments(attachments: string[]): File[] {
 
 export function useTaskForm({
   initialTask,
-}: { initialTask?: Task | null } = {}) {
+  initialStatus,
+}: {
+  initialTask?: Task | null
+  initialStatus?: TaskStatusEnum | null
+} = {}) {
   const defaultFormData: TaskFormValues = {
     title: initialTask?.title || '',
     description: initialTask?.description || '',
-    status: initialTask?.status ?? TaskStatusEnum.PLANNED,
+    status: initialTask?.status ?? initialStatus ?? TaskStatusEnum.PLANNED,
     startDate: initialTask?.startDate
       ? new Date(initialTask.startDate)
       : undefined,

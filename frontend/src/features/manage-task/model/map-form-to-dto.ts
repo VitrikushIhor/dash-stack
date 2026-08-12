@@ -2,14 +2,14 @@ import { type FileWithServerData } from '@/shared/api'
 import { type LabelColor } from '@/entities/label'
 import { type CreateTaskDto, type UpdateTaskDto } from '@/entities/task'
 import { type TaskFormValues } from './create-task-schema'
-import { TaskModalMode } from './use-task-modal-store'
+import { ManageTaskMode } from './types'
 
 function serializeDate(
   value: Date | null | undefined,
-  mode: TaskModalMode
+  mode: ManageTaskMode
 ): string | null | undefined {
   if (value === undefined) return undefined
-  if (value === null) return mode === TaskModalMode.EDIT ? null : undefined
+  if (value === null) return mode === ManageTaskMode.EDIT ? null : undefined
   return value.toISOString()
 }
 
@@ -21,15 +21,15 @@ function collectAttachmentKeys(files: File[]): string[] {
 
 export function mapTaskFormToDto(
   values: TaskFormValues,
-  mode: TaskModalMode.CREATE
+  mode: typeof ManageTaskMode.CREATE
 ): CreateTaskDto
 export function mapTaskFormToDto(
   values: TaskFormValues,
-  mode: TaskModalMode.EDIT
+  mode: typeof ManageTaskMode.EDIT
 ): UpdateTaskDto
 export function mapTaskFormToDto(
   values: TaskFormValues,
-  mode: TaskModalMode = TaskModalMode.CREATE
+  mode: ManageTaskMode = ManageTaskMode.CREATE
 ): CreateTaskDto | UpdateTaskDto {
   const attachmentKeys = collectAttachmentKeys(values.files ?? [])
 

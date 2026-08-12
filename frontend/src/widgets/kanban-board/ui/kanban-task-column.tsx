@@ -10,7 +10,7 @@ import { Button } from '@/shared/ui/core/button'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui/kanban'
 import { type Task, TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
-import { useTaskModalStore } from '@/features/manage-task'
+import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { KanbanViewMode } from '../model/types/kanban-types'
 import { KanbanTaskCard } from './kanban-task-card'
 
@@ -31,14 +31,14 @@ export const KanbanTaskColum = memo(
   }: TaskColumnProps) => {
     const isCompleted = value === TaskStatusEnum.COMPLETED
 
-    const { openEdit, openCreate, openDelete } = useTaskModalStore()
+    const [, setTaskParams] = useTaskSearchParams()
 
     const openEditDialog = (task: Task) => {
-      openEdit(task)
+      setTaskParams({ 'update-task': task.id })
     }
 
     const openDeleteDialog = (task: Task) => {
-      openDelete(task)
+      setTaskParams({ 'delete-task': task.id })
     }
 
     if (viewMode === KanbanViewMode.List) {
@@ -85,7 +85,10 @@ export const KanbanTaskColum = memo(
                   size={'sm'}
                   className='w-full'
                   onClick={() => {
-                    openCreate({ status: value as TaskStatusEnum })
+                    setTaskParams({
+                      'create-task': true,
+                      'task-status': value as string,
+                    })
                   }}
                 >
                   <Plus className='mr-2 h-4 w-4' />
@@ -153,7 +156,10 @@ export const KanbanTaskColum = memo(
             size={'sm'}
             className='w-full'
             onClick={() => {
-              openCreate({ status: value as TaskStatusEnum })
+              setTaskParams({
+                'create-task': true,
+                'task-status': value as string,
+              })
             }}
           >
             <Plus className='mr-2 h-4 w-4' />

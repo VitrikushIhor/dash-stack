@@ -1,9 +1,17 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useOptimistic,
+  useTransition,
+} from 'react'
+import { toast } from 'sonner'
 import { Kanban, KanbanBoard, KanbanOverlay } from '@/shared/ui/kanban'
-import { useActiveOrganization } from '@/entities/organization'
-import { type Task, type TaskStatusEnum, useUpdateTask } from '@/entities/task'
+import { type Task, type TaskStatusEnum } from '@/entities/task'
+import { updateTaskAction } from '@/features/manage-task/server'
 import { KanbanViewMode } from '../model/types/kanban-types'
 import { groupTasksByStatus } from '../model/utils'
 import { KanbanTaskCard } from './kanban-task-card'
@@ -18,82 +26,82 @@ export function KanbanTaskBoard({
 }) {
   const groupedTask = useMemo(() => groupTasksByStatus(tasks), [tasks])
 
-  const [columns, setColumns] = useState<Record<string, Task[]>>(groupedTask)
-  const prevColumnsRef = useRef<Record<string, Task[]>>(groupedTask)
-  const dragStartColumnsRef = useRef<Record<string, Task[]> | null>(null)
-
-  useEffect(() => {
-    if (prevColumnsRef.current !== groupedTask) {
-      prevColumnsRef.current = groupedTask
-
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setColumns(groupedTask)
-    }
-  }, [groupedTask])
-
-  const { activeOrg } = useActiveOrganization()
-  const activeOrgId = activeOrg?.id
-  const { mutate: updateTask } = useUpdateTask(activeOrgId || '')
-
-  const handleTaskMove = useCallback(
-    (taskId: string, newStatus: TaskStatusEnum) => {
-      if (!activeOrgId) return
-
-      updateTask({ id: taskId, data: { status: newStatus } })
-    },
-    [updateTask, activeOrgId]
+  const [optimisticColumns, setOptimisticColumns] = useOptimistic(
+    groupedTask,
+    (_state, newColumns: Record<string, Task[]>) => newColumns
   )
+
+  const [dragState, setDragState] = useState<Record<string, Task[]> | null>(
+    null
+  )
+  const dragStartColumnsRef = useRef<Record<string, Task[]> | null>(null)
+  const [, startTransition] = useTransition()
+
+  const displayColumns = dragState ?? optimisticColumns
 
   const handleValueChange = useCallback(
     (newColumns: Record<string, Task[]>) => {
-      prevColumnsRef.current = newColumns
-      setColumns(newColumns)
+      setDragState(newColumns)
     },
     []
   )
 
   const handleDragStart = useCallback(() => {
-    dragStartColumnsRef.current = columns
-  }, [columns])
+    dragStartColumnsRef.current = displayColumns
+  }, [displayColumns])
 
   const handleDragCancel = useCallback(() => {
-    if (dragStartColumnsRef.current) {
-      setColumns(dragStartColumnsRef.current)
-      prevColumnsRef.current = dragStartColumnsRef.current
-      dragStartColumnsRef.current = null
-    }
+    setDragState(null)
+    dragStartColumnsRef.current = null
   }, [])
 
   const handleDragEnd = useCallback(() => {
     const startColumns = dragStartColumnsRef.current
-    if (!startColumns) return
+    const currentDragState = dragState
 
-    for (const [columnId, newTasks] of Object.entries(columns)) {
+    setDragState(null)
+    dragStartColumnsRef.current = null
+
+    if (!startColumns || !currentDragState) return
+
+    let movedTask: Task | null = null
+    let targetColumnId: TaskStatusEnum | null = null
+
+    for (const [columnId, newTasks] of Object.entries(currentDragState)) {
       const prevTasks = startColumns[columnId] ?? []
 
       for (const newTask of newTasks) {
-        const prevTask = prevTasks.find((t) => t.id === newTask.id)
-        if (!prevTask) {
-          const prevColumn = Object.entries(startColumns).find(([, tasks]) =>
-            tasks.some((t) => t.id === newTask.id)
-          )?.[0]
-
-          if (prevColumn && prevColumn !== columnId) {
-            handleTaskMove(newTask.id, columnId as TaskStatusEnum)
-          }
+        if (!prevTasks.find((t) => t.id === newTask.id)) {
+          movedTask = newTask
+          targetColumnId = columnId as TaskStatusEnum
+          break
         }
       }
+      if (movedTask) break
     }
 
-    dragStartColumnsRef.current = null
-  }, [columns, handleTaskMove])
+    if (movedTask && targetColumnId) {
+      startTransition(async () => {
+        setOptimisticColumns(currentDragState)
+
+        const result = await updateTaskAction({
+          id: movedTask!.id,
+          data: { status: targetColumnId! },
+        })
+
+        if (!result.success) {
+          toast.error('Failed to move task')
+        }
+      })
+    }
+  }, [dragState, setOptimisticColumns])
 
   return (
     <>
       {viewMode === KanbanViewMode.Kanban && (
         <Kanban
           data-testid='kanban-root'
-          value={columns}
+          value={displayColumns}
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}
           orientation='horizontal'
@@ -102,7 +110,7 @@ export function KanbanTaskBoard({
           onDragCancel={handleDragCancel}
         >
           <KanbanBoard className='grid auto-rows-fr grid-cols-3'>
-            {Object.entries(columns).map(([columnValue, tasks]) => (
+            {Object.entries(displayColumns).map(([columnValue, tasks]) => (
               <KanbanTaskColum
                 key={columnValue}
                 value={columnValue}
@@ -114,7 +122,7 @@ export function KanbanTaskBoard({
           <KanbanOverlay>
             {({ value, variant }) => {
               if (variant === 'column') {
-                const tasks = columns[value] ?? []
+                const tasks = displayColumns[value] ?? []
 
                 return (
                   <KanbanTaskColum
@@ -125,7 +133,7 @@ export function KanbanTaskBoard({
                 )
               }
 
-              const task = Object.values(columns)
+              const task = Object.values(displayColumns)
                 .flat()
                 .find((task) => task.id === value)
 
@@ -140,7 +148,7 @@ export function KanbanTaskBoard({
       {viewMode === KanbanViewMode.List && (
         <Kanban
           data-testid='kanban-root'
-          value={columns}
+          value={displayColumns}
           onValueChange={handleValueChange}
           getItemValue={(item) => item.id}
           orientation='vertical'
@@ -150,7 +158,7 @@ export function KanbanTaskBoard({
         >
           {/* <KanbanBoard className='h-[calc(100vh-200px)] overflow-x-auto'> */}
           <KanbanBoard className=''>
-            {Object.entries(columns).map(([columnValue, tasks]) => (
+            {Object.entries(displayColumns).map(([columnValue, tasks]) => (
               <KanbanTaskColum
                 key={columnValue}
                 value={columnValue}
@@ -163,7 +171,7 @@ export function KanbanTaskBoard({
           <KanbanOverlay>
             {({ value, variant }) => {
               if (variant === 'column') {
-                const tasks = columns[value] ?? []
+                const tasks = displayColumns[value] ?? []
 
                 return (
                   <KanbanTaskColum
@@ -174,7 +182,7 @@ export function KanbanTaskBoard({
                 )
               }
 
-              const task = Object.values(columns)
+              const task = Object.values(displayColumns)
                 .flat()
                 .find((task) => task.id === value)
 
