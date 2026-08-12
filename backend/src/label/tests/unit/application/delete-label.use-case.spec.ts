@@ -32,35 +32,31 @@ describe('DeleteLabelUseCase', () => {
     });
     labelRepository.delete.mockResolvedValue(undefined);
 
-    // Act
-    await useCase.execute(organizationId, labelId);
+    await useCase.execute(labelId, organizationId);
 
-    // Assert
     expect(labelRepository.findById).toHaveBeenCalledWith(
-      organizationId,
       labelId,
+      organizationId,
     );
     expect(labelRepository.delete).toHaveBeenCalledWith(
-      organizationId,
       labelId,
+      organizationId,
     );
   });
 
   it('throws NotFoundException if the label does not exist', async () => {
-    // Arrange
     const organizationId = 'org-1';
     const labelId = 'non-existent';
 
     labelRepository.findById.mockResolvedValue(null);
 
-    // Act & Assert
-    await expect(useCase.execute(organizationId, labelId)).rejects.toThrow(
+    await expect(useCase.execute(labelId, organizationId)).rejects.toThrow(
       new NotFoundException(LABEL_ERRORS.NOT_FOUND),
     );
 
     expect(labelRepository.findById).toHaveBeenCalledWith(
-      organizationId,
       labelId,
+      organizationId,
     );
     expect(labelRepository.delete).not.toHaveBeenCalled();
   });

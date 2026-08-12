@@ -14,7 +14,6 @@ import {
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
 import { paginate } from '../../../common/pagination/paginate';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaTaskRepository

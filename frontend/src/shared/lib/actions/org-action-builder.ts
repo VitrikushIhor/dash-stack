@@ -28,9 +28,7 @@ export function createOrgAction<TInput, TOutput>(
         return {
           success: false,
           error: 'Validation failed',
-          validationMessages: error.issues.map(
-            (e: z.core.$ZodIssue) => e.message
-          ),
+          validationMessages: error.issues.map((e) => e.message),
         }
       }
       if (error instanceof ApiError) {

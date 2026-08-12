@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import {
   CreateLabelData,
@@ -7,6 +7,7 @@ import {
 } from '../../application/ports/label.repository.port';
 import { LabelReadModel } from '../../application/read-models/label.read-model';
 import { PrismaLabelMapper } from './prisma-label.mapper';
+import { LABEL_ERRORS } from '../../domain/constants/label-errors';
 
 @Injectable()
 export class PrismaLabelRepository implements LabelRepositoryPort {
@@ -56,16 +57,24 @@ export class PrismaLabelRepository implements LabelRepositoryPort {
     organizationId: string,
     data: UpdateLabelData,
   ): Promise<LabelReadModel> {
-    const updatedLabel = await this.prisma.organizationLabel.update({
+    await this.prisma.organizationLabel.updateMany({
       where: { id, organizationId },
       data,
     });
+
+    const updatedLabel = await this.prisma.organizationLabel.findFirst({
+      where: { id, organizationId },
+    });
+
+    if (!updatedLabel) {
+      throw new NotFoundException(LABEL_ERRORS.NOT_FOUND);
+    }
 
     return PrismaLabelMapper.toDomain(updatedLabel);
   }
 
   async delete(id: string, organizationId: string): Promise<void> {
-    await this.prisma.organizationLabel.delete({
+    await this.prisma.organizationLabel.deleteMany({
       where: { id, organizationId },
     });
   }

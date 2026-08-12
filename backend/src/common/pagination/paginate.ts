@@ -38,7 +38,7 @@ export async function paginate<
   ]);
 
   const lastPage = total === 0 ? 1 : Math.ceil(total / perPage);
-  const currentPage = Math.min(page, lastPage);
+  const currentPage = page;
 
   return {
     data,
