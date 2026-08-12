@@ -9,6 +9,12 @@ export type {
   UpdateTaskDto,
 } from './model/types'
 export { TaskStatusEnum } from './model/types'
+export {
+  CreateTaskDtoSchema,
+  UpdateTaskDtoSchema,
+  BulkUpdateTasksDtoSchema,
+  BulkDeleteTasksDtoSchema,
+} from './model/task.schema'
 export * from './lib/task-utils'
 
 export { taskApi, type TaskFilters } from './api/task-api'
