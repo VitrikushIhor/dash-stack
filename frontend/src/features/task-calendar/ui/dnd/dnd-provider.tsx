@@ -2,7 +2,6 @@
 
 import { useOptimistic, useTransition, type ReactNode } from 'react'
 import { parseISO, set } from 'date-fns'
-import { toast } from 'sonner'
 import {
   DndContext,
   type DragEndEvent,
@@ -12,6 +11,7 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core'
+import { toast } from 'sonner'
 import { useActiveOrganization } from '@/entities/organization'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { CustomDragLayer } from './custom-drag-layer'
@@ -87,7 +87,7 @@ export function DndProviderWrapper({
 
     startTransition(() => {
       setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
-      
+
       try {
         onTaskUpdate(droppedEvent.id, { dueDate: newDueDateISO })
       } catch (error) {

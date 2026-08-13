@@ -1,10 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
+import { toast } from 'sonner'
+import { useAction } from '@/shared/lib/hooks/use-action'
 import { type Task } from '@/entities/task'
 import { updateTaskAction } from '@/features/manage-task/server'
-import { useAction } from '@/shared/lib/hooks/use-action'
-import { toast } from 'sonner'
-import { useMemo } from 'react'
 import {
   useCalendarSearchParams,
   CalendarHeader,
@@ -36,8 +36,17 @@ export function CalendarYearPage({ tasks }: Props) {
     <DndProviderWrapper tasks={tasks} onTaskUpdate={handleTaskUpdate}>
       {(optimisticTasks) => (
         <div className='flex flex-col gap-4'>
-          <CalendarHeader tasks={optimisticTasks} view='year' selectedDate={selectedDate} setParams={setParams} />
-          <CalendarYearView tasks={optimisticTasks} selectedDate={selectedDate} setParams={setParams} />
+          <CalendarHeader
+            tasks={optimisticTasks}
+            view='year'
+            selectedDate={selectedDate}
+            setParams={setParams}
+          />
+          <CalendarYearView
+            tasks={optimisticTasks}
+            selectedDate={selectedDate}
+            setParams={setParams}
+          />
         </div>
       )}
     </DndProviderWrapper>

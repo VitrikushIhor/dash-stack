@@ -1,4 +1,3 @@
-
 export type TEventColor =
   | 'blue'
   | 'green'

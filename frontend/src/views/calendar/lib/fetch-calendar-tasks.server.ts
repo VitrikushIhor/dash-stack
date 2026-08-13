@@ -2,11 +2,11 @@ import { redirect } from 'next/navigation'
 import 'server-only'
 import { getActiveOrganization } from '@/entities/organization/server'
 import { getOrganizationTasks } from '@/entities/task/server'
-import { calendarSearchParamsCache } from '@/features/task-calendar/model/calendar-search-params.server'
-import { getVisibleRange } from './get-visible-range'
 import { type TCalendarView } from '@/features/task-calendar'
-
+import { MAX_CALENDAR_TASKS_PER_PAGE } from '@/features/task-calendar/lib/constants'
+import { calendarSearchParamsCache } from '@/features/task-calendar/model/calendar-search-params.server'
 import { getParsedTaskFilters } from '@/widgets/tasks-table/lib/parse-task-search-params.server'
+import { getVisibleRange } from './get-visible-range'
 
 export async function fetchCalendarTasks(
   view: TCalendarView,
@@ -28,7 +28,7 @@ export async function fetchCalendarTasks(
   const tasksResult = await getOrganizationTasks(activeOrgId, {
     ...filters,
     ...range,
-    perPage: 1000,
+    perPage: MAX_CALENDAR_TASKS_PER_PAGE,
   })
 
   return {

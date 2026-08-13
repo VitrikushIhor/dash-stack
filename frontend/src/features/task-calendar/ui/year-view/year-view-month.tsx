@@ -1,4 +1,3 @@
-import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import {
   format,
@@ -9,7 +8,10 @@ import {
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
-
+import {
+  type TCalendarView,
+  type TSetCalendarParams,
+} from '../../model/calendar-types'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
@@ -19,8 +21,13 @@ interface IProps {
   tasks: Task[]
 }
 
-export function YearViewMonth({ month, tasks, selectedDate, setParams }: IProps) {
-    const setView = (v: TCalendarView) => setParams({ view: v })
+export function YearViewMonth({
+  month,
+  tasks,
+  selectedDate,
+  setParams,
+}: IProps) {
+  const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const monthName = format(month, 'MMMM')
@@ -76,11 +83,14 @@ export function YearViewMonth({ month, tasks, selectedDate, setParams }: IProps)
             })
 
             return (
-              <YearViewDayCell key={`day-${day}`}
+              <YearViewDayCell
+                key={`day-${day}`}
                 day={day}
                 date={date}
                 tasks={dayEvents}
-               selectedDate={selectedDate} setParams={setParams} />
+                selectedDate={selectedDate}
+                setParams={setParams}
+              />
             )
           })}
         </div>

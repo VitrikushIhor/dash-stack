@@ -3,13 +3,12 @@ import { format, differenceInMinutes, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
-import { DraggableTask } from '../dnd/draggable-task'
-import { calendarWeekEventCardVariants } from '../variants'
-
+import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { type TBadgeVariant } from '../../model/calendar-types'
+import { DraggableTask } from '../dnd/draggable-task'
+import { TaskDot } from '../task-dot'
+import { calendarWeekEventCardVariants } from '../variants'
 
 interface IProps
   extends
@@ -60,16 +59,7 @@ export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
         onKeyDown={handleKeyDown}
       >
         <div className='flex items-center gap-1.5 truncate'>
-          {['mixed', 'dot'].includes(badgeVariant) && (
-            <svg
-              width='8'
-              height='8'
-              viewBox='0 0 8 8'
-              className='task-dot shrink-0'
-            >
-              <circle cx='4' cy='4' r='4' />
-            </svg>
-          )}
+          {['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
 
           <p className='truncate font-semibold'>{task.title}</p>
         </div>

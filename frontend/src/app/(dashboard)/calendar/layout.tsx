@@ -1,14 +1,13 @@
+import { redirect } from 'next/navigation'
 import { getOrganizationLabels } from '@/entities/label/server'
 import {
   getActiveOrganization,
   getOrganizationMembers,
 } from '@/entities/organization/server'
 import { TaskHeaderActions, TaskModals } from '@/features/manage-task'
-import { Main } from '@/widgets/layout'
-import { CalendarTabsNav } from '@/widgets/calendar-tabs-nav'
-import { redirect } from 'next/navigation'
-
 import { TaskToolbar } from '@/features/task-filters'
+import { CalendarTabsNav } from '@/widgets/calendar-tabs-nav'
+import { Main } from '@/widgets/layout'
 
 export default async function CalendarLayout({
   children,
@@ -46,9 +45,7 @@ export default async function CalendarLayout({
         <TaskToolbar labels={labels} members={members} />
       </div>
 
-      <div className='bg-card rounded-xl border p-4 shadow-sm'>
-        {children}
-      </div>
+      <div className='bg-card rounded-xl border p-4 shadow-sm'>{children}</div>
 
       <TaskModals labels={labels} members={members} />
     </Main>

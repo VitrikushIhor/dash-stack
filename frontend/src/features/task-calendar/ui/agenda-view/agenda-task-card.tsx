@@ -2,11 +2,11 @@ import { format, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { Clock, Text, User } from 'lucide-react'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { getTaskColor, getTaskUser } from '@/features/task-calendar/lib/mappers'
-
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
-import { agendaEventCardVariants } from '../variants'
+import { getTaskColor, getTaskUser } from '@/features/task-calendar/lib/mappers'
 import { type TBadgeVariant } from '../../model/calendar-types'
+import { TaskDot } from '../task-dot'
+import { agendaEventCardVariants } from '../variants'
 
 interface IProps {
   task: Task
@@ -55,16 +55,7 @@ export function AgendaTaskCard({
     >
       <div className='flex flex-col gap-2'>
         <div className='flex items-center gap-1.5'>
-          {['mixed', 'dot'].includes(badgeVariant) && (
-            <svg
-              width='8'
-              height='8'
-              viewBox='0 0 8 8'
-              className='task-dot shrink-0'
-            >
-              <circle cx='4' cy='4' r='4' />
-            </svg>
-          )}
+          {['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
 
           <p className='font-medium'>
             {eventCurrentDay && eventTotalDays && (

@@ -12,7 +12,10 @@ import {
 } from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
-import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
+import {
+  type TCalendarView,
+  type TSetCalendarParams,
+} from '../../model/calendar-types'
 
 interface IProps {
   view: TCalendarView
@@ -21,9 +24,14 @@ interface IProps {
   setParams: TSetCalendarParams
 }
 
-export function DateNavigator({ view, tasks, selectedDate, setParams }: IProps) {
+export function DateNavigator({
+  view,
+  tasks,
+  selectedDate,
+  setParams,
+}: IProps) {
   const [, startTransition] = useTransition()
-  
+
   const month = formatDate(selectedDate, 'MMMM')
   const year = selectedDate.getFullYear()
 

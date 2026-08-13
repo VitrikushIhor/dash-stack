@@ -2,12 +2,12 @@ import { endOfDay, format, isSameDay, parseISO, startOfDay } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
-import { DraggableTask } from '../dnd/draggable-task'
-import { eventBadgeVariants } from '../variants'
+import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { type TBadgeVariant } from '../../model/calendar-types'
+import { DraggableTask } from '../dnd/draggable-task'
+import { TaskDot } from '../task-dot'
+import { eventBadgeVariants } from '../variants'
 
 interface IProps extends Omit<
   VariantProps<typeof eventBadgeVariants>,
@@ -82,16 +82,7 @@ export function MonthTaskBadge({
       >
         <div className='flex items-center gap-1.5 truncate'>
           {!['middle', 'last'].includes(position) &&
-            ['mixed', 'dot'].includes(badgeVariant) && (
-              <svg
-                width='8'
-                height='8'
-                viewBox='0 0 8 8'
-                className='task-dot shrink-0'
-              >
-                <circle cx='4' cy='4' r='4' />
-              </svg>
-            )}
+            ['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
 
           {renderBadgeText && (
             <p className='flex-1 truncate font-semibold'>

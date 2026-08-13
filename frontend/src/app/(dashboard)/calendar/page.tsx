@@ -1,5 +1,5 @@
-import { CalendarMonthPage } from '@/views/calendar/ui/calendar-month-page'
 import { fetchCalendarTasks } from '@/views/calendar/lib/fetch-calendar-tasks.server'
+import { CalendarMonthPage } from '@/views/calendar/ui/calendar-month-page'
 
 interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>

@@ -1,11 +1,13 @@
-import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { getMonthCellEvents } from '../../lib/helpers'
-
+import {
+  type TCalendarView,
+  type TSetCalendarParams,
+} from '../../model/calendar-types'
 import { type ICalendarCell } from '../../model/types'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { MonthTaskBadge } from './month-task-badge'
@@ -21,8 +23,14 @@ interface IProps {
 
 const MAX_VISIBLE_EVENTS = 3
 
-export function DayCell({ cell, tasks, eventPositions, selectedDate: _selectedDate, setParams }: IProps) {
-    const setView = (v: TCalendarView) => setParams({ view: v })
+export function DayCell({
+  cell,
+  tasks,
+  eventPositions,
+  selectedDate: _selectedDate,
+  setParams,
+}: IProps) {
+  const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const { day, currentMonth, date } = cell

@@ -12,7 +12,12 @@ export { CALENDAR_VIEWS, type TCalendarView } from './model/calendar-types'
 export { calendarParsers } from './model/calendar-search-params.shared'
 export { useCalendarSearchParams } from './model/calendar-search-params'
 export { useMonthLayout, useTimelineLayout } from './model/use-calendar-layouts'
-export { type ICalendarCell, type TBadgeVariant, type TEventColor, type IUser } from './model/types'
+export {
+  type ICalendarCell,
+  type TBadgeVariant,
+  type TEventColor,
+  type IUser,
+} from './model/types'
 
 // Lib (Mappers)
 export { getTaskColor } from './lib/mappers'

@@ -1,8 +1,7 @@
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
 import { type Task } from '@/entities/task'
-
+import { type TSetCalendarParams } from '../../model/calendar-types'
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {
@@ -12,7 +11,6 @@ interface IProps {
 }
 
 export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {
-    
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)
     return Array.from({ length: 12 }, (_, i) => addMonths(yearStart, i))
@@ -22,10 +20,13 @@ export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {
     <div className='p-4'>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {months.map((month) => (
-          <YearViewMonth key={month.toString()}
+          <YearViewMonth
+            key={month.toString()}
             month={month}
             tasks={tasks}
-           selectedDate={selectedDate} setParams={setParams} />
+            selectedDate={selectedDate}
+            setParams={setParams}
+          />
         ))}
       </div>
     </div>
