@@ -1,10 +1,6 @@
-import { useMemo } from 'react'
 import { type Task } from '@/entities/task'
-import {
-  calculateMonthEventPositions,
-  getCalendarCells,
-} from '../../lib/helpers'
 import { useCalendar } from '../../model/calendar-context'
+import { useMonthLayout } from '../../model/use-calendar-layouts'
 import { DayCell } from './day-cell'
 
 interface IProps {
@@ -14,13 +10,12 @@ interface IProps {
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export function CalendarMonthView({ singleDayTasks }: IProps) {
+  // Temporary: we will remove useCalendar entirely in Phase 3
   const { selectedDate } = useCalendar()
 
-  const cells = useMemo(() => getCalendarCells(selectedDate), [selectedDate])
-
-  const eventPositions = useMemo(
-    () => calculateMonthEventPositions(singleDayTasks, selectedDate),
-    [singleDayTasks, selectedDate]
+  const { cells, eventPositions } = useMonthLayout(
+    singleDayTasks,
+    selectedDate
   )
 
   return (

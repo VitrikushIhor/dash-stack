@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
-import { startOfWeek, format, parseISO, isSameDay } from 'date-fns'
+
+import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { getWeekDays } from '../../lib/helpers'
+import { type Task } from '@/entities/task'
 import { useCalendar } from '../../model/calendar-context'
+import { useTimelineLayout } from '../../model/use-calendar-layouts'
 import { TaskBlock } from './task-block'
 
 interface IProps {
@@ -11,26 +11,13 @@ interface IProps {
 }
 
 export function CalendarWeekView({ singleDayTasks }: IProps) {
+  // Temporary: we will remove useCalendar entirely in Phase 3
   const { selectedDate } = useCalendar()
 
-  const weekStart = useMemo(() => startOfWeek(selectedDate), [selectedDate])
-  const weekDays = useMemo(() => getWeekDays(weekStart), [weekStart])
-
-  const eventsByDay = useMemo(() => {
-    return weekDays.map((day) => {
-      return singleDayTasks
-        .filter((task) => {
-          const anchor = getTaskCalendarAnchor(task)
-          return anchor && isSameDay(parseISO(anchor), day)
-        })
-        .sort((a, b) => {
-          const anchorA = getTaskCalendarAnchor(a)
-          const anchorB = getTaskCalendarAnchor(b)
-          if (!anchorA || !anchorB) return 0
-          return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-        })
-    })
-  }, [singleDayTasks, weekDays])
+  const { weekDays, eventsByDay } = useTimelineLayout(
+    singleDayTasks,
+    selectedDate
+  )
 
   return (
     <>
