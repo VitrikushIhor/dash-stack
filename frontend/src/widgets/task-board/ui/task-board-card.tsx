@@ -27,13 +27,6 @@ export const TaskBoardCard = memo(
       if (onTaskClick) onTaskClick(task.id)
     }
 
-    const handleCardKeyDown = (event: React.KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
-        handleCardClick()
-      }
-    }
-
     const handlePointerDown = (event: React.PointerEvent) => {
       const target = event.target as HTMLElement
       if (
@@ -49,15 +42,7 @@ export const TaskBoardCard = memo(
 
     return (
       <KanbanItem value={task.id} asChild {...props}>
-        <div
-          role='button'
-          tabIndex={0}
-          aria-label={`View task: ${task.title}`}
-          onClick={handleCardClick}
-          onKeyDown={handleCardKeyDown}
-          onPointerDown={handlePointerDown}
-          className='outline-none'
-        >
+        <div onPointerDown={handlePointerDown} className='outline-none'>
           <TaskCard
             task={task}
             viewMode={viewMode}

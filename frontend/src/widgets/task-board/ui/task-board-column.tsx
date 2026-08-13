@@ -47,6 +47,8 @@ export const TaskBoardColumn = memo(
       setTaskParams({ 'delete-task': task.id })
     }
 
+    const taskCountText = `${tasks.length} ${isCompleted ? 'completed' : 'open'} ${tasks.length === 1 ? 'task' : 'tasks'}`
+
     if (viewMode === TaskViewMode.List) {
       return (
         <KanbanColumn
@@ -77,9 +79,7 @@ export const TaskBoardColumn = memo(
                       </h2>
                     </div>
                     <span className='text-muted-foreground text-sm'>
-                      {isCompleted
-                        ? `${tasks.length} completed ${tasks.length === 1 ? 'task' : 'tasks'}`
-                        : `${tasks.length} open ${tasks.length === 1 ? 'task' : 'tasks'}`}
+                      {taskCountText}
                     </span>
                   </div>
                 </AccordionTrigger>
@@ -146,9 +146,7 @@ export const TaskBoardColumn = memo(
                 {STATUS_CONFIG[value as TaskStatusEnum].label}
               </h2>
               <span className='text-muted-foreground text-sm'>
-                {isCompleted
-                  ? `${tasks.length} completed ${tasks.length === 1 ? 'task' : 'tasks'}`
-                  : `${tasks.length} open ${tasks.length === 1 ? 'task' : 'tasks'}`}
+                {taskCountText}
               </span>
             </div>
             <KanbanColumnHandle asChild>

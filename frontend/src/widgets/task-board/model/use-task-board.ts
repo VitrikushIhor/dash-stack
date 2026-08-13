@@ -61,7 +61,7 @@ export function useTaskBoard(tasks: Task[]) {
       const prevTasks = startColumns[columnId] ?? []
 
       for (const newTask of newTasks) {
-        if (!prevTasks.find((t) => t.id === newTask.id)) {
+        if (!prevTasks.some((t) => t.id === newTask.id)) {
           movedTask = newTask
           targetColumnId = columnId as TaskStatusEnum
           break

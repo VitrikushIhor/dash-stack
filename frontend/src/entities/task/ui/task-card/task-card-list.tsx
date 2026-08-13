@@ -5,14 +5,14 @@ import { Card, CardContent } from '@/shared/ui/core/card'
 import { Checkbox } from '@/shared/ui/core/checkbox'
 import { LabelBadge } from '@/entities/label'
 import { STATUS_CONFIG } from '../../model/task-status-config'
-import { type Task, type TaskViewMode } from '../../model/types'
+import { type Task } from '../../model/types'
 import { TaskCardActions } from '../task-card-actions'
 import { TaskDate, TaskProgress, TaskAttachments } from './task-card-elements'
 import { useTaskCardData } from './use-task-card-data'
 
 export interface TaskCardProps {
   task: Task
-  viewMode?: TaskViewMode
+
   onEdit?: (task: Task) => void
   onDelete?: (task: Task) => void
   onTaskClick?: () => void
@@ -36,7 +36,12 @@ export const TaskCardList = memo(
         <CardContent>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 flex-1 items-center gap-3'>
-              <div className='shrink-0' onClick={(e) => e.stopPropagation()}>
+              <div
+                role='presentation'
+                className='shrink-0'
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
                 <Checkbox checked={data.isCompleted} />
               </div>
 
