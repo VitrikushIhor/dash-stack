@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useTransition } from 'react'
 import { formatDate } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Badge } from '@/shared/ui/core/badge'
@@ -10,8 +10,8 @@ import {
 } from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
-import { useCalendar } from '../../model/calendar-context'
-import { type TCalendarView } from '../../model/types'
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
+import { type TCalendarView } from '../../model/calendar-types'
 
 interface IProps {
   view: TCalendarView
@@ -19,7 +19,10 @@ interface IProps {
 }
 
 export function DateNavigator({ view, tasks }: IProps) {
-  const { selectedDate, setSelectedDate } = useCalendar()
+  const [{ date }, setParams] = useCalendarSearchParams()
+  const [isPending, startTransition] = useTransition()
+  
+  const selectedDate = date || new Date()
 
   const month = formatDate(selectedDate, 'MMMM')
   const year = selectedDate.getFullYear()
@@ -29,10 +32,17 @@ export function DateNavigator({ view, tasks }: IProps) {
     [tasks, selectedDate, view]
   )
 
-  const handlePrevious = () =>
-    setSelectedDate(navigateDate(selectedDate, view, 'previous'))
-  const handleNext = () =>
-    setSelectedDate(navigateDate(selectedDate, view, 'next'))
+  const handlePrevious = () => {
+    startTransition(() => {
+      setParams({ date: navigateDate(selectedDate, view, 'previous') })
+    })
+  }
+
+  const handleNext = () => {
+    startTransition(() => {
+      setParams({ date: navigateDate(selectedDate, view, 'next') })
+    })
+  }
 
   return (
     <div className='space-y-0.5'>

@@ -1,1 +1,5 @@
-export { CalendarPage } from './ui/calendar-page'
+export { CalendarMonthPage } from './ui/calendar-month-page'
+export { CalendarWeekPage } from './ui/calendar-week-page'
+export { CalendarDayPage } from './ui/calendar-day-page'
+export { CalendarYearPage } from './ui/calendar-year-page'
+export { CalendarAgendaPage } from './ui/calendar-agenda-page'

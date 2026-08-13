@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { CalendarMonthPage } from '@/views/calendar/ui/calendar-month-page'
+import { CalendarYearPage } from '@/views/calendar/ui/calendar-year-page'
 import { fetchCalendarTasks } from '@/views/calendar/lib/fetch-calendar-tasks.server'
 import { Skeleton } from '@/shared/ui/core/skeleton'
 
@@ -9,8 +9,8 @@ interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function CalendarMonthRoute({ searchParams }: Props) {
-  const { tasks, date } = await fetchCalendarTasks('month', searchParams)
+export default async function CalendarYearRoute({ searchParams }: Props) {
+  const { tasks, date } = await fetchCalendarTasks('year', searchParams)
 
   return (
     <Suspense
@@ -21,7 +21,7 @@ export default async function CalendarMonthRoute({ searchParams }: Props) {
         </div>
       }
     >
-      <CalendarMonthPage tasks={tasks} initialDate={date} />
+      <CalendarYearPage tasks={tasks} initialDate={date} />
     </Suspense>
   )
 }
