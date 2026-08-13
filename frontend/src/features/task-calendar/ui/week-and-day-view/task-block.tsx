@@ -23,9 +23,7 @@ export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)
-  if (!anchor) {
-    throw new Error(`Task ${task.id} has no calendar anchor`)
-  }
+  if (!anchor) return null
   const start = parseISO(anchor)
   const end = start
   const durationInMinutes = differenceInMinutes(end, start)
