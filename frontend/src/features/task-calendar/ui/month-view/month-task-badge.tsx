@@ -18,6 +18,7 @@ interface IProps extends Omit<
   eventTotalDays?: number
   className?: string
   position?: 'first' | 'middle' | 'last' | 'none'
+  badgeVariant?: 'mixed' | 'dot' | 'solid'
 }
 
 export function MonthTaskBadge({
@@ -27,8 +28,8 @@ export function MonthTaskBadge({
   eventTotalDays,
   className,
   position: propPosition,
+  badgeVariant = 'mixed',
 }: IProps) {
-  const badgeVariant = 'mixed' as 'mixed' | 'dot' | 'solid'
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)
@@ -39,21 +40,14 @@ export function MonthTaskBadge({
 
   if (cellDate < itemStart || cellDate > itemEnd) return null
 
-  let position: 'first' | 'middle' | 'last' | 'none' | undefined
-
-  if (propPosition) {
-    position = propPosition
-  } else if (eventCurrentDay && eventTotalDays) {
-    position = 'none'
-  } else if (isSameDay(itemStart, itemEnd)) {
-    position = 'none'
-  } else if (isSameDay(cellDate, itemStart)) {
-    position = 'first'
-  } else if (isSameDay(cellDate, itemEnd)) {
-    position = 'last'
-  } else {
-    position = 'middle'
-  }
+  const position = (() => {
+    if (propPosition) return propPosition
+    if (eventCurrentDay && eventTotalDays) return 'none'
+    if (isSameDay(itemStart, itemEnd)) return 'none'
+    if (isSameDay(cellDate, itemStart)) return 'first'
+    if (isSameDay(cellDate, itemEnd)) return 'last'
+    return 'middle'
+  })()
 
   const renderBadgeText = ['first', 'none'].includes(position)
 

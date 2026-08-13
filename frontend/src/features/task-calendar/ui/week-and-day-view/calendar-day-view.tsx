@@ -1,9 +1,8 @@
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-
+import { type TSetCalendarParams } from '../../model/calendar-types'
 import { TaskBlock } from './task-block'
 
 interface IProps {
@@ -12,8 +11,11 @@ interface IProps {
   setParams: TSetCalendarParams
 }
 
-export function CalendarDayView({ singleDayTasks, selectedDate, setParams: _setParams }: IProps) {
-    
+export function CalendarDayView({
+  singleDayTasks,
+  selectedDate,
+  setParams: _setParams,
+}: IProps) {
   const dayEvents = singleDayTasks
     .filter((task) => {
       const anchor = getTaskCalendarAnchor(task)
@@ -47,7 +49,7 @@ export function CalendarDayView({ singleDayTasks, selectedDate, setParams: _setP
           </div>
         </div>
 
-        <ScrollArea className='h-[800px]' type='always'>
+        <ScrollArea className='h-200' type='always'>
           <div className='p-4'>
             {dayEvents.length === 0 ? (
               <div className='border-muted/50 bg-muted/10 flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20 text-center'>
@@ -57,7 +59,7 @@ export function CalendarDayView({ singleDayTasks, selectedDate, setParams: _setP
                 <h3 className='text-foreground text-base font-semibold'>
                   No tasks for today
                 </h3>
-                <p className='text-muted-foreground mt-1 max-w-[280px] text-sm'>
+                <p className='text-muted-foreground mt-1 max-w-70 text-sm'>
                   Enjoy your free day! Or create a new task by clicking on the
                   add button.
                 </p>
