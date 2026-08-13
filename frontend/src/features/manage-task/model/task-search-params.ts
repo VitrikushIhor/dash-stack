@@ -1,9 +1,7 @@
-import {
-  parseAsBoolean,
-  parseAsString,
-  createSerializer,
-  useQueryStates,
-} from 'nuqs'
+'use client'
+
+import { useQueryStates } from 'nuqs'
+import { parseAsBoolean, parseAsString, createSerializer } from 'nuqs/server'
 
 export const taskSearchParams = {
   'create-task': parseAsBoolean.withDefault(false),

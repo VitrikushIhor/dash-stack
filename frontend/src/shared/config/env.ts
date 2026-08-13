@@ -8,6 +8,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
   NEXT_PUBLIC_AUTH0_DOMAIN: z.string().optional(),
   NEXT_PUBLIC_AUTH0_CLIENT_ID: z.string().optional(),
+  API_URL: z.string().url().optional(),
+  COOKIE_SECURE: z.string().optional(),
 })
 
 const parsedEnv = envSchema.safeParse(process.env)

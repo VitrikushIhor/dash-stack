@@ -1,18 +1,12 @@
-'use client'
+import { TaskKanbanPageView } from '@/views/task'
+import { fetchTaskViewData } from '@/views/task/lib/fetch-task-view-data.server'
 
-import { Suspense } from 'react'
-import { TaskPage } from '@/views/task'
+interface PageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
 
-export const dynamic = 'force-dynamic'
+export default async function TaskKanbanPage({ searchParams }: PageProps) {
+  const data = await fetchTaskViewData(searchParams)
 
-export default function TaskRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6'>Loading tasks...</div>
-      }
-    >
-      <TaskPage />
-    </Suspense>
-  )
+  return <TaskKanbanPageView tasks={data.tasks} />
 }

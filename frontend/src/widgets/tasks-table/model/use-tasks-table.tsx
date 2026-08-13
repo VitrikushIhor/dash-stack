@@ -17,9 +17,9 @@ import {
   type OnChangeFn,
   type ColumnDef,
 } from '@tanstack/react-table'
-import { useTasksTableSearchParams } from '@/shared/lib'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
 import { type Task } from '@/entities/task'
+import { useTasksTableSearchParams } from '@/features/task-filters/model/use-search-params'
 import {
   mapSearchParamsToColumnFilters,
   mapColumnFiltersToSearchParams,

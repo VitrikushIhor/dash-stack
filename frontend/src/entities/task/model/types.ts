@@ -84,3 +84,11 @@ export interface UpdateTaskDto extends Partial<
   startDate?: string | null
   dueDate?: string | null
 }
+
+export const TaskViewMode = {
+  Kanban: 'kanban',
+  List: 'list',
+  Table: 'table',
+} as const
+
+export type TaskViewMode = (typeof TaskViewMode)[keyof typeof TaskViewMode]

@@ -1,35 +1,36 @@
 'use client'
 
+import { Loader2 } from 'lucide-react'
 import { type Membership } from '@/shared/model'
 import { type Label } from '@/entities/label'
-import { type Task } from '@/entities/task'
+import { useActiveOrganization } from '@/entities/organization'
+import { useTaskQuery } from '@/entities/task'
 import { useTaskSearchParams } from '../model/task-search-params'
 import { ManageTaskMode } from '../model/types'
 import { ManageTaskForm } from './manage-task-form'
 import { TaskModalView } from './task-modal-view'
 
 interface ManageTaskModalProps {
-  tasks: Task[]
   labels: Label[]
   members: Membership[]
 }
 
-export const ManageTaskModal = ({
-  tasks,
-  labels,
-  members,
-}: ManageTaskModalProps) => {
+export const ManageTaskModal = ({ labels, members }: ManageTaskModalProps) => {
   const [{ 'create-task': create, 'update-task': updateId }, setParams] =
     useTaskSearchParams()
 
-  const isCreate = create === true
-  const isUpdate = !!updateId
-  const isOpen = isCreate || isUpdate
+  const { activeOrg } = useActiveOrganization()
+  const activeOrgId = activeOrg?.id || ''
 
-  const selectedTaskId = updateId
-  const selectedTask = selectedTaskId
-    ? (tasks.find((t) => t.id === selectedTaskId) ?? null)
-    : null
+  const isCreate = create === true
+  const isOpen = !!updateId || isCreate
+
+  const { data: fetchedTask, isLoading } = useTaskQuery(
+    activeOrgId,
+    updateId || ''
+  )
+
+  const selectedTask = updateId ? (fetchedTask ?? null) : null
 
   const close = () => {
     setParams({
@@ -44,14 +45,20 @@ export const ManageTaskModal = ({
       open={isOpen}
       onOpenChange={(open) => !open && close()}
     >
-      <ManageTaskForm
-        key={`${isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}-${selectedTask?.id || 'new'}-${isOpen}`}
-        mode={isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}
-        selectedTask={selectedTask}
-        close={close}
-        labels={labels}
-        members={members}
-      />
+      {isLoading && !!updateId ? (
+        <div className='flex items-center justify-center p-8'>
+          <Loader2 className='text-primary h-8 w-8 animate-spin' />
+        </div>
+      ) : (
+        <ManageTaskForm
+          key={`${isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}-${selectedTask?.id || 'new'}-${isOpen}`}
+          mode={isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}
+          selectedTask={selectedTask}
+          close={close}
+          labels={labels}
+          members={members}
+        />
+      )}
     </TaskModalView>
   )
 }
