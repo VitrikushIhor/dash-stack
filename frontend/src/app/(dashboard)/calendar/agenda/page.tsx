@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default async function CalendarAgendaRoute({ searchParams }: Props) {
-  const { tasks, date } = await fetchCalendarTasks('agenda', searchParams)
+  const { tasks } = await fetchCalendarTasks('agenda', searchParams)
 
   return <CalendarAgendaPage tasks={tasks} />
 }

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 
 import { format } from 'date-fns'
@@ -13,7 +14,7 @@ interface IProps {
 
 export function CalendarWeekView({ singleDayTasks }: IProps) {
 const [{ date }] = useCalendarSearchParams()
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const { weekDays, eventsByDay } = useTimelineLayout(
     singleDayTasks,

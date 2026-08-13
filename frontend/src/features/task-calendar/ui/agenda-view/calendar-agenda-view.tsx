@@ -13,7 +13,7 @@ interface IProps {
 
 export function CalendarAgendaView({ singleDayTasks }: IProps) {
   const [{ date }] = useCalendarSearchParams()
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const eventsByDay = useMemo(() => {
     const allDates = new Map<string, { date: Date; tasks: Task[] }>()

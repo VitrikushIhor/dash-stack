@@ -1,5 +1,5 @@
 import { parseAsStringEnum, parseAsIsoDate, useQueryStates } from 'nuqs'
-import { CALENDAR_VIEWS, type TCalendarView } from './calendar-types'
+import { CALENDAR_VIEWS } from './calendar-types'
 
 export const calendarParsers = {
   view: parseAsStringEnum(CALENDAR_VIEWS.slice()).withDefault('month'),

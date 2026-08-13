@@ -11,7 +11,7 @@ interface IProps {
 
 export function CalendarYearView({ allTasks }: IProps) {
   const [{ date }] = useCalendarSearchParams()
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)

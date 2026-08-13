@@ -22,7 +22,7 @@ export function DateNavigator({ view, tasks }: IProps) {
   const [{ date }, setParams] = useCalendarSearchParams()
   const [, startTransition] = useTransition()
   
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const month = formatDate(selectedDate, 'MMMM')
   const year = selectedDate.getFullYear()

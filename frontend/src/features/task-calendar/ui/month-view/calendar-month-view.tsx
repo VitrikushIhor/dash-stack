@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { type Task } from '@/entities/task'
 
@@ -12,7 +13,7 @@ const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export function CalendarMonthView({ singleDayTasks }: IProps) {
 const [{ date }] = useCalendarSearchParams()
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const { cells, eventPositions } = useMonthLayout(
     singleDayTasks,

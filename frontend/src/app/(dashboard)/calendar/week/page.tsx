@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default async function CalendarWeekRoute({ searchParams }: Props) {
-  const { tasks, date } = await fetchCalendarTasks('week', searchParams)
+  const { tasks } = await fetchCalendarTasks('week', searchParams)
 
   return <CalendarWeekPage tasks={tasks} />
 }

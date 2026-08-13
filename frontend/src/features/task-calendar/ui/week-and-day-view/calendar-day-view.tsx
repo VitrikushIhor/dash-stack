@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
@@ -12,7 +13,7 @@ interface IProps {
 
 export function CalendarDayView({ singleDayTasks }: IProps) {
   const [{ date }] = useCalendarSearchParams()
-  const selectedDate = date || new Date()
+  const selectedDate = useMemo(() => date || new Date(), [date])
 
   const dayEvents = singleDayTasks
     .filter((task) => {
