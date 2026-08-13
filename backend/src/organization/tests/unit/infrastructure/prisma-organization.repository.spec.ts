@@ -1,5 +1,4 @@
 import { PrismaOrganizationRepository } from '../../../infrastructure/persistence/prisma-organization.repository';
-import { PrismaService } from 'nestjs-prisma';
 
 describe('PrismaOrganizationRepository', () => {
   let repository: PrismaOrganizationRepository;

@@ -37,6 +37,7 @@ describe('UpdateTaskUseCase', () => {
     taskRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      findAllUnpaginated: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),

@@ -1,10 +1,9 @@
 import { format, parseISO } from 'date-fns'
-import { type VariantProps } from 'class-variance-authority'
 import { Clock, Text, User } from 'lucide-react'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { getTaskColor, getTaskUser } from '@/features/task-calendar/lib/mappers'
 import { type TBadgeVariant } from '../../model/calendar-types'
+import { type TBadgeColor } from '../../model/types'
 import { TaskDot } from '../task-dot'
 import { agendaEventCardVariants } from '../variants'
 
@@ -13,29 +12,29 @@ interface IProps {
   eventCurrentDay?: number
   eventTotalDays?: number
   badgeVariant?: TBadgeVariant
+  onTaskClick?: (taskId: string) => void
 }
 
 export function AgendaTaskCard({
   task,
   eventCurrentDay,
   eventTotalDays,
-  badgeVariant = 'mixed',
+  badgeVariant = 'dot',
+  onTaskClick,
 }: IProps) {
-  const [, setTaskParams] = useTaskSearchParams()
-
   const anchor = getTaskCalendarAnchor(task)
   if (!anchor) return null
   const startDate = parseISO(anchor)
   const endDate = startDate
 
-  const color = (
-    badgeVariant === 'dot' ? `${getTaskColor(task)}-dot` : getTaskColor(task)
-  ) as VariantProps<typeof agendaEventCardVariants>['color']
+  const baseColor = getTaskColor(task)
+  const color: TBadgeColor =
+    badgeVariant === 'dot' ? `${baseColor}-dot` : baseColor
 
   const agendaEventCardClasses = agendaEventCardVariants({ color })
 
   const handleClick = () => {
-    setTaskParams({ 'update-task': task.id })
+    onTaskClick?.(task.id)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

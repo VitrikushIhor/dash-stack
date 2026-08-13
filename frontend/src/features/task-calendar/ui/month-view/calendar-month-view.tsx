@@ -1,12 +1,11 @@
 import { type Task } from '@/entities/task'
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { useMonthLayout } from '../../model/use-calendar-layouts'
 import { DayCell } from './day-cell'
 
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: TSetCalendarParams
+  onTaskClick?: (taskId: string) => void
 }
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -14,7 +13,7 @@ const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export function CalendarMonthView({
   singleDayTasks,
   selectedDate,
-  setParams,
+  onTaskClick,
 }: IProps) {
   const { cells, eventPositions } = useMonthLayout(singleDayTasks, selectedDate)
 
@@ -38,7 +37,7 @@ export function CalendarMonthView({
             tasks={singleDayTasks}
             eventPositions={eventPositions}
             selectedDate={selectedDate}
-            setParams={setParams}
+            onTaskClick={onTaskClick}
           />
         ))}
       </div>

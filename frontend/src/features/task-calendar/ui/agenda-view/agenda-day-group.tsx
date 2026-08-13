@@ -5,9 +5,10 @@ import { AgendaTaskCard } from './agenda-task-card'
 interface IProps {
   date: Date
   tasks: Task[]
+  onTaskClick?: (taskId: string) => void
 }
 
-export function AgendaDayGroup({ date, tasks }: IProps) {
+export function AgendaDayGroup({ date, tasks, onTaskClick }: IProps) {
   const sortedEvents = [...tasks].sort((a, b) => {
     const anchorA = getTaskCalendarAnchor(a)
     const anchorB = getTaskCalendarAnchor(b)
@@ -26,7 +27,11 @@ export function AgendaDayGroup({ date, tasks }: IProps) {
       <div className='space-y-2'>
         {sortedEvents.length > 0 &&
           sortedEvents.map((task) => (
-            <AgendaTaskCard key={task.id} task={task} />
+            <AgendaTaskCard
+              key={task.id}
+              task={task}
+              onTaskClick={onTaskClick}
+            />
           ))}
 
         {sortedEvents.length === 0 && (

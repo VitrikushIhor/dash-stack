@@ -1,16 +1,19 @@
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
 import { type Task } from '@/entities/task'
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {
   tasks: Task[]
   selectedDate: Date
-  setParams: TSetCalendarParams
+  onTaskClick?: (taskId: string) => void
 }
 
-export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {
+export function CalendarYearView({
+  tasks,
+  selectedDate,
+  onTaskClick: _onTaskClick,
+}: IProps) {
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)
     return Array.from({ length: 12 }, (_, i) => addMonths(yearStart, i))
@@ -25,7 +28,6 @@ export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {
             month={month}
             tasks={tasks}
             selectedDate={selectedDate}
-            setParams={setParams}
           />
         ))}
       </div>

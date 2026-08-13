@@ -2,19 +2,18 @@ import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { TaskBlock } from './task-block'
 
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: TSetCalendarParams
+  onTaskClick?: (taskId: string) => void
 }
 
 export function CalendarDayView({
   singleDayTasks,
   selectedDate,
-  setParams: _setParams,
+  onTaskClick,
 }: IProps) {
   const dayEvents = singleDayTasks
     .filter((task) => {
@@ -67,7 +66,11 @@ export function CalendarDayView({
             ) : (
               <div className='space-y-3'>
                 {dayEvents.map((task) => (
-                  <TaskBlock task={task} />
+                  <TaskBlock
+                    key={task.id}
+                    task={task}
+                    onTaskClick={onTaskClick}
+                  />
                 ))}
               </div>
             )}

@@ -1,26 +1,33 @@
-import type { HTMLAttributes } from 'react'
 import { format, differenceInMinutes, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { type TBadgeVariant } from '../../model/calendar-types'
+import { type TBadgeColor } from '../../model/types'
 import { DraggableTask } from '../dnd/draggable-task'
 import { TaskDot } from '../task-dot'
 import { calendarWeekEventCardVariants } from '../variants'
 
-interface IProps
-  extends
-    HTMLAttributes<HTMLDivElement>,
-    Omit<VariantProps<typeof calendarWeekEventCardVariants>, 'color'> {
+const MIN_FLEX_COLUMN_DURATION = 35
+const MIN_TIME_LABEL_DURATION = 25
+
+export interface TaskBlockProps extends Omit<
+  VariantProps<typeof calendarWeekEventCardVariants>,
+  'color'
+> {
   task: Task
   badgeVariant?: TBadgeVariant
+  className?: string
+  onTaskClick?: (taskId: string) => void
 }
 
-export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
-  const [, setTaskParams] = useTaskSearchParams()
-
+export function TaskBlock({
+  task,
+  className,
+  badgeVariant = 'mixed',
+  onTaskClick,
+}: TaskBlockProps) {
   const anchor = getTaskCalendarAnchor(task)
   if (!anchor) return null
   const start = parseISO(anchor)
@@ -28,17 +35,17 @@ export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
   const durationInMinutes = differenceInMinutes(end, start)
   const heightInPixels = Math.max(32, (durationInMinutes / 60) * 96 - 8)
 
-  const color = (
-    badgeVariant === 'dot' ? `${getTaskColor(task)}-dot` : getTaskColor(task)
-  ) as VariantProps<typeof calendarWeekEventCardVariants>['color']
+  const baseColor = getTaskColor(task)
+  const color: TBadgeColor =
+    badgeVariant === 'dot' ? `${baseColor}-dot` : baseColor
 
   const calendarWeekEventCardClasses = cn(
     calendarWeekEventCardVariants({ color, className }),
-    durationInMinutes < 35 && 'py-0 justify-center'
+    durationInMinutes < MIN_FLEX_COLUMN_DURATION && 'py-0 justify-center'
   )
 
   const handleClick = () => {
-    setTaskParams({ 'update-task': task.id })
+    onTaskClick?.(task.id)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -59,12 +66,12 @@ export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
         onKeyDown={handleKeyDown}
       >
         <div className='flex items-center gap-1.5 truncate'>
-          {['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
+          {(badgeVariant === 'mixed' || badgeVariant === 'dot') && <TaskDot />}
 
           <p className='truncate font-semibold'>{task.title}</p>
         </div>
 
-        {durationInMinutes > 25 && (
+        {durationInMinutes > MIN_TIME_LABEL_DURATION && (
           <p>
             {format(start, 'h:mm a')} - {format(end, 'h:mm a')}
           </p>

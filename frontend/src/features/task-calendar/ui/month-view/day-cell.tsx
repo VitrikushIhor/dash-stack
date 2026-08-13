@@ -1,13 +1,10 @@
 import { useMemo } from 'react'
-import { isToday, startOfDay } from 'date-fns'
+import { useRouter } from 'next/navigation'
+import { isToday, startOfDay, format } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { getMonthCellEvents } from '../../lib/helpers'
-import {
-  type TCalendarView,
-  type TSetCalendarParams,
-} from '../../model/calendar-types'
 import { type ICalendarCell } from '../../model/types'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { MonthTaskBadge } from './month-task-badge'
@@ -15,10 +12,10 @@ import { TaskBullet } from './task-bullet'
 
 interface IProps {
   selectedDate: Date
-  setParams: TSetCalendarParams
   cell: ICalendarCell
   tasks: Task[]
   eventPositions: Record<string, number>
+  onTaskClick?: (taskId: string) => void
 }
 
 const MAX_VISIBLE_EVENTS = 3
@@ -28,10 +25,9 @@ export function DayCell({
   tasks,
   eventPositions,
   selectedDate: _selectedDate,
-  setParams,
+  onTaskClick,
 }: IProps) {
-  const setView = (v: TCalendarView) => setParams({ view: v })
-  const setSelectedDate = (d: Date) => setParams({ date: d })
+  const router = useRouter()
 
   const { day, currentMonth, date } = cell
 
@@ -42,8 +38,7 @@ export function DayCell({
   const isSunday = date.getDay() === 0
 
   const handleClick = () => {
-    setSelectedDate(date)
-    setView('day')
+    router.push(`/calendar/day?date=${format(date, 'yyyy-MM-dd')}`)
   }
 
   return (
@@ -90,6 +85,7 @@ export function DayCell({
                       className='hidden lg:flex'
                       task={task}
                       cellDate={startOfDay(date)}
+                      onTaskClick={onTaskClick}
                     />
                   </>
                 )}

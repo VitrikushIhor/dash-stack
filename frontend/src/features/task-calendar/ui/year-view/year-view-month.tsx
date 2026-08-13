@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   format,
   isSameDay,
@@ -8,27 +9,16 @@ import {
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
-import {
-  type TCalendarView,
-  type TSetCalendarParams,
-} from '../../model/calendar-types'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
   selectedDate: Date
-  setParams: TSetCalendarParams
   month: Date
   tasks: Task[]
 }
 
-export function YearViewMonth({
-  month,
-  tasks,
-  selectedDate,
-  setParams,
-}: IProps) {
-  const setView = (v: TCalendarView) => setParams({ view: v })
-  const setSelectedDate = (d: Date) => setParams({ date: d })
+export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
+  const router = useRouter()
 
   const monthName = format(month, 'MMMM')
 
@@ -45,8 +35,8 @@ export function YearViewMonth({
   const weekDays = SHORT_WEEK_DAYS
 
   const handleClick = () => {
-    setSelectedDate(new Date(month.getFullYear(), month.getMonth(), 1))
-    setView('month')
+    const firstDay = new Date(month.getFullYear(), month.getMonth(), 1)
+    router.push(`/calendar?date=${format(firstDay, 'yyyy-MM-dd')}`)
   }
 
   return (
@@ -89,7 +79,6 @@ export function YearViewMonth({
                 date={date}
                 tasks={dayEvents}
                 selectedDate={selectedDate}
-                setParams={setParams}
               />
             )
           })}

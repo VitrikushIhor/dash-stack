@@ -1,20 +1,19 @@
 import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task } from '@/entities/task'
-import { type TSetCalendarParams } from '../../model/calendar-types'
 import { useTimelineLayout } from '../../model/use-calendar-layouts'
 import { TaskBlock } from './task-block'
 
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: TSetCalendarParams
+  onTaskClick?: (taskId: string) => void
 }
 
 export function CalendarWeekView({
   singleDayTasks,
   selectedDate,
-  setParams: _setParams,
+  onTaskClick,
 }: IProps) {
   const { weekDays, eventsByDay } = useTimelineLayout(
     singleDayTasks,
@@ -62,7 +61,11 @@ export function CalendarWeekView({
                       className='flex min-h-full flex-col gap-2 p-1.5'
                     >
                       {dayEvents.map((task) => (
-                        <TaskBlock key={task.id} task={task} />
+                        <TaskBlock
+                          key={task.id}
+                          task={task}
+                          onTaskClick={onTaskClick}
+                        />
                       ))}
                     </div>
                   )

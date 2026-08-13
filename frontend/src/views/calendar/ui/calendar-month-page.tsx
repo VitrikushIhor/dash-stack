@@ -1,54 +1,11 @@
-'use client'
-
-import { useMemo } from 'react'
-import { toast } from 'sonner'
-import { useAction } from '@/shared/lib/hooks/use-action'
-import { type Task } from '@/entities/task'
-import { updateTaskAction } from '@/features/manage-task/server'
-import {
-  useCalendarSearchParams,
-  CalendarHeader,
-  CalendarMonthView,
-  DndProviderWrapper,
-} from '@/features/task-calendar'
+import { fetchCalendarTasks } from '@/views/calendar/lib/fetch-calendar-tasks.server'
+import { CalendarMonthClient } from './calendar-month-client'
 
 interface Props {
-  tasks: Task[]
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export function CalendarMonthPage({ tasks }: Props) {
-  const [{ date }, setParams] = useCalendarSearchParams()
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
-  const { execute } = useAction(updateTaskAction, {
-    onError: (error: unknown) => {
-      // eslint-disable-next-line no-console
-      console.error('[Calendar DnD Error]', error)
-      toast.error('Failed to update task date.')
-    },
-  })
-
-  const handleTaskUpdate = (id: string, data: Partial<Task>) => {
-    execute({ id, data })
-  }
-
-  return (
-    <DndProviderWrapper tasks={tasks} onTaskUpdate={handleTaskUpdate}>
-      {(optimisticTasks) => (
-        <div className='flex flex-col gap-4'>
-          <CalendarHeader
-            tasks={optimisticTasks}
-            view='month'
-            selectedDate={selectedDate}
-            setParams={setParams}
-          />
-          <CalendarMonthView
-            singleDayTasks={optimisticTasks}
-            selectedDate={selectedDate}
-            setParams={setParams}
-          />
-        </div>
-      )}
-    </DndProviderWrapper>
-  )
+export async function CalendarMonthPage({ searchParams }: Props) {
+  const { tasks } = await fetchCalendarTasks('month', searchParams)
+  return <CalendarMonthClient tasks={tasks} />
 }

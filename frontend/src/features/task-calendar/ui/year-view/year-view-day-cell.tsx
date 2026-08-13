@@ -1,15 +1,11 @@
-import { isToday } from 'date-fns'
+import { useRouter } from 'next/navigation'
+import { isToday, format } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-import {
-  type TCalendarView,
-  type TSetCalendarParams,
-} from '../../model/calendar-types'
 
 interface IProps {
   selectedDate: Date
-  setParams: TSetCalendarParams
   day: number
   date: Date
   tasks: Task[]
@@ -20,17 +16,14 @@ export function YearViewDayCell({
   date,
   tasks,
   selectedDate: _selectedDate,
-  setParams,
 }: IProps) {
-  const setView = (v: TCalendarView) => setParams({ view: v })
-  const setSelectedDate = (d: Date) => setParams({ date: d })
+  const router = useRouter()
 
   const maxIndicators = 3
   const eventCount = tasks.length
 
   const handleClick = () => {
-    setSelectedDate(date)
-    setView('day')
+    router.push(`/calendar/day?date=${format(date, 'yyyy-MM-dd')}`)
   }
 
   return (

@@ -6,6 +6,7 @@ export type TEventColor =
   | 'purple'
   | 'gray'
   | 'orange'
+export type TBadgeColor = TEventColor | `${TEventColor}-dot`
 export type TBadgeVariant = 'dot' | 'colored' | 'mixed'
 
 export interface IUser {

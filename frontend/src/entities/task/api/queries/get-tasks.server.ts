@@ -22,3 +22,20 @@ export const getOrganizationTasks = async (
     return { data: null, meta: null, error: getErrorMessage(error) }
   }
 }
+
+type GetTasksUnpaginatedResponse = {
+  data: Task[] | null
+  error: string | null
+}
+
+export const getTasksUnpaginated = async (
+  orgId: string,
+  filters?: Omit<TaskFilters, 'page' | 'perPage'>
+): Promise<GetTasksUnpaginatedResponse> => {
+  try {
+    const result = await taskServerApi.findAllUnpaginated(orgId, filters)
+    return { data: result, error: null }
+  } catch (error) {
+    return { data: null, error: getErrorMessage(error) }
+  }
+}

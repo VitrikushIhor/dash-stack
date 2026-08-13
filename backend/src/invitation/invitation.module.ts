@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { EmailModule } from '../email/email.module';
-import { EmailService } from '../email/email.service';
 import { InvitationController } from './presentation/controllers/invitation.controller';
 import { InvitationAcceptController } from './presentation/controllers/invitation-accept.controller';
 import { SendInviteUseCase } from './application/use-cases/send-invite.use-case';

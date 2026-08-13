@@ -46,6 +46,26 @@ export function createTaskApi(client: HttpClient) {
       )
     },
 
+    findAllUnpaginated: (
+      orgId: string,
+      filters?: Omit<TaskFilters, 'page' | 'perPage'>
+    ): Promise<Task[]> => {
+      const params: Record<string, string | undefined> = {
+        search: filters?.search,
+        dueDateFrom: filters?.dueDateFrom,
+        dueDateTo: filters?.dueDateTo,
+        startDateFrom: filters?.startDateFrom,
+        startDateTo: filters?.startDateTo,
+        status: filters?.status?.join(','),
+        assigneeIds: filters?.assigneeIds?.join(','),
+        labelNames: filters?.labelNames?.join(','),
+      }
+
+      return client.get<Task[]>(`/organizations/${orgId}/tasks/all`, {
+        params,
+      })
+    },
+
     findById: (orgId: string, id: string): Promise<Task> =>
       client.get<Task>(`/organizations/${orgId}/tasks/${id}`),
 

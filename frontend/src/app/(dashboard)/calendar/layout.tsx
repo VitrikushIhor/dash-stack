@@ -5,7 +5,6 @@ import {
   getOrganizationMembers,
 } from '@/entities/organization/server'
 import { TaskHeaderActions, TaskModals } from '@/features/manage-task'
-import { TaskToolbar } from '@/features/task-filters'
 import { CalendarTabsNav } from '@/widgets/calendar-tabs-nav'
 import { Main } from '@/widgets/layout'
 
@@ -39,10 +38,6 @@ export default async function CalendarLayout({
             <TaskHeaderActions />
           </div>
         </div>
-      </div>
-
-      <div className='mb-4'>
-        <TaskToolbar labels={labels} members={members} />
       </div>
 
       <div className='bg-card rounded-xl border p-4 shadow-sm'>{children}</div>
