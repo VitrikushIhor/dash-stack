@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { type TaskFilters } from '../api/task-api'
-import { useTasksQuery, useTaskQuery } from './queries'
+import { useTaskQuery } from './queries'
 import { TaskStatusEnum, type Task } from './types'
 
 // --- Mocks ---
@@ -52,51 +52,6 @@ describe('Task Query Hooks', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
   }
-
-  describe('useTasksQuery', () => {
-    it('successfully queries all tasks when orgId is provided', async () => {
-      mockFindAll.mockResolvedValue([mockTask])
-
-      const { result } = renderHook(() => useTasksQuery('org-1'), {
-        wrapper: createWrapper(),
-      })
-
-      // Initially loading
-      expect(result.current.isLoading).toBe(true)
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-      expect(result.current.data).toEqual([mockTask])
-      expect(mockFindAll).toHaveBeenCalledTimes(1)
-      expect(mockFindAll).toHaveBeenCalledWith('org-1', undefined)
-    })
-
-    it('does not run query (is disabled) if orgId is empty', () => {
-      const { result } = renderHook(() => useTasksQuery(''), {
-        wrapper: createWrapper(),
-      })
-
-      expect(result.current.isEnabled).toBe(false)
-      expect(result.current.fetchStatus).toBe('idle')
-      expect(mockFindAll).not.toHaveBeenCalled()
-    })
-
-    it('submits filters correctly to the API', async () => {
-      mockFindAll.mockResolvedValue([])
-
-      const filters = {
-        search: 'testing-search',
-        status: [TaskStatusEnum.PLANNED],
-      }
-      const { result } = renderHook(() => useTasksQuery('org-1', filters), {
-        wrapper: createWrapper(),
-      })
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-      expect(mockFindAll).toHaveBeenCalledWith('org-1', filters)
-    })
-  })
 
   describe('useTaskQuery', () => {
     it('successfully queries a single task by ID', async () => {

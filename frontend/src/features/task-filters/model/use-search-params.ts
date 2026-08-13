@@ -4,5 +4,5 @@ import { useQueryStates } from 'nuqs'
 import { tasksTableSearchParams } from './search-params'
 
 export function useTasksTableSearchParams() {
-  return useQueryStates(tasksTableSearchParams)
+  return useQueryStates(tasksTableSearchParams, { shallow: false })
 }

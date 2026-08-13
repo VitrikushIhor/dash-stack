@@ -3,6 +3,7 @@ import { PrismaService } from 'nestjs-prisma';
 import {
   CreateTaskData,
   FindAllTasksFilters,
+  FindAllTasksUnpaginatedFilters,
   TaskRepositoryPort,
   UpdateTaskData,
 } from '../../application/ports/task.repository.port';
@@ -79,63 +80,12 @@ export class PrismaTaskRepository
     organizationId: string,
     filters: FindAllTasksFilters = {},
   ): Promise<PaginatedResult<TaskReadModel>> {
-    const {
-      search,
-      status,
-      assigneeIds,
-      labelNames,
-      dueDateFrom,
-      dueDateTo,
-      startDateFrom,
-      startDateTo,
-      page,
-      perPage,
-    } = filters;
+    const { page, perPage } = filters;
 
     const paginated = await paginate(
       this.prisma.task,
       {
-        where: {
-          organizationId,
-          AND: [
-            search
-              ? {
-                  OR: [
-                    {
-                      title: { contains: search, mode: 'insensitive' as const },
-                    },
-                    {
-                      description: {
-                        contains: search,
-                        mode: 'insensitive' as const,
-                      },
-                    },
-                  ],
-                }
-              : {},
-            status?.length ? { status: { in: status } } : {},
-            assigneeIds?.length
-              ? { assignees: { some: { id: { in: assigneeIds } } } }
-              : {},
-            labelNames?.length ? { label: { name: { in: labelNames } } } : {},
-            dueDateFrom || dueDateTo
-              ? {
-                  dueDate: {
-                    gte: dueDateFrom,
-                    lte: dueDateTo,
-                  },
-                }
-              : {},
-            startDateFrom || startDateTo
-              ? {
-                  startDate: {
-                    gte: startDateFrom,
-                    lte: startDateTo,
-                  },
-                }
-              : {},
-          ],
-        },
+        where: this.buildWhereClause(organizationId, filters),
         include: this.taskInclude,
         orderBy: [
           { createdAt: 'desc' as const },
@@ -151,6 +101,21 @@ export class PrismaTaskRepository
         PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
       ),
     };
+  }
+
+  async findAllUnpaginated(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters = {},
+  ): Promise<TaskReadModel[]> {
+    const tasks = await this.prisma.task.findMany({
+      where: this.buildWhereClause(organizationId, filters),
+      include: this.taskInclude,
+      orderBy: [{ createdAt: 'desc' as const }, { updatedAt: 'desc' as const }],
+    });
+
+    return tasks.map((task) =>
+      PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
+    );
   }
 
   async findById(
@@ -258,5 +223,63 @@ export class PrismaTaskRepository
     });
 
     return count === uniqueIds.length;
+  }
+
+  private buildWhereClause(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters,
+  ) {
+    const {
+      search,
+      status,
+      assigneeIds,
+      labelNames,
+      dueDateFrom,
+      dueDateTo,
+      startDateFrom,
+      startDateTo,
+    } = filters;
+
+    return {
+      organizationId,
+      AND: [
+        search
+          ? {
+              OR: [
+                {
+                  title: { contains: search, mode: 'insensitive' as const },
+                },
+                {
+                  description: {
+                    contains: search,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ],
+            }
+          : {},
+        status?.length ? { status: { in: status } } : {},
+        assigneeIds?.length
+          ? { assignees: { some: { id: { in: assigneeIds } } } }
+          : {},
+        labelNames?.length ? { label: { name: { in: labelNames } } } : {},
+        dueDateFrom || dueDateTo
+          ? {
+              dueDate: {
+                gte: dueDateFrom,
+                lte: dueDateTo,
+              },
+            }
+          : {},
+        startDateFrom || startDateTo
+          ? {
+              startDate: {
+                gte: startDateFrom,
+                lte: startDateTo,
+              },
+            }
+          : {},
+      ],
+    };
   }
 }

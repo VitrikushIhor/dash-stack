@@ -9,7 +9,7 @@ import {
   endOfYear,
   formatISO,
 } from 'date-fns'
-import { type TCalendarView } from '@/features/event-calendar'
+import { type TCalendarView } from '@/features/task-calendar'
 
 export const getVisibleRange = (view: TCalendarView, date: Date) => {
   switch (view) {

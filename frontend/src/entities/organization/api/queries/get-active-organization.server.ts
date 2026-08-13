@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { cookies } from 'next/headers'
 import 'server-only'
 import { COOKIE_CONFIG } from '@/shared/lib/cookie-config'
@@ -13,27 +14,29 @@ type GetActiveOrganizationResponse = {
   error: string | null
 }
 
-export async function getActiveOrganization(): Promise<GetActiveOrganizationResponse> {
-  const { data: memberships, error } = await getUserOrganizations()
+export const getActiveOrganization = cache(
+  async (): Promise<GetActiveOrganizationResponse> => {
+    const { data: memberships, error } = await getUserOrganizations()
 
-  if (error || !memberships || memberships.length === 0) {
-    return { activeOrg: null, memberships: memberships || null, error }
+    if (error || !memberships || memberships.length === 0) {
+      return { activeOrg: null, memberships: memberships || null, error }
+    }
+
+    const cookieStore = await cookies()
+    const cookieOrgId = cookieStore.get(COOKIE_CONFIG.ACTIVE_ORG_ID.name)?.value
+
+    const selectedMembership = memberships.find(
+      (m) => m.organization.id === cookieOrgId
+    )
+
+    const activeOrg = selectedMembership
+      ? selectedMembership.organization
+      : memberships[0].organization
+
+    return {
+      activeOrg,
+      memberships,
+      error: null,
+    }
   }
-
-  const cookieStore = await cookies()
-  const cookieOrgId = cookieStore.get(COOKIE_CONFIG.ACTIVE_ORG_ID.name)?.value
-
-  const selectedMembership = memberships.find(
-    (m) => m.organization.id === cookieOrgId
-  )
-
-  const activeOrg = selectedMembership
-    ? selectedMembership.organization
-    : memberships[0].organization
-
-  return {
-    activeOrg,
-    memberships,
-    error: null,
-  }
-}
+)

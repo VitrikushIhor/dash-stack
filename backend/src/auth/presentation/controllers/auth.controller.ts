@@ -22,8 +22,6 @@ import { OAuthExchangeUseCase } from '../../application/use-cases/commands/oauth
 import { SignupDto } from '../dto/signup.dto';
 import { LoginDto } from '../dto/login.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { LogoutDto } from '../dto/logout.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { OAuthExchangeDto } from '../dto/oauth-exchange.dto';

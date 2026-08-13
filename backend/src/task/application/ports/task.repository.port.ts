@@ -52,12 +52,27 @@ export interface FindAllTasksFilters {
   perPage?: number;
 }
 
+export interface FindAllTasksUnpaginatedFilters {
+  search?: string;
+  status?: TaskStatus[];
+  assigneeIds?: string[];
+  labelNames?: string[];
+  dueDateFrom?: Date;
+  dueDateTo?: Date;
+  startDateFrom?: Date;
+  startDateTo?: Date;
+}
+
 export interface TaskRepositoryPort {
   create(data: CreateTaskData): Promise<TaskReadModel>;
   findAll(
     organizationId: string,
     filters: FindAllTasksFilters,
   ): Promise<PaginatedResult<TaskReadModel>>;
+  findAllUnpaginated(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters,
+  ): Promise<TaskReadModel[]>;
   findById(id: string, organizationId: string): Promise<TaskReadModel | null>;
   update(
     id: string,

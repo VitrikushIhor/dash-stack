@@ -25,8 +25,10 @@ import { BulkUpdateTaskStatusUseCase } from '../application/use-cases/bulk-updat
 import { DeleteManyTasksUseCase } from '../application/use-cases/delete-many-tasks.use-case';
 import { FindTaskByIdUseCase } from '../application/use-cases/find-task-by-id.use-case';
 import { FindAllTasksUseCase } from '../application/use-cases/find-all-tasks.use-case';
+import { FindAllTasksUnpaginatedUseCase } from '../application/use-cases/find-all-tasks-unpaginated.use-case';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { FindAllTasksDto } from './dto/find-all-tasks.dto';
+import { FindAllTasksUnpaginatedDto } from './dto/find-all-tasks-unpaginated.dto';
 import { BulkDeleteTasksDto, BulkUpdateTasksDto } from './dto/bulk-action.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateTaskCommand } from '../application/commands/create-task.command';
@@ -45,6 +47,7 @@ export class TaskController {
     private readonly deleteManyTasksUseCase: DeleteManyTasksUseCase,
     private readonly findTaskByIdUseCase: FindTaskByIdUseCase,
     private readonly findAllTasksUseCase: FindAllTasksUseCase,
+    private readonly findAllTasksUnpaginatedUseCase: FindAllTasksUnpaginatedUseCase,
   ) {}
 
   @Post()
@@ -75,18 +78,19 @@ export class TaskController {
   @RequireOrgRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'List all tasks for an organization (paginated)' })
   findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
-    return this.findAllTasksUseCase.execute(orgId, {
-      search: dto.search,
-      status: dto.status,
-      assigneeIds: dto.assigneeIds,
-      labelNames: dto.labelNames,
-      dueDateFrom: dto.dueDateFrom,
-      dueDateTo: dto.dueDateTo,
-      startDateFrom: dto.startDateFrom,
-      startDateTo: dto.startDateTo,
-      page: dto.page,
-      perPage: dto.perPage,
-    });
+    return this.findAllTasksUseCase.execute(orgId, dto);
+  }
+
+  @Get('all')
+  @RequireOrgRole(OrgRole.GUEST)
+  @ApiOperation({
+    summary: 'List all tasks for an organization without pagination',
+  })
+  findAllUnpaginated(
+    @Param('orgId') orgId: string,
+    @Query() dto: FindAllTasksUnpaginatedDto,
+  ) {
+    return this.findAllTasksUnpaginatedUseCase.execute(orgId, dto);
   }
 
   @Patch('bulk/update')

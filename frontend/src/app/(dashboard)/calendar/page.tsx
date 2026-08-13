@@ -1,18 +1,9 @@
-'use client'
+import { CalendarMonthPage } from '@/views/calendar/ui/calendar-month-page'
 
-import { Suspense } from 'react'
-import { CalendarPage } from '@/views/calendar'
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
 
-export const dynamic = 'force-dynamic'
-
-export default function CalendarRoute() {
-  return (
-    <Suspense
-      fallback={
-        <div className='text-muted-foreground p-6'>Loading calendar...</div>
-      }
-    >
-      <CalendarPage />
-    </Suspense>
-  )
+export default function CalendarMonthRoute({ searchParams }: Props) {
+  return <CalendarMonthPage searchParams={searchParams} />
 }
