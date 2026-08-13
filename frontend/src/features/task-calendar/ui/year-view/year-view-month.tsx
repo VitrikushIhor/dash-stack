@@ -1,3 +1,4 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import {
   format,
@@ -8,7 +9,7 @@ import {
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
-import { useCalendar } from '../../model/calendar-context'
+
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
@@ -17,7 +18,9 @@ interface IProps {
 }
 
 export function YearViewMonth({ month, tasks }: IProps) {
-  const { setSelectedDate, setView } = useCalendar()
+  const [, setParams] = useCalendarSearchParams()
+  const setView = (v: any) => setParams({ view: v })
+  const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const monthName = format(month, 'MMMM')
 

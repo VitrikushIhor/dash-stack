@@ -14,11 +14,13 @@ interface Props {
 
 export function CalendarMonthPage({ tasks, initialDate }: Props) {
   return (
-    <DndProviderWrapper>
-      <div className='flex flex-col gap-4'>
-        <CalendarHeader tasks={tasks} view='month' />
-        <CalendarMonthView singleDayTasks={tasks} />
-      </div>
+    <DndProviderWrapper tasks={tasks}>
+      {(optimisticTasks) => (
+        <div className='flex flex-col gap-4'>
+          <CalendarHeader tasks={optimisticTasks} view='month' />
+          <CalendarMonthView singleDayTasks={optimisticTasks} />
+        </div>
+      )}
     </DndProviderWrapper>
   )
 }

@@ -1,5 +1,6 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { type Task } from '@/entities/task'
-import { useCalendar } from '../../model/calendar-context'
+
 import { useMonthLayout } from '../../model/use-calendar-layouts'
 import { DayCell } from './day-cell'
 
@@ -10,8 +11,8 @@ interface IProps {
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export function CalendarMonthView({ singleDayTasks }: IProps) {
-  // Temporary: we will remove useCalendar entirely in Phase 3
-  const { selectedDate } = useCalendar()
+const [{ date }] = useCalendarSearchParams()
+  const selectedDate = date || new Date()
 
   const { cells, eventPositions } = useMonthLayout(
     singleDayTasks,

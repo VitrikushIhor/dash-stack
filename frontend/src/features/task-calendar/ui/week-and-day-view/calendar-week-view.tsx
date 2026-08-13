@@ -1,8 +1,9 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 
 import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task } from '@/entities/task'
-import { useCalendar } from '../../model/calendar-context'
+
 import { useTimelineLayout } from '../../model/use-calendar-layouts'
 import { TaskBlock } from './task-block'
 
@@ -11,8 +12,8 @@ interface IProps {
 }
 
 export function CalendarWeekView({ singleDayTasks }: IProps) {
-  // Temporary: we will remove useCalendar entirely in Phase 3
-  const { selectedDate } = useCalendar()
+const [{ date }] = useCalendarSearchParams()
+  const selectedDate = date || new Date()
 
   const { weekDays, eventsByDay } = useTimelineLayout(
     singleDayTasks,

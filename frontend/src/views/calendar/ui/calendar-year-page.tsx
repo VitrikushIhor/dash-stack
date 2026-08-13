@@ -14,11 +14,13 @@ interface Props {
 
 export function CalendarYearPage({ tasks, initialDate }: Props) {
   return (
-    <DndProviderWrapper>
-      <div className='flex flex-col gap-4'>
-        <CalendarHeader tasks={tasks} view='year' />
-        <CalendarYearView allTasks={tasks} />
-      </div>
+    <DndProviderWrapper tasks={tasks}>
+      {(optimisticTasks) => (
+        <div className='flex flex-col gap-4'>
+          <CalendarHeader tasks={optimisticTasks} view='year' />
+          <CalendarYearView allTasks={optimisticTasks} />
+        </div>
+      )}
     </DndProviderWrapper>
   )
 }

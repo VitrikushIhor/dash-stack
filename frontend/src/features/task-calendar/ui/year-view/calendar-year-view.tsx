@@ -1,7 +1,8 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
 import { type Task } from '@/entities/task'
-import { useCalendar } from '../../model/calendar-context'
+
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {
@@ -9,7 +10,8 @@ interface IProps {
 }
 
 export function CalendarYearView({ allTasks }: IProps) {
-  const { selectedDate } = useCalendar()
+  const [{ date }] = useCalendarSearchParams()
+  const selectedDate = date || new Date()
 
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)

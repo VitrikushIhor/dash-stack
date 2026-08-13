@@ -1,4 +1,7 @@
+import { useOptimistic, useTransition, ReactNode } from 'react'
 import { parseISO } from 'date-fns'
+import { toast } from 'sonner'
+import { useAction } from '@/shared/lib/hooks/use-action'
 import {
   DndContext,
   type DragEndEvent,
@@ -10,16 +13,33 @@ import {
 } from '@dnd-kit/core'
 import { useActiveOrganization } from '@/entities/organization'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { updateTaskAction } from '@/features/manage-task/server'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
-  children: React.ReactNode
+  tasks: Task[]
+  children: (optimisticTasks: Task[]) => ReactNode
 }
 
-export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
+export function DndProviderWrapper({ tasks, children }: DndProviderWrapperProps) {
   const { activeOrg } = useActiveOrganization()
   const activeOrgId = activeOrg?.id
-  const updateTask = (_task: unknown) => {}
+  const [, startTransition] = useTransition()
+  
+  const { execute } = useAction(updateTaskAction, {
+    onError: (error: any) => {
+      console.error('[Calendar DnD Error]', error)
+      toast.error('Failed to update task date.')
+    },
+  })
+
+  const [optimisticTasks, setOptimisticTasks] = useOptimistic(
+    tasks,
+    (state: Task[], updatedTask: Partial<Task> & { id: string }) =>
+      state.map((task) =>
+        task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+      )
+  )
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -31,8 +51,8 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     useSensor(TouchSensor)
   )
 
-  const handleDragEnd = (task: DragEndEvent) => {
-    const { active, over } = task
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
 
     if (!over || !active.data.current || !activeOrgId) return
 
@@ -60,18 +80,25 @@ export function DndProviderWrapper({ children }: DndProviderWrapperProps) {
     } else {
       return
     }
+    
+    const newDueDateISO = newStartDate.toISOString()
+    if (droppedEvent.dueDate === newDueDateISO) return
 
-    updateTask({
-      id: droppedEvent.id,
-      data: {
-        dueDate: newStartDate.toISOString(),
-      },
+    startTransition(() => {
+      setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
+      
+      execute({
+        id: droppedEvent.id,
+        data: {
+          dueDate: newDueDateISO,
+        },
+      })
     })
   }
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      {children}
+      {children(optimisticTasks)}
       <CustomDragLayer />
     </DndContext>
   )

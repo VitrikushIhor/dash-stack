@@ -3,9 +3,9 @@ import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-import { useCalendar } from '../../model/calendar-context'
+
+import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { DraggableTask } from '../dnd/draggable-task'
-import { TaskDetailsDialog } from '../task-details-dialog'
 import { eventBadgeVariants } from '../variants'
 
 interface IProps extends Omit<
@@ -28,7 +28,8 @@ export function MonthTaskBadge({
   className,
   position: propPosition,
 }: IProps) {
-  const { badgeVariant } = useCalendar()
+  const badgeVariant = 'mixed' as any
+  const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)
   if (!anchor) return null
@@ -64,50 +65,53 @@ export function MonthTaskBadge({
     eventBadgeVariants({ color, multiDayPosition: position, className })
   )
 
+  const handleClick = () => {
+    setTaskParams({ 'update-task': task.id })
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      if (e.currentTarget instanceof HTMLElement) e.currentTarget.click()
+      handleClick()
     }
   }
 
   return (
     <DraggableTask task={task}>
-      <TaskDetailsDialog task={task}>
-        <div
-          role='button'
-          tabIndex={0}
-          className={eventBadgeClasses}
-          onKeyDown={handleKeyDown}
-        >
-          <div className='flex items-center gap-1.5 truncate'>
-            {!['middle', 'last'].includes(position) &&
-              ['mixed', 'dot'].includes(badgeVariant) && (
-                <svg
-                  width='8'
-                  height='8'
-                  viewBox='0 0 8 8'
-                  className='task-dot shrink-0'
-                >
-                  <circle cx='4' cy='4' r='4' />
-                </svg>
-              )}
-
-            {renderBadgeText && (
-              <p className='flex-1 truncate font-semibold'>
-                {eventCurrentDay && (
-                  <span className='text-xs'>
-                    Day {eventCurrentDay} of {eventTotalDays} •{' '}
-                  </span>
-                )}
-                {task.title}
-              </p>
+      <div
+        role='button'
+        tabIndex={0}
+        className={eventBadgeClasses}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      >
+        <div className='flex items-center gap-1.5 truncate'>
+          {!['middle', 'last'].includes(position) &&
+            ['mixed', 'dot'].includes(badgeVariant) && (
+              <svg
+                width='8'
+                height='8'
+                viewBox='0 0 8 8'
+                className='task-dot shrink-0'
+              >
+                <circle cx='4' cy='4' r='4' />
+              </svg>
             )}
-          </div>
 
-          {renderBadgeText && <span>{format(new Date(anchor), 'h:mm a')}</span>}
+          {renderBadgeText && (
+            <p className='flex-1 truncate font-semibold'>
+              {eventCurrentDay && (
+                <span className='text-xs'>
+                  Day {eventCurrentDay} of {eventTotalDays} •{' '}
+                </span>
+              )}
+              {task.title}
+            </p>
+          )}
         </div>
-      </TaskDetailsDialog>
+
+        {renderBadgeText && <span>{format(new Date(anchor), 'h:mm a')}</span>}
+      </div>
     </DraggableTask>
   )
 }

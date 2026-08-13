@@ -1,8 +1,9 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { useCalendar } from '../../model/calendar-context'
+
 import { TaskBlock } from './task-block'
 
 interface IProps {
@@ -10,7 +11,8 @@ interface IProps {
 }
 
 export function CalendarDayView({ singleDayTasks }: IProps) {
-  const { selectedDate } = useCalendar()
+  const [{ date }] = useCalendarSearchParams()
+  const selectedDate = date || new Date()
 
   const dayEvents = singleDayTasks
     .filter((task) => {

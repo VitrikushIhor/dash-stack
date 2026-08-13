@@ -4,9 +4,9 @@ import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-import { useCalendar } from '../../model/calendar-context'
+
+import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { DraggableTask } from '../dnd/draggable-task'
-import { TaskDetailsDialog } from '../task-details-dialog'
 import { calendarWeekEventCardVariants } from '../variants'
 
 interface IProps
@@ -17,7 +17,8 @@ interface IProps
 }
 
 export function TaskBlock({ task, className }: IProps) {
-  const { badgeVariant } = useCalendar()
+  const badgeVariant = 'mixed' as any
+  const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)
   if (!anchor) {
@@ -37,45 +38,48 @@ export function TaskBlock({ task, className }: IProps) {
     durationInMinutes < 35 && 'py-0 justify-center'
   )
 
+  const handleClick = () => {
+    setTaskParams({ 'update-task': task.id })
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      if (e.currentTarget instanceof HTMLElement) e.currentTarget.click()
+      handleClick()
     }
   }
 
   return (
     <DraggableTask task={task}>
-      <TaskDetailsDialog task={task}>
-        <div
-          role='button'
-          tabIndex={0}
-          className={calendarWeekEventCardClasses}
-          style={{ height: `${heightInPixels}px` }}
-          onKeyDown={handleKeyDown}
-        >
-          <div className='flex items-center gap-1.5 truncate'>
-            {['mixed', 'dot'].includes(badgeVariant) && (
-              <svg
-                width='8'
-                height='8'
-                viewBox='0 0 8 8'
-                className='task-dot shrink-0'
-              >
-                <circle cx='4' cy='4' r='4' />
-              </svg>
-            )}
-
-            <p className='truncate font-semibold'>{task.title}</p>
-          </div>
-
-          {durationInMinutes > 25 && (
-            <p>
-              {format(start, 'h:mm a')} - {format(end, 'h:mm a')}
-            </p>
+      <div
+        role='button'
+        tabIndex={0}
+        className={calendarWeekEventCardClasses}
+        style={{ height: `${heightInPixels}px` }}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      >
+        <div className='flex items-center gap-1.5 truncate'>
+          {['mixed', 'dot'].includes(badgeVariant) && (
+            <svg
+              width='8'
+              height='8'
+              viewBox='0 0 8 8'
+              className='task-dot shrink-0'
+            >
+              <circle cx='4' cy='4' r='4' />
+            </svg>
           )}
+
+          <p className='truncate font-semibold'>{task.title}</p>
         </div>
-      </TaskDetailsDialog>
+
+        {durationInMinutes > 25 && (
+          <p>
+            {format(start, 'h:mm a')} - {format(end, 'h:mm a')}
+          </p>
+        )}
+      </div>
     </DraggableTask>
   )
 }

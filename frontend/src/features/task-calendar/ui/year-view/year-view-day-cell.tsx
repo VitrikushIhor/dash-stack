@@ -1,8 +1,9 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-import { useCalendar } from '../../model/calendar-context'
+
 
 interface IProps {
   day: number
@@ -11,7 +12,9 @@ interface IProps {
 }
 
 export function YearViewDayCell({ day, date, tasks }: IProps) {
-  const { setSelectedDate, setView } = useCalendar()
+  const [, setParams] = useCalendarSearchParams()
+  const setView = (v: any) => setParams({ view: v })
+  const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const maxIndicators = 3
   const eventCount = tasks.length

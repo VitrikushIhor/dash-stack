@@ -14,11 +14,13 @@ interface Props {
 
 export function CalendarAgendaPage({ tasks, initialDate }: Props) {
   return (
-    <DndProviderWrapper>
-      <div className='flex flex-col gap-4'>
-        <CalendarHeader tasks={tasks} view='agenda' />
-        <CalendarAgendaView singleDayTasks={tasks} />
-      </div>
+    <DndProviderWrapper tasks={tasks}>
+      {(optimisticTasks) => (
+        <div className='flex flex-col gap-4'>
+          <CalendarHeader tasks={optimisticTasks} view='agenda' />
+          <CalendarAgendaView singleDayTasks={optimisticTasks} />
+        </div>
+      )}
     </DndProviderWrapper>
   )
 }

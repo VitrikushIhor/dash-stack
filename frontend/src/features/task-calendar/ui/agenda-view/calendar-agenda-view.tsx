@@ -1,9 +1,10 @@
+import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { useCalendar } from '@/features/task-calendar/model/calendar-context'
+
 import { AgendaDayGroup } from './agenda-day-group'
 
 interface IProps {
@@ -11,7 +12,8 @@ interface IProps {
 }
 
 export function CalendarAgendaView({ singleDayTasks }: IProps) {
-  const { selectedDate } = useCalendar()
+  const [{ date }] = useCalendarSearchParams()
+  const selectedDate = date || new Date()
 
   const eventsByDay = useMemo(() => {
     const allDates = new Map<string, { date: Date; tasks: Task[] }>()
