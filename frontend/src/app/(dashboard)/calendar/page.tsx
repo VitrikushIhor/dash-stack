@@ -1,7 +1,5 @@
-import { Suspense } from 'react'
 import { CalendarMonthPage } from '@/views/calendar/ui/calendar-month-page'
 import { fetchCalendarTasks } from '@/views/calendar/lib/fetch-calendar-tasks.server'
-import { Skeleton } from '@/shared/ui/core/skeleton'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,16 +10,5 @@ interface Props {
 export default async function CalendarMonthRoute({ searchParams }: Props) {
   const { tasks, date } = await fetchCalendarTasks('month', searchParams)
 
-  return (
-    <Suspense
-      fallback={
-        <div className='flex flex-col gap-4'>
-          <Skeleton className='h-20 w-full' />
-          <Skeleton className='h-[600px] w-full' />
-        </div>
-      }
-    >
-      <CalendarMonthPage tasks={tasks} initialDate={date} />
-    </Suspense>
-  )
+  return <CalendarMonthPage tasks={tasks} />
 }

@@ -9,7 +9,6 @@ import {
 
 interface Props {
   tasks: Task[]
-  initialDate: Date
 }
 
 export function CalendarAgendaPage({ tasks }: Props) {
