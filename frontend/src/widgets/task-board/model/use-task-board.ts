@@ -80,6 +80,7 @@ export function useTaskBoard(tasks: Task[]) {
         })
 
         if (!result.success) {
+          setOptimisticColumns(startColumns)
           toast.error('Failed to move task')
         }
       })

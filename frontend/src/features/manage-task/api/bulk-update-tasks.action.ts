@@ -11,5 +11,6 @@ export const bulkUpdateTasksAction = createOrgAction(
   async ({ ids, data }, { activeOrg }) => {
     await taskServerApi.bulkUpdate(activeOrg.id, ids, data)
     revalidateTag(SERVER_CACHE_TAGS.tasks(activeOrg.id))
+    return ids.length
   }
 )

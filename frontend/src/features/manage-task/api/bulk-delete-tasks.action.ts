@@ -11,5 +11,6 @@ export const bulkDeleteTasksAction = createOrgAction(
   async (ids, { activeOrg }) => {
     await taskServerApi.bulkDelete(activeOrg.id, ids)
     revalidateTag(SERVER_CACHE_TAGS.tasks(activeOrg.id))
+    return ids.length
   }
 )
