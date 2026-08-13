@@ -5,7 +5,7 @@ export * from './event-emitter/use-emitter-event'
 export * from './hooks/use-attachments'
 export * from './hooks/use-dialog-state'
 export * from './hooks/use-mobile'
-export * from './hooks/use-tasks-table-search-params'
+
 export * from './logger'
 export * from './show-submitted-data'
 export * from './utils'

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, memo } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { type Membership } from '@/shared/model'

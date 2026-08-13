@@ -1,4 +1,4 @@
-import { api, type PaginatedResult } from '@/shared/api'
+import { api, type PaginatedResult, type HttpClient } from '@/shared/api'
 import {
   type Task,
   type CreateTaskDto,
@@ -19,51 +19,60 @@ export interface TaskFilters {
   perPage?: number
 }
 
-export const taskApi = {
-  findAll: (
-    orgId: string,
-    filters?: TaskFilters
-  ): Promise<PaginatedResult<Task>> => {
-    const params: Record<string, string | undefined> = {
-      search: filters?.search,
-      dueDateFrom: filters?.dueDateFrom,
-      dueDateTo: filters?.dueDateTo,
-      startDateFrom: filters?.startDateFrom,
-      startDateTo: filters?.startDateTo,
-      status: filters?.status?.join(','),
-      assigneeIds: filters?.assigneeIds?.join(','),
-      labelNames: filters?.labelNames?.join(','),
-      page: filters?.page?.toString(),
-      perPage: filters?.perPage?.toString(),
-    }
+export function createTaskApi(client: HttpClient) {
+  return {
+    findAll: (
+      orgId: string,
+      filters?: TaskFilters
+    ): Promise<PaginatedResult<Task>> => {
+      const params: Record<string, string | undefined> = {
+        search: filters?.search,
+        dueDateFrom: filters?.dueDateFrom,
+        dueDateTo: filters?.dueDateTo,
+        startDateFrom: filters?.startDateFrom,
+        startDateTo: filters?.startDateTo,
+        status: filters?.status?.join(','),
+        assigneeIds: filters?.assigneeIds?.join(','),
+        labelNames: filters?.labelNames?.join(','),
+        page: filters?.page?.toString(),
+        perPage: filters?.perPage?.toString(),
+      }
 
-    return api.get<PaginatedResult<Task>>(`/organizations/${orgId}/tasks`, {
-      params,
-    })
-  },
+      return client.get<PaginatedResult<Task>>(
+        `/organizations/${orgId}/tasks`,
+        {
+          params,
+        }
+      )
+    },
 
-  findById: (orgId: string, id: string): Promise<Task> =>
-    api.get<Task>(`/organizations/${orgId}/tasks/${id}`),
+    findById: (orgId: string, id: string): Promise<Task> =>
+      client.get<Task>(`/organizations/${orgId}/tasks/${id}`),
 
-  create: (orgId: string, data: CreateTaskDto): Promise<Task> =>
-    api.post<Task>(`/organizations/${orgId}/tasks`, data),
+    create: (orgId: string, data: CreateTaskDto): Promise<Task> =>
+      client.post<Task>(`/organizations/${orgId}/tasks`, data),
 
-  update: (orgId: string, id: string, data: UpdateTaskDto): Promise<Task> =>
-    api.patch<Task>(`/organizations/${orgId}/tasks/${id}`, data),
+    update: (orgId: string, id: string, data: UpdateTaskDto): Promise<Task> =>
+      client.patch<Task>(`/organizations/${orgId}/tasks/${id}`, data),
 
-  delete: (orgId: string, id: string): Promise<void> =>
-    api.delete<void>(`/organizations/${orgId}/tasks/${id}`),
+    delete: (orgId: string, id: string): Promise<void> =>
+      client.delete<void>(`/organizations/${orgId}/tasks/${id}`),
 
-  bulkUpdate: (
-    orgId: string,
-    ids: string[],
-    data: Partial<Pick<UpdateTaskDto, 'status'>>
-  ): Promise<void> =>
-    api.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, {
-      ids,
-      ...data,
-    }),
+    bulkUpdate: (
+      orgId: string,
+      ids: string[],
+      data: Partial<Pick<UpdateTaskDto, 'status'>>
+    ): Promise<void> =>
+      client.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, {
+        ids,
+        ...data,
+      }),
 
-  bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
-    api.delete<void>(`/organizations/${orgId}/tasks/bulk`, { body: { ids } }),
+    bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
+      client.delete<void>(`/organizations/${orgId}/tasks/bulk`, {
+        body: { ids },
+      }),
+  }
 }
+
+export const taskApi = createTaskApi(api)

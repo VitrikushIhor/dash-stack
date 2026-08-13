@@ -1,7 +1,4 @@
 import { type ColumnFiltersState } from '@tanstack/react-table'
-import { type Membership } from '@/shared/model'
-import { type Label } from '@/entities/label'
-import { type TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
 
 export function parseDateSafe(val: string | undefined): string | undefined {
   if (!val) return undefined
@@ -73,28 +70,5 @@ export function mapColumnFiltersToSearchParams(filters: ColumnFiltersState): {
     labels: labelFilter && labelFilter.length > 0 ? labelFilter : null,
     members: membersFilter && membersFilter.length > 0 ? membersFilter : null,
     dueDate: dueDateStrings.length > 0 ? dueDateStrings : null,
-  }
-}
-
-export function generateFilterOptions(
-  members: Membership[],
-  availableLabels: Label[]
-) {
-  const memberOptions = members.map((m) => {
-    const name = m.user.firstName || m.user.email
-    return { label: name, value: m.user.id }
-  })
-
-  return {
-    status: Object.keys(STATUS_CONFIG).map((st) => ({
-      label: STATUS_CONFIG[st as TaskStatusEnum].label,
-      value: st,
-      icon: STATUS_CONFIG[st as TaskStatusEnum].icon,
-    })),
-    labels: availableLabels.map((lbl) => ({
-      label: lbl.name,
-      value: lbl.name,
-    })),
-    members: memberOptions,
   }
 }

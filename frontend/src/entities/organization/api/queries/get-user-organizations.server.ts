@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import 'server-only'
 import { getErrorMessage } from '@/shared/api'
 import { type UserMembership } from '../../model/types/organization.types'
@@ -8,11 +9,13 @@ type GetOrganizationsResponse = {
   error: string | null
 }
 
-export async function getUserOrganizations(): Promise<GetOrganizationsResponse> {
-  try {
-    const data = await organizationServerApi.getMyMemberships()
-    return { data, error: null }
-  } catch (error) {
-    return { data: null, error: getErrorMessage(error) }
+export const getUserOrganizations = cache(
+  async (): Promise<GetOrganizationsResponse> => {
+    try {
+      const data = await organizationServerApi.getMyMemberships()
+      return { data, error: null }
+    } catch (error) {
+      return { data: null, error: getErrorMessage(error) }
+    }
   }
-}
+)

@@ -12,8 +12,8 @@ import { getVisibleRange } from '../lib/get-visible-range'
 
 export function CalendarPage() {
   const searchParams = useSearchParams()
-  const viewParam = searchParams.get('view')
-  const dateParam = searchParams.get('date')
+  const viewParam = searchParams?.get('view')
+  const dateParam = searchParams?.get('date')
 
   const initialView = (viewParam as TCalendarView) || 'month'
   const initialDate = useMemo(

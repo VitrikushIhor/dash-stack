@@ -17,8 +17,8 @@ import {
   type TaskAssignee,
   calculateTaskProgress,
   isTaskOverdue as checkOverdue,
+  TaskStatusBadge,
 } from '@/entities/task'
-import { TaskStatusBadge } from '@/features/task'
 import { TaskTableRowActions } from './task-table-row-actions'
 
 export const tasksColumns: ColumnDef<Task>[] = [
