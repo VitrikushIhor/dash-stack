@@ -4,7 +4,6 @@ export { organizationKeys } from './api/organization-query-keys'
 
 // Queries
 export { useGetOrganizations } from './model/queries/use-get-organizations'
-export { useGetMembers } from './model/queries/use-get-members'
 
 // Hooks
 export { useActiveOrganization } from './model/hooks/use-active-organization'

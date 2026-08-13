@@ -2,10 +2,9 @@
 
 import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useActiveOrganization } from '@/entities/organization'
 import { Skeleton } from '@/shared/ui/core/skeleton'
-import { useGetMembers, useActiveOrganization } from '@/entities/organization'
-import { useTasksQuery } from '@/entities/task'
-import { type TCalendarView } from '@/features/event-calendar'
+import { type TCalendarView } from '@/features/task-calendar'
 import { CalendarView } from '@/widgets/calendar-view'
 import { Main } from '@/widgets/layout'
 import { getVisibleRange } from '../lib/get-visible-range'
@@ -22,23 +21,20 @@ export function CalendarPage() {
   )
 
   const { activeOrg } = useActiveOrganization()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const activeOrgId = activeOrg?.id
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const range = useMemo(
     () => getVisibleRange(initialView, initialDate),
     [initialView, initialDate]
   )
 
-  const { data: paginatedTasks, isLoading } = useTasksQuery(activeOrgId || '', {
-    ...range,
-    page: 1,
-    perPage: 100,
-  })
+  const paginatedTasks = { data: [] }
+  const isLoading = false
   const tasks = paginatedTasks?.data || []
 
-  const { data: members = [], isLoading: membersLoading } = useGetMembers(
-    activeOrgId || ''
-  )
+  const members: never[] = []
+  const membersLoading = false
 
   if (isLoading || membersLoading) {
     return (

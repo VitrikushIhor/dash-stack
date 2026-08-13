@@ -1,0 +1,93 @@
+import { format, parseISO } from 'date-fns'
+import { Calendar, Clock, Text, User } from 'lucide-react'
+import { Button } from '@/shared/ui/core/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/ui/core/dialog'
+import { getTaskCalendarAnchor, type Task } from '@/entities/task'
+import { getTaskUser } from '@/features/task-calendar/lib/mappers'
+import { useCalendar } from '../model/calendar-context'
+
+interface IProps {
+  task: Task
+  children: React.ReactNode
+}
+
+export function TaskDetailsDialog({ task, children }: IProps) {
+  const { onEditTask } = useCalendar()
+  const anchor = getTaskCalendarAnchor(task)
+  if (!anchor) return null
+  const startDate = parseISO(anchor)
+  const endDate = startDate
+
+  return (
+    <>
+      <Dialog>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{task.title}</DialogTitle>
+          </DialogHeader>
+
+          <div className='space-y-4'>
+            <div className='flex items-start gap-2'>
+              <User className='mt-1 size-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>Responsible</p>
+                <p className='text-muted-foreground text-sm'>
+                  {getTaskUser(task).name}
+                </p>
+              </div>
+            </div>
+
+            <div className='flex items-start gap-2'>
+              <Calendar className='mt-1 size-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>Start Date</p>
+                <p className='text-muted-foreground text-sm'>
+                  {format(startDate, 'MMM d, yyyy h:mm a')}
+                </p>
+              </div>
+            </div>
+
+            <div className='flex items-start gap-2'>
+              <Clock className='mt-1 size-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>End Date</p>
+                <p className='text-muted-foreground text-sm'>
+                  {format(endDate, 'MMM d, yyyy h:mm a')}
+                </p>
+              </div>
+            </div>
+
+            <div className='flex items-start gap-2'>
+              <Text className='mt-1 size-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>Description</p>
+                <p className='text-muted-foreground text-sm'>
+                  {task.description}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => onEditTask?.(task)}
+            >
+              Edit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

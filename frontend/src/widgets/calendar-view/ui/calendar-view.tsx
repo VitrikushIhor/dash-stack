@@ -6,7 +6,7 @@ import {
   DndProviderWrapper,
   memberToUser,
   useCalendar,
-  useFilteredEvents,
+  useFilteredTasks,
   CalendarAgendaView,
   CalendarHeader,
   CalendarMonthView,
@@ -14,7 +14,7 @@ import {
   CalendarWeekView,
   CalendarYearView,
   type TCalendarView,
-} from '@/features/event-calendar'
+} from '@/features/task-calendar'
 
 interface CalendarViewProps {
   tasks: Task[]
@@ -25,28 +25,26 @@ interface CalendarViewProps {
 
 function CalendarContent() {
   const { view } = useCalendar()
-  const { filteredEvents, singleDayEvents } = useFilteredEvents()
+  const { filteredTasks, singleDayTasks } = useFilteredTasks()
 
   return (
     <>
       <div className='mb-6 flex flex-col gap-3'>
         <h1 className='text-3xl font-bold tracking-tight'>Calendar</h1>
-        <CalendarHeader events={filteredEvents} />
+        <CalendarHeader tasks={filteredTasks} />
       </div>
 
       <div className='bg-card rounded-xl border p-4 shadow-sm'>
-        {view === 'day' && (
-          <CalendarDayView singleDayEvents={singleDayEvents} />
-        )}
+        {view === 'day' && <CalendarDayView singleDayTasks={singleDayTasks} />}
         {view === 'month' && (
-          <CalendarMonthView singleDayEvents={singleDayEvents} />
+          <CalendarMonthView singleDayTasks={singleDayTasks} />
         )}
         {view === 'week' && (
-          <CalendarWeekView singleDayEvents={singleDayEvents} />
+          <CalendarWeekView singleDayTasks={singleDayTasks} />
         )}
-        {view === 'year' && <CalendarYearView allEvents={filteredEvents} />}
+        {view === 'year' && <CalendarYearView allTasks={filteredTasks} />}
         {view === 'agenda' && (
-          <CalendarAgendaView singleDayEvents={singleDayEvents} />
+          <CalendarAgendaView singleDayTasks={singleDayTasks} />
         )}
       </div>
     </>
@@ -64,7 +62,7 @@ export function CalendarView({
   return (
     <CalendarProvider
       users={users}
-      events={tasks}
+      tasks={tasks}
       view={initialView}
       selectedDate={initialDate}
     >

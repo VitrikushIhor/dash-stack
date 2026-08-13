@@ -27,16 +27,16 @@ export const TaskBoardCard = memo(
       if (onTaskClick) onTaskClick(task.id)
     }
 
-    const handlePointerDown = (event: React.PointerEvent) => {
-      const target = event.target as HTMLElement
+    const handlePointerDown = (task: React.PointerEvent) => {
+      const target = task.target as HTMLElement
       if (
         target.closest('button') ||
         target.closest('[role="menuitem"]') ||
         target.closest('[data-radix-dropdown-menu-trigger]') ||
         target.closest('[data-radix-dropdown-menu-content]')
       ) {
-        event.preventDefault()
-        event.stopPropagation()
+        task.preventDefault()
+        task.stopPropagation()
       }
     }
 
