@@ -9,15 +9,17 @@ import { useTaskSearchParams } from '@/features/manage-task/model/task-search-pa
 import { DraggableTask } from '../dnd/draggable-task'
 import { calendarWeekEventCardVariants } from '../variants'
 
+import { type TBadgeVariant } from '../../model/calendar-types'
+
 interface IProps
   extends
     HTMLAttributes<HTMLDivElement>,
     Omit<VariantProps<typeof calendarWeekEventCardVariants>, 'color'> {
   task: Task
+  badgeVariant?: TBadgeVariant
 }
 
-export function TaskBlock({ task, className }: IProps) {
-  const badgeVariant = 'mixed' as 'mixed' | 'dot' | 'solid'
+export function TaskBlock({ task, className, badgeVariant = 'mixed' }: IProps) {
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)

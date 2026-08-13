@@ -6,12 +6,13 @@ import { getTaskColor, getTaskUser } from '@/features/task-calendar/lib/mappers'
 
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { agendaEventCardVariants } from '../variants'
+import { type TBadgeVariant } from '../../model/calendar-types'
 
 interface IProps {
   task: Task
   eventCurrentDay?: number
   eventTotalDays?: number
-  badgeVariant?: 'mixed' | 'dot' | 'solid'
+  badgeVariant?: TBadgeVariant
 }
 
 export function AgendaTaskCard({

@@ -7,6 +7,7 @@ import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { DraggableTask } from '../dnd/draggable-task'
 import { eventBadgeVariants } from '../variants'
+import { type TBadgeVariant } from '../../model/calendar-types'
 
 interface IProps extends Omit<
   VariantProps<typeof eventBadgeVariants>,
@@ -18,7 +19,7 @@ interface IProps extends Omit<
   eventTotalDays?: number
   className?: string
   position?: 'first' | 'middle' | 'last' | 'none'
-  badgeVariant?: 'mixed' | 'dot' | 'solid'
+  badgeVariant?: TBadgeVariant
 }
 
 export function MonthTaskBadge({
