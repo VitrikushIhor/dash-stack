@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 
 import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
@@ -10,12 +8,12 @@ import { TaskBlock } from './task-block'
 
 interface IProps {
   singleDayTasks: Task[]
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
 }
 
-export function CalendarWeekView({ singleDayTasks }: IProps) {
-const [{ date }] = useCalendarSearchParams()
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
+export function CalendarWeekView({ singleDayTasks, selectedDate, setParams: _setParams }: IProps) {
+  
   const { weekDays, eventsByDay } = useTimelineLayout(
     singleDayTasks,
     selectedDate

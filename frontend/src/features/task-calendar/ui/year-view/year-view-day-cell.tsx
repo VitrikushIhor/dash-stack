@@ -1,5 +1,4 @@
 import { type TCalendarView } from '../../model/calendar-types'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
@@ -7,14 +6,15 @@ import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 
 
 interface IProps {
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
   day: number
   date: Date
   tasks: Task[]
 }
 
-export function YearViewDayCell({ day, date, tasks }: IProps) {
-  const [, setParams] = useCalendarSearchParams()
-  const setView = (v: TCalendarView) => setParams({ view: v })
+export function YearViewDayCell({ day, date, tasks, selectedDate: _selectedDate, setParams }: IProps) {
+    const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const maxIndicators = 3

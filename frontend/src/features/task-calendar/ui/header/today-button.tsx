@@ -1,16 +1,20 @@
+'use client'
+
 import { formatDate, isToday } from 'date-fns'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 
-export function TodayButton() {
-  const [{ date }, setParams] = useCalendarSearchParams()
+interface IProps {
+  selectedDate: Date
+  setParams: (params: { date: Date | null }) => void
+}
 
+export function TodayButton({ selectedDate, setParams }: IProps) {
   const today = new Date()
-  const isCurrentToday = isToday(date || today)
+  const isCurrentToday = isToday(selectedDate)
 
   const handleClick = () => setParams({ date: today })
 

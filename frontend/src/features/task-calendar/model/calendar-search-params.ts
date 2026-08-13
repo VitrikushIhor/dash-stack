@@ -1,10 +1,5 @@
-import { parseAsStringEnum, parseAsIsoDate, useQueryStates } from 'nuqs'
-import { CALENDAR_VIEWS } from './calendar-types'
-
-export const calendarParsers = {
-  view: parseAsStringEnum(CALENDAR_VIEWS.slice()).withDefault('month'),
-  date: parseAsIsoDate,
-}
+import { useQueryStates } from 'nuqs'
+import { calendarParsers } from './calendar-search-params.shared'
 
 export function useCalendarSearchParams() {
   return useQueryStates(calendarParsers)

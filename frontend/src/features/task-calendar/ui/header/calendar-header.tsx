@@ -6,13 +6,20 @@ import { TodayButton } from './today-button'
 interface IProps {
   tasks: Task[]
   view: TCalendarView
+  selectedDate: Date
+  setParams: (params: { date: Date | null }) => void
 }
 
-export function CalendarHeader({ tasks, view }: IProps) {
+export function CalendarHeader({ tasks, view, selectedDate, setParams }: IProps) {
   return (
     <div className='flex items-center gap-3'>
-      <TodayButton />
-      <DateNavigator view={view} tasks={tasks} />
+      <TodayButton selectedDate={selectedDate} setParams={setParams} />
+      <DateNavigator 
+        view={view} 
+        tasks={tasks} 
+        selectedDate={selectedDate} 
+        setParams={setParams} 
+      />
     </div>
   )
 }

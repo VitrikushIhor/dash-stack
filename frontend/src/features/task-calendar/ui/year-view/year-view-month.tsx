@@ -1,5 +1,4 @@
 import { type TCalendarView } from '../../model/calendar-types'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import {
   format,
@@ -14,13 +13,14 @@ import { SHORT_WEEK_DAYS } from '../../lib/constants'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
   month: Date
   tasks: Task[]
 }
 
-export function YearViewMonth({ month, tasks }: IProps) {
-  const [, setParams] = useCalendarSearchParams()
-  const setView = (v: TCalendarView) => setParams({ view: v })
+export function YearViewMonth({ month, tasks, selectedDate, setParams }: IProps) {
+    const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const monthName = format(month, 'MMMM')
@@ -76,12 +76,11 @@ export function YearViewMonth({ month, tasks }: IProps) {
             })
 
             return (
-              <YearViewDayCell
-                key={`day-${day}`}
+              <YearViewDayCell key={`day-${day}`}
                 day={day}
                 date={date}
                 tasks={dayEvents}
-              />
+               selectedDate={selectedDate} setParams={setParams} />
             )
           })}
         </div>

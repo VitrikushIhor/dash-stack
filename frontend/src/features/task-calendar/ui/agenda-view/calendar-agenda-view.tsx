@@ -1,4 +1,3 @@
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
@@ -8,17 +7,17 @@ import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { AgendaDayGroup } from './agenda-day-group'
 
 interface IProps {
-  singleDayTasks: Task[]
+  tasks: Task[]
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
 }
 
-export function CalendarAgendaView({ singleDayTasks }: IProps) {
-  const [{ date }] = useCalendarSearchParams()
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
+export function CalendarAgendaView({ tasks, selectedDate, setParams: _setParams }: IProps) {
+    
   const eventsByDay = useMemo(() => {
     const allDates = new Map<string, { date: Date; tasks: Task[] }>()
 
-    singleDayTasks.forEach((task) => {
+    tasks.forEach((task) => {
       const anchor = getTaskCalendarAnchor(task)
       if (!anchor) return
       const eventDate = parseISO(anchor)
@@ -39,9 +38,9 @@ export function CalendarAgendaView({ singleDayTasks }: IProps) {
     return Array.from(allDates.values()).sort(
       (a, b) => a.date.getTime() - b.date.getTime()
     )
-  }, [singleDayTasks, selectedDate])
+  }, [tasks, selectedDate])
 
-  const hasAnyEvents = singleDayTasks.length > 0
+  const hasAnyEvents = tasks.length > 0
 
   return (
     <div className='h-[800px]'>

@@ -1,7 +1,8 @@
+'use client'
+
 import { useOptimistic, useTransition, type ReactNode } from 'react'
-import { parseISO } from 'date-fns'
+import { parseISO, set } from 'date-fns'
 import { toast } from 'sonner'
-import { useAction } from '@/shared/lib/hooks/use-action'
 import {
   DndContext,
   type DragEndEvent,
@@ -13,26 +14,22 @@ import {
 } from '@dnd-kit/core'
 import { useActiveOrganization } from '@/entities/organization'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { updateTaskAction } from '@/features/manage-task/server'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
   tasks: Task[]
+  onTaskUpdate: (id: string, data: Partial<Task>) => void
   children: (optimisticTasks: Task[]) => ReactNode
 }
 
-export function DndProviderWrapper({ tasks, children }: DndProviderWrapperProps) {
+export function DndProviderWrapper({
+  tasks,
+  onTaskUpdate,
+  children,
+}: DndProviderWrapperProps) {
   const { activeOrg } = useActiveOrganization()
   const activeOrgId = activeOrg?.id
   const [, startTransition] = useTransition()
-  
-  const { execute } = useAction(updateTaskAction, {
-    onError: (error: unknown) => {
-      // eslint-disable-next-line no-console
-      console.error('[Calendar DnD Error]', error)
-      toast.error('Failed to update task date.')
-    },
-  })
 
   const [optimisticTasks, setOptimisticTasks] = useOptimistic(
     tasks,
@@ -68,32 +65,36 @@ export function DndProviderWrapper({ tasks, children }: DndProviderWrapperProps)
     let newStartDate: Date
 
     if (overData.type === 'day') {
-      newStartDate = new Date(overData.date)
-      newStartDate.setHours(
-        eventStartDate.getHours(),
-        eventStartDate.getMinutes(),
-        eventStartDate.getSeconds(),
-        eventStartDate.getMilliseconds()
-      )
+      newStartDate = set(new Date(overData.date), {
+        hours: eventStartDate.getHours(),
+        minutes: eventStartDate.getMinutes(),
+        seconds: eventStartDate.getSeconds(),
+        milliseconds: eventStartDate.getMilliseconds(),
+      })
     } else if (overData.type === 'time-block') {
-      newStartDate = new Date(overData.date)
-      newStartDate.setHours(overData.hour, overData.minute, 0, 0)
+      newStartDate = set(new Date(overData.date), {
+        hours: overData.hour,
+        minutes: overData.minute,
+        seconds: 0,
+        milliseconds: 0,
+      })
     } else {
       return
     }
-    
+
     const newDueDateISO = newStartDate.toISOString()
     if (droppedEvent.dueDate === newDueDateISO) return
 
     startTransition(() => {
       setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
       
-      execute({
-        id: droppedEvent.id,
-        data: {
-          dueDate: newDueDateISO,
-        },
-      })
+      try {
+        onTaskUpdate(droppedEvent.id, { dueDate: newDueDateISO })
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('[Calendar DnD Error]', error)
+        toast.error('Failed to update task date.')
+      }
     })
   }
 

@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { type Task } from '@/entities/task'
 
 import { useMonthLayout } from '../../model/use-calendar-layouts'
@@ -7,14 +5,14 @@ import { DayCell } from './day-cell'
 
 interface IProps {
   singleDayTasks: Task[]
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
 }
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export function CalendarMonthView({ singleDayTasks }: IProps) {
-const [{ date }] = useCalendarSearchParams()
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
+export function CalendarMonthView({ singleDayTasks, selectedDate, setParams }: IProps) {
+  
   const { cells, eventPositions } = useMonthLayout(
     singleDayTasks,
     selectedDate
@@ -39,6 +37,8 @@ const [{ date }] = useCalendarSearchParams()
             cell={cell}
             tasks={singleDayTasks}
             eventPositions={eventPositions}
+            selectedDate={selectedDate}
+            setParams={setParams}
           />
         ))}
       </div>

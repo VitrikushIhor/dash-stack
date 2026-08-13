@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useTransition } from 'react'
 import { formatDate } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -10,20 +12,18 @@ import {
 } from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { type TCalendarView } from '../../model/calendar-types'
 
 interface IProps {
   view: TCalendarView
   tasks: Task[]
+  selectedDate: Date
+  setParams: (params: { date: Date | null }) => void
 }
 
-export function DateNavigator({ view, tasks }: IProps) {
-  const [{ date }, setParams] = useCalendarSearchParams()
+export function DateNavigator({ view, tasks, selectedDate, setParams }: IProps) {
   const [, startTransition] = useTransition()
   
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
   const month = formatDate(selectedDate, 'MMMM')
   const year = selectedDate.getFullYear()
 

@@ -1,5 +1,4 @@
 import { type TCalendarView } from '../../model/calendar-types'
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
@@ -13,6 +12,8 @@ import { MonthTaskBadge } from './month-task-badge'
 import { TaskBullet } from './task-bullet'
 
 interface IProps {
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
   cell: ICalendarCell
   tasks: Task[]
   eventPositions: Record<string, number>
@@ -20,9 +21,8 @@ interface IProps {
 
 const MAX_VISIBLE_EVENTS = 3
 
-export function DayCell({ cell, tasks, eventPositions }: IProps) {
-  const [, setParams] = useCalendarSearchParams()
-  const setView = (v: TCalendarView) => setParams({ view: v })
+export function DayCell({ cell, tasks, eventPositions, selectedDate: _selectedDate, setParams }: IProps) {
+    const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const { day, currentMonth, date } = cell

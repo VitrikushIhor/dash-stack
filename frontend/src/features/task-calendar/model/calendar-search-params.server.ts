@@ -1,9 +1,4 @@
-import { createSearchParamsCache, parseAsStringEnum, parseAsIsoDate } from 'nuqs/server'
-import { CALENDAR_VIEWS } from './calendar-types'
-
-export const calendarParsers = {
-  view: parseAsStringEnum(CALENDAR_VIEWS.slice()).withDefault('month'),
-  date: parseAsIsoDate,
-}
+import { createSearchParamsCache } from 'nuqs/server'
+import { calendarParsers } from './calendar-search-params.shared'
 
 export const calendarSearchParamsCache = createSearchParamsCache(calendarParsers)

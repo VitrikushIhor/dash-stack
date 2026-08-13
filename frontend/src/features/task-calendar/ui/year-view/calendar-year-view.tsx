@@ -1,4 +1,3 @@
-import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
 import { type Task } from '@/entities/task'
@@ -6,13 +5,13 @@ import { type Task } from '@/entities/task'
 import { YearViewMonth } from './year-view-month'
 
 interface IProps {
-  allTasks: Task[]
+  tasks: Task[]
+  selectedDate: Date
+  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
 }
 
-export function CalendarYearView({ allTasks }: IProps) {
-  const [{ date }] = useCalendarSearchParams()
-  const selectedDate = useMemo(() => date || new Date(), [date])
-
+export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {
+    
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)
     return Array.from({ length: 12 }, (_, i) => addMonths(yearStart, i))
@@ -22,11 +21,10 @@ export function CalendarYearView({ allTasks }: IProps) {
     <div className='p-4'>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {months.map((month) => (
-          <YearViewMonth
-            key={month.toString()}
+          <YearViewMonth key={month.toString()}
             month={month}
-            tasks={allTasks}
-          />
+            tasks={tasks}
+           selectedDate={selectedDate} setParams={setParams} />
         ))}
       </div>
     </div>

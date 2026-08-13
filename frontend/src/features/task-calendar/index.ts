@@ -9,7 +9,8 @@ export { CalendarHeader } from './ui/header/calendar-header'
 
 // Model
 export { CALENDAR_VIEWS, type TCalendarView } from './model/calendar-types'
-export { calendarParsers, useCalendarSearchParams } from './model/calendar-search-params'
+export { calendarParsers } from './model/calendar-search-params.shared'
+export { useCalendarSearchParams } from './model/calendar-search-params'
 export { useMonthLayout, useTimelineLayout } from './model/use-calendar-layouts'
 export { type ICalendarCell, type TBadgeVariant, type TEventColor, type IUser } from './model/types'
 
