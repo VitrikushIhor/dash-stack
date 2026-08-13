@@ -17,7 +17,7 @@ interface IProps
 }
 
 export function TaskBlock({ task, className }: IProps) {
-  const badgeVariant = 'mixed' as any
+  const badgeVariant = 'mixed' as 'mixed' | 'dot' | 'solid'
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)

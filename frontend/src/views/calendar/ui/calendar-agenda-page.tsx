@@ -12,7 +12,7 @@ interface Props {
   initialDate: Date
 }
 
-export function CalendarAgendaPage({ tasks, initialDate }: Props) {
+export function CalendarAgendaPage({ tasks }: Props) {
   return (
     <DndProviderWrapper tasks={tasks}>
       {(optimisticTasks) => (

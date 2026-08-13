@@ -1,3 +1,4 @@
+import { type TCalendarView } from '../../model/calendar-types'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
@@ -21,7 +22,7 @@ const MAX_VISIBLE_EVENTS = 3
 
 export function DayCell({ cell, tasks, eventPositions }: IProps) {
   const [, setParams] = useCalendarSearchParams()
-  const setView = (v: any) => setParams({ view: v })
+  const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const { day, currentMonth, date } = cell

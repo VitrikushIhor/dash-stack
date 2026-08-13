@@ -1,3 +1,4 @@
+import { type TCalendarView } from '../../model/calendar-types'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
@@ -13,7 +14,7 @@ interface IProps {
 
 export function YearViewDayCell({ day, date, tasks }: IProps) {
   const [, setParams] = useCalendarSearchParams()
-  const setView = (v: any) => setParams({ view: v })
+  const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const maxIndicators = 3

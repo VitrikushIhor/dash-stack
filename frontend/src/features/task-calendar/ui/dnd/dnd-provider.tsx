@@ -1,4 +1,4 @@
-import { useOptimistic, useTransition, ReactNode } from 'react'
+import { useOptimistic, useTransition, type ReactNode } from 'react'
 import { parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { useAction } from '@/shared/lib/hooks/use-action'
@@ -27,7 +27,8 @@ export function DndProviderWrapper({ tasks, children }: DndProviderWrapperProps)
   const [, startTransition] = useTransition()
   
   const { execute } = useAction(updateTaskAction, {
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      // eslint-disable-next-line no-console
       console.error('[Calendar DnD Error]', error)
       toast.error('Failed to update task date.')
     },

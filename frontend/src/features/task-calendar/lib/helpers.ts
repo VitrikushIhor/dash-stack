@@ -24,7 +24,7 @@ import {
   isSameYear,
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import { CALENDAR_VIEWS, type TCalendarView } from '../model/calendar-types'
+import { type TCalendarView } from '../model/calendar-types'
 import { type ICalendarCell } from '../model/types'
 
 // ================ Header helper functions ================ //

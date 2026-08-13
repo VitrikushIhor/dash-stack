@@ -20,7 +20,7 @@ interface IProps {
 
 export function DateNavigator({ view, tasks }: IProps) {
   const [{ date }, setParams] = useCalendarSearchParams()
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   
   const selectedDate = date || new Date()
 

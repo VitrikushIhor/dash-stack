@@ -1,3 +1,4 @@
+import { type TCalendarView } from '../../model/calendar-types'
 import { useCalendarSearchParams } from '../../model/calendar-search-params'
 import { useMemo } from 'react'
 import {
@@ -19,7 +20,7 @@ interface IProps {
 
 export function YearViewMonth({ month, tasks }: IProps) {
   const [, setParams] = useCalendarSearchParams()
-  const setView = (v: any) => setParams({ view: v })
+  const setView = (v: TCalendarView) => setParams({ view: v })
   const setSelectedDate = (d: Date) => setParams({ date: d })
 
   const monthName = format(month, 'MMMM')

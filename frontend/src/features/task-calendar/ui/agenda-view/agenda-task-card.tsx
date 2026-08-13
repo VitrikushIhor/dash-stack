@@ -18,7 +18,7 @@ export function AgendaTaskCard({
   eventCurrentDay,
   eventTotalDays,
 }: IProps) {
-  const badgeVariant = 'mixed' as any
+  const badgeVariant = 'mixed' as 'mixed' | 'dot' | 'solid'
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)
