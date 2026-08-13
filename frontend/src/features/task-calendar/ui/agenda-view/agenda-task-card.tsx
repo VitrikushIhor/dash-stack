@@ -11,14 +11,15 @@ interface IProps {
   task: Task
   eventCurrentDay?: number
   eventTotalDays?: number
+  badgeVariant?: 'mixed' | 'dot' | 'solid'
 }
 
 export function AgendaTaskCard({
   task,
   eventCurrentDay,
   eventTotalDays,
+  badgeVariant = 'mixed',
 }: IProps) {
-  const badgeVariant = 'mixed' as 'mixed' | 'dot' | 'solid'
   const [, setTaskParams] = useTaskSearchParams()
 
   const anchor = getTaskCalendarAnchor(task)

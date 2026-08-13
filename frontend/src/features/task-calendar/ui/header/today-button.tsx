@@ -1,4 +1,3 @@
-import { type TSetCalendarParams } from '../../model/calendar-types'
 'use client'
 
 import { formatDate, isToday } from 'date-fns'
@@ -7,6 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
+import { type TSetCalendarParams } from '../../model/calendar-types'
 
 interface IProps {
   selectedDate: Date
