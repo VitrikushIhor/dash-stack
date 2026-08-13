@@ -12,13 +12,13 @@ import {
 } from '@/shared/ui/core/tooltip'
 import { type Task } from '@/entities/task'
 import { getEventsCount, navigateDate, rangeText } from '../../lib/helpers'
-import { type TCalendarView } from '../../model/calendar-types'
+import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 
 interface IProps {
   view: TCalendarView
   tasks: Task[]
   selectedDate: Date
-  setParams: (params: { date: Date | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function DateNavigator({ view, tasks, selectedDate, setParams }: IProps) {

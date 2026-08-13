@@ -1,3 +1,4 @@
+import { type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
 import { type Task } from '@/entities/task'
@@ -7,7 +8,7 @@ import { YearViewMonth } from './year-view-month'
 interface IProps {
   tasks: Task[]
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function CalendarYearView({ tasks, selectedDate, setParams }: IProps) {

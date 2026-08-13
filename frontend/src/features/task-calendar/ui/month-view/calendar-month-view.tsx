@@ -1,3 +1,4 @@
+import { type TSetCalendarParams } from '../../model/calendar-types'
 import { type Task } from '@/entities/task'
 
 import { useMonthLayout } from '../../model/use-calendar-layouts'
@@ -6,7 +7,7 @@ import { DayCell } from './day-cell'
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
 }
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

@@ -1,5 +1,5 @@
 import { type Task } from '@/entities/task'
-import { type TCalendarView } from '../../model/calendar-types'
+import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { DateNavigator } from './date-navigator'
 import { TodayButton } from './today-button'
 
@@ -7,7 +7,7 @@ interface IProps {
   tasks: Task[]
   view: TCalendarView
   selectedDate: Date
-  setParams: (params: { date: Date | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function CalendarHeader({ tasks, view, selectedDate, setParams }: IProps) {

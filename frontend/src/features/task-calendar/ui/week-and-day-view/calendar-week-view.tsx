@@ -1,3 +1,4 @@
+import { type TSetCalendarParams } from '../../model/calendar-types'
 
 import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
@@ -9,7 +10,7 @@ import { TaskBlock } from './task-block'
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function CalendarWeekView({ singleDayTasks, selectedDate, setParams: _setParams }: IProps) {

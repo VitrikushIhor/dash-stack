@@ -1,4 +1,4 @@
-import { type TCalendarView } from '../../model/calendar-types'
+import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
@@ -7,7 +7,7 @@ import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 
 interface IProps {
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
   day: number
   date: Date
   tasks: Task[]

@@ -1,4 +1,4 @@
-import { type TCalendarView } from '../../model/calendar-types'
+import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import { isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
@@ -13,7 +13,7 @@ import { TaskBullet } from './task-bullet'
 
 interface IProps {
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
   cell: ICalendarCell
   tasks: Task[]
   eventPositions: Record<string, number>

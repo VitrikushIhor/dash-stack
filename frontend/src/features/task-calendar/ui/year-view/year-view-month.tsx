@@ -1,4 +1,4 @@
-import { type TCalendarView } from '../../model/calendar-types'
+import { type TCalendarView, type TSetCalendarParams } from '../../model/calendar-types'
 import { useMemo } from 'react'
 import {
   format,
@@ -14,7 +14,7 @@ import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
   month: Date
   tasks: Task[]
 }

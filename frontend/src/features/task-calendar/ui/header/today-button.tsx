@@ -1,3 +1,4 @@
+import { type TSetCalendarParams } from '../../model/calendar-types'
 'use client'
 
 import { formatDate, isToday } from 'date-fns'
@@ -9,7 +10,7 @@ import {
 
 interface IProps {
   selectedDate: Date
-  setParams: (params: { date: Date | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function TodayButton({ selectedDate, setParams }: IProps) {

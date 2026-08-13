@@ -1,3 +1,4 @@
+import { type TSetCalendarParams } from '../../model/calendar-types'
 import { parseISO, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
@@ -8,7 +9,7 @@ import { TaskBlock } from './task-block'
 interface IProps {
   singleDayTasks: Task[]
   selectedDate: Date
-  setParams: (params: { date?: Date | null; view?: "month" | "week" | "day" | "year" | "agenda" | null }) => void
+  setParams: TSetCalendarParams
 }
 
 export function CalendarDayView({ singleDayTasks, selectedDate, setParams: _setParams }: IProps) {
