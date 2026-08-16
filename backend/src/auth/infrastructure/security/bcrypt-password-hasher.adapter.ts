@@ -12,9 +12,7 @@ export class BcryptPasswordHasherAdapter implements PasswordHasherPort {
     const securityConfig = this.configService.get<SecurityConfig>('security');
     const saltOrRounds = securityConfig.bcryptSaltOrRound;
 
-    return Number.isInteger(Number(saltOrRounds))
-      ? Number(saltOrRounds)
-      : saltOrRounds;
+    return Number.isInteger(Number(saltOrRounds)) ? Number(saltOrRounds) : saltOrRounds;
   }
 
   validatePassword(password: string, hashedPassword: string): Promise<boolean> {

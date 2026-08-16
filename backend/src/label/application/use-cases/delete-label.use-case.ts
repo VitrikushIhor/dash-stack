@@ -10,10 +10,7 @@ export class DeleteLabelUseCase {
   ) {}
 
   async execute(id: string, organizationId: string) {
-    const existingLabel = await this.labelRepository.findById(
-      id,
-      organizationId,
-    );
+    const existingLabel = await this.labelRepository.findById(id, organizationId);
 
     if (!existingLabel) {
       throw new NotFoundException(LABEL_ERRORS.NOT_FOUND);

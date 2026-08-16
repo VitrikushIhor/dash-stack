@@ -34,14 +34,8 @@ describe('DeleteLabelUseCase', () => {
 
     await useCase.execute(labelId, organizationId);
 
-    expect(labelRepository.findById).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
-    expect(labelRepository.delete).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
+    expect(labelRepository.findById).toHaveBeenCalledWith(labelId, organizationId);
+    expect(labelRepository.delete).toHaveBeenCalledWith(labelId, organizationId);
   });
 
   it('throws NotFoundException if the label does not exist', async () => {
@@ -54,10 +48,7 @@ describe('DeleteLabelUseCase', () => {
       new NotFoundException(LABEL_ERRORS.NOT_FOUND),
     );
 
-    expect(labelRepository.findById).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
+    expect(labelRepository.findById).toHaveBeenCalledWith(labelId, organizationId);
     expect(labelRepository.delete).not.toHaveBeenCalled();
   });
 });

@@ -1,20 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../common/guards/membership-role.guard';
+import { MembershipRoleGuard, RequireOrgRole } from '../../common/guards/membership-role.guard';
 import { OrgRole } from '@prisma/client';
 import { UserEntity } from '../../common/decorators/user.decorator';
 import { CreateOrganizationUseCase } from '../application/use-cases/create-organization.use-case';
@@ -41,10 +29,7 @@ export class OrganizationController {
   ) {}
 
   @Post()
-  create(
-    @UserEntity() user: { id: string },
-    @Body() dto: CreateOrganizationDto,
-  ) {
+  create(@UserEntity() user: { id: string }, @Body() dto: CreateOrganizationDto) {
     const command: CreateOrganizationCommand = {
       name: dto.name,
       description: dto.description ?? null,

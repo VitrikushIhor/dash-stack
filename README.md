@@ -1,45 +1,93 @@
-# 🚀 Dash Stack
+<div align="center">
 
-Modern full-stack monorepo with React frontend and NestJS backend.
+# ⚡ Dash Stack
 
-![CI](https://github.com/VitrikushIhor/dash-stack/actions/workflows/ci.yml/badge.svg)
+**Modern Full-Stack Monorepo: Next.js 15 App Router Frontend + NestJS 11 Clean Architecture Backend**
 
-> 🇺🇦 [Українська версія](README.ua.md)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.1-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![React](https://img.shields.io/badge/React-19.2-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.2-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![CI](https://img.shields.io/github/actions/workflow/status/VitrikushIhor/dash-stack/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/VitrikushIhor/dash-stack/actions/workflows/ci.yml)
 
-## 📦 Tech Stack
+<p align="center">
+  A production-ready full-stack monorepo featuring multi-tenant workspace management, real-time optimistic task & Kanban boards, dual-token JWT authentication with refresh rotation, pluggable S3/Local storage, and universal bidirectional (LTR/RTL) design.
+</p>
 
-### Frontend
-- **React 19** + TypeScript
-- **Vite** - fast build tool
-- **TanStack Router** - type-safe routing
-- **TanStack Query** - data fetching
-- **Tailwind CSS 4** - styling
-- **Radix UI** - accessible components
-- **Vitest** - unit testing
+[Quick Start](#-quick-start) • [Architecture Overview](#-architecture-overview) • [Workspaces](#-workspaces) • [Monorepo Scripts](#-monorepo-scripts) • [Docker Orchestration](#-docker-orchestration) • [Quality Gates](#-quality-gates--ci)
 
-### Backend
-- **NestJS** - Node.js framework
-- **Prisma** - ORM
-- **PostgreSQL** - database
-- **Passport.js** - authentication
-- **Swagger** - API documentation
-- **Jest** - testing
-
-### DevOps
-- **Docker & Docker Compose** - containerization
-- **GitHub Actions** - CI/CD
-- **Husky** - git hooks
-- **npm Workspaces** - monorepo management
+</div>
 
 ---
 
-## 🛠 Getting Started
+## 🌟 Core Platform Features
+
+- **🏢 Multi-Tenant Workspace System**: Seamless organization creation, active workspace switching, member invitations, and role-based permissions (`OWNER`, `ADMIN`, `MEMBER`, `VIEWER`).
+- **📋 Advanced Task & Kanban Suite**: Drag-and-drop Kanban board (`@dnd-kit`), filterable data tables (`@tanstack/react-table`), labels management, checklists, and bulk operations.
+- **🔐 Secure Dual-Token Authentication**: JWT Access + Refresh rotation with HttpOnly cookies, OAuth2 social login (Google, GitHub, Auth0), and email verification workflows.
+- **🌐 Universal Bidirectional Layout (LTR / RTL)**: Built-in support for RTL scripts (Arabic, Hebrew) and dynamic theme switching (Dark, Light, System) via persistent cookies.
+- **📁 Pluggable Media Storage**: High-performance image transcoding with Sharp (WebP conversion) and interchangeable AWS S3 and Local filesystem storage adapters.
+- **⚡ Server-First Full-Stack Model**: Next.js 15 Server Actions with runtime Zod validation proxying to a decoupled, hexagonal NestJS REST API.
+- **📖 Auto-Generated OpenAPI Docs**: Interactive Swagger documentation generated via `@nestjs/swagger` at `/api/docs`.
+
+---
+
+## 🏛️ Architecture Overview
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           DASH STACK MONOREPO                               │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+            ┌──────────────────────────┴──────────────────────────┐
+            ▼                                                     ▼
+┌─────────────────────────────┐                         ┌─────────────────────┐
+│   FRONTEND (Next.js 15)     │                         │  BACKEND (NestJS 11)│
+│  - Feature-Sliced Design    │      Proxy / REST       │  - Clean Architecture│
+│  - React 19 + Server Actions│◄───────────────────────►│  - Hexagonal Ports  │
+│  - Tailwind CSS v4 + Radix  │                         │  - Prisma 7 + Postgres│
+│  - TanStack Query v5        │                         │  - S3 / Local Storage│
+└─────────────────────────────┘                         └─────────────────────┘
+```
+
+### Monorepo Dependency Flow
+
+```text
+  User Browser                Next.js 15 Frontend             NestJS 11 Backend
+       │                               │                               │
+       │  1. HTTP Request              │                               │
+       ├──────────────────────────────►│  2. SSR / Server Action       │
+       │                               ├──────────────────────────────►│  3. Business Use Case
+       │                               │   (via Cookie Proxy / Secret) │     - Domain Policy Check
+       │                               │                               │     - Prisma Repository
+       │                               │◄──────────────────────────────┤
+       │  4. Rendered HTML / State     │                               │
+       │◄──────────────────────────────┤                               │
+```
+
+---
+
+## 📦 Workspaces
+
+The monorepo is managed via **npm Workspaces** across two dedicated services:
+
+| Workspace | Architecture | Guide & Documentation | Description |
+| :--- | :--- | :--- | :--- |
+| **`frontend`** | Feature-Sliced Design (FSD v2.1) | [Frontend README](./frontend/README.md) • [Architecture Guide](./frontend/ARCHITECTURE.md) | Next.js 15 App Router, React 19, Server Components, Zustand, TanStack Query |
+| **`backend`** | Clean & Hexagonal Architecture | [Backend README](./backend/README.md) • [Architecture Guide](./backend/ARCHITECTURE.md) | NestJS 11, Prisma 7, PostgreSQL, Passport JWT, AWS S3 / Local storage, Swagger |
+
+---
+
+## 🏁 Quick Start
 
 ### Prerequisites
 
-- Node.js 20+
-- npm 10+
-- Docker & Docker Compose (for database)
+- **Node.js**: `v20.x` or `v22.x`
+- **npm**: `v10+`
+- **Docker & Docker Compose**: For local PostgreSQL database
 
 ### 1. Clone the repository
 
@@ -54,228 +102,122 @@ cd dash-stack
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Configure Environment Variables
+
+Copy the root environment template:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit the `.env` file as needed.
-
-### 4. Start the database
+### 4. Start PostgreSQL Database
 
 ```bash
 npm run docker:dev
 ```
 
-Or just PostgreSQL:
+Or run standalone PostgreSQL:
 
 ```bash
-docker-compose -f docker-compose.dev.yml up postgres -d
+docker compose -f docker-compose.dev.yml up postgres -d
 ```
 
-### 5. Run database migrations
+### 5. Apply Database Migrations & Seed
 
 ```bash
-cd backend
-npx prisma migrate dev
-cd ..
+# Run Prisma migrations
+npx prisma migrate dev --workspace=backend
+
+# Seed database with demo accounts and tasks
+npm run seed -w backend
 ```
 
-### 6. Start development servers
+### 6. Start Development Servers
 
 ```bash
-# In separate terminals:
-npm run dev:frontend  # http://localhost:3000
-npm run dev:backend   # http://localhost:8000
+# In separate terminals (or concurrently):
+npm run dev:frontend   # http://localhost:3000
+npm run dev:backend    # http://localhost:8000
 ```
+
+* **Frontend Application**: [http://localhost:3000](http://localhost:3000)
+* **Backend API**: [http://localhost:8000/api](http://localhost:8000/api)
+* **Swagger OpenAPI Docs**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+* **Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
 ---
 
-## 📜 Available Commands
+## 📜 Monorepo Scripts
 
-### Development
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev:frontend` | Start frontend dev server |
-| `npm run dev:backend` | Start backend dev server |
-
-### Testing
+### Development & Build
 
 | Command | Description |
-|---------|-------------|
-| `npm run test -w frontend` | Run frontend tests |
-| `npm run test:watch -w frontend` | Frontend tests in watch mode |
-| `npm run test:coverage -w frontend` | Frontend tests with coverage |
-| `npm run test -w backend` | Run backend tests |
-| `npm run test:e2e -w backend` | Backend e2e tests |
+| :--- | :--- |
+| `npm run dev:frontend` | Start Next.js frontend development server with Turbopack |
+| `npm run dev:backend` | Start NestJS backend development server with SWC hot-reload |
+| `npm run build:frontend` | Build Next.js production standalone bundle |
+| `npm run build:backend` | Build NestJS production bundle via Nest CLI & SWC |
 
-### Linting & Formatting
-
-| Command | Description |
-|---------|-------------|
-| `npm run lint` | Lint both projects |
-| `npm run lint:frontend` | Lint frontend |
-| `npm run lint:backend` | Lint backend |
-| `npm run format:frontend` | Format frontend |
-| `npm run format:backend` | Format backend |
-
-### Build
+### Testing & Quality Assurance
 
 | Command | Description |
-|---------|-------------|
-| `npm run build:frontend` | Production build frontend |
-| `npm run build:backend` | Production build backend |
-
-### Docker
-
-| Command | Description |
-|---------|-------------|
-| `npm run docker:up` | Start production containers |
-| `npm run docker:up:build` | Rebuild and start |
-| `npm run docker:down` | Stop containers |
-| `npm run docker:dev` | Start dev containers with hot-reload |
-| `npm run docker:dev:build` | Rebuild and start dev |
-| `npm run docker:logs` | View logs |
-| `npm run docker:ps` | Container status |
+| :--- | :--- |
+| `npm run test -w frontend` | Run all 75 Vitest frontend test suites (327 tests) |
+| `npm run test -w backend` | Run all 51 Jest backend test suites (284 tests) |
+| `npm run lint` | Run ESLint 9 Flat Config across both frontend and backend |
+| `npm run lint:frontend` | Run frontend ESLint checks |
+| `npm run lint:backend` | Run backend ESLint checks |
+| `npm run lint:fsd -w frontend`| Run Steiger FSD architectural linter on frontend |
+| `npm run format:frontend` | Format frontend files via Prettier |
+| `npm run format:backend` | Format backend files via Prettier |
+| `npm run knip` | Scan monorepo for unused exports, types, and dependencies |
 
 ---
 
-## 🐳 Docker
+## 🐳 Docker Orchestration
 
-### Development (with hot-reload)
+### Development Environment (with Hot-Reload)
 
 ```bash
+# Starts PostgreSQL, Backend (hot-reload), and Frontend (hot-reload)
 npm run docker:dev:build
 ```
 
-Services:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000
-- PostgreSQL: localhost:5432
-
-### Production
+### Production Environment
 
 ```bash
+# Builds optimized Next.js Standalone and NestJS production containers
 npm run docker:up:build
 ```
 
-Services:
-- Frontend: http://localhost:80
-- Backend: http://localhost:8000
-- PostgreSQL: localhost:5432
+| Service | Port | Endpoint |
+| :--- | :--- | :--- |
+| **Frontend** | `3000` | [http://localhost:3000](http://localhost:3000) |
+| **Backend** | `8000` | [http://localhost:8000/api](http://localhost:8000/api) |
+| **PostgreSQL** | `5432` | `localhost:5432` |
 
 ---
 
-## 📁 Project Structure
+## 🛡️ Quality Gates & CI
 
+Dash Stack enforces multi-tier quality assurance gates to guarantee zero regressions:
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│ 1. Git Pre-Commit Hook (Husky + lint-staged)                           │
+│    - Runs ESLint 9 --fix on staged files                               │
+│    - Formats code with Prettier                                        │
+├────────────────────────────────────────────────────────────────────────┤
+│ 2. FSD Boundary Check (Steiger)                                        │
+│    - Prevents cross-slice and lower-to-higher layer import violations  │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3. Automated Test Suites (Vitest + Jest)                               │
+│    - 126 test suites (611 total unit and integration tests)            │
+├────────────────────────────────────────────────────────────────────────┤
+│ 4. Knip Dead-Code Scanner                                              │
+│    - Guarantees 0 unused files, 0 dead exports, 0 orphaned dependencies│
+└────────────────────────────────────────────────────────────────────────┘
 ```
-dash-stack/
-├── .github/
-│   └── workflows/
-│       └── ci.yml          # GitHub Actions CI
-├── .husky/                  # Git hooks
-├── frontend/                # React application
-│   ├── src/
-│   │   ├── app/            # App-level config, routes
-│   │   ├── entities/       # Business entities
-│   │   ├── features/       # Feature modules
-│   │   ├── pages/          # Page components
-│   │   ├── shared/         # Shared UI, utils, hooks
-│   │   ├── widgets/        # Complex UI blocks
-│   │   └── test/           # Test utilities
-│   ├── package.json
-│   └── vite.config.ts
-├── backend/                 # NestJS API
-│   ├── src/
-│   ├── prisma/             # Database schema & migrations
-│   ├── test/               # E2E tests
-│   └── package.json
-├── docker-compose.yml       # Production Docker
-├── docker-compose.dev.yml   # Development Docker
-├── package.json            # Root package.json (workspaces)
-└── README.md
-```
-
----
-
-## 🔐 API Documentation
-
-Swagger UI is available at:
-
-```
-http://localhost:8000/api
-```
-
----
-
-## 🧪 Testing
-
-### Frontend (Vitest)
-
-```bash
-# Run tests
-npm run test -w frontend
-
-# Watch mode
-npm run test:watch -w frontend
-
-# Coverage report
-npm run test:coverage -w frontend
-```
-
-### Backend (Jest)
-
-```bash
-# Unit tests
-npm run test -w backend
-
-# E2E tests
-npm run test:e2e -w backend
-
-# Coverage
-npm run test:cov -w backend
-```
-
----
-
-## 🔄 CI/CD
-
-GitHub Actions automatically runs:
-
-1. **Lint & Type Check** - ESLint, TypeScript
-2. **Build** - Production builds
-3. **Tests** - Unit and E2E tests
-4. **Security Audit** - npm audit
-5. **Docker Build** - Verify Docker images
-
-CI only runs for changed parts of the project (paths filter).
-
----
-
-## 📝 Git Workflow
-
-### Commit Hooks (Husky)
-
-- **pre-commit**: lint-staged (ESLint + Prettier)
-
-### Branches
-
-- `main` - production
-- `develop` - development
-- `feature/*` - new features
-- `fix/*` - bug fixes
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ---
 

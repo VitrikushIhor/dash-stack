@@ -1,10 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException } from '../../../common/exceptions/domain.exception';
-import {
-  Auth0ClientPort,
-  Auth0UserInfo,
-} from '../../application/ports/outgoing/auth0-client.port';
+import { Auth0ClientPort, Auth0UserInfo } from '../../application/ports/outgoing/auth0-client.port';
 import { AUTH_ERRORS } from '../../domain/constants/auth-errors';
 
 interface Auth0TokenExchangeResponse {
@@ -27,10 +24,7 @@ export class Auth0ClientAdapter implements Auth0ClientPort {
 
     // 2. If direct fetch fails (e.g. 401), attempt authorization code exchange
     if (!userInfo) {
-      const accessToken = await this.exchangeCodeForAccessToken(
-        domain,
-        tokenOrCode,
-      );
+      const accessToken = await this.exchangeCodeForAccessToken(domain, tokenOrCode);
       if (accessToken) {
         userInfo = await this.fetchUserInfo(domain, accessToken);
       }
@@ -61,10 +55,7 @@ export class Auth0ClientAdapter implements Auth0ClientPort {
     return rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
-  private async fetchUserInfo(
-    domain: string,
-    accessToken: string,
-  ): Promise<Auth0UserInfo | null> {
+  private async fetchUserInfo(domain: string, accessToken: string): Promise<Auth0UserInfo | null> {
     try {
       const response = await fetch(`https://${domain}/userinfo`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -73,32 +64,24 @@ export class Auth0ClientAdapter implements Auth0ClientPort {
       if (!response.ok) return null;
       return (await response.json()) as Auth0UserInfo;
     } catch (error) {
-      this.logger.debug(
-        `Auth0 /userinfo request failed: ${(error as Error)?.message}`,
-      );
+      this.logger.debug(`Auth0 /userinfo request failed: ${(error as Error)?.message}`);
       return null;
     }
   }
 
-  private async exchangeCodeForAccessToken(
-    domain: string,
-    code: string,
-  ): Promise<string | null> {
+  private async exchangeCodeForAccessToken(domain: string, code: string): Promise<string | null> {
     const clientId =
       this.configService.get<string>('AUTH0_CLIENT_ID') ||
       process.env.AUTH0_CLIENT_ID ||
       process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
 
     if (!clientId) {
-      this.logger.warn(
-        'AUTH0_CLIENT_ID is not configured for authorization code exchange',
-      );
+      this.logger.warn('AUTH0_CLIENT_ID is not configured for authorization code exchange');
       return null;
     }
 
     const clientSecret =
-      this.configService.get<string>('AUTH0_CLIENT_SECRET') ||
-      process.env.AUTH0_CLIENT_SECRET;
+      this.configService.get<string>('AUTH0_CLIENT_SECRET') || process.env.AUTH0_CLIENT_SECRET;
 
     const frontendUrl =
       this.configService.get<string>('FRONTEND_URL') ||
@@ -120,18 +103,14 @@ export class Auth0ClientAdapter implements Auth0ClientPort {
 
       if (!response.ok) {
         const errorDetails = await response.text();
-        this.logger.warn(
-          `Auth0 token exchange failed (${response.status}): ${errorDetails}`,
-        );
+        this.logger.warn(`Auth0 token exchange failed (${response.status}): ${errorDetails}`);
         return null;
       }
 
       const payload = (await response.json()) as Auth0TokenExchangeResponse;
       return payload.access_token ?? null;
     } catch (error) {
-      this.logger.error(
-        `Auth0 token exchange exception: ${(error as Error)?.message}`,
-      );
+      this.logger.error(`Auth0 token exchange exception: ${(error as Error)?.message}`);
       return null;
     }
   }

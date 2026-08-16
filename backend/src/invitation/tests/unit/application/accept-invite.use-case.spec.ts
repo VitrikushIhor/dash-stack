@@ -61,29 +61,22 @@ describe('AcceptInviteUseCase', () => {
 
     expect(result).toBe(membership);
     expect(repository.findByToken).toHaveBeenCalledWith('token-abc');
-    expect(repository.accept).toHaveBeenCalledWith(
-      'inv-1',
-      'user-1',
-      'org-1',
-      OrgRole.MEMBER,
-    );
+    expect(repository.accept).toHaveBeenCalledWith('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
   });
 
   it('should throw InvitationNotFoundException when token is invalid', async () => {
     repository.findByToken.mockResolvedValue(null);
 
-    await expect(useCase.execute(command)).rejects.toThrow(
-      InvitationNotFoundException,
-    );
+    await expect(useCase.execute(command)).rejects.toThrow(InvitationNotFoundException);
     expect(repository.accept).not.toHaveBeenCalled();
   });
 
   it('should throw InvitationEmailMismatchException when emails differ', async () => {
     repository.findByToken.mockResolvedValue(mockInvitation());
 
-    await expect(
-      useCase.execute({ ...command, userEmail: 'other@example.com' }),
-    ).rejects.toThrow(InvitationEmailMismatchException);
+    await expect(useCase.execute({ ...command, userEmail: 'other@example.com' })).rejects.toThrow(
+      InvitationEmailMismatchException,
+    );
     expect(repository.accept).not.toHaveBeenCalled();
   });
 
@@ -99,13 +92,9 @@ describe('AcceptInviteUseCase', () => {
   });
 
   it('should throw InvitationAlreadyAcceptedException when already accepted', async () => {
-    repository.findByToken.mockResolvedValue(
-      mockInvitation({ acceptedAt: new Date() }),
-    );
+    repository.findByToken.mockResolvedValue(mockInvitation({ acceptedAt: new Date() }));
 
-    await expect(useCase.execute(command)).rejects.toThrow(
-      InvitationAlreadyAcceptedException,
-    );
+    await expect(useCase.execute(command)).rejects.toThrow(InvitationAlreadyAcceptedException);
     expect(repository.accept).not.toHaveBeenCalled();
   });
 
@@ -114,9 +103,7 @@ describe('AcceptInviteUseCase', () => {
       mockInvitation({ expiresAt: new Date(Date.now() - 86400000) }),
     );
 
-    await expect(useCase.execute(command)).rejects.toThrow(
-      InvitationExpiredException,
-    );
+    await expect(useCase.execute(command)).rejects.toThrow(InvitationExpiredException);
     expect(repository.accept).not.toHaveBeenCalled();
   });
 });

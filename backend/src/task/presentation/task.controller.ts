@@ -12,10 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../common/guards/membership-role.guard';
+import { MembershipRoleGuard, RequireOrgRole } from '../../common/guards/membership-role.guard';
 import { OrgRole } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateTaskUseCase } from '../application/use-cases/create-task.use-case';
@@ -86,10 +83,7 @@ export class TaskController {
   @ApiOperation({
     summary: 'List all tasks for an organization without pagination',
   })
-  findAllUnpaginated(
-    @Param('orgId') orgId: string,
-    @Query() dto: FindAllTasksUnpaginatedDto,
-  ) {
+  findAllUnpaginated(@Param('orgId') orgId: string, @Query() dto: FindAllTasksUnpaginatedDto) {
     return this.findAllTasksUnpaginatedUseCase.execute(orgId, dto);
   }
 
@@ -97,10 +91,7 @@ export class TaskController {
   @RequireOrgRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Bulk update tasks' })
   @ApiBody({ type: BulkUpdateTasksDto })
-  async updateMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkUpdateTasksDto,
-  ) {
+  async updateMany(@Param('orgId') orgId: string, @Body() dto: BulkUpdateTasksDto) {
     return this.bulkUpdateTaskStatusUseCase.execute(orgId, dto.ids, dto.status);
   }
 
@@ -109,10 +100,7 @@ export class TaskController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Bulk delete tasks' })
   @ApiBody({ type: BulkDeleteTasksDto })
-  async deleteMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkDeleteTasksDto,
-  ) {
+  async deleteMany(@Param('orgId') orgId: string, @Body() dto: BulkDeleteTasksDto) {
     await this.deleteManyTasksUseCase.execute(orgId, dto.ids);
   }
 
@@ -126,11 +114,7 @@ export class TaskController {
   @Patch(':id')
   @RequireOrgRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Update a task' })
-  update(
-    @Param('orgId') orgId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateTaskDto,
-  ) {
+  update(@Param('orgId') orgId: string, @Param('id') id: string, @Body() dto: UpdateTaskDto) {
     const command: UpdateTaskCommand = {
       title: dto.title,
       description: dto.description,

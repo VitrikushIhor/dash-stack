@@ -86,9 +86,7 @@ describe('UpdateCurrentUserUseCase', () => {
   it('should throw UserNotFoundException when user does not exist', async () => {
     userRepository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute({ userId: 'invalid-id' })).rejects.toThrow(
-      UserNotFoundException,
-    );
+    await expect(useCase.execute({ userId: 'invalid-id' })).rejects.toThrow(UserNotFoundException);
 
     expect(userRepository.findById).toHaveBeenCalledWith('invalid-id');
     expect(userRepository.updateProfile).not.toHaveBeenCalled();

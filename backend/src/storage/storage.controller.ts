@@ -63,9 +63,7 @@ export class StorageController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid file type or file too large',
   })
-  async uploadImage(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<UploadResponseDto> {
+  async uploadImage(@UploadedFile() file: Express.Multer.File): Promise<UploadResponseDto> {
     if (!file) {
       throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }
@@ -98,9 +96,7 @@ export class StorageController {
     description: 'File uploaded successfully',
     type: UploadResponseDto,
   })
-  async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<UploadResponseDto> {
+  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<UploadResponseDto> {
     if (!file) {
       throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }

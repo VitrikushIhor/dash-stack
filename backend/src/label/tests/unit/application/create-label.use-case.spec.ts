@@ -41,10 +41,7 @@ describe('CreateLabelUseCase', () => {
 
     // Assert
     expect(result).toEqual(expectedLabel);
-    expect(labelRepository.findByName).toHaveBeenCalledWith(
-      'Bug',
-      organizationId,
-    );
+    expect(labelRepository.findByName).toHaveBeenCalledWith('Bug', organizationId);
     expect(labelRepository.create).toHaveBeenCalledWith({
       organizationId,
       ...command,
@@ -72,10 +69,7 @@ describe('CreateLabelUseCase', () => {
       new ConflictException(LABEL_ERRORS.ALREADY_EXISTS('Bug')),
     );
 
-    expect(labelRepository.findByName).toHaveBeenCalledWith(
-      'Bug',
-      organizationId,
-    );
+    expect(labelRepository.findByName).toHaveBeenCalledWith('Bug', organizationId);
     expect(labelRepository.create).not.toHaveBeenCalled();
   });
 });

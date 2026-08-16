@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Body,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Request } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
 import { FindUserMembershipsUseCase } from '../../../organization/application/use-cases/find-user-memberships.use-case';
 import { GetCurrentUserUseCase } from '../../application/use-cases/get-current-user.use-case';

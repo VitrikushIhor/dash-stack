@@ -1,8 +1,5 @@
 import type { Response } from 'express';
-import {
-  AUTH_COOKIE_NAMES,
-  AUTH_COOKIE_TTL,
-} from '../../domain/constants/auth.constants';
+import { AUTH_COOKIE_NAMES, AUTH_COOKIE_TTL } from '../../domain/constants/auth.constants';
 
 export class AuthCookieHelper {
   static setAuthCookies(

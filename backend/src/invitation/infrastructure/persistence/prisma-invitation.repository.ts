@@ -12,10 +12,7 @@ import { PrismaInvitationMapper } from './prisma-invitation.mapper';
 export class PrismaInvitationRepository implements InvitationRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findMembershipByEmailAndOrg(
-    email: string,
-    orgId: string,
-  ): Promise<unknown | null> {
+  async findMembershipByEmailAndOrg(email: string, orgId: string): Promise<unknown | null> {
     return this.prisma.membership.findFirst({
       where: {
         orgId,
@@ -24,10 +21,7 @@ export class PrismaInvitationRepository implements InvitationRepositoryPort {
     });
   }
 
-  async findPendingByEmailAndOrg(
-    email: string,
-    orgId: string,
-  ): Promise<unknown | null> {
+  async findPendingByEmailAndOrg(email: string, orgId: string): Promise<unknown | null> {
     return this.prisma.invitation.findFirst({
       where: {
         email,
@@ -45,9 +39,7 @@ export class PrismaInvitationRepository implements InvitationRepositoryPort {
     });
   }
 
-  async create(
-    data: CreateInvitationData,
-  ): Promise<PendingInvitationReadModel> {
+  async create(data: CreateInvitationData): Promise<PendingInvitationReadModel> {
     const invitation = await this.prisma.invitation.create({ data });
     return PrismaInvitationMapper.toReadModel(invitation);
   }

@@ -11,8 +11,7 @@ import { OrgRole } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 
 const ORG_ROLES_KEY = 'orgRoles';
-export const RequireOrgRole = (...roles: OrgRole[]) =>
-  SetMetadata(ORG_ROLES_KEY, roles);
+export const RequireOrgRole = (...roles: OrgRole[]) => SetMetadata(ORG_ROLES_KEY, roles);
 
 const roleHierarchy: Record<OrgRole, number> = {
   [OrgRole.OWNER]: 4,
@@ -29,10 +28,10 @@ export class MembershipRoleGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<OrgRole[]>(
-      ORG_ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<OrgRole[]>(ORG_ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
@@ -66,9 +65,7 @@ export class MembershipRoleGuard implements CanActivate {
       throw new ForbiddenException('Membership not found');
     }
 
-    const minRequiredRoleValue = Math.min(
-      ...requiredRoles.map((role) => roleHierarchy[role]),
-    );
+    const minRequiredRoleValue = Math.min(...requiredRoles.map((role) => roleHierarchy[role]));
     const userRoleValue = roleHierarchy[membership.role as OrgRole];
 
     if (userRoleValue >= minRequiredRoleValue) {

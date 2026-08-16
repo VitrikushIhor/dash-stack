@@ -12,9 +12,7 @@ const mockUser = {
 describe('InvitationController', () => {
   let controller: InvitationController;
   let sendInviteUseCase: jest.Mocked<Pick<SendInviteUseCase, 'execute'>>;
-  let listPendingUseCase: jest.Mocked<
-    Pick<ListPendingInvitationsUseCase, 'execute'>
-  >;
+  let listPendingUseCase: jest.Mocked<Pick<ListPendingInvitationsUseCase, 'execute'>>;
   let revokeInviteUseCase: jest.Mocked<Pick<RevokeInviteUseCase, 'execute'>>;
 
   beforeEach(() => {
@@ -37,25 +35,17 @@ describe('InvitationController', () => {
       const result = await controller.sendInvite('org-1', mockUser, dto);
 
       expect(result).toBe(expected);
-      expect(sendInviteUseCase.execute).toHaveBeenCalledWith(
-        'org-1',
-        'user-1',
-        {
-          email: 'new@example.com',
-          role: OrgRole.MEMBER,
-        },
-      );
+      expect(sendInviteUseCase.execute).toHaveBeenCalledWith('org-1', 'user-1', {
+        email: 'new@example.com',
+        role: OrgRole.MEMBER,
+      });
     });
 
     it('passes orgId and user.id correctly', async () => {
       const dto = { email: 'test@test.com', role: OrgRole.ADMIN };
       sendInviteUseCase.execute.mockResolvedValue({} as any);
 
-      await controller.sendInvite(
-        'org-abc',
-        { ...mockUser, id: 'admin-5' } as User,
-        dto,
-      );
+      await controller.sendInvite('org-abc', { ...mockUser, id: 'admin-5' } as User, dto);
 
       expect(sendInviteUseCase.execute).toHaveBeenCalledWith(
         'org-abc',
@@ -83,10 +73,7 @@ describe('InvitationController', () => {
 
       await controller.revokeInvite('org-1', 'inv-1');
 
-      expect(revokeInviteUseCase.execute).toHaveBeenCalledWith(
-        'inv-1',
-        'org-1',
-      );
+      expect(revokeInviteUseCase.execute).toHaveBeenCalledWith('inv-1', 'org-1');
     });
   });
 });

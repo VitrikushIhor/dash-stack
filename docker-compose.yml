@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-prisma}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-topsecret}
-      POSTGRES_DB: ${POSTGRES_DB:-blog}
+      POSTGRES_DB: ${POSTGRES_DB:-db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -52,7 +52,7 @@ services:
       retries: 3
 
   # ============================================
-  # FRONTEND (Vite + Nginx)
+  # FRONTEND (Next.js 15 Standalone)
   # ============================================
   frontend:
     container_name: dash-stack-frontend
@@ -61,9 +61,21 @@ services:
       dockerfile: frontend/Dockerfile
     restart: unless-stopped
     ports:
-      - '${FRONTEND_PORT:-80}:8080'
+      - '${FRONTEND_PORT:-3000}:3000'
     depends_on:
       - backend
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    env_file:
+      - .env
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 
 volumes:
   postgres_data:

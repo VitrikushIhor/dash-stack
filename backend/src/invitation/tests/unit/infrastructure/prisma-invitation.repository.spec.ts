@@ -59,20 +59,14 @@ describe('PrismaInvitationRepository', () => {
       const membership = { id: 'mem-1' };
       prisma.membership.findFirst.mockResolvedValue(membership);
 
-      const result = await repository.findMembershipByEmailAndOrg(
-        'user@example.com',
-        'org-1',
-      );
+      const result = await repository.findMembershipByEmailAndOrg('user@example.com', 'org-1');
       expect(result).toBe(membership);
     });
 
     it('returns null when not found', async () => {
       prisma.membership.findFirst.mockResolvedValue(null);
 
-      const result = await repository.findMembershipByEmailAndOrg(
-        'user@example.com',
-        'org-1',
-      );
+      const result = await repository.findMembershipByEmailAndOrg('user@example.com', 'org-1');
       expect(result).toBeNull();
     });
   });
@@ -195,12 +189,7 @@ describe('PrismaInvitationRepository', () => {
       };
       prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
-      const result = await repository.accept(
-        'inv-1',
-        'user-1',
-        'org-1',
-        OrgRole.MEMBER,
-      );
+      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
 
       expect(tx.membership.findUnique).toHaveBeenCalledWith({
         where: { userId_orgId: { userId: 'user-1', orgId: 'org-1' } },
@@ -228,12 +217,7 @@ describe('PrismaInvitationRepository', () => {
       };
       prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
-      const result = await repository.accept(
-        'inv-1',
-        'user-1',
-        'org-1',
-        OrgRole.MEMBER,
-      );
+      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
 
       expect(tx.membership.create).not.toHaveBeenCalled();
       expect(tx.invitation.update).toHaveBeenCalled();

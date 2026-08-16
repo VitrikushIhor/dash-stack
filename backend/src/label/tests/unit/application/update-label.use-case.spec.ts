@@ -51,19 +51,9 @@ describe('UpdateLabelUseCase', () => {
 
     // Assert
     expect(result).toEqual(updatedLabel);
-    expect(labelRepository.findById).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
-    expect(labelRepository.findByName).toHaveBeenCalledWith(
-      'Critical Bug',
-      organizationId,
-    );
-    expect(labelRepository.update).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-      command,
-    );
+    expect(labelRepository.findById).toHaveBeenCalledWith(labelId, organizationId);
+    expect(labelRepository.findByName).toHaveBeenCalledWith('Critical Bug', organizationId);
+    expect(labelRepository.update).toHaveBeenCalledWith(labelId, organizationId, command);
   });
 
   it('updates only the color successfully without checking name uniqueness', async () => {
@@ -94,16 +84,9 @@ describe('UpdateLabelUseCase', () => {
 
     // Assert
     expect(result).toEqual(updatedLabel);
-    expect(labelRepository.findById).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
+    expect(labelRepository.findById).toHaveBeenCalledWith(labelId, organizationId);
     expect(labelRepository.findByName).not.toHaveBeenCalled(); // No name check if name wasn't provided
-    expect(labelRepository.update).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-      command,
-    );
+    expect(labelRepository.update).toHaveBeenCalledWith(labelId, organizationId, command);
   });
 
   it('throws NotFoundException if the label does not exist', async () => {
@@ -118,10 +101,7 @@ describe('UpdateLabelUseCase', () => {
       new NotFoundException(LABEL_ERRORS.NOT_FOUND),
     );
 
-    expect(labelRepository.findById).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-    );
+    expect(labelRepository.findById).toHaveBeenCalledWith(labelId, organizationId);
     expect(labelRepository.update).not.toHaveBeenCalled();
   });
 
@@ -149,9 +129,7 @@ describe('UpdateLabelUseCase', () => {
     });
 
     // Act & Assert
-    await expect(
-      useCase.execute(labelId, organizationId, command),
-    ).rejects.toThrow(
+    await expect(useCase.execute(labelId, organizationId, command)).rejects.toThrow(
       new ConflictException(LABEL_ERRORS.ALREADY_EXISTS('Feature')),
     );
 
@@ -187,10 +165,6 @@ describe('UpdateLabelUseCase', () => {
     await useCase.execute(labelId, organizationId, command);
 
     // Assert
-    expect(labelRepository.update).toHaveBeenCalledWith(
-      labelId,
-      organizationId,
-      command,
-    );
+    expect(labelRepository.update).toHaveBeenCalledWith(labelId, organizationId, command);
   });
 });

@@ -11,8 +11,7 @@ export class UploadResponseDto {
   @ApiProperty({
     description:
       'Public CDN URL for display. Do NOT store in DB — derive from key via storageService.getPublicUrl()',
-    example:
-      'https://d1234abcdef.cloudfront.net/avatars/550e8400-e29b-41d4-a716-446655440000.webp',
+    example: 'https://d1234abcdef.cloudfront.net/avatars/550e8400-e29b-41d4-a716-446655440000.webp',
   })
   url: string;
 

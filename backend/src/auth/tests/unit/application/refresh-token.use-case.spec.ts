@@ -41,9 +41,7 @@ describe('RefreshTokenUseCase', () => {
 
   it('should throw UnauthorizedException for invalid token', async () => {
     refreshTokenRepoMock.findByToken.mockResolvedValue(null);
-    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(UnauthorizedException);
   });
 
   it('should delete token and throw if it is expired', async () => {
@@ -52,9 +50,7 @@ describe('RefreshTokenUseCase', () => {
       expiresAt: new Date(Date.now() - 10000), // past
     });
 
-    await expect(useCase.execute({ token: 'expired' })).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(useCase.execute({ token: 'expired' })).rejects.toThrow(UnauthorizedException);
     expect(refreshTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
   });
 });

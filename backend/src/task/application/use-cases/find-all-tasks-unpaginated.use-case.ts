@@ -1,8 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import {
-  TaskRepositoryPort,
-  FindAllTasksUnpaginatedFilters,
-} from '../ports/task.repository.port';
+import { TaskRepositoryPort, FindAllTasksUnpaginatedFilters } from '../ports/task.repository.port';
 import { TaskReadModel } from '../read-models/task.read-model';
 
 @Injectable()
@@ -12,10 +9,7 @@ export class FindAllTasksUnpaginatedUseCase {
     private readonly taskRepository: TaskRepositoryPort,
   ) {}
 
-  async execute(
-    orgId: string,
-    filters: FindAllTasksUnpaginatedFilters,
-  ): Promise<TaskReadModel[]> {
+  async execute(orgId: string, filters: FindAllTasksUnpaginatedFilters): Promise<TaskReadModel[]> {
     return this.taskRepository.findAllUnpaginated(orgId, filters);
   }
 }

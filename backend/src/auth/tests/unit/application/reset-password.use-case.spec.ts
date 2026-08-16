@@ -46,32 +46,25 @@ describe('ResetPasswordUseCase', () => {
     await useCase.execute({ token: 'valid-token', newPassword: 'new-pwd' });
 
     expect(passwordHasherMock.hashPassword).toHaveBeenCalledWith('new-pwd');
-    expect(userRepoMock.updatePassword).toHaveBeenCalledWith(
-      'test@example.com',
-      'new_hash',
-    );
-    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith(
-      'token-1',
-    );
-    expect(refreshTokenRepoMock.deleteAllByUserId).toHaveBeenCalledWith(
-      'user-1',
-    );
+    expect(userRepoMock.updatePassword).toHaveBeenCalledWith('test@example.com', 'new_hash');
+    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
+    expect(refreshTokenRepoMock.deleteAllByUserId).toHaveBeenCalledWith('user-1');
   });
 
   it('should throw BadRequestException for invalid token', async () => {
     verificationTokenRepoMock.findByToken.mockResolvedValue(null);
-    await expect(
-      useCase.execute({ token: 'bad', newPassword: 'pwd' }),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw BadRequestException if token type is wrong', async () => {
     verificationTokenRepoMock.findByToken.mockResolvedValue({
       type: AuthTokenType.EMAIL_VERIFICATION,
     });
-    await expect(
-      useCase.execute({ token: 'bad', newPassword: 'pwd' }),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw BadRequestException if token is expired', async () => {
@@ -79,8 +72,8 @@ describe('ResetPasswordUseCase', () => {
       type: AuthTokenType.PASSWORD_RESET,
       expires: new Date(Date.now() - 10000), // past
     });
-    await expect(
-      useCase.execute({ token: 'bad', newPassword: 'pwd' }),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
+      BadRequestException,
+    );
   });
 });

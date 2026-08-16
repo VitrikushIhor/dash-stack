@@ -18,17 +18,13 @@ describe('LogoutUseCase', () => {
 
     const result = await useCase.execute({ refreshToken: 'valid-token' });
 
-    expect(refreshTokenRepoMock.deleteByToken).toHaveBeenCalledWith(
-      'valid-token',
-    );
+    expect(refreshTokenRepoMock.deleteByToken).toHaveBeenCalledWith('valid-token');
     expect(result).toEqual({ message: AUTH_ERRORS.LOGOUT_SUCCESS });
   });
 
   it('should throw BadRequestException if token not found (count 0)', async () => {
     refreshTokenRepoMock.deleteByToken.mockResolvedValue({ count: 0 });
 
-    await expect(useCase.execute({ refreshToken: 'invalid' })).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(useCase.execute({ refreshToken: 'invalid' })).rejects.toThrow(BadRequestException);
   });
 });

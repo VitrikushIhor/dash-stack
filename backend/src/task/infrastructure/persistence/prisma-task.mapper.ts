@@ -45,9 +45,7 @@ export interface PrismaTaskWithRelations {
 }
 
 export class PrismaTaskMapper {
-  static toDomain(
-    prismaTask: PrismaTaskWithRelations | null,
-  ): TaskReadModel | null {
+  static toDomain(prismaTask: PrismaTaskWithRelations | null): TaskReadModel | null {
     if (!prismaTask) return null;
 
     return {

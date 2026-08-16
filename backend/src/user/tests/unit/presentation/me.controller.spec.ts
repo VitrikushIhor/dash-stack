@@ -75,9 +75,7 @@ describe('MeController', () => {
     it('should return user memberships', async () => {
       const req = { user: { id: 'user-1' } };
       const expectedResult = [{ id: 'org-1', name: 'Org 1' }];
-      findUserMembershipsUseCase.execute.mockResolvedValue(
-        expectedResult as any,
-      );
+      findUserMembershipsUseCase.execute.mockResolvedValue(expectedResult as any);
 
       const result = await controller.getMemberships(req);
 

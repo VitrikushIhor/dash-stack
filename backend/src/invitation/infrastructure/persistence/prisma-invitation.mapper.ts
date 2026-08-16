@@ -13,9 +13,7 @@ interface PrismaInvitationPayload {
 }
 
 export class PrismaInvitationMapper {
-  static toReadModel(
-    payload: PrismaInvitationPayload,
-  ): PendingInvitationReadModel {
+  static toReadModel(payload: PrismaInvitationPayload): PendingInvitationReadModel {
     return {
       id: payload.id,
       email: payload.email,

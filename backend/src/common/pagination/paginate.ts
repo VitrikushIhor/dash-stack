@@ -7,25 +7,16 @@ export interface PaginateOptions {
 
 const MAX_PER_PAGE = 100;
 
-export async function paginate<
-  T,
-  FindManyArgs extends { where?: W },
-  W = FindManyArgs['where'],
->(
+export async function paginate<T, FindManyArgs extends { where?: W }, W = FindManyArgs['where']>(
   delegate: {
     count: (args: { where?: W }) => Promise<number>;
-    findMany: (
-      args: FindManyArgs & { skip?: number; take?: number },
-    ) => Promise<T[]>;
+    findMany: (args: FindManyArgs & { skip?: number; take?: number }) => Promise<T[]>;
   },
   args: FindManyArgs,
   options: PaginateOptions,
 ): Promise<PaginatedResult<T>> {
   const page = Math.max(1, Math.floor(Number(options.page) || 1));
-  const perPage = Math.min(
-    MAX_PER_PAGE,
-    Math.max(1, Math.floor(Number(options.perPage) || 10)),
-  );
+  const perPage = Math.min(MAX_PER_PAGE, Math.max(1, Math.floor(Number(options.perPage) || 10)));
   const skip = (page - 1) * perPage;
 
   const [total, data] = await Promise.all([

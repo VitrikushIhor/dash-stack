@@ -11,10 +11,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../common/guards/membership-role.guard';
+import { MembershipRoleGuard, RequireOrgRole } from '../../common/guards/membership-role.guard';
 import { OrgRole } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateLabelUseCase } from '../application/use-cases/create-label.use-case';
@@ -53,11 +50,7 @@ export class LabelController {
   @Patch(':id')
   @RequireOrgRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Update a label' })
-  update(
-    @Param('orgId') orgId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateLabelDto,
-  ) {
+  update(@Param('orgId') orgId: string, @Param('id') id: string, @Body() dto: UpdateLabelDto) {
     return this.updateLabelUseCase.execute(id, orgId, dto);
   }
 

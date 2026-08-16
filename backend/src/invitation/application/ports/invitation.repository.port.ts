@@ -10,15 +10,9 @@ export interface CreateInvitationData {
 }
 
 export interface InvitationRepositoryPort {
-  findMembershipByEmailAndOrg(
-    email: string,
-    orgId: string,
-  ): Promise<unknown | null>;
+  findMembershipByEmailAndOrg(email: string, orgId: string): Promise<unknown | null>;
 
-  findPendingByEmailAndOrg(
-    email: string,
-    orgId: string,
-  ): Promise<unknown | null>;
+  findPendingByEmailAndOrg(email: string, orgId: string): Promise<unknown | null>;
 
   findOrgById(orgId: string): Promise<{ name: string } | null>;
 
@@ -28,12 +22,7 @@ export interface InvitationRepositoryPort {
 
   create(data: CreateInvitationData): Promise<PendingInvitationReadModel>;
 
-  accept(
-    invitationId: string,
-    userId: string,
-    orgId: string,
-    role: OrgRole,
-  ): Promise<unknown>;
+  accept(invitationId: string, userId: string, orgId: string, role: OrgRole): Promise<unknown>;
 
   listPending(orgId: string): Promise<PendingInvitationReadModel[]>;
 

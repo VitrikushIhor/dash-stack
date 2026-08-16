@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  FindAllTasksFilters,
-  TaskRepositoryPort,
-} from '../ports/task.repository.port';
+import { FindAllTasksFilters, TaskRepositoryPort } from '../ports/task.repository.port';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 import { TaskReadModel } from '../read-models/task.read-model';
 

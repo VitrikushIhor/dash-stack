@@ -51,20 +51,14 @@ describe('RevokeInviteUseCase', () => {
   it('should throw InvitationNotInOrgException when invitation is null', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(
-      InvitationNotInOrgException,
-    );
+    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(InvitationNotInOrgException);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw InvitationNotInOrgException when orgId does not match', async () => {
-    repository.findById.mockResolvedValue(
-      mockInvitation({ orgId: 'org-other' }),
-    );
+    repository.findById.mockResolvedValue(mockInvitation({ orgId: 'org-other' }));
 
-    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(
-      InvitationNotInOrgException,
-    );
+    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(InvitationNotInOrgException);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 });

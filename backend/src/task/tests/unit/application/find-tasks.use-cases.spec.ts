@@ -59,9 +59,7 @@ describe('Find Tasks Use Cases', () => {
     it('should throw TaskNotFoundException if task is not found', async () => {
       taskRepository.findById.mockResolvedValue(null);
 
-      await expect(useCase.execute('task-1', 'org-1')).rejects.toThrow(
-        TaskNotFoundException,
-      );
+      await expect(useCase.execute('task-1', 'org-1')).rejects.toThrow(TaskNotFoundException);
       expect(taskRepository.findById).toHaveBeenCalledWith('task-1', 'org-1');
     });
   });
@@ -74,10 +72,7 @@ describe('Find Tasks Use Cases', () => {
     });
 
     it('should return tasks matching filters', async () => {
-      const expectedTasks = [
-        mockTask({ id: 'task-1' }),
-        mockTask({ id: 'task-2' }),
-      ];
+      const expectedTasks = [mockTask({ id: 'task-1' }), mockTask({ id: 'task-2' })];
       const paginatedResult = {
         data: expectedTasks,
         meta: {

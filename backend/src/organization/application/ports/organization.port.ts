@@ -24,10 +24,7 @@ export interface OrganizationRepositoryPort {
   ): Promise<OrganizationReadModel>;
   findManyByUserId(userId: string): Promise<OrganizationReadModel[]>;
   countByUserId(userId: string): Promise<number>;
-  findById(
-    id: string,
-    requesterId: string,
-  ): Promise<OrganizationReadModel | null>;
+  findById(id: string, requesterId: string): Promise<OrganizationReadModel | null>;
   findUserMemberships(userId: string): Promise<UserMembershipReadModel[]>;
   update(
     orgId: string,
@@ -35,9 +32,6 @@ export interface OrganizationRepositoryPort {
   ): Promise<OrganizationReadModel | null>;
   delete(orgId: string): Promise<void>;
   findOrganizationMembers(orgId: string): Promise<OrganizationMember[]>;
-  findOrganizationMember(
-    orgId: string,
-    userId: string,
-  ): Promise<OrganizationMember | null>;
+  findOrganizationMember(orgId: string, userId: string): Promise<OrganizationMember | null>;
   existsBySlug(slug: string): Promise<boolean>;
 }

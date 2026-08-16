@@ -14,9 +14,7 @@ describe('TaskAssigneeValidatorService', () => {
   });
 
   it('should pass if assigneeIds is undefined', async () => {
-    await expect(
-      service.validateOrThrow('org-1', undefined),
-    ).resolves.not.toThrow();
+    await expect(service.validateOrThrow('org-1', undefined)).resolves.not.toThrow();
     expect(membershipRepository.validateMemberships).not.toHaveBeenCalled();
   });
 
@@ -28,26 +26,24 @@ describe('TaskAssigneeValidatorService', () => {
   it('should pass if memberships are valid', async () => {
     membershipRepository.validateMemberships.mockResolvedValue(true);
 
-    await expect(
-      service.validateOrThrow('org-1', ['user-1', 'user-2']),
-    ).resolves.not.toThrow();
+    await expect(service.validateOrThrow('org-1', ['user-1', 'user-2'])).resolves.not.toThrow();
 
-    expect(membershipRepository.validateMemberships).toHaveBeenCalledWith(
-      'org-1',
-      ['user-1', 'user-2'],
-    );
+    expect(membershipRepository.validateMemberships).toHaveBeenCalledWith('org-1', [
+      'user-1',
+      'user-2',
+    ]);
   });
 
   it('should throw InvalidAssigneesException if memberships are invalid', async () => {
     membershipRepository.validateMemberships.mockResolvedValue(false);
 
-    await expect(
-      service.validateOrThrow('org-1', ['user-1', 'invalid-user']),
-    ).rejects.toThrow(InvalidAssigneesException);
-
-    expect(membershipRepository.validateMemberships).toHaveBeenCalledWith(
-      'org-1',
-      ['user-1', 'invalid-user'],
+    await expect(service.validateOrThrow('org-1', ['user-1', 'invalid-user'])).rejects.toThrow(
+      InvalidAssigneesException,
     );
+
+    expect(membershipRepository.validateMemberships).toHaveBeenCalledWith('org-1', [
+      'user-1',
+      'invalid-user',
+    ]);
   });
 });

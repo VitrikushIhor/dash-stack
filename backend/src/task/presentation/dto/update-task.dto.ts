@@ -1,8 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsDueDateAfterStartDate } from './create-task.dto';
+import { CreateTaskDto, IsDueDateAfterStartDate } from './create-task.dto';
 import { IsDateString, IsOptional, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { CreateTaskDto } from './create-task.dto';
 
 /**
  * UpdateTaskDto extends PartialType(CreateTaskDto) so all create fields become

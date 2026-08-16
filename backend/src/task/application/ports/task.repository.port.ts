@@ -74,11 +74,7 @@ export interface TaskRepositoryPort {
     filters: FindAllTasksUnpaginatedFilters,
   ): Promise<TaskReadModel[]>;
   findById(id: string, organizationId: string): Promise<TaskReadModel | null>;
-  update(
-    id: string,
-    organizationId: string,
-    data: UpdateTaskData,
-  ): Promise<TaskReadModel>;
+  update(id: string, organizationId: string, data: UpdateTaskData): Promise<TaskReadModel>;
   delete(id: string, organizationId: string): Promise<void>;
   deleteMany(organizationId: string, ids: string[]): Promise<{ count: number }>;
   updateMany(

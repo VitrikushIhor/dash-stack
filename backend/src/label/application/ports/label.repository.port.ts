@@ -15,14 +15,7 @@ export interface LabelRepositoryPort {
   create(data: CreateLabelData): Promise<LabelReadModel>;
   findAll(organizationId: string): Promise<LabelReadModel[]>;
   findById(id: string, organizationId: string): Promise<LabelReadModel | null>;
-  findByName(
-    name: string,
-    organizationId: string,
-  ): Promise<LabelReadModel | null>;
-  update(
-    id: string,
-    organizationId: string,
-    data: UpdateLabelData,
-  ): Promise<LabelReadModel>;
+  findByName(name: string, organizationId: string): Promise<LabelReadModel | null>;
+  update(id: string, organizationId: string, data: UpdateLabelData): Promise<LabelReadModel>;
   delete(id: string, organizationId: string): Promise<void>;
 }

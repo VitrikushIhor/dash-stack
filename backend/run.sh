@@ -1,2 +1,6 @@
-docker build -t nest-prisma-server .
-docker run -d -t -p 8000:8000 -e PORT=8000 nest-prisma-server
+#!/bin/sh
+set -e
+
+# Start backend container and database in development mode
+echo "🚀 Starting Dash Stack Backend development environment..."
+docker compose -f docker-compose.dev.yml up --build "$@"

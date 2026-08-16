@@ -43,7 +43,7 @@ export function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
   };
 }
 
-class CreateChecklistItemDto {
+export class CreateChecklistItemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -99,8 +99,7 @@ export class CreateTaskDto {
   @ApiPropertyOptional({
     type: String,
     format: 'date-time',
-    description:
-      'Optional task due date (ISO 8601). Must be >= startDate when both are provided.',
+    description: 'Optional task due date (ISO 8601). Must be >= startDate when both are provided.',
   })
   @IsOptional()
   @IsDateString()

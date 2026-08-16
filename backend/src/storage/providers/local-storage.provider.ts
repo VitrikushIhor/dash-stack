@@ -8,10 +8,7 @@ import type {
   UploadFileDto,
   StorageUploadResult,
 } from '../interfaces/storage.interface';
-import {
-  StorageUploadException,
-  StorageDeleteException,
-} from '../exceptions/storage.exception';
+import { StorageUploadException, StorageDeleteException } from '../exceptions/storage.exception';
 
 @Injectable()
 export class LocalStorageProvider implements IStorageProvider {
@@ -23,9 +20,7 @@ export class LocalStorageProvider implements IStorageProvider {
     this.uploadDir = join(process.cwd(), 'uploads');
     this.port = this.configService.get<number>('nest.port', 8000);
 
-    this.logger.log(
-      `Local storage provider initialized — uploads dir: ${this.uploadDir}`,
-    );
+    this.logger.log(`Local storage provider initialized — uploads dir: ${this.uploadDir}`);
   }
 
   async upload(dto: UploadFileDto): Promise<StorageUploadResult> {
@@ -38,9 +33,7 @@ export class LocalStorageProvider implements IStorageProvider {
       await mkdir(dirPath, { recursive: true });
       await writeFile(filePath, dto.buffer);
 
-      this.logger.log(
-        `File saved locally: ${key} (${dto.buffer.length} bytes)`,
-      );
+      this.logger.log(`File saved locally: ${key} (${dto.buffer.length} bytes)`);
 
       return {
         key,
@@ -50,20 +43,13 @@ export class LocalStorageProvider implements IStorageProvider {
       };
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.error(
-          `Local upload failed for key "${key}": ${error.message}`,
-          error.stack,
-        );
+        this.logger.error(`Local upload failed for key "${key}": ${error.message}`, error.stack);
         throw new StorageUploadException(error);
       }
-      this.logger.error(
-        `Local upload failed for key "${key}" with unknown error`,
-      );
+      this.logger.error(`Local upload failed for key "${key}" with unknown error`);
       throw new StorageUploadException(
         new Error(
-          typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
-            : String(error),
+          typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error),
         ),
       );
     }
@@ -79,25 +65,16 @@ export class LocalStorageProvider implements IStorageProvider {
       if (error instanceof Error) {
         // If the file doesn't exist, silently succeed — same behavior as S3
         if ((error as any).code === 'ENOENT') {
-          this.logger.warn(
-            `File not found during delete (already removed): ${key}`,
-          );
+          this.logger.warn(`File not found during delete (already removed): ${key}`);
           return;
         }
-        this.logger.error(
-          `Local delete failed for key "${key}": ${error.message}`,
-          error.stack,
-        );
+        this.logger.error(`Local delete failed for key "${key}": ${error.message}`, error.stack);
         throw new StorageDeleteException(error);
       }
-      this.logger.error(
-        `Local delete failed for key "${key}" with unknown error`,
-      );
+      this.logger.error(`Local delete failed for key "${key}" with unknown error`);
       throw new StorageDeleteException(
         new Error(
-          typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
-            : String(error),
+          typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error),
         ),
       );
     }

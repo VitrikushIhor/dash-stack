@@ -145,8 +145,7 @@ describe('SendInviteUseCase', () => {
     await useCase.execute('org-1', 'admin-1', command);
 
     const createCall = repository.create.mock.calls[0][0];
-    const daysDiff =
-      (createCall.expiresAt.getTime() - before.getTime()) / 86400000;
+    const daysDiff = (createCall.expiresAt.getTime() - before.getTime()) / 86400000;
     expect(daysDiff).toBeGreaterThanOrEqual(6.9);
     expect(daysDiff).toBeLessThanOrEqual(7.1);
   });

@@ -9,12 +9,7 @@ export const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 /** Maximum general file size: 50 MB */
 export const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-export const ALLOWED_IMAGE_MIMES: string[] = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-];
+export const ALLOWED_IMAGE_MIMES: string[] = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 /** Allowed general file MIME types */
 export const ALLOWED_FILE_MIMES: string[] = [

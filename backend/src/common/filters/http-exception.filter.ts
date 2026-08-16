@@ -16,9 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = exception.getStatus
-      ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = exception.getStatus ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const errorResponse = exception.getResponse();
     const message =
@@ -26,9 +24,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? errorResponse['message']
         : errorResponse;
 
-    this.logger.error(
-      `Http Status: ${status} Error Message: ${JSON.stringify(message)}`,
-    );
+    this.logger.error(`Http Status: ${status} Error Message: ${JSON.stringify(message)}`);
 
     response.status(status).json({
       statusCode: status,

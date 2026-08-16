@@ -34,9 +34,7 @@ export class AuthMailerAdapter implements AuthMailerPort {
       });
     } catch (error) {
       console.error('Email send error:', error);
-      throw new InternalServerErrorException(
-        'Failed to send verification email',
-      );
+      throw new InternalServerErrorException('Failed to send verification email');
     }
   }
 
@@ -59,9 +57,7 @@ export class AuthMailerAdapter implements AuthMailerPort {
       });
     } catch (error) {
       console.error('Email send error:', error);
-      throw new InternalServerErrorException(
-        'Failed to send password reset email',
-      );
+      throw new InternalServerErrorException('Failed to send password reset email');
     }
   }
 }

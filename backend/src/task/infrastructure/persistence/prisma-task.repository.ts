@@ -8,18 +8,13 @@ import {
   UpdateTaskData,
 } from '../../application/ports/task.repository.port';
 import { TaskReadModel } from '../../application/read-models/task.read-model';
-import {
-  PrismaTaskMapper,
-  PrismaTaskWithRelations,
-} from './prisma-task.mapper';
+import { PrismaTaskMapper, PrismaTaskWithRelations } from './prisma-task.mapper';
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
 import { paginate } from '../../../common/pagination/paginate';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
 @Injectable()
-export class PrismaTaskRepository
-  implements TaskRepositoryPort, MembershipRepositoryPort
-{
+export class PrismaTaskRepository implements TaskRepositoryPort, MembershipRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   private readonly taskInclude = {
@@ -87,10 +82,7 @@ export class PrismaTaskRepository
       {
         where: this.buildWhereClause(organizationId, filters),
         include: this.taskInclude,
-        orderBy: [
-          { createdAt: 'desc' as const },
-          { updatedAt: 'desc' as const },
-        ],
+        orderBy: [{ createdAt: 'desc' as const }, { updatedAt: 'desc' as const }],
       },
       { page, perPage },
     );
@@ -118,10 +110,7 @@ export class PrismaTaskRepository
     );
   }
 
-  async findById(
-    id: string,
-    organizationId: string,
-  ): Promise<TaskReadModel | null> {
+  async findById(id: string, organizationId: string): Promise<TaskReadModel | null> {
     const task = await this.prisma.task.findFirst({
       where: { id, organizationId },
       include: this.taskInclude,
@@ -130,11 +119,7 @@ export class PrismaTaskRepository
     return task ? PrismaTaskMapper.toDomain(task) : null;
   }
 
-  async update(
-    id: string,
-    organizationId: string,
-    data: UpdateTaskData,
-  ): Promise<TaskReadModel> {
+  async update(id: string, organizationId: string, data: UpdateTaskData): Promise<TaskReadModel> {
     const { assigneeIds, checklists, ...rest } = data;
 
     const updatedTask = await this.prisma.$transaction(async (tx) => {
@@ -198,10 +183,7 @@ export class PrismaTaskRepository
     });
   }
 
-  async deleteMany(
-    organizationId: string,
-    ids: string[],
-  ): Promise<{ count: number }> {
+  async deleteMany(organizationId: string, ids: string[]): Promise<{ count: number }> {
     return this.prisma.task.deleteMany({
       where: {
         id: { in: ids },
@@ -210,10 +192,7 @@ export class PrismaTaskRepository
     });
   }
 
-  async validateMemberships(
-    organizationId: string,
-    membershipIds: string[],
-  ): Promise<boolean> {
+  async validateMemberships(organizationId: string, membershipIds: string[]): Promise<boolean> {
     const uniqueIds = [...new Set(membershipIds)];
     const count = await this.prisma.membership.count({
       where: {
@@ -225,10 +204,7 @@ export class PrismaTaskRepository
     return count === uniqueIds.length;
   }
 
-  private buildWhereClause(
-    organizationId: string,
-    filters: FindAllTasksUnpaginatedFilters,
-  ) {
+  private buildWhereClause(organizationId: string, filters: FindAllTasksUnpaginatedFilters) {
     const {
       search,
       status,
@@ -259,9 +235,7 @@ export class PrismaTaskRepository
             }
           : {},
         status?.length ? { status: { in: status } } : {},
-        assigneeIds?.length
-          ? { assignees: { some: { id: { in: assigneeIds } } } }
-          : {},
+        assigneeIds?.length ? { assignees: { some: { id: { in: assigneeIds } } } } : {},
         labelNames?.length ? { label: { name: { in: labelNames } } } : {},
         dueDateFrom || dueDateTo
           ? {

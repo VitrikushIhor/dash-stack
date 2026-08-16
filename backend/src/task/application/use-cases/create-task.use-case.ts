@@ -21,10 +21,7 @@ export class CreateTaskUseCase {
 
     TaskDates.validateRange(startDate, dueDate);
 
-    await this.assigneeValidator.validateOrThrow(
-      organizationId,
-      command.assigneeIds,
-    );
+    await this.assigneeValidator.validateOrThrow(organizationId, command.assigneeIds);
 
     return this.taskRepository.create({
       organizationId,

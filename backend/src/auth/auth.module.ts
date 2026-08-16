@@ -109,11 +109,6 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
     Auth0ClientAdapter,
     { provide: 'Auth0ClientPort', useExisting: Auth0ClientAdapter },
   ],
-  exports: [
-    JwtAuthGuard,
-    ValidateUserUseCase,
-    PrismaUserRepository,
-    'UserRepositoryPort',
-  ],
+  exports: [JwtAuthGuard, ValidateUserUseCase, PrismaUserRepository, 'UserRepositoryPort'],
 })
 export class AuthModule {}

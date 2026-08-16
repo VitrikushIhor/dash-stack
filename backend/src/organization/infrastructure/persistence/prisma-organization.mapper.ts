@@ -18,9 +18,7 @@ interface PrismaOrganizationWithCount {
 }
 
 export class PrismaOrganizationMapper {
-  static toReadModel(
-    org: PrismaOrganizationWithCount | null,
-  ): OrganizationReadModel | null {
+  static toReadModel(org: PrismaOrganizationWithCount | null): OrganizationReadModel | null {
     if (!org) return null;
     const { _count, memberships, ...rest } = org;
 

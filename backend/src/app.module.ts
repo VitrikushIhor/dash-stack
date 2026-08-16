@@ -48,9 +48,7 @@ import { join } from 'node:path';
             const schema = url.searchParams.get('schema');
             if (schema) {
               poolConfig.options = `-c search_path=${schema}`;
-              console.log(
-                `[AppModule] Configured Postgres search_path to: ${schema}`,
-              );
+              console.log(`[AppModule] Configured Postgres search_path to: ${schema}`);
             }
           }
         } catch (e) {
@@ -83,11 +81,7 @@ import { join } from 'node:path';
             customProps: () => ({
               context: 'HTTP',
             }),
-            redact: [
-              'req.headers.authorization',
-              'req.body.password',
-              'req.body.newPassword',
-            ],
+            redact: ['req.headers.authorization', 'req.body.password', 'req.body.newPassword'],
             transport: {
               target: 'pino-pretty',
               options: {

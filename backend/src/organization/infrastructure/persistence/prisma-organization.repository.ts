@@ -68,10 +68,7 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
     });
   }
 
-  async findById(
-    id: string,
-    requesterId: string,
-  ): Promise<OrganizationReadModel | null> {
+  async findById(id: string, requesterId: string): Promise<OrganizationReadModel | null> {
     const rawOrg = await this.prisma.organization.findUnique({
       where: { id },
       include: {

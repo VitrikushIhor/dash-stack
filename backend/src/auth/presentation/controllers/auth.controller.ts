@@ -56,10 +56,7 @@ export class AuthController {
 
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
-  async verifyEmail(
-    @Body() { token }: VerifyEmailDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async verifyEmail(@Body() { token }: VerifyEmailDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.verifyEmailUseCase.execute({ token });
     AuthCookieHelper.setAuthCookies(res, tokens);
     return tokens;
@@ -68,10 +65,7 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() { email, password }: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Body() { email, password }: LoginDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.loginUseCase.execute({ email, password });
     AuthCookieHelper.setAuthCookies(res, tokens);
     return tokens;
@@ -79,10 +73,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(
-    @RefreshToken() token: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async refreshToken(@RefreshToken() token: string, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.refreshTokenUseCase.execute({
       token,
     });
@@ -92,10 +83,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @RefreshToken() refreshToken: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logout(@RefreshToken() refreshToken: string, @Res({ passthrough: true }) res: Response) {
     AuthCookieHelper.clearAuthCookies(res);
     if (refreshToken) {
       return this.logoutUseCase.execute({ refreshToken });

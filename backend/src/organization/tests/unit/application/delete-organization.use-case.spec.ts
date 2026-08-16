@@ -43,8 +43,6 @@ describe('DeleteOrganizationUseCase', () => {
     const prismaError = new Error('Record to delete does not exist');
     repository.delete.mockRejectedValue(prismaError);
 
-    await expect(useCase.execute('org-999')).rejects.toThrow(
-      'Record to delete does not exist',
-    );
+    await expect(useCase.execute('org-999')).rejects.toThrow('Record to delete does not exist');
   });
 });

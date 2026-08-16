@@ -10,10 +10,7 @@ export class CreateLabelUseCase {
   ) {}
 
   async execute(organizationId: string, data: { name: string; color: string }) {
-    const existingLabel = await this.labelRepository.findByName(
-      data.name,
-      organizationId,
-    );
+    const existingLabel = await this.labelRepository.findByName(data.name, organizationId);
 
     if (existingLabel) {
       throw new ConflictException(LABEL_ERRORS.ALREADY_EXISTS(data.name));

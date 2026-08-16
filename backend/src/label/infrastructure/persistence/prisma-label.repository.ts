@@ -30,10 +30,7 @@ export class PrismaLabelRepository implements LabelRepositoryPort {
     return labels.map((label) => PrismaLabelMapper.toDomain(label));
   }
 
-  async findById(
-    id: string,
-    organizationId: string,
-  ): Promise<LabelReadModel | null> {
+  async findById(id: string, organizationId: string): Promise<LabelReadModel | null> {
     const label = await this.prisma.organizationLabel.findFirst({
       where: { id, organizationId },
     });
@@ -41,10 +38,7 @@ export class PrismaLabelRepository implements LabelRepositoryPort {
     return label ? PrismaLabelMapper.toDomain(label) : null;
   }
 
-  async findByName(
-    name: string,
-    organizationId: string,
-  ): Promise<LabelReadModel | null> {
+  async findByName(name: string, organizationId: string): Promise<LabelReadModel | null> {
     const label = await this.prisma.organizationLabel.findFirst({
       where: { name, organizationId },
     });
@@ -52,11 +46,7 @@ export class PrismaLabelRepository implements LabelRepositoryPort {
     return label ? PrismaLabelMapper.toDomain(label) : null;
   }
 
-  async update(
-    id: string,
-    organizationId: string,
-    data: UpdateLabelData,
-  ): Promise<LabelReadModel> {
+  async update(id: string, organizationId: string, data: UpdateLabelData): Promise<LabelReadModel> {
     await this.prisma.organizationLabel.updateMany({
       where: { id, organizationId },
       data,
