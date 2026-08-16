@@ -1,11 +1,18 @@
 import { PrismaClient, TaskStatus, OrgRole } from '@prisma/client';
 import { addDays, startOfDay } from 'date-fns';
 
-const prisma = new PrismaClient();
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Cleaning up database...');
-  await prisma.taskLabel.deleteMany();
+  await prisma.organizationLabel.deleteMany();
   await prisma.checklistItem.deleteMany();
   await prisma.checklist.deleteMany();
   await prisma.task.deleteMany();
@@ -22,6 +29,7 @@ async function main() {
       firstName: 'Ihor',
       lastName: 'Vitrikush',
       password: '$2b$10$EpRnTzVlqHNP0.fUbXUwSOyuiXe/QLSUG6xNekdHgTGmrpHEfIoxm', // secret42
+      emailVerified: new Date(),
     },
   });
 
@@ -31,6 +39,7 @@ async function main() {
       firstName: 'Bart',
       lastName: 'Simpson',
       password: '$2b$10$EpRnTzVlqHNP0.fUbXUwSOyuiXe/QLSUG6xNekdHgTGmrpHEfIoxm', // secret42
+      emailVerified: new Date(),
     },
   });
 
@@ -70,12 +79,16 @@ async function main() {
       status: TaskStatus.COMPLETED,
       dueDate: today,
       completedAt: today,
-      organizationId: org.id,
+      organization: { connect: { id: org.id } },
       assignees: {
         connect: [{ id: membership1.id }],
       },
       label: {
-        create: { name: 'Feature', color: 'blue' },
+        create: {
+          name: 'Feature',
+          color: 'blue',
+          organization: { connect: { id: org.id } },
+        },
       },
     },
   });
@@ -87,12 +100,16 @@ async function main() {
       status: TaskStatus.COMPLETED,
       dueDate: addDays(today, 1),
       completedAt: addDays(today, 1),
-      organizationId: org.id,
+      organization: { connect: { id: org.id } },
       assignees: {
         connect: [{ id: membership1.id }],
       },
       label: {
-        create: { name: 'DevOps', color: 'purple' },
+        create: {
+          name: 'DevOps',
+          color: 'purple',
+          organization: { connect: { id: org.id } },
+        },
       },
     },
   });
@@ -103,12 +120,16 @@ async function main() {
       description: 'Review the new dashboard layout with the team',
       status: TaskStatus.UPCOMING,
       dueDate: addDays(today, 2),
-      organizationId: org.id,
+      organization: { connect: { id: org.id } },
       assignees: {
         connect: [{ id: membership2.id }],
       },
       label: {
-        create: { name: 'Design', color: 'pink' },
+        create: {
+          name: 'Design',
+          color: 'pink',
+          organization: { connect: { id: org.id } },
+        },
       },
     },
   });
@@ -119,12 +140,16 @@ async function main() {
       description: 'Deploy the first beta to staging environment',
       status: TaskStatus.PLANNED,
       dueDate: addDays(today, 5),
-      organizationId: org.id,
+      organization: { connect: { id: org.id } },
       assignees: {
         connect: [{ id: membership1.id }, { id: membership2.id }],
       },
       label: {
-        create: { name: 'Release', color: 'green' },
+        create: {
+          name: 'Release',
+          color: 'green',
+          organization: { connect: { id: org.id } },
+        },
       },
     },
   });
@@ -139,4 +164,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

@@ -1,5 +1,7 @@
+import { format, isValid, parseISO } from 'date-fns'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { ROUTES } from '@/shared/config/constants/routes'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -99,4 +101,34 @@ export function getUserDisplayName(
   if (firstName) return firstName
   if (email) return email
   return 'User'
+}
+
+export function sanitizeRedirectUrl(
+  url: string | undefined | null,
+  fallback: string = ROUTES.organizations
+): string {
+  if (!url || typeof url !== 'string') return fallback
+  const trimmed = url.trim()
+  if (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.startsWith('/\\')
+  ) {
+    return trimmed
+  }
+  return fallback
+}
+
+/**
+ * Formats an ISO date string or Date instance using date-fns.
+ * Returns null if the date is invalid, null, or undefined.
+ */
+export function formatDate(
+  dateValue?: string | Date | null,
+  formatStr: string = 'MMM d, yyyy'
+): string | null {
+  if (!dateValue) return null
+  const date = typeof dateValue === 'string' ? parseISO(dateValue) : dateValue
+  if (!isValid(date)) return null
+  return format(date, formatStr)
 }

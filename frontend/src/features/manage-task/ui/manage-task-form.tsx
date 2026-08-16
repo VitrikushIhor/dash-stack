@@ -1,56 +1,65 @@
-import { useMemo } from 'react'
+'use client'
+
 import { toast } from 'sonner'
 import { useAttachments } from '@/shared/lib'
+import { useAction } from '@/shared/lib/hooks/use-action'
 import { logger } from '@/shared/lib/logger'
-import { useGetMembers, useOrgStore } from '@/entities/organization'
-import { type Task, useCreateTask, useUpdateTask } from '@/entities/task'
+import { type Membership } from '@/shared/model'
+import { type Label } from '@/entities/label'
+import { type Task, type TaskStatusEnum } from '@/entities/task'
 import { type TaskFormValues } from '../model/create-task-schema'
 import { mapTaskFormToDto } from '../model/map-form-to-dto'
+import { useTaskSearchParams } from '../model/task-search-params'
+import { ManageTaskMode } from '../model/types'
 import { useTaskForm } from '../model/use-task-form'
-import { TaskModalMode } from '../model/use-task-modal-store'
+import { createTaskAction, updateTaskAction } from '../server'
 import { TaskForm } from './task-form'
 
 interface ManageTaskFormProps {
-  mode: TaskModalMode.CREATE | TaskModalMode.EDIT
+  mode: ManageTaskMode
   selectedTask: Task | null
   close: () => void
+  labels: Label[]
+  members: Membership[]
 }
 
 export function ManageTaskForm({
   mode,
   selectedTask,
   close,
+  labels,
+  members,
 }: ManageTaskFormProps) {
-  const { activeOrgId } = useOrgStore()
-  const createTaskMutation = useCreateTask(activeOrgId || '')
-  const updateTaskMutation = useUpdateTask(activeOrgId || '')
+  const { execute: executeCreate } = useAction(createTaskAction, {
+    successMessage: 'Task created successfully',
+    onSuccess: () => close(),
+  })
 
-  const { form } = useTaskForm({ initialTask: selectedTask })
+  const { execute: executeUpdate } = useAction(updateTaskAction, {
+    successMessage: 'Task updated successfully',
+    onSuccess: () => close(),
+  })
+
+  const [{ 'task-status': initialStatus }] = useTaskSearchParams()
+
+  const { form } = useTaskForm({
+    initialTask: selectedTask,
+    initialStatus: initialStatus as TaskStatusEnum | null,
+  })
   const { onUpload, onFileReject } = useAttachments()
-
-  const { data: members } = useGetMembers(activeOrgId ?? '')
-  const allMembers = useMemo(() => members ?? [], [members])
 
   const onSubmit = async (values: TaskFormValues) => {
     try {
-      if (mode === TaskModalMode.CREATE) {
-        const createData = mapTaskFormToDto(values, TaskModalMode.CREATE)
-        const res = await createTaskMutation.mutateAsync(createData)
-        if (res) {
-          toast.success('Task created successfully')
-          close()
-        }
+      if (mode === ManageTaskMode.CREATE) {
+        const createData = mapTaskFormToDto(values, ManageTaskMode.CREATE)
+        await executeCreate(createData)
       } else {
         if (!selectedTask) return
-        const updateData = mapTaskFormToDto(values, TaskModalMode.EDIT)
-        const res = await updateTaskMutation.mutateAsync({
+        const updateData = mapTaskFormToDto(values, ManageTaskMode.EDIT)
+        await executeUpdate({
           id: selectedTask.id,
           data: updateData,
         })
-        if (res) {
-          toast.success('Task updated successfully')
-          close()
-        }
       }
     } catch (error: unknown) {
       logger.error(error)
@@ -65,10 +74,11 @@ export function ManageTaskForm({
       form={form}
       onSubmit={onSubmit}
       onCancel={close}
-      allMembers={allMembers}
+      allMembers={members}
+      availableLabels={labels}
       onFileReject={onFileReject}
       onUpload={onUpload}
-      submitText={mode === TaskModalMode.CREATE ? 'Create' : 'Update'}
+      submitText={mode === ManageTaskMode.CREATE ? 'Create' : 'Update'}
     />
   )
 }

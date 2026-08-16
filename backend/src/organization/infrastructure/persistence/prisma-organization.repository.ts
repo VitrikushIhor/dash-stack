@@ -32,6 +32,16 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
             role: 'OWNER',
           },
         },
+        labels: {
+          create: [
+            { name: 'Internal', color: 'orange' },
+            { name: 'Marketing', color: 'lime' },
+            { name: 'Bug', color: 'red' },
+            { name: 'Feature', color: 'blue' },
+            { name: 'Documentation', color: 'purple' },
+            { name: 'Design', color: 'pink' },
+          ],
+        },
       },
       include: {
         _count: { select: this.countSelect },
@@ -50,6 +60,12 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
     });
 
     return rawOrgs.map((org) => PrismaOrganizationMapper.toReadModel(org));
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.prisma.membership.count({
+      where: { userId },
+    });
   }
 
   async findById(

@@ -1,44 +1,52 @@
-import { useAuth0 } from '@auth0/auth0-react'
-import { Github, Loader2 } from 'lucide-react'
+'use client'
+
+import { Github } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 
 interface OAuthButtonsProps {
   disabled?: boolean
+  showDivider?: boolean
 }
 
-export function OAuthButtons({ disabled }: OAuthButtonsProps) {
-  const { loginWithRedirect, isLoading } = useAuth0()
+export function OAuthButtons({
+  disabled,
+  showDivider = true,
+}: OAuthButtonsProps) {
+  const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN
+  const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID
 
-  const handleGoogleLogin = () => {
-    loginWithRedirect({
-      authorizationParams: {
-        connection: 'google-oauth2',
-      },
-    })
+  const handleOAuthRedirect = (connection: string) => {
+    if (typeof window === 'undefined') return
+    const redirectUri = `${window.location.origin}/oauth/callback`
+    const authUrl = `https://${domain}/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&connection=${connection}&scope=openid%20profile%20email`
+    window.location.href = authUrl
   }
-
-  const handleGithubLogin = () => {
-    loginWithRedirect({
-      authorizationParams: {
-        connection: 'github',
-      },
-    })
-  }
-
-  const isDisabled = disabled || isLoading
 
   return (
-    <div className='grid grid-cols-2 gap-2'>
-      <Button
-        variant='outline'
-        className='w-full'
-        type='button'
-        disabled={isDisabled}
-        onClick={handleGoogleLogin}
-      >
-        {isLoading ? (
-          <Loader2 className='h-4 w-4 animate-spin' />
-        ) : (
+    <>
+      {showDivider && (
+        <div className='relative my-2'>
+          <div className='absolute inset-0 flex items-center'>
+            <span className='w-full border-t' />
+          </div>
+          <div className='relative flex justify-center text-xs uppercase'>
+            <span className='bg-background text-muted-foreground px-2'>
+              Or continue with
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className='grid grid-cols-2 gap-2'>
+        <Button
+          variant='outline'
+          className='w-full'
+          type='button'
+          disabled={disabled}
+          onClick={() => handleOAuthRedirect('google-oauth2')}
+        >
           <svg
             className='h-4 w-4'
             viewBox='0 0 24 24'
@@ -62,23 +70,19 @@ export function OAuthButtons({ disabled }: OAuthButtonsProps) {
               fill='#EA4335'
             />
           </svg>
-        )}
-        Google
-      </Button>
-      <Button
-        variant='outline'
-        className='w-full'
-        type='button'
-        disabled={isDisabled}
-        onClick={handleGithubLogin}
-      >
-        {isLoading ? (
-          <Loader2 className='h-4 w-4 animate-spin' />
-        ) : (
+          Google
+        </Button>
+        <Button
+          variant='outline'
+          className='w-full'
+          type='button'
+          disabled={disabled}
+          onClick={() => handleOAuthRedirect('github')}
+        >
           <Github className='h-4 w-4' />
-        )}
-        GitHub
-      </Button>
-    </div>
+          GitHub
+        </Button>
+      </div>
+    </>
   )
 }

@@ -1,86 +1,56 @@
-import { api, clearTokens, getRefreshToken, setTokens } from '@/shared/api'
-import {
-  type AuthTokens,
-  type SignupInput,
-  type LoginInput,
+import { type HttpClient, api } from '@/shared/api'
+import type {
+  AuthTokens,
+  SignInInput,
+  SignUpInput,
 } from '../model/types/auth.types'
 
-// Auth API functions
-export const authApi = {
-  signup: (input: SignupInput): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/auth/signup', input, {
-      skipAuth: true,
-    })
-  },
+export function createAuthApi(client: HttpClient) {
+  return {
+    login: (data: SignInInput) =>
+      client.post<AuthTokens, SignInInput>('/auth/login', data, {
+        skipAuth: true,
+      }),
 
-  login: async (input: LoginInput): Promise<AuthTokens> => {
-    const data = await api.post<AuthTokens>('/auth/login', input, {
-      skipAuth: true,
-    })
-    setTokens(data.accessToken, data.refreshToken)
-    return data
-  },
+    signup: (data: SignUpInput) =>
+      client.post<{ message: string }, SignUpInput>('/auth/signup', data, {
+        skipAuth: true,
+      }),
 
-  verifyEmail: async (token: string): Promise<AuthTokens> => {
-    const data = await api.post<AuthTokens>('/auth/verify-email', { token })
-    setTokens(data.accessToken, data.refreshToken)
-    return data
-  },
+    verifyEmail: (token: string) =>
+      client.post<AuthTokens, { token: string }>(
+        '/auth/verify-email',
+        { token },
+        { skipAuth: true }
+      ),
 
-  refreshToken: (): Promise<{ accessToken: string }> => {
-    const token = getRefreshToken()
-    if (!token) {
-      return Promise.reject(new Error('No refresh token available'))
-    }
-    return api.post<{ accessToken: string }>('/auth/refresh', { token })
-  },
+    logout: (refreshToken: string) =>
+      client.post<{ message: string }, { refreshToken: string }>(
+        '/auth/logout',
+        { refreshToken }
+      ),
 
-  logout: async (): Promise<{ message: string }> => {
-    const refreshToken = getRefreshToken()
-    if (refreshToken) {
-      try {
-        await api.post('/auth/logout', { refreshToken })
-      } catch {
-        // Ignore errors, clear tokens anyway
-      }
-    }
-    clearTokens()
-    return { message: 'Logged out successfully' }
-  },
+    forgotPassword: (email: string) =>
+      client.post<{ message: string }, { email: string }>(
+        '/auth/forgot-password',
+        { email },
+        { skipAuth: true }
+      ),
 
-  logoutAll: async (): Promise<{ message: string }> => {
-    const data = await api.post<{ message: string }>('/auth/logout-all')
-    clearTokens()
-    return data
-  },
+    resetPassword: (data: { token: string; password: string }) =>
+      client.post<{ message: string }, { token: string; password: string }>(
+        '/auth/reset-password',
+        data,
+        { skipAuth: true }
+      ),
 
-  forgotPassword: (email: string): Promise<{ message: string }> => {
-    return api.post<{ message: string }>(
-      '/auth/forgot-password',
-      { email },
-      { skipAuth: true }
-    )
-  },
-
-  resetPassword: (
-    token: string,
-    password: string
-  ): Promise<{ message: string }> => {
-    return api.post<{ message: string }>(
-      '/auth/reset-password',
-      {
-        token,
-        password,
-      },
-      { skipAuth: true }
-    )
-  },
-
-  oauthExchange: async (token: string): Promise<AuthTokens> => {
-    const data = await api.post<AuthTokens>('/auth/oauth/exchange', { token })
-    setTokens(data.accessToken, data.refreshToken)
-    return data
-  },
+    oauthExchange: (token: string) =>
+      client.post<AuthTokens, { token: string }>(
+        '/auth/oauth/exchange',
+        { token },
+        { skipAuth: true }
+      ),
+  }
 }
 
-export default authApi
+export const authApi = createAuthApi(api)

@@ -80,6 +80,7 @@ model Organization {
   memberships    Membership[]
   projects       Project[]
   tasks          Task[]
+  labels         OrganizationLabel[]
 }
 
 model Membership {
@@ -142,8 +143,9 @@ model Task {
   startDate      DateTime?
   calendarEvents CalendarEvent[]
   checklists     Checklist[]
-  label          TaskLabel?
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  labelId        String?
+  label          OrganizationLabel? @relation("TaskLabel", fields: [labelId], references: [id], onDelete: SetNull)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignees      Membership[]    @relation("TaskAssignees")
 
   @@unique([id, organizationId])
@@ -153,15 +155,17 @@ model Task {
   @@map("tasks")
 }
 
-model TaskLabel {
-  id     String @id @default(cuid())
-  name   String
-  color  String
-  taskId String @unique
-  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+model OrganizationLabel {
+  id             String       @id @default(cuid())
+  name           String
+  color          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tasks          Task[]       @relation("TaskLabel")
 
-  @@index([taskId])
-  @@map("task_labels")
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("organization_labels")
 }
 
 model Checklist {

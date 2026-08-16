@@ -58,10 +58,14 @@ describe('AuthController', () => {
 
   it('should map login DTO to Command and call UseCase', async () => {
     loginUseCase.execute.mockResolvedValue({ accessToken: 'acc' });
-    const result = await controller.login({
-      email: 'a@b.com',
-      password: 'pwd',
-    });
+    const mockRes = { cookie: jest.fn(), clearCookie: jest.fn() } as any;
+    const result = await controller.login(
+      {
+        email: 'a@b.com',
+        password: 'pwd',
+      },
+      mockRes,
+    );
     expect(loginUseCase.execute).toHaveBeenCalledWith({
       email: 'a@b.com',
       password: 'pwd',

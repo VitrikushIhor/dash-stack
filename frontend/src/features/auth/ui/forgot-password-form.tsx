@@ -1,7 +1,8 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -13,44 +14,25 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
-import { useForgotPassword } from '../model/mutations/use-forgot-password'
-import {
-  forgotPasswordDefaultValues,
-  forgotPasswordSchema,
-  type TForgotPasswordSchema,
-} from '../model/schema/forgot-password.schema'
+import { useForgotPasswordForm } from '../model/hooks/use-forgot-password-form'
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const navigate = useNavigate()
-  const forgotPasswordMutation = useForgotPassword()
+  const { form, onSubmit, isPending, isSent } = useForgotPasswordForm()
 
-  const form = useForm<TForgotPasswordSchema>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: forgotPasswordDefaultValues,
-  })
-
-  function onSubmit(data: TForgotPasswordSchema) {
-    forgotPasswordMutation.mutate(data.email)
-  }
-
-  if (forgotPasswordMutation.isSuccess || forgotPasswordMutation.isError) {
+  if (isSent) {
     return (
       <div className='space-y-4 text-center'>
         <div className='text-4xl'>📧</div>
         <h3 className='text-lg font-semibold'>Check your email</h3>
         <p className='text-muted-foreground text-sm'>
-          If an account exists with that email, we've sent a password reset
+          If an account exists with that email, we&apos;ve sent a password reset
           link.
         </p>
-        <Button
-          variant='outline'
-          className='mt-4'
-          onClick={() => navigate({ to: '/sign-in' })}
-        >
-          Back to Sign In
+        <Button variant='outline' className='mt-4' asChild>
+          <Link href={ROUTES.signIn}>Back to Sign In</Link>
         </Button>
       </div>
     )
@@ -59,7 +41,7 @@ export function ForgotPasswordForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-2', className)}
         {...props}
       >
@@ -76,12 +58,12 @@ export function ForgotPasswordForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={forgotPasswordMutation.isPending}>
+        <Button className='mt-2' disabled={isPending}>
           Continue
-          {forgotPasswordMutation.isPending ? (
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
-            <ArrowRight />
+            <ArrowRight className='h-4 w-4' />
           )}
         </Button>
       </form>

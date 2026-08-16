@@ -34,6 +34,7 @@ describe('CreateTaskUseCase', () => {
     taskRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      findAllUnpaginated: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -55,7 +56,7 @@ describe('CreateTaskUseCase', () => {
       dueDate: '2026-06-10T00:00:00.000Z',
       assigneeIds: ['user-1'],
       attachments: ['attachment-1'],
-      label: { name: 'Bug', color: '#ff0000' },
+      labelId: 'label-1',
       checklists: [
         {
           name: 'To Do',
@@ -91,7 +92,7 @@ describe('CreateTaskUseCase', () => {
       startDate: new Date('2026-06-01T00:00:00.000Z'),
       dueDate: new Date('2026-06-10T00:00:00.000Z'),
       completedAt: undefined,
-      label: { name: 'Bug', color: '#ff0000' },
+      labelId: 'label-1',
       checklists: [
         {
           name: 'To Do',
@@ -123,7 +124,7 @@ describe('CreateTaskUseCase', () => {
       startDate: new Date('2026-06-01T00:00:00.000Z'),
       dueDate: new Date('2026-06-10T00:00:00.000Z'),
       completedAt: undefined,
-      label: null,
+      labelId: null,
       checklists: undefined,
     });
   });

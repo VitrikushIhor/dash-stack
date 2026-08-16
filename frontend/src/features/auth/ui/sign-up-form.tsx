@@ -1,8 +1,10 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
 import { Loader2, UserPlus } from 'lucide-react'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
-import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -13,42 +15,48 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
-import { useSignup } from '../model/mutations/use-signup'
-import {
-  signUpDefaultValues,
-  signUpSchema,
-  type TSignUpSchema,
-} from '../model/schema/sign-up.schema'
+import { PasswordInput } from '@/shared/ui/password-input'
+import { useSignUpForm } from '../model/hooks/use-sign-up-form'
 import { OAuthButtons } from './oauth-buttons'
+
+interface SignUpFormProps extends React.HTMLAttributes<HTMLFormElement> {
+  onSuccess?: () => void
+}
 
 export function SignUpForm({
   className,
   onSuccess,
   ...props
-}: React.HTMLAttributes<HTMLFormElement> & { onSuccess?: () => void }) {
-  const signupMutation = useSignup()
-
-  const form = useForm<TSignUpSchema>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: signUpDefaultValues,
+}: SignUpFormProps) {
+  const [isSuccess, setIsSuccess] = useState(false)
+  const { form, onSubmit, isPending } = useSignUpForm({
+    onSuccess: () => {
+      setIsSuccess(true)
+      onSuccess?.()
+    },
   })
 
-  function onSubmit(data: TSignUpSchema) {
-    signupMutation.mutate(
-      {
-        email: data.email,
-        password: data.password,
-      },
-      {
-        onSuccess: () => onSuccess?.(),
-      }
+  if (isSuccess) {
+    return (
+      <div className='space-y-4 py-2 text-center'>
+        <div className='text-4xl'>📧</div>
+        <h3 className='text-lg font-semibold'>Check your email</h3>
+        <p className='text-muted-foreground text-sm'>
+          We&apos;ve sent a verification link to your email address.
+          <br />
+          Please click the link to verify your account.
+        </p>
+        <Button variant='outline' className='mt-4' asChild>
+          <Link href={ROUTES.signIn}>Back to Sign In</Link>
+        </Button>
+      </div>
     )
   }
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-3', className)}
         {...props}
       >
@@ -91,8 +99,9 @@ export function SignUpForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={signupMutation.isPending}>
-          {signupMutation.isPending ? (
+
+        <Button className='mt-2' disabled={isPending}>
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
             <UserPlus className='h-4 w-4' />
@@ -100,18 +109,7 @@ export function SignUpForm({
           Create Account
         </Button>
 
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background text-muted-foreground px-2'>
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <OAuthButtons disabled={signupMutation.isPending} />
+        <OAuthButtons disabled={isPending} />
       </form>
     </Form>
   )

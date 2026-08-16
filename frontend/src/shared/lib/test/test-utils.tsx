@@ -5,7 +5,6 @@ interface WrapperProps {
   children: ReactNode
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 function AllTheProviders({ children }: WrapperProps) {
   return <>{children}</>
 }
@@ -16,6 +15,5 @@ const customRender = (
 ) => render(ui, { wrapper: AllTheProviders, ...options })
 
 // Re-export everything from testing-library
-// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react'
 export { customRender as render }

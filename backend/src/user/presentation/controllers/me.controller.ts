@@ -11,6 +11,7 @@ import { FindUserMembershipsUseCase } from '../../../organization/application/us
 import { GetCurrentUserUseCase } from '../../application/use-cases/get-current-user.use-case';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { UpdateCurrentUserUseCase } from '../../application/use-cases/update-current-user.use-case';
+import { CountUserOrganizationsUseCase } from '../../../organization/application/use-cases/count-user-organizations.use-case';
 
 @Controller('me')
 @UseGuards(JwtAuthGuard)
@@ -19,6 +20,7 @@ export class MeController {
     private readonly findUserMembershipsUseCase: FindUserMembershipsUseCase,
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     private readonly updateCurrentUserUseCase: UpdateCurrentUserUseCase,
+    private readonly countUserOrganizationsUseCase: CountUserOrganizationsUseCase,
   ) {}
 
   @Get()
@@ -37,5 +39,10 @@ export class MeController {
   @Get('memberships')
   async getMemberships(@Request() req) {
     return this.findUserMembershipsUseCase.execute(req.user.id);
+  }
+
+  @Get('organizations/count')
+  async countOrganizations(@Request() req) {
+    return this.countUserOrganizationsUseCase.execute(req.user.id);
   }
 }

@@ -1,5 +1,0 @@
-export { Settings } from './ui/settings'
-export { SettingsAppearance } from './appearance'
-export { SettingsDisplay } from './display'
-export { SettingsNotifications } from './notifications'
-export { SettingsProfile } from './profile'

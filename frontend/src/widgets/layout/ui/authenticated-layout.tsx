@@ -1,40 +1,50 @@
-import { Outlet } from '@tanstack/react-router'
-import { LayoutProvider, SearchProvider } from '@/shared/lib/context'
-import { getCookie } from '@/shared/lib/cookies'
+'use client'
+
+import {
+  type Collapsible,
+  LayoutProvider,
+  SearchProvider,
+  type Variant,
+} from '@/shared/lib/providers'
 import { cn } from '@/shared/lib/utils'
-import { SkipToMain } from '@/shared/ui'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/core/sidebar'
-import { ManageTaskModal } from '@/features/manage-task'
+import { SkipToMain } from '@/shared/ui/skip-to-main'
 import { AppSidebar, CommandMenu } from '@/widgets/layout'
+import { AppHeader } from './app-header'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
+  teamSwitcher?: React.ReactNode
+  defaultOpen?: boolean
+  defaultCollapsible?: Collapsible
+  defaultVariant?: Variant
 }
 
-export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const defaultOpen = getCookie('sidebar_state') !== 'false'
+export function AuthenticatedLayout({
+  children,
+  teamSwitcher,
+  defaultOpen = true,
+  defaultCollapsible,
+  defaultVariant,
+}: AuthenticatedLayoutProps) {
   return (
     <SearchProvider>
-      <LayoutProvider>
+      <LayoutProvider
+        initialCollapsible={defaultCollapsible}
+        initialVariant={defaultVariant}
+      >
         <SidebarProvider defaultOpen={defaultOpen}>
           <SkipToMain />
-          <AppSidebar />
+          <AppSidebar teamSwitcher={teamSwitcher} />
           <SidebarInset
             className={cn(
-              // Set content container, so we can use container queries
               '@container/content',
-
-              // If layout is fixed, set the height
-              // to 100svh to prevent overflow
               'has-data-[layout=fixed]:h-svh',
-
-              // If layout is fixed and sidebar is inset,
-              // set the height to 100svh - spacing (total margins) to prevent overflow
               'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
             )}
           >
-            {children ?? <Outlet />}
-            <ManageTaskModal />
+            <AppHeader />
+            {children}
             <CommandMenu />
           </SidebarInset>
         </SidebarProvider>

@@ -8,7 +8,7 @@ export interface UpdateTaskCommand {
   attachments?: string[];
   startDate?: string | Date | null;
   dueDate?: string | Date | null;
-  label?: { name: string; color: string } | null;
+  labelId?: string | null;
   checklists?: Array<{
     name: string;
     items: Array<{ text: string; completed?: boolean }>;

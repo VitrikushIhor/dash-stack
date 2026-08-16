@@ -16,7 +16,7 @@ import {
   type Collapsible,
   useLayout,
   useTheme,
-} from '@/shared/lib/context'
+} from '@/shared/lib/providers'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -172,13 +172,13 @@ function RadioGroupItem({
 }
 
 function ThemeConfig() {
-  const { defaultTheme, theme, setTheme } = useTheme()
+  const { defaultTheme, theme, setTheme, resetTheme } = useTheme()
   return (
     <div>
       <SectionTitle
         title='Theme'
         showReset={theme !== defaultTheme}
-        onReset={() => setTheme(defaultTheme)}
+        onReset={resetTheme}
       />
       <Radio
         value={theme}

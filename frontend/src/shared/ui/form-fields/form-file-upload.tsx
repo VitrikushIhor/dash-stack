@@ -1,3 +1,5 @@
+'use client'
+
 import { useFormContext } from 'react-hook-form'
 import { Upload, X } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'

@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from './health/health.module';
 import { Pool } from 'pg';
@@ -16,6 +14,7 @@ import { InvitationModule } from './invitation/invitation.module';
 import { TaskModule } from './task/task.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './user/user.module';
+import { LabelModule } from './label/label.module';
 import config from './common/configs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
@@ -101,12 +100,12 @@ import { join } from 'node:path';
         };
       },
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     ttl: 60000,
+    //     limit: 10,
+    //   },
+    // ]),
 
     AuthModule,
     HealthModule,
@@ -116,14 +115,15 @@ import { join } from 'node:path';
     TaskModule,
     StorageModule,
     UserModule,
+    LabelModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class AppModule {}

@@ -32,6 +32,7 @@ export interface OrganizationRepositoryPort {
     data: CreateOrganizationData,
   ): Promise<OrganizationReadModel>;
   findManyByUserId(userId: string): Promise<OrganizationReadModel[]>;
+  countByUserId(userId: string): Promise<number>;
   findById(
     id: string,
     requesterId: string,

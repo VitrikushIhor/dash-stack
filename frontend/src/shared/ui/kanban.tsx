@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import {
@@ -1038,6 +1040,7 @@ function KanbanOverlay(props: KanbanOverlayProps) {
   const context = useKanbanContext(OVERLAY_NAME)
 
   const [mounted, setMounted] = React.useState(false)
+
   React.useLayoutEffect(() => setMounted(true), [])
 
   const container =

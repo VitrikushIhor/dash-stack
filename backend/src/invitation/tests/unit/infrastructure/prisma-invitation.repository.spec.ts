@@ -149,7 +149,7 @@ describe('PrismaInvitationRepository', () => {
         where: { token: 'token-abc' },
       });
       expect(result).not.toBeNull();
-      expect(result!.token).toBe('token-abc');
+      expect(result?.token).toBe('token-abc');
     });
 
     it('returns null when invitation not found', async () => {
@@ -170,7 +170,7 @@ describe('PrismaInvitationRepository', () => {
         where: { id: 'inv-1' },
       });
       expect(result).not.toBeNull();
-      expect(result!.id).toBe('inv-1');
+      expect(result?.id).toBe('inv-1');
     });
 
     it('returns null when invitation not found', async () => {

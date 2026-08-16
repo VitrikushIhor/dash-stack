@@ -1,7 +1,9 @@
+'use client'
+
 import { useState, memo } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { type Membership } from '@/shared/model'
-import { AvatarGroup } from '@/shared/ui'
+import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Button } from '@/shared/ui/core/button'
 import {
   Popover,

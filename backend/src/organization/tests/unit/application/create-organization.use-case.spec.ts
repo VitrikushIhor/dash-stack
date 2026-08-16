@@ -32,6 +32,7 @@ describe('CreateOrganizationUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
     };
 
     slugService = {

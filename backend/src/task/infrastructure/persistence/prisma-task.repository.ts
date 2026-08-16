@@ -3,12 +3,18 @@ import { PrismaService } from 'nestjs-prisma';
 import {
   CreateTaskData,
   FindAllTasksFilters,
+  FindAllTasksUnpaginatedFilters,
   TaskRepositoryPort,
   UpdateTaskData,
 } from '../../application/ports/task.repository.port';
 import { TaskReadModel } from '../../application/read-models/task.read-model';
-import { PrismaTaskMapper } from './prisma-task.mapper';
+import {
+  PrismaTaskMapper,
+  PrismaTaskWithRelations,
+} from './prisma-task.mapper';
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
+import { paginate } from '../../../common/pagination/paginate';
+import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
 @Injectable()
 export class PrismaTaskRepository
@@ -38,7 +44,7 @@ export class PrismaTaskRepository
   } as const;
 
   async create(data: CreateTaskData): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+    const { assigneeIds, checklists, ...rest } = data;
 
     const createdTask = await this.prisma.task.create({
       data: {
@@ -49,14 +55,7 @@ export class PrismaTaskRepository
               connect: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        label: label
-          ? {
-              create: {
-                name: label.name,
-                color: label.color ?? null,
-              },
-            }
-          : undefined,
+
         checklists: checklists?.length
           ? {
               create: checklists.map((cl) => ({
@@ -80,58 +79,43 @@ export class PrismaTaskRepository
   async findAll(
     organizationId: string,
     filters: FindAllTasksFilters = {},
-  ): Promise<TaskReadModel[]> {
-    const {
-      search,
-      status,
-      assigneeIds,
-      labelNames,
-      dueDateFrom,
-      dueDateTo,
-      startDateFrom,
-      startDateTo,
-    } = filters;
+  ): Promise<PaginatedResult<TaskReadModel>> {
+    const { page, perPage } = filters;
 
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        organizationId,
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { description: { contains: search, mode: 'insensitive' } },
-                ],
-              }
-            : {},
-          status?.length ? { status: { in: status } } : {},
-          assigneeIds?.length
-            ? { assignees: { some: { id: { in: assigneeIds } } } }
-            : {},
-          labelNames?.length ? { label: { name: { in: labelNames } } } : {},
-          dueDateFrom || dueDateTo
-            ? {
-                dueDate: {
-                  gte: dueDateFrom,
-                  lte: dueDateTo,
-                },
-              }
-            : {},
-          startDateFrom || startDateTo
-            ? {
-                startDate: {
-                  gte: startDateFrom,
-                  lte: startDateTo,
-                },
-              }
-            : {},
+    const paginated = await paginate(
+      this.prisma.task,
+      {
+        where: this.buildWhereClause(organizationId, filters),
+        include: this.taskInclude,
+        orderBy: [
+          { createdAt: 'desc' as const },
+          { updatedAt: 'desc' as const },
         ],
       },
+      { page, perPage },
+    );
+
+    return {
+      ...paginated,
+      data: paginated.data.map((task) =>
+        PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
+      ),
+    };
+  }
+
+  async findAllUnpaginated(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters = {},
+  ): Promise<TaskReadModel[]> {
+    const tasks = await this.prisma.task.findMany({
+      where: this.buildWhereClause(organizationId, filters),
       include: this.taskInclude,
-      orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
+      orderBy: [{ createdAt: 'desc' as const }, { updatedAt: 'desc' as const }],
     });
 
-    return tasks.map((task) => PrismaTaskMapper.toDomain(task));
+    return tasks.map((task) =>
+      PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
+    );
   }
 
   async findById(
@@ -151,15 +135,9 @@ export class PrismaTaskRepository
     organizationId: string,
     data: UpdateTaskData,
   ): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+    const { assigneeIds, checklists, ...rest } = data;
 
     const updatedTask = await this.prisma.$transaction(async (tx) => {
-      if (label !== undefined) {
-        await tx.taskLabel.deleteMany({
-          where: { taskId: id },
-        });
-      }
-
       if (checklists !== undefined) {
         await tx.checklist.deleteMany({
           where: { taskId: id },
@@ -175,17 +153,7 @@ export class PrismaTaskRepository
                 set: assigneeIds.map((membershipId) => ({ id: membershipId })),
               }
             : undefined,
-          label:
-            label === undefined
-              ? undefined
-              : label === null
-                ? undefined
-                : {
-                    create: {
-                      name: label.name,
-                      color: label.color ?? null,
-                    },
-                  },
+
           checklists:
             checklists === undefined
               ? undefined
@@ -255,5 +223,63 @@ export class PrismaTaskRepository
     });
 
     return count === uniqueIds.length;
+  }
+
+  private buildWhereClause(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters,
+  ) {
+    const {
+      search,
+      status,
+      assigneeIds,
+      labelNames,
+      dueDateFrom,
+      dueDateTo,
+      startDateFrom,
+      startDateTo,
+    } = filters;
+
+    return {
+      organizationId,
+      AND: [
+        search
+          ? {
+              OR: [
+                {
+                  title: { contains: search, mode: 'insensitive' as const },
+                },
+                {
+                  description: {
+                    contains: search,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ],
+            }
+          : {},
+        status?.length ? { status: { in: status } } : {},
+        assigneeIds?.length
+          ? { assignees: { some: { id: { in: assigneeIds } } } }
+          : {},
+        labelNames?.length ? { label: { name: { in: labelNames } } } : {},
+        dueDateFrom || dueDateTo
+          ? {
+              dueDate: {
+                gte: dueDateFrom,
+                lte: dueDateTo,
+              },
+            }
+          : {},
+        startDateFrom || startDateTo
+          ? {
+              startDate: {
+                gte: startDateFrom,
+                lte: startDateTo,
+              },
+            }
+          : {},
+      ],
+    };
   }
 }

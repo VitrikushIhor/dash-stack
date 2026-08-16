@@ -1,0 +1,36 @@
+import { useMemo } from 'react'
+import { addMonths, startOfYear } from 'date-fns'
+import { type Task } from '@/entities/task'
+import { YearViewMonth } from './year-view-month'
+
+interface IProps {
+  tasks: Task[]
+  selectedDate: Date
+  onTaskClick?: (taskId: string) => void
+}
+
+export function CalendarYearView({
+  tasks,
+  selectedDate,
+  onTaskClick: _onTaskClick,
+}: IProps) {
+  const months = useMemo(() => {
+    const yearStart = startOfYear(selectedDate)
+    return Array.from({ length: 12 }, (_, i) => addMonths(yearStart, i))
+  }, [selectedDate])
+
+  return (
+    <div className='p-4'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+        {months.map((month) => (
+          <YearViewMonth
+            key={month.toString()}
+            month={month}
+            tasks={tasks}
+            selectedDate={selectedDate}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}

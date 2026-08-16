@@ -1,59 +1,57 @@
-import { toast } from 'sonner'
-import { ConfirmDialog } from '@/shared/ui'
-import { useOrgStore } from '@/entities/organization'
-import { useDeleteTask } from '@/entities/task'
-import { useTaskModalStore, TaskModalMode } from '../model/use-task-modal-store'
+'use client'
+
+import { Loader2 } from 'lucide-react'
+import { type Membership } from '@/shared/model'
+import { type Label } from '@/entities/label'
+import { useTaskSearchParams } from '../model/task-search-params'
+import { ManageTaskMode } from '../model/types'
+import { useTaskQuery } from '../model/use-task-query'
 import { ManageTaskForm } from './manage-task-form'
 import { TaskModalView } from './task-modal-view'
 
-export const ManageTaskModal = () => {
-  const { isOpen, mode, selectedTask, close } = useTaskModalStore()
-  const { activeOrgId } = useOrgStore()
-  const deleteTaskMutation = useDeleteTask(activeOrgId || '')
+interface ManageTaskModalProps {
+  labels: Label[]
+  members: Membership[]
+}
 
-  const handleDelete = async () => {
-    if (!selectedTask || !activeOrgId) return
-    toast.promise(deleteTaskMutation.mutateAsync(selectedTask.id), {
-      loading: 'Deleting task...',
-      success: 'Task deleted successfully',
-      error: 'Failed to delete task',
+export const ManageTaskModal = ({ labels, members }: ManageTaskModalProps) => {
+  const [{ 'create-task': create, 'update-task': updateId }, setParams] =
+    useTaskSearchParams()
+
+  const isCreate = create === true
+  const isOpen = !!updateId || isCreate
+
+  const { data: fetchedTask, isLoading } = useTaskQuery(updateId || null)
+
+  const selectedTask = updateId ? (fetchedTask ?? null) : null
+
+  const close = () => {
+    setParams({
+      'create-task': null,
+      'update-task': null,
     })
-    close()
-  }
-
-  if (mode === TaskModalMode.DELETE) {
-    return (
-      <ConfirmDialog
-        destructive
-        open={isOpen}
-        onOpenChange={(open) => !open && close()}
-        handleConfirm={handleDelete}
-        className='max-w-md'
-        title={`Delete this task: ${selectedTask?.title} ?`}
-        desc={
-          <>
-            Are you sure you want to delete{' '}
-            <strong>{selectedTask?.title}</strong>? <br />
-            This action cannot be undone.
-          </>
-        }
-        confirmText='Delete'
-      />
-    )
   }
 
   return (
     <TaskModalView
-      title={mode === TaskModalMode.CREATE ? 'Create Task' : 'Edit Task'}
+      title={isCreate ? 'Create Task' : 'Edit Task'}
       open={isOpen}
       onOpenChange={(open) => !open && close()}
     >
-      <ManageTaskForm
-        key={`${mode}-${selectedTask?.id || selectedTask?.status || 'new'}-${isOpen}`}
-        mode={mode as TaskModalMode.CREATE | TaskModalMode.EDIT}
-        selectedTask={selectedTask}
-        close={close}
-      />
+      {isLoading && !!updateId ? (
+        <div className='flex items-center justify-center p-8'>
+          <Loader2 className='text-primary h-8 w-8 animate-spin' />
+        </div>
+      ) : (
+        <ManageTaskForm
+          key={`${isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}-${selectedTask?.id || 'new'}-${isOpen}`}
+          mode={isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}
+          selectedTask={selectedTask}
+          close={close}
+          labels={labels}
+          members={members}
+        />
+      )}
     </TaskModalView>
   )
 }

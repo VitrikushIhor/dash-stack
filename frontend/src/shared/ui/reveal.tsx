@@ -1,3 +1,5 @@
+'use client'
+
 import { useReveal } from '@/shared/lib/hooks/use-reveal'
 
 interface RevealProps {

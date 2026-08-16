@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { cn, getInitials, getPageNumbers, stringToColor } from './utils'
+import { ROUTES } from '@/shared/config/constants/routes'
+import {
+  cn,
+  getInitials,
+  getPageNumbers,
+  sanitizeRedirectUrl,
+  stringToColor,
+  formatDate,
+} from './utils'
 
 describe('cn (className merge utility)', () => {
   it('should merge class names', () => {
@@ -85,5 +93,62 @@ describe('getPageNumbers', () => {
     const result = getPageNumbers(5, 20)
     expect(result[0]).toBe(1)
     expect(result[result.length - 1]).toBe(20)
+  })
+})
+
+describe('sanitizeRedirectUrl', () => {
+  it('returns a valid relative path as-is', () => {
+    expect(sanitizeRedirectUrl(ROUTES.organizations)).toBe(ROUTES.organizations)
+    expect(sanitizeRedirectUrl('/settings/profile')).toBe('/settings/profile')
+  })
+
+  it('defaults to fallback for absolute URLs or invalid paths', () => {
+    const defaultValue = ROUTES.organizations
+    expect(
+      sanitizeRedirectUrl('https://evil-phishing-site.com', defaultValue)
+    ).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('http://evil.com', defaultValue)).toBe(
+      defaultValue
+    )
+    expect(sanitizeRedirectUrl('//evil.com', defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('/\\evil.com', defaultValue)).toBe(defaultValue)
+  })
+
+  it('defaults to fallback when URL is empty/null/undefined', () => {
+    const defaultValue = ROUTES.organizations
+    expect(sanitizeRedirectUrl(undefined, defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl(null, defaultValue)).toBe(defaultValue)
+    expect(sanitizeRedirectUrl('', defaultValue)).toBe(defaultValue)
+  })
+
+  it('should use custom fallback when specified', () => {
+    expect(sanitizeRedirectUrl('https://evil.com', '/sign-in')).toBe('/sign-in')
+  })
+})
+
+describe('formatDate', () => {
+  it('returns formatted date string for valid ISO date string', () => {
+    const result = formatDate('2026-08-02T12:00:00Z')
+    expect(result).toBe('Aug 2, 2026')
+  })
+
+  it('supports custom date-fns format string', () => {
+    const result = formatDate('2026-08-02T12:00:00Z', 'yyyy-MM-dd')
+    expect(result).toBe('2026-08-02')
+  })
+
+  it('supports Date instance input', () => {
+    const date = new Date('2026-08-02T12:00:00Z')
+    expect(formatDate(date)).toBe('Aug 2, 2026')
+  })
+
+  it('returns null for null, undefined, or empty values', () => {
+    expect(formatDate(null)).toBeNull()
+    expect(formatDate(undefined)).toBeNull()
+    expect(formatDate('')).toBeNull()
+  })
+
+  it('returns null for invalid date string', () => {
+    expect(formatDate('invalid-date-string')).toBeNull()
   })
 })

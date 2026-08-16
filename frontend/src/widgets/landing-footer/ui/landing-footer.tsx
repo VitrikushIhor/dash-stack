@@ -16,7 +16,7 @@ export function LandingFooter() {
           <div className='md:col-span-2'>
             <div className='mb-4 flex items-center gap-2.5'>
               <LogoIcon />
-              <span className='font-inter text-base font-bold text-emerald-500'>
+              <span className='font-inter text-primary text-base font-bold'>
                 Dash Stack
               </span>
             </div>

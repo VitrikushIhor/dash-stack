@@ -1,5 +1,5 @@
 import z from 'zod'
-import { labelColorNames } from '@/shared/ui'
+import { labelColorNames } from '@/entities/label'
 import { TaskStatusEnum } from '@/entities/task'
 import { membershipSchema } from '@/entities/team'
 
@@ -27,7 +27,7 @@ export const taskFormSchema = z
   .object({
     title: z.string().min(1, 'Title is required').max(255),
     description: z.string().max(5000).optional(),
-    status: z.enum(TaskStatusEnum, { message: 'Status is required' }),
+    status: z.nativeEnum(TaskStatusEnum, { message: 'Status is required' }),
     startDate: z.date().nullable().optional(),
     dueDate: z.date().nullable().optional(),
     assignees: z.array(membershipSchema),

@@ -31,6 +31,7 @@ describe('FindOrganizationByIdUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
     };
 
     useCase = new FindOrganizationByIdUseCase(repository);
@@ -70,6 +71,7 @@ describe('FindOrganizationsByUserIdUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
     };
 
     useCase = new FindOrganizationsByUserIdUseCase(repository);

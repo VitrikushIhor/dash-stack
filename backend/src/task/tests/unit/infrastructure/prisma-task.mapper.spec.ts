@@ -26,7 +26,7 @@ const basePrismaTask = () => ({
     id: string;
     name: string;
     color: string;
-    taskId: string;
+    organizationId: string;
   } | null,
   checklists: [] as Array<{
     id: string;
@@ -91,7 +91,7 @@ describe('PrismaTaskMapper', () => {
           id: 'label-1',
           name: 'Bug',
           color: '#ff0000',
-          taskId: 'task-1',
+          organizationId: 'org-1',
         },
       };
 
