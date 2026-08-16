@@ -1,6 +1,6 @@
 {
-  "name": "dash-stack",
-  "private": false,
+  "name": "frontend",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -16,10 +16,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "knip": "knip",
+    "test:related": "vitest related --run --passWithNoTests",
+    "knip": "npm run knip --prefix ..",
     "audit": "npm audit --audit-level=moderate",
     "audit:fix": "npm audit fix",
-    "validate": "npm run type-check && npm run lint && npm run lint:fsd && npm run format:check && npm run test"
+    "validate": "npm run type-check && npm run lint && npm run lint:fsd && npm run format:check && npm run knip"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

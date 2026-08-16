@@ -28,13 +28,16 @@
     "knip": "knip"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
     "frontend/**/*.{ts,tsx}": [
       "npm run lint:fix -w frontend",
-      "npm run format -w frontend"
+      "npm run format -w frontend",
+      "npm run test:related -w frontend"
     ],
     "backend/**/*.ts": [
       "npm run lint -w backend",
