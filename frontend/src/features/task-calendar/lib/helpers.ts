@@ -236,14 +236,12 @@ export function calculateMonthEventPositions(
     occupiedPositions[day.toISOString()] = [false, false, false]
   })
 
-  const sortedEvents = [
-    ...singleDayTasks.sort((a, b) => {
-      const anchorA = getTaskCalendarAnchor(a)
-      const anchorB = getTaskCalendarAnchor(b)
-      if (!anchorA || !anchorB) return 0
-      return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-    }),
-  ]
+  const sortedEvents = [...singleDayTasks].sort((a, b) => {
+    const anchorA = getTaskCalendarAnchor(a)
+    const anchorB = getTaskCalendarAnchor(b)
+    if (!anchorA || !anchorB) return 0
+    return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
+  })
 
   sortedEvents.forEach((task) => {
     const anchor = getTaskCalendarAnchor(task)

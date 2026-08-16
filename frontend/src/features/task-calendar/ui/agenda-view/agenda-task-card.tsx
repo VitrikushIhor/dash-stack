@@ -37,20 +37,11 @@ export function AgendaTaskCard({
     onTaskClick?.(task.id)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleClick()
-    }
-  }
-
   return (
-    <div
-      role='button'
-      tabIndex={0}
+    <button
+      type='button'
       className={agendaEventCardClasses}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
     >
       <div className='flex flex-col gap-2'>
         <div className='flex items-center gap-1.5'>
@@ -83,6 +74,6 @@ export function AgendaTaskCard({
           <p className='text-foreground text-xs'>{task.description}</p>
         </div>
       </div>
-    </div>
+    </button>
   )
 }

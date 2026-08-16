@@ -64,22 +64,9 @@ export function MonthTaskBadge({
     onTaskClick?.(task.id)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleClick()
-    }
-  }
-
   return (
     <DraggableTask task={task}>
-      <div
-        role='button'
-        tabIndex={0}
-        className={eventBadgeClasses}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-      >
+      <button type='button' className={eventBadgeClasses} onClick={handleClick}>
         <div className='flex items-center gap-1.5 truncate'>
           {!['middle', 'last'].includes(position) &&
             ['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
@@ -97,7 +84,7 @@ export function MonthTaskBadge({
         </div>
 
         {renderBadgeText && <span>{format(new Date(anchor), 'h:mm a')}</span>}
-      </div>
+      </button>
     </DraggableTask>
   )
 }

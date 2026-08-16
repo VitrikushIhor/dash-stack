@@ -36,12 +36,7 @@ export const TaskCardList = memo(
         <CardContent>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 flex-1 items-center gap-3'>
-              <div
-                role='presentation'
-                className='shrink-0'
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
+              <div className='shrink-0' onClick={(e) => e.stopPropagation()}>
                 <Checkbox checked={data.isCompleted} />
               </div>
 

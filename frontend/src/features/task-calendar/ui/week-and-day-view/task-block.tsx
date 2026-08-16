@@ -48,22 +48,13 @@ export function TaskBlock({
     onTaskClick?.(task.id)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleClick()
-    }
-  }
-
   return (
     <DraggableTask task={task}>
-      <div
-        role='button'
-        tabIndex={0}
+      <button
+        type='button'
         className={calendarWeekEventCardClasses}
         style={{ height: `${heightInPixels}px` }}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
       >
         <div className='flex items-center gap-1.5 truncate'>
           {(badgeVariant === 'mixed' || badgeVariant === 'dot') && <TaskDot />}
@@ -76,7 +67,7 @@ export function TaskBlock({
             {format(start, 'h:mm a')} - {format(end, 'h:mm a')}
           </p>
         )}
-      </div>
+      </button>
     </DraggableTask>
   )
 }
