@@ -3,19 +3,16 @@
 import { Loader2 } from 'lucide-react'
 import { useAction } from '@/shared/lib/hooks/use-action'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
-import { useActiveOrganization } from '@/entities/organization'
-import { useTaskQuery } from '@/entities/task'
 import { useTaskSearchParams } from '../model/task-search-params'
+import { useTaskQuery } from '../model/use-task-query'
 import { deleteTaskAction } from '../server'
 
 export const DeleteTaskModal = () => {
   const [{ 'delete-task': deleteId }, setParams] = useTaskSearchParams()
-  const { activeOrg } = useActiveOrganization()
-  const activeOrgId = activeOrg?.id || ''
 
   const isOpen = !!deleteId
 
-  const { data: fetchedTask, isLoading } = useTaskQuery(activeOrgId, deleteId)
+  const { data: fetchedTask, isLoading } = useTaskQuery(deleteId)
   const selectedTask = deleteId ? (fetchedTask ?? null) : null
 
   const close = () => {

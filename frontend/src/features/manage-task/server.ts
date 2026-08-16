@@ -1,3 +1,4 @@
+export { getTaskAction } from './api/get-task.action'
 export { createTaskAction } from './api/create-task.action'
 export { updateTaskAction } from './api/update-task.action'
 export { deleteTaskAction } from './api/delete-task.action'

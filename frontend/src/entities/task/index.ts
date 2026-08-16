@@ -18,7 +18,6 @@ export {
 export * from './lib/task-utils'
 
 export { taskApi, type TaskFilters } from './api/task-api'
-export { useTaskQuery } from './model/queries'
 export { STATUS_CONFIG } from './model/task-status-config'
 
 export { ChecklistWidget } from './ui/checklist/checklist-widget'

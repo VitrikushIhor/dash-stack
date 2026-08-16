@@ -3,10 +3,9 @@
 import { Loader2 } from 'lucide-react'
 import { type Membership } from '@/shared/model'
 import { type Label } from '@/entities/label'
-import { useActiveOrganization } from '@/entities/organization'
-import { useTaskQuery } from '@/entities/task'
 import { useTaskSearchParams } from '../model/task-search-params'
 import { ManageTaskMode } from '../model/types'
+import { useTaskQuery } from '../model/use-task-query'
 import { ManageTaskForm } from './manage-task-form'
 import { TaskModalView } from './task-modal-view'
 
@@ -19,16 +18,10 @@ export const ManageTaskModal = ({ labels, members }: ManageTaskModalProps) => {
   const [{ 'create-task': create, 'update-task': updateId }, setParams] =
     useTaskSearchParams()
 
-  const { activeOrg } = useActiveOrganization()
-  const activeOrgId = activeOrg?.id || ''
-
   const isCreate = create === true
   const isOpen = !!updateId || isCreate
 
-  const { data: fetchedTask, isLoading } = useTaskQuery(
-    activeOrgId,
-    updateId || ''
-  )
+  const { data: fetchedTask, isLoading } = useTaskQuery(updateId || null)
 
   const selectedTask = updateId ? (fetchedTask ?? null) : null
 

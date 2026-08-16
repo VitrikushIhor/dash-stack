@@ -12,7 +12,6 @@ import {
   PointerSensor,
 } from '@dnd-kit/core'
 import { toast } from 'sonner'
-import { useActiveOrganization } from '@/entities/organization'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { CustomDragLayer } from './custom-drag-layer'
 
@@ -27,8 +26,6 @@ export function DndProviderWrapper({
   onTaskUpdate,
   children,
 }: DndProviderWrapperProps) {
-  const { activeOrg } = useActiveOrganization()
-  const activeOrgId = activeOrg?.id
   const [, startTransition] = useTransition()
 
   const [optimisticTasks, setOptimisticTasks] = useOptimistic(
@@ -52,7 +49,7 @@ export function DndProviderWrapper({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (!over || !active.data.current || !activeOrgId) return
+    if (!over || !active.data.current) return
 
     const droppedEvent = active.data.current.task as Task
     const overData = over.data.current

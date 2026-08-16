@@ -2,11 +2,7 @@ export * from './model/types/organization.types'
 export { organizationApi } from './api/organization-api'
 export { organizationKeys } from './api/organization-query-keys'
 
-// Queries
-export { useGetOrganizations } from './model/queries/use-get-organizations'
-
 // Hooks
-export { useActiveOrganization } from './model/hooks/use-active-organization'
 export { useOrganizationPermission } from './model/hooks/use-organization-permission'
 export { OrganizationLogo } from './ui/organization-logo'
 export { MemberDetailView } from './ui/member-detail-view'

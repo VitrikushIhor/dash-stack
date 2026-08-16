@@ -16,7 +16,6 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
 import { DataTableBulkActions } from '@/shared/ui/data-table'
-import { useActiveOrganization } from '@/entities/organization'
 import { type TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
 import {
   bulkUpdateTasksAction,
@@ -34,26 +33,24 @@ export function TaskTableBulkActions<TData>({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const { activeOrg } = useActiveOrganization()
-  const activeOrgId = activeOrg?.id
+  const { execute: executeBulkUpdate, isPending: isUpdating } = useAction(
+    bulkUpdateTasksAction,
+    {
+      onSuccess: () => table.resetRowSelection(),
+    }
+  )
 
-  const { execute: executeBulkUpdate } = useAction(bulkUpdateTasksAction, {
-    onSuccess: () => table.resetRowSelection(),
-  })
-
-  const { execute: executeBulkDelete } = useAction(bulkDeleteTasksAction, {
-    onSuccess: () => {
-      table.resetRowSelection()
-      setShowDeleteConfirm(false)
-    },
-  })
+  const { execute: executeBulkDelete, isPending: isDeleting } = useAction(
+    bulkDeleteTasksAction,
+    {
+      onSuccess: () => {
+        table.resetRowSelection()
+        setShowDeleteConfirm(false)
+      },
+    }
+  )
 
   const handleBulkStatusChange = async (status: string) => {
-    if (!activeOrgId) {
-      toast.error('No organization selected')
-      return
-    }
-
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
     const toastId = toast.loading('Updating status...')
 
@@ -73,11 +70,6 @@ export function TaskTableBulkActions<TData>({
   }
 
   const handleBulkDelete = async () => {
-    if (!activeOrgId) {
-      toast.error('No organization selected')
-      return
-    }
-
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
     const toastId = toast.loading('Deleting tasks...')
 
@@ -106,7 +98,7 @@ export function TaskTableBulkActions<TData>({
                   className='size-8'
                   aria-label='Update status'
                   title='Update status'
-                  disabled={!activeOrgId}
+                  disabled={isUpdating}
                 >
                   <CircleArrowUp />
                   <span className='sr-only'>Update status</span>
@@ -141,7 +133,7 @@ export function TaskTableBulkActions<TData>({
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
-              disabled={!activeOrgId}
+              disabled={isDeleting}
             >
               <Trash2 />
               <span className='sr-only'>Delete selected tasks</span>

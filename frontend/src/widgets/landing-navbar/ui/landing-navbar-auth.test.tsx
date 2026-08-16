@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useGetOrganizations } from '@/entities/organization'
 import { useIsAuthenticated } from '@/entities/session'
 import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
@@ -12,10 +11,6 @@ vi.mock('@/entities/session', () => ({
 
 vi.mock('@/entities/user', () => ({
   useCurrentUser: vi.fn(),
-}))
-
-vi.mock('@/entities/organization', () => ({
-  useGetOrganizations: vi.fn(),
 }))
 
 vi.mock('@/features/auth', () => ({
@@ -31,11 +26,6 @@ describe('LandingNavbarAuth', () => {
       mutate: mockLogoutMutate,
       isPending: false,
     } as Partial<ReturnType<typeof useLogout>> as ReturnType<typeof useLogout>)
-    vi.mocked(useGetOrganizations).mockReturnValue({
-      data: [],
-    } as Partial<ReturnType<typeof useGetOrganizations>> as ReturnType<
-      typeof useGetOrganizations
-    >)
   })
 
   it('displays "Sign In" and "Start Free" buttons in desktop mode when unauthenticated', () => {
