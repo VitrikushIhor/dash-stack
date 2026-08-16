@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import {

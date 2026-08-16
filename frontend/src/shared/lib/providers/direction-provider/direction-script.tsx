@@ -1,4 +1,3 @@
-import Script from 'next/script'
 import {
   DEFAULT_DIRECTION,
   DIRECTION_COOKIE_NAME,
@@ -39,9 +38,8 @@ export function DirectionScript() {
   `
 
   return (
-    <Script
+    <script
       id='direction-preference'
-      strategy='beforeInteractive'
       dangerouslySetInnerHTML={{ __html: script }}
     />
   )

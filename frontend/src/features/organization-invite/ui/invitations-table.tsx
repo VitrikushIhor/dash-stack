@@ -12,6 +12,8 @@ import type { Invitation } from '@/entities/organization'
 import { useRevokeInvite } from '../model/use-revoke-invite'
 import { invitationsTableColumns } from './invitations-table-columns'
 
+/* eslint-disable react-hooks/incompatible-library */
+
 interface InvitationsTableProps {
   orgId: string
   invitations: Invitation[]

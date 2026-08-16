@@ -25,6 +25,8 @@ import {
   mapColumnFiltersToSearchParams,
 } from '../lib/filters'
 
+/* eslint-disable react-hooks/incompatible-library */
+
 interface UseTasksTableStateProps {
   data: Task[]
   columns: ColumnDef<Task, unknown>[]
