@@ -38,11 +38,3 @@ export const UpdateProfileSchema = z.object({
 
 export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>
 
-export const defaultProfileValues: Partial<UpdateProfileFormValues> = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  bio: '',
-  avatar: { kind: 'none' },
-  urls: [],
-}

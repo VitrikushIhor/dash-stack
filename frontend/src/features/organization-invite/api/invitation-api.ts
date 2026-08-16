@@ -1,4 +1,4 @@
-import { type HttpClient, api } from '@/shared/api'
+import { type HttpClient } from '@/shared/api'
 import { type Membership } from '@/shared/model'
 import {
   type Invitation,
@@ -20,5 +20,3 @@ export const createInvitationApi = (client: HttpClient) => ({
   acceptInvite: (token: string) =>
     client.post<Membership>(`/invitations/${token}/accept`),
 })
-
-export const invitationApi = createInvitationApi(api)

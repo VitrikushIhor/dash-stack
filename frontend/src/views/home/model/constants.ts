@@ -1,10 +1,4 @@
-import { type NavLink, type PricingTier } from './types'
-
-export const NAV_LINKS: NavLink[] = [
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Demo', href: '#demo' },
-]
+import { type PricingTier } from './types'
 
 export const PRICING: PricingTier[] = [
   {

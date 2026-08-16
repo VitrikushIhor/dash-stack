@@ -2,7 +2,7 @@ import { TaskStatus } from '../../domain/enums/task-status.enum';
 import { TaskReadModel } from '../read-models/task.read-model';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
-export interface ChecklistItemInput {
+interface ChecklistItemInput {
   text: string;
   completed?: boolean;
 }

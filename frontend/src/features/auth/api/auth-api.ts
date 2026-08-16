@@ -1,4 +1,4 @@
-import { type HttpClient, api } from '@/shared/api'
+import { type HttpClient } from '@/shared/api'
 import type {
   AuthTokens,
   SignInInput,
@@ -52,5 +52,3 @@ export function createAuthApi(client: HttpClient) {
       ),
   }
 }
-
-export const authApi = createAuthApi(api)

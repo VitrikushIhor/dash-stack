@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "ignoreBinaries": ["docker-compose", "knip"],
+  "workspaces": {
+    "frontend": {
+      "entry": [
+        "src/app/**/{page,layout,loading,error,not-found,route}.tsx",
+        "src/app/**/{page,layout,loading,error,not-found,route}.ts",
+        "src/{entities,features,widgets,views,shared}/**/{index,server}.ts",
+        "src/shared/ui/**/*.{ts,tsx}",
+        "steiger.config.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": [
+        "src/shared/ui/core/**",
+        "src/features/manage-label/model/label-search-params.ts",
+        "src/features/manage-task/model/task-search-params.ts",
+        "src/features/manage-task/model/create-task-schema.ts"
+      ],
+      "ignoreDependencies": ["tailwindcss", "tw-animate-css", "eslint-config-next", "@next/eslint-plugin-next", "@dnd-kit/modifiers"]
+    },
+    "backend": {
+      "entry": [
+        "src/main.ts",
+        "src/**/*.module.ts",
+        "test-db.ts"
+      ],
+      "project": ["src/**/*.ts"],
+      "ignore": [
+        "src/common/order/**",
+        "src/auth/domain/constants/auth.constants.ts"
+      ],
+      "ignoreDependencies": ["pino-pretty"]
+    }
+  }
+}

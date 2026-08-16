@@ -1,6 +1,6 @@
 import { TaskStatus } from '../../domain/enums/task-status.enum';
 
-export interface TaskAssigneeUser {
+interface TaskAssigneeUser {
   id: string;
   firstName: string;
   email?: string | null;
@@ -18,7 +18,7 @@ export interface TaskLabelRecord {
   color: string | null;
 }
 
-export interface TaskChecklistItemRecord {
+interface TaskChecklistItemRecord {
   id: string;
   text: string;
   completed: boolean;

@@ -43,19 +43,7 @@ export function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
   };
 }
 
-export class CreateTaskLabelDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  color: string;
-}
-
-export class CreateChecklistItemDto {
+class CreateChecklistItemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

@@ -38,17 +38,3 @@ export const getTaskUser = (task: Task): IUser => {
     : { id: 'unassigned', name: 'Unassigned', avatar: null }
 }
 
-interface UserLike {
-  user: {
-    id: string
-    firstName?: string | null
-    email?: string | null
-    avatar?: string | null
-  }
-}
-
-export const memberToUser = (data: UserLike): IUser => ({
-  id: data.user.id,
-  name: data.user.firstName ?? data.user.email ?? 'Unknown',
-  avatar: data.user.avatar ?? null,
-})

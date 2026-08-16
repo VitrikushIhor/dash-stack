@@ -1,8 +1,3 @@
-export interface NavLink {
-  label: string
-  href: string
-}
-
 export interface PricingTier {
   name: string
   price: string

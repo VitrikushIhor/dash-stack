@@ -22,5 +22,3 @@ export const serverApi = createHttpClient({
     // error boundary / middleware handle the redirect instead.
   },
 })
-
-export default serverApi

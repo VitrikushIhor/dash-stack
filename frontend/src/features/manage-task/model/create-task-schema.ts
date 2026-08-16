@@ -3,7 +3,6 @@ import { labelColorNames } from '@/entities/label'
 import { TaskStatusEnum } from '@/entities/task'
 import { membershipSchema } from '@/entities/team'
 
-export { membershipSchema }
 
 export const checklistItemSchema = z.object({
   id: z.string(),

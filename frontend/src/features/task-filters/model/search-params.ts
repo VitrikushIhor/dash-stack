@@ -2,7 +2,6 @@ import {
   parseAsString,
   parseAsInteger,
   parseAsArrayOf,
-  createSerializer,
 } from 'nuqs/server'
 
 export const tasksTableSearchParams = {
@@ -15,6 +14,3 @@ export const tasksTableSearchParams = {
   dueDate: parseAsArrayOf(parseAsString).withDefault([]),
 }
 
-export const serializeTasksTableSearchParams = createSerializer(
-  tasksTableSearchParams
-)

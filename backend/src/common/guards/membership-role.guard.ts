@@ -10,7 +10,7 @@ import { OrgRole } from '@prisma/client';
 
 import { PrismaService } from 'nestjs-prisma';
 
-export const ORG_ROLES_KEY = 'orgRoles';
+const ORG_ROLES_KEY = 'orgRoles';
 export const RequireOrgRole = (...roles: OrgRole[]) =>
   SetMetadata(ORG_ROLES_KEY, roles);
 

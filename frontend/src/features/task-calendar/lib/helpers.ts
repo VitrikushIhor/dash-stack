@@ -14,7 +14,6 @@ import {
   endOfWeek,
   format,
   parseISO,
-  differenceInMinutes,
   eachDayOfInterval,
   startOfDay,
   endOfYear,
@@ -97,85 +96,6 @@ export function getEventsCount(
     const anchor = getTaskCalendarAnchor(task)
     return anchor && compareFns[view](new Date(anchor), date)
   }).length
-}
-
-// ================ Week and day view helper functions ================ //
-
-export function getCurrentEvents(tasks: Task[]) {
-  const now = new Date()
-  return (
-    tasks.filter((task) => {
-      const anchor = getTaskCalendarAnchor(task)
-      if (!anchor) return false
-      return isSameDay(now, parseISO(anchor))
-    }) || null
-  )
-}
-
-export function groupEvents(dayEvents: Task[]) {
-  const sortedEvents = dayEvents.sort((a, b) => {
-    const anchorA = getTaskCalendarAnchor(a)
-    const anchorB = getTaskCalendarAnchor(b)
-    if (!anchorA || !anchorB) return 0
-    return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-  })
-  const groups: Task[][] = []
-
-  for (const task of sortedEvents) {
-    const anchor = getTaskCalendarAnchor(task)
-    if (!anchor) continue
-    const eventStart = parseISO(anchor)
-
-    let placed = false
-    for (const group of groups) {
-      const lastEventInGroup = group[group.length - 1]
-      const lastAnchor = getTaskCalendarAnchor(lastEventInGroup)
-      const lastEventEnd = lastAnchor ? parseISO(lastAnchor) : eventStart
-
-      if (eventStart >= lastEventEnd) {
-        group.push(task)
-        placed = true
-        break
-      }
-    }
-
-    if (!placed) groups.push([task])
-  }
-
-  return groups
-}
-
-export function getTaskBlockStyle(
-  task: Task,
-  day: Date,
-  groupIndex: number,
-  groupSize: number,
-  visibleHoursRange?: { from: number; to: number }
-) {
-  const anchor = getTaskCalendarAnchor(task)
-  if (!anchor) {
-    throw new Error(`Task ${task.id} has no calendar anchor`)
-  }
-  const startDate = parseISO(anchor)
-  const dayStart = new Date(day.setHours(0, 0, 0, 0))
-  const eventStart = startDate < dayStart ? dayStart : startDate
-  const startMinutes = differenceInMinutes(eventStart, dayStart)
-
-  let top
-
-  if (visibleHoursRange) {
-    const visibleStartMinutes = visibleHoursRange.from * 60
-    const visibleEndMinutes = visibleHoursRange.to * 60
-    const visibleRangeMinutes = visibleEndMinutes - visibleStartMinutes
-    top = ((startMinutes - visibleStartMinutes) / visibleRangeMinutes) * 100
-  } else {
-    top = (startMinutes / 1440) * 100
-  }
-
-  const width = 100 / groupSize
-  const left = groupIndex * width
-
-  return { top: `${top}%`, width: `${width}%`, left: `${left}%` }
 }
 
 // ================ Month view helper functions ================ //

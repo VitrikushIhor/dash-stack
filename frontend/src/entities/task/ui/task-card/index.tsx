@@ -2,7 +2,7 @@ import { type TaskViewMode } from '../../model/types'
 import { TaskCardKanban } from './task-card-kanban'
 import { TaskCardList, type TaskCardProps } from './task-card-list'
 
-export interface TaskCardWrapperProps extends TaskCardProps {
+interface TaskCardWrapperProps extends TaskCardProps {
   viewMode?: TaskViewMode
 }
 
@@ -14,4 +14,3 @@ export const TaskCard = ({ viewMode, ...props }: TaskCardWrapperProps) => {
 }
 
 export { TaskCardList, TaskCardKanban }
-export type { TaskCardProps }

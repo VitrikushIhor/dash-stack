@@ -19,5 +19,3 @@ export const api = createHttpClient({
     }
   },
 })
-
-export default api

@@ -16,15 +16,6 @@ export interface OrganizationMember {
   };
 }
 
-export interface OrganizationDetailsRecord {
-  id: string;
-  name: string;
-  description: string | null;
-  logo?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface OrganizationRepositoryPort {
   create(
     userId: string,

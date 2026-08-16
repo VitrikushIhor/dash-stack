@@ -58,3 +58,4 @@ Thumbs.db
 uploads
 
 backend/src/metadata.ts
+knip-report.json
