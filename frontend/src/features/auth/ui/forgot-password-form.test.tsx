@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
 import { ForgotPasswordForm } from './forgot-password-form'
 
 const mockForgotPasswordAction = vi.fn()
-vi.mock('../model/mutations/auth-actions', () => ({
+vi.mock('../api/actions/forgot-password.action', () => ({
   forgotPasswordAction: (...args: unknown[]) =>
     mockForgotPasswordAction(...args),
 }))
@@ -45,7 +45,9 @@ describe('ForgotPasswordForm Component', () => {
     await user.click(screen.getByRole('button', { name: /continue/i }))
 
     await waitFor(() => {
-      expect(mockForgotPasswordAction).toHaveBeenCalledWith('user@example.com')
+      expect(mockForgotPasswordAction).toHaveBeenCalledWith({
+        email: 'user@example.com',
+      })
     })
 
     expect(await screen.findByText(/check your email/i)).toBeInTheDocument()

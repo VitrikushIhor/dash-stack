@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useTransition } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
 import { ROUTES } from '@/shared/config/constants/routes'
+import { useAction } from '@/shared/lib/hooks/use-action'
+import { oauthExchangeAction } from '../../api/actions/oauth-exchange.action'
 import { extractOAuthToken } from '../../lib/oauth-token-extractor'
-import { oauthExchangeAction } from '../mutations/auth-actions'
 
 interface UseOAuthCallbackProps {
   code: string | null
@@ -15,8 +15,14 @@ interface UseOAuthCallbackProps {
 
 export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
   const hasHandledRef = useRef(false)
+
+  const { execute: exchangeToken } = useAction(oauthExchangeAction, {
+    successMessage: 'Successfully signed in!',
+    onSuccess: () => {
+      router.replace(ROUTES.organizations)
+    },
+  })
 
   useEffect(() => {
     if (hasHandledRef.current) return
@@ -35,15 +41,6 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
       return
     }
 
-    startTransition(async () => {
-      try {
-        await oauthExchangeAction(token)
-        toast.success('Successfully signed in!')
-
-        router.replace(ROUTES.organizations)
-      } catch (err) {
-        handleServerError(err)
-      }
-    })
-  }, [code, error, router])
+    exchangeToken({ token })
+  }, [code, error, router, exchangeToken])
 }

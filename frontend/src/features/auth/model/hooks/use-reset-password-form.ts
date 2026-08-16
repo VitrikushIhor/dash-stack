@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
-import { resetPasswordAction } from '../mutations/auth-actions'
+import { useAction } from '@/shared/lib/hooks/use-action'
+import { resetPasswordAction } from '../../api/actions/reset-password.action'
 import {
   resetPasswordDefaultValues,
   resetPasswordSchema,
@@ -17,7 +16,6 @@ interface UseResetPasswordFormProps {
 }
 
 export function useResetPasswordForm({ token }: UseResetPasswordFormProps) {
-  const [isPending, startTransition] = useTransition()
   const [isSuccess, setIsSuccess] = useState(false)
 
   const form = useForm<TResetPasswordSchema>({
@@ -25,24 +23,25 @@ export function useResetPasswordForm({ token }: UseResetPasswordFormProps) {
     defaultValues: resetPasswordDefaultValues,
   })
 
-  function handleSubmit(data: TResetPasswordSchema) {
-    if (!token) return
+  const { execute: resetPassword, isPending } = useAction(resetPasswordAction, {
+    successMessage: 'Password has been successfully reset!',
+    onSuccess: () => {
+      setIsSuccess(true)
+    },
+  })
 
-    startTransition(async () => {
-      try {
-        await resetPasswordAction(token, data.password)
-        setIsSuccess(true)
-        toast.success('Password has been successfully reset!')
-      } catch (error) {
-        handleServerError(error)
-      }
+  const onSubmit = form.handleSubmit(async (data) => {
+    if (!token) return
+    await resetPassword({
+      ...data,
+      token,
     })
-  }
+  })
 
   return {
     form,
     isPending,
     isSuccess,
-    onSubmit: form.handleSubmit(handleSubmit),
+    onSubmit,
   }
 }

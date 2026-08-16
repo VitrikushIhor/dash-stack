@@ -5,6 +5,9 @@ import { afterEach, vi } from 'vitest'
 
 globalThis.React = React
 
+// Mock server-only package for tests
+vi.mock('server-only', () => ({}))
+
 // Cleanup after each test case
 afterEach(() => {
   cleanup()

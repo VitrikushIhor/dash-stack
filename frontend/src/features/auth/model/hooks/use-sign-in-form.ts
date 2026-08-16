@@ -1,14 +1,13 @@
 'use client'
 
-import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
 import { ROUTES } from '@/shared/config/constants/routes'
+import { useAction } from '@/shared/lib/hooks/use-action'
 import { sanitizeRedirectUrl } from '@/shared/lib/utils'
-import { signInAction } from '../mutations/auth-actions'
+import { signInAction } from '../../api/actions/sign-in.action'
 import {
   signInDefaultValues,
   signInSchema,
@@ -20,7 +19,6 @@ interface UseSignInFormProps {
 }
 
 export function useSignInForm(options?: UseSignInFormProps) {
-  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const form = useForm<TSignInSchema>({
@@ -28,30 +26,25 @@ export function useSignInForm(options?: UseSignInFormProps) {
     defaultValues: signInDefaultValues,
   })
 
-  function handleSubmit(data: TSignInSchema) {
-    startTransition(async () => {
-      try {
-        await signInAction({
-          email: data.email,
-          password: data.password,
-        })
+  const { execute: signIn, isPending } = useAction(signInAction, {
+    onSuccess: () => {
+      toast.success(`Welcome back, ${form.getValues('email')}!`)
 
-        toast.success(`Welcome back, ${data.email}!`)
+      const targetPath = sanitizeRedirectUrl(
+        options?.redirectTo,
+        ROUTES.organizations
+      )
+      router.replace(targetPath)
+    },
+  })
 
-        const targetPath = sanitizeRedirectUrl(
-          options?.redirectTo,
-          ROUTES.organizations
-        )
-        router.replace(targetPath)
-      } catch (error) {
-        handleServerError(error)
-      }
-    })
-  }
+  const onSubmit = form.handleSubmit(async (data) => {
+    await signIn(data)
+  })
 
   return {
     form,
     isPending,
-    onSubmit: form.handleSubmit(handleSubmit),
+    onSubmit,
   }
 }

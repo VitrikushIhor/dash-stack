@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
 import { SignUpForm } from './sign-up-form'
 
 const mockSignUpAction = vi.fn()
-vi.mock('../model/mutations/auth-actions', () => ({
+vi.mock('../api/actions/sign-up.action', () => ({
   signUpAction: (...args: unknown[]) => mockSignUpAction(...args),
 }))
 
@@ -72,6 +72,7 @@ describe('SignUpForm Component', () => {
       expect(mockSignUpAction).toHaveBeenCalledWith({
         email: 'newuser@example.com',
         password: 'Password123!',
+        confirmPassword: 'Password123!',
       })
     })
 

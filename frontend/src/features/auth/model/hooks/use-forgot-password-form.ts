@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
-import { forgotPasswordAction } from '../mutations/auth-actions'
+import { useAction } from '@/shared/lib/hooks/use-action'
+import { forgotPasswordAction } from '../../api/actions/forgot-password.action'
 import {
   forgotPasswordDefaultValues,
   forgotPasswordSchema,
@@ -13,7 +12,6 @@ import {
 } from '../schema/forgot-password.schema'
 
 export function useForgotPasswordForm() {
-  const [isPending, startTransition] = useTransition()
   const [isSent, setIsSent] = useState(false)
 
   const form = useForm<TForgotPasswordSchema>({
@@ -21,22 +19,24 @@ export function useForgotPasswordForm() {
     defaultValues: forgotPasswordDefaultValues,
   })
 
-  function handleSubmit(data: TForgotPasswordSchema) {
-    startTransition(async () => {
-      try {
-        await forgotPasswordAction(data.email)
+  const { execute: forgotPassword, isPending } = useAction(
+    forgotPasswordAction,
+    {
+      successMessage: 'Password reset link sent to your email!',
+      onSuccess: () => {
         setIsSent(true)
-        toast.success('Password reset link sent to your email!')
-      } catch (error) {
-        handleServerError(error)
-      }
-    })
-  }
+      },
+    }
+  )
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    await forgotPassword(data)
+  })
 
   return {
     form,
     isPending,
     isSent,
-    onSubmit: form.handleSubmit(handleSubmit),
+    onSubmit,
   }
 }

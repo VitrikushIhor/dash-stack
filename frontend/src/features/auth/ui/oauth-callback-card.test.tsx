@@ -5,7 +5,7 @@ import { OAuthCallbackCard } from './oauth-callback-card'
 const mockOAuthExchangeAction = vi.fn()
 const mockReplace = vi.fn()
 
-vi.mock('../model/mutations/auth-actions', () => ({
+vi.mock('../api/actions/oauth-exchange.action', () => ({
   oauthExchangeAction: (...args: unknown[]) => mockOAuthExchangeAction(...args),
 }))
 

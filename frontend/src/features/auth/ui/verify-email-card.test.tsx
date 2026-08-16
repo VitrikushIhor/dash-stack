@@ -7,7 +7,7 @@ import { VerifyEmailCard } from './verify-email-card'
 const mockVerifyEmailAction = vi.fn()
 const mockReplace = vi.fn()
 
-vi.mock('../model/mutations/auth-actions', () => ({
+vi.mock('../api/actions/verify-email.action', () => ({
   verifyEmailAction: (...args: unknown[]) => mockVerifyEmailAction(...args),
 }))
 
@@ -41,7 +41,9 @@ describe('VerifyEmailCard Component', () => {
     render(<VerifyEmailCard token='valid-email-token' />)
 
     await waitFor(() => {
-      expect(mockVerifyEmailAction).toHaveBeenCalledWith('valid-email-token')
+      expect(mockVerifyEmailAction).toHaveBeenCalledWith({
+        token: 'valid-email-token',
+      })
     })
 
     expect(

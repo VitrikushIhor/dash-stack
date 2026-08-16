@@ -4,14 +4,20 @@ import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config/constants/routes'
-import { logoutAction } from './auth-actions'
+import { logoutAction } from '../../api/actions/logout.action'
 
 export function useLogout() {
   const queryClient = useQueryClient()
   const router = useRouter()
 
   return useMutation({
-    mutationFn: logoutAction,
+    mutationFn: async () => {
+      const res = await logoutAction()
+      if (!res.success) {
+        throw new Error(res.error)
+      }
+      return res.data
+    },
     onSuccess: () => {
       queryClient.clear()
       toast.success('Logged out successfully')

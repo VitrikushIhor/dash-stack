@@ -1,11 +1,9 @@
 'use client'
 
-import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
-import { signUpAction } from '../mutations/auth-actions'
+import { useAction } from '@/shared/lib/hooks/use-action'
+import { signUpAction } from '../../api/actions/sign-up.action'
 import {
   signUpDefaultValues,
   signUpSchema,
@@ -17,31 +15,25 @@ interface UseSignUpFormProps {
 }
 
 export function useSignUpForm({ onSuccess }: UseSignUpFormProps = {}) {
-  const [isPending, startTransition] = useTransition()
-
   const form = useForm<TSignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: signUpDefaultValues,
   })
 
-  function handleSubmit(data: TSignUpSchema) {
-    startTransition(async () => {
-      try {
-        await signUpAction({
-          email: data.email,
-          password: data.password,
-        })
-        toast.success('Account created! Please check your email to verify.')
-        onSuccess?.()
-      } catch (error) {
-        handleServerError(error)
-      }
-    })
-  }
+  const { execute: signUp, isPending } = useAction(signUpAction, {
+    successMessage: 'Account created! Please check your email to verify.',
+    onSuccess: () => {
+      onSuccess?.()
+    },
+  })
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    await signUp(data)
+  })
 
   return {
     form,
     isPending,
-    onSubmit: form.handleSubmit(handleSubmit),
+    onSubmit,
   }
 }

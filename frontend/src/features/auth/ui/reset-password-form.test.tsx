@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
 import { ResetPasswordForm } from './reset-password-form'
 
 const mockResetPasswordAction = vi.fn()
-vi.mock('../model/mutations/auth-actions', () => ({
+vi.mock('../api/actions/reset-password.action', () => ({
   resetPasswordAction: (...args: unknown[]) => mockResetPasswordAction(...args),
 }))
 
@@ -54,10 +54,11 @@ describe('ResetPasswordForm Component', () => {
     await user.click(screen.getByRole('button', { name: /reset password/i }))
 
     await waitFor(() => {
-      expect(mockResetPasswordAction).toHaveBeenCalledWith(
-        'valid-token-xyz',
-        'newSecret123'
-      )
+      expect(mockResetPasswordAction).toHaveBeenCalledWith({
+        token: 'valid-token-xyz',
+        password: 'newSecret123',
+        confirmPassword: 'newSecret123',
+      })
     })
 
     expect(
