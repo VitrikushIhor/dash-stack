@@ -5,7 +5,7 @@ import {
   ClipboardList,
   Calendar,
 } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {

@@ -19,7 +19,7 @@ import {
 } from '@tanstack/react-table'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
 import { type Task } from '@/entities/task'
-import { useTasksTableSearchParams } from '@/features/task-filters/model/use-search-params'
+import { useTasksTableSearchParams } from '@/features/task-filters'
 import {
   mapSearchParamsToColumnFilters,
   mapColumnFiltersToSearchParams,

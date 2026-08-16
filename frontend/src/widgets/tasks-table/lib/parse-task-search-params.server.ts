@@ -1,7 +1,7 @@
 import 'server-only'
 import { type TaskStatusEnum, type TaskFilters } from '@/entities/task'
-import { tasksSearchParamsCache } from '@/features/task-filters/model/search-params.server'
-import { parseDateSafe } from '@/widgets/tasks-table/lib/filters'
+import { tasksSearchParamsCache } from '@/features/task-filters/server'
+import { parseDateSafe } from './filters'
 
 export function getParsedTaskFilters(
   searchParams: Record<string, string | string[] | undefined>,

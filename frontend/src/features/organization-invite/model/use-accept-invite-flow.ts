@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { acceptInviteAction } from '../api/actions/accept-invite.action'
 
 export type AcceptInviteFlowStatus = 'loading' | 'success' | 'error'

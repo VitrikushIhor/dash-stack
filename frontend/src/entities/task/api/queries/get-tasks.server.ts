@@ -1,6 +1,5 @@
 import 'server-only'
-import { getErrorMessage } from '@/shared/api'
-import { type PaginationMeta } from '@/shared/api/pagination'
+import { getErrorMessage, type PaginationMeta } from '@/shared/api'
 import { type Task } from '../../model/types'
 import { type TaskFilters } from '../task-api'
 import { taskServerApi } from '../task-api.server'

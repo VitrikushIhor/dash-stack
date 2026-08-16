@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { getErrorMessage, ApiError, type ActionState } from '@/shared/api'
-import type { OrganizationSummary } from '@/entities/organization'
-import { getActiveOrganization } from '@/entities/organization/server'
+import type { OrganizationSummary } from '../model/types/organization.types'
+import { getActiveOrganization } from './queries/get-active-organization.server'
 
 type OrgActionHandler<TInput, TOutput> = (
   input: TInput,

@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { resetPasswordSchema } from '../../model/schema/reset-password.schema'
 import { authServerApi } from '../auth-api.server'
 

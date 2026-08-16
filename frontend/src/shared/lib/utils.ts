@@ -1,7 +1,7 @@
 import { format, isValid, parseISO } from 'date-fns'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

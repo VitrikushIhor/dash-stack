@@ -37,4 +37,3 @@ export const getTaskUser = (task: Task): IUser => {
       }
     : { id: 'unassigned', name: 'Unassigned', avatar: null }
 }
-

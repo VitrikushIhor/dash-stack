@@ -17,7 +17,7 @@ import {
   STATUS_CONFIG,
   TaskViewMode,
 } from '@/entities/task'
-import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
+import { useTaskSearchParams } from '@/features/manage-task'
 import { TaskBoardCard } from './task-board-card'
 
 interface TaskColumnProps extends Omit<

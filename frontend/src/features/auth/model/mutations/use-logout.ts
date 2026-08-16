@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { logoutAction } from '../../api/actions/logout.action'
 
 export function useLogout() {

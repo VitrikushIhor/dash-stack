@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Mail, ArrowLeft } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { getInitials } from '@/shared/lib/utils'
 import {
   formatPosition,

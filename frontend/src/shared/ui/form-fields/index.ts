@@ -1,3 +1,2 @@
-export * from './form-file-upload'
-export * from './form-image-upload'
-export * from './form-label-selector'
+export { FormFileUpload } from './form-file-upload'
+export { FormImageUpload } from './form-image-upload'

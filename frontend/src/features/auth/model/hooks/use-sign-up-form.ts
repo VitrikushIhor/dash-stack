@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { signUpAction } from '../../api/actions/sign-up.action'
 import {
   signUpDefaultValues,

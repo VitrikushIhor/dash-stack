@@ -1,6 +1,6 @@
 'use server'
 
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { forgotPasswordSchema } from '../../model/schema/forgot-password.schema'
 import { authServerApi } from '../auth-api.server'
 

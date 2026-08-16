@@ -3,8 +3,8 @@
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ROUTES } from '@/shared/config/constants/routes'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { ROUTES } from '@/shared/config'
+import { useAction } from '@/shared/lib'
 import { oauthExchangeAction } from '../../api/actions/oauth-exchange.action'
 import { extractOAuthToken } from '../../lib/oauth-token-extractor'
 

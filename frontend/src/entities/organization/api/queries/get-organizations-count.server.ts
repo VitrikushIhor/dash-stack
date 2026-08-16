@@ -1,5 +1,5 @@
 import 'server-only'
-import { serverApi } from '@/shared/api/server-api-client'
+import { serverApi } from '@/shared/api/server'
 
 export async function getOrganizationCount() {
   const { count } = await serverApi.get<{

@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { createOrgAction } from '@/shared/lib/actions/org-action-builder'
+import { createOrgAction } from '@/entities/organization/server'
 import { taskServerApi } from '@/entities/task/server'
 
 export const getTaskAction = createOrgAction(

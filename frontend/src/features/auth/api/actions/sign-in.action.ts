@@ -1,6 +1,6 @@
 'use server'
 
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { setAuthCookies } from '@/shared/lib/session-cookies'
 import { signInSchema } from '../../model/schema/sign-in.schema'
 import type { AuthTokens } from '../../model/types/auth.types'

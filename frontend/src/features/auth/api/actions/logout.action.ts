@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { clearAuthCookies, COOKIE_CONFIG } from '@/shared/lib/session-cookies'
 import { authServerApi } from '../auth-api.server'
 

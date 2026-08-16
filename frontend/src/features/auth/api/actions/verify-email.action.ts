@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { setAuthCookies } from '@/shared/lib/session-cookies'
 import type { AuthTokens } from '../../model/types/auth.types'
 import { authServerApi } from '../auth-api.server'

@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { getOrganizationCount } from '../../api/queries/get-organizations-count.server'
 
 export async function ensureCanCreateOrganization() {

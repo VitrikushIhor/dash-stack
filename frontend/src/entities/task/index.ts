@@ -15,7 +15,16 @@ export {
   BulkUpdateTasksDtoSchema,
   BulkDeleteTasksDtoSchema,
 } from './model/task.schema'
-export * from './lib/task-utils'
+export {
+  calculateTaskProgress,
+  isTaskCompleted,
+  isTaskOverdue,
+  getTaskEffectiveStart,
+  getTaskCalendarAnchor,
+  getTaskDisplayDate,
+  hasTaskDateRange,
+  loadFilesFromUrls,
+} from './lib/task-utils'
 
 export { taskApi, type TaskFilters } from './api/task-api'
 export { STATUS_CONFIG } from './model/task-status-config'

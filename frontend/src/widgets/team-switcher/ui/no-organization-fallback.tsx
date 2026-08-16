@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Building2 } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import {
   SidebarMenu,
   SidebarMenuButton,

@@ -7,7 +7,8 @@ import {
   FormItem,
   FormMessage,
 } from '@/shared/ui/core/form'
-import { LabelSelector, type Label } from '@/entities/label'
+import { type Label } from '../model/types'
+import { LabelSelector } from './label-selector'
 
 interface FormLabelSelectorProps {
   name: string

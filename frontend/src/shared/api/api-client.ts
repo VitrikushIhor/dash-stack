@@ -1,5 +1,5 @@
 import { toast } from 'sonner'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { createHttpClient } from './http-core'
 
 /**

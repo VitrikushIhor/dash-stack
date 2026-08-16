@@ -1,5 +1,5 @@
 import { getActiveOrganization } from '@/entities/organization/server'
-import { NoOrganizationFallback } from '@/widgets/layout/ui/no-organization-fallback'
+import { NoOrganizationFallback } from './no-organization-fallback'
 import { TeamSwitcherUI } from './team-switcher-ui'
 
 export async function TeamSwitcher() {

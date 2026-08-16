@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { format } from 'date-fns'
 import { List, Columns, Grid2x2, Grid3x3, CalendarRange } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
-import { useCalendarSearchParams } from '@/features/task-calendar/model/calendar-search-params'
+import { useCalendarSearchParams } from '@/features/task-calendar'
 
 const TABS = [
   { href: '/calendar/day', icon: List, label: 'Day view' },

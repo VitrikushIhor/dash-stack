@@ -6,7 +6,9 @@ const BASE_URL = process.env.API_URL ?? 'http://localhost:8000'
 
 if (!process.env.API_URL && process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
-  console.warn('API_URL is missing in production. Defaulting to http://localhost:8000')
+  console.warn(
+    'API_URL is missing in production. Defaulting to http://localhost:8000'
+  )
 }
 
 const UPSTREAM_TIMEOUT_MS = 30_000

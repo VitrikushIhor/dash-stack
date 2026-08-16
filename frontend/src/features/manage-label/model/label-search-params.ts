@@ -9,7 +9,6 @@ export const labelSearchParams = {
   'delete-label': parseAsString,
 }
 
-
 export function useLabelSearchParams() {
   return useQueryStates(labelSearchParams)
 }

@@ -19,8 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/core/select'
-import type { LabelDto } from '@/entities/label'
-import { labelColorNames, labelColorStyles } from '@/entities/label/model/types'
+import {
+  type LabelDto,
+  labelColorNames,
+  labelColorStyles,
+} from '@/entities/label'
 import { useLabelForm } from '../model/use-label-form'
 
 interface LabelFormProps {

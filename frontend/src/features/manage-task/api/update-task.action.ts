@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { createOrgAction } from '@/shared/lib/actions/org-action-builder'
+import { createOrgAction } from '@/entities/organization/server'
 import { UpdateTaskDtoSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
 

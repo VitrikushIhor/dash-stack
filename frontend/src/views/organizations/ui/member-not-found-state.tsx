@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { UserX, ArrowLeft } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 
 interface MemberNotFoundStateProps {

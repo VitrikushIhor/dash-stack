@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ROUTES } from '@/shared/config/constants/routes'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { ROUTES } from '@/shared/config'
+import { useAction } from '@/shared/lib'
 import { verifyEmailAction } from '../../api/actions/verify-email.action'
 import { VerificationStatus } from '../types/auth.types'
 

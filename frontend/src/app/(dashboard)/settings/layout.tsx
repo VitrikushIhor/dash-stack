@@ -1,5 +1,5 @@
 import { Monitor, Bell, Palette, UserCog } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { Separator } from '@/shared/ui/core/separator'
 import { SidebarNav } from '@/shared/ui/sidebar-nav'
 import { Main } from '@/widgets/layout'

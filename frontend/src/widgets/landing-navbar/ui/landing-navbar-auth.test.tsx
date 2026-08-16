@@ -1,13 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useIsAuthenticated } from '@/entities/session'
 import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
 import { LandingNavbarAuth } from './landing-navbar-auth'
-
-vi.mock('@/entities/session', () => ({
-  useIsAuthenticated: vi.fn(),
-}))
 
 vi.mock('@/entities/user', () => ({
   useCurrentUser: vi.fn(),
@@ -29,11 +24,6 @@ describe('LandingNavbarAuth', () => {
   })
 
   it('displays "Sign In" and "Start Free" buttons in desktop mode when unauthenticated', () => {
-    vi.mocked(useIsAuthenticated).mockReturnValue({
-      isAuthenticated: false,
-    } as Partial<ReturnType<typeof useIsAuthenticated>> as ReturnType<
-      typeof useIsAuthenticated
-    >)
     vi.mocked(useCurrentUser).mockReturnValue({ data: undefined } as Partial<
       ReturnType<typeof useCurrentUser>
     > as ReturnType<typeof useCurrentUser>)
@@ -50,11 +40,6 @@ describe('LandingNavbarAuth', () => {
   })
 
   it('displays "Go to App" button and user avatar dropdown when authenticated in desktop mode', () => {
-    vi.mocked(useIsAuthenticated).mockReturnValue({
-      isAuthenticated: true,
-    } as Partial<ReturnType<typeof useIsAuthenticated>> as ReturnType<
-      typeof useIsAuthenticated
-    >)
     vi.mocked(useCurrentUser).mockReturnValue({
       data: {
         id: 'usr-1',
@@ -76,11 +61,6 @@ describe('LandingNavbarAuth', () => {
   })
 
   it('displays user info, "Go to App" button, and "Sign out" button inline without a dropdown when authenticated in mobile mode', () => {
-    vi.mocked(useIsAuthenticated).mockReturnValue({
-      isAuthenticated: true,
-    } as Partial<ReturnType<typeof useIsAuthenticated>> as ReturnType<
-      typeof useIsAuthenticated
-    >)
     vi.mocked(useCurrentUser).mockReturnValue({
       data: {
         id: 'usr-2',
@@ -109,14 +89,16 @@ describe('LandingNavbarAuth', () => {
     const userEvent = (
       await import('@testing-library/user-event')
     ).default.setup()
-    vi.mocked(useIsAuthenticated).mockReturnValue({
-      isAuthenticated: true,
-    } as Partial<ReturnType<typeof useIsAuthenticated>> as ReturnType<
-      typeof useIsAuthenticated
+    vi.mocked(useCurrentUser).mockReturnValue({
+      data: {
+        id: 'usr-1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+      },
+    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
+      typeof useCurrentUser
     >)
-    vi.mocked(useCurrentUser).mockReturnValue({ data: undefined } as Partial<
-      ReturnType<typeof useCurrentUser>
-    > as ReturnType<typeof useCurrentUser>)
 
     render(<LandingNavbarAuth variant='desktop' />)
 

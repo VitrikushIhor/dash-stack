@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ROUTES } from '@/shared/config'
-import { createAction } from '@/shared/lib/actions/action-builder'
+import { createAction } from '@/shared/lib'
 import { UpdateUserDtoSchema } from '@/entities/user'
 import { userServerApi } from '@/entities/user/server'
 

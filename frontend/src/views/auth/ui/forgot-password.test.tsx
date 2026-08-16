@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ROUTES } from '@/shared/config/constants/routes'
-import { render, screen } from '@/shared/lib/test/test-utils'
+import { ROUTES } from '@/shared/config'
+import { render, screen } from '@/shared/lib/test'
 import { ForgotPassword } from './forgot-password'
 
 // Mock ForgotPasswordForm to isolate ForgotPassword view component behavior

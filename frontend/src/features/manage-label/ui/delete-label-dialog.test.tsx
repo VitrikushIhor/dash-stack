@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { type LabelDto } from '@/entities/label'
 import { useLabelSearchParams } from '../model/label-search-params'
 import { DeleteLabelDialog } from './delete-label-dialog'
@@ -13,7 +13,7 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
-vi.mock('@/shared/lib/hooks/use-action', () => ({
+vi.mock('@/shared/lib', () => ({
   useAction: vi.fn(),
 }))
 

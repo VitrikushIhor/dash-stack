@@ -1,2 +1,1 @@
-export * from './action-builder'
-export * from './org-action-builder'
+export { createAction } from './action-builder'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import {
   AlertDialog,
   AlertDialogAction,

@@ -10,7 +10,6 @@ export const taskSearchParams = {
   'task-status': parseAsString,
 }
 
-
 export function useTaskSearchParams() {
   return useQueryStates(taskSearchParams)
 }

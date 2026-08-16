@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
 import { type Task } from '@/entities/task'
-import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
+import { useTaskSearchParams } from '@/features/manage-task'
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>

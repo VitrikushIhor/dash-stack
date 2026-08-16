@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { OrganizationLogo, type Organization } from '@/entities/organization'
 

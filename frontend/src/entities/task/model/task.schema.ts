@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { labelColorNames } from '@/entities/label'
+import { labelColorNames } from '@/shared/model'
 import { TaskStatusEnum } from './types'
 
 export const CreateTaskDtoSchema = z.object({

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { type LabelDto } from '@/entities/label'
 import { createLabelAction } from '../api/create-label.action'
 import { updateLabelAction } from '../api/update-label.action'
@@ -21,7 +21,7 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
-vi.mock('@/shared/lib/hooks/use-action', () => ({
+vi.mock('@/shared/lib', () => ({
   useAction: vi.fn(),
 }))
 

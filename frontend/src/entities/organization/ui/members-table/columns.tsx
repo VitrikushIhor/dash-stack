@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { type ColumnDef } from '@tanstack/react-table'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { getInitials } from '@/shared/lib/utils'
 import {
   formatJoinedDate,

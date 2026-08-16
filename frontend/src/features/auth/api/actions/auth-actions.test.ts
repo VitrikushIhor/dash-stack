@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { serverApi } from '@/shared/api/server-api-client'
+import { serverApi } from '@/shared/api/server'
 import {
   setAuthCookies,
   clearAuthCookies,
@@ -18,7 +18,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(),
 }))
 
-vi.mock('@/shared/api/server-api-client', () => ({
+vi.mock('@/shared/api/server', () => ({
   serverApi: {
     post: vi.fn(),
   },

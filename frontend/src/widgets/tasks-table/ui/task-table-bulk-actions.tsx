@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,

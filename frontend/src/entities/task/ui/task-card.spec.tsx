@@ -1,8 +1,7 @@
 import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { OrgRole } from '@/shared/model'
-import { type Label } from '@/entities/label'
+import { OrgRole, type Label } from '@/shared/model'
 import { TaskStatusEnum, type Task } from '../model/types'
 import { TaskCardKanban } from './task-card'
 
@@ -13,16 +12,12 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-// Mock FSD entity components
-vi.mock('@/entities/label', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/entities/label')>()
-  return {
-    ...actual,
-    LabelBadge: ({ label }: { label: Label }) => (
-      <span data-testid='label-badge'>{label.name}</span>
-    ),
-  }
-})
+// Mock UI components
+vi.mock('@/shared/ui/label-badge', () => ({
+  LabelBadge: ({ label }: { label: Label }) => (
+    <span data-testid='label-badge'>{label.name}</span>
+  ),
+}))
 
 // Mock UI components
 vi.mock('@/shared/ui/avatar-group', () => ({

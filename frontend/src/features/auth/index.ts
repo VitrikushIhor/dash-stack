@@ -1,4 +1,9 @@
-export * from './model/types/auth.types'
+export type {
+  AuthTokens,
+  SignUpInput,
+  SignInInput,
+  VerificationStatus,
+} from './model/types/auth.types'
 
 // Hooks
 export { useSignInForm } from './model/hooks/use-sign-in-form'
@@ -10,10 +15,26 @@ export { useVerifyEmail } from './model/hooks/use-verify-email'
 export { useOAuthCallback } from './model/hooks/use-oauth-callback'
 
 // Schemas
-export * from './model/schema/sign-in.schema'
-export * from './model/schema/sign-up.schema'
-export * from './model/schema/forgot-password.schema'
-export * from './model/schema/reset-password.schema'
+export {
+  signInSchema,
+  signInDefaultValues,
+  type TSignInSchema,
+} from './model/schema/sign-in.schema'
+export {
+  signUpSchema,
+  signUpDefaultValues,
+  type TSignUpSchema,
+} from './model/schema/sign-up.schema'
+export {
+  forgotPasswordSchema,
+  forgotPasswordDefaultValues,
+  type TForgotPasswordSchema,
+} from './model/schema/forgot-password.schema'
+export {
+  resetPasswordSchema,
+  resetPasswordDefaultValues,
+  type TResetPasswordSchema,
+} from './model/schema/reset-password.schema'
 
 // UI
 export { SignInForm } from './ui/sign-in-form'

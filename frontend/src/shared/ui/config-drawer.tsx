@@ -1,16 +1,6 @@
 import { type SVGProps } from 'react'
 import { Root as Radio, Item } from '@radix-ui/react-radio-group'
 import { CircleCheck, RotateCcw, Settings } from 'lucide-react'
-import { IconDir } from '@/shared/assets/custom/icon-dir'
-import { IconLayoutCompact } from '@/shared/assets/custom/icon-layout-compact'
-import { IconLayoutDefault } from '@/shared/assets/custom/icon-layout-default'
-import { IconLayoutFull } from '@/shared/assets/custom/icon-layout-full'
-import { IconSidebarFloating } from '@/shared/assets/custom/icon-sidebar-floating'
-import { IconSidebarInset } from '@/shared/assets/custom/icon-sidebar-inset'
-import { IconSidebarSidebar } from '@/shared/assets/custom/icon-sidebar-sidebar'
-import { IconThemeDark } from '@/shared/assets/custom/icon-theme-dark'
-import { IconThemeLight } from '@/shared/assets/custom/icon-theme-light'
-import { IconThemeSystem } from '@/shared/assets/custom/icon-theme-system'
 import {
   useDirection,
   type Collapsible,
@@ -29,6 +19,18 @@ import {
   SheetTrigger,
 } from '@/shared/ui/core/sheet'
 import { useSidebar } from './core/sidebar'
+import {
+  IconDir,
+  IconLayoutCompact,
+  IconLayoutDefault,
+  IconLayoutFull,
+  IconSidebarFloating,
+  IconSidebarInset,
+  IconSidebarSidebar,
+  IconThemeDark,
+  IconThemeLight,
+  IconThemeSystem,
+} from './icons'
 
 export function ConfigDrawer() {
   const { setOpen } = useSidebar()

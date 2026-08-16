@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { type Task } from '@/entities/task'
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { updateTaskAction } from '@/features/manage-task/server'

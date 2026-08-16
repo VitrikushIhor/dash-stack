@@ -2,9 +2,9 @@
 
 import { revalidateTag } from 'next/cache'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { createOrgAction } from '@/shared/lib/actions/org-action-builder'
 import { CreateLabelDtoSchema } from '@/entities/label'
 import { labelServerApi } from '@/entities/label/server'
+import { createOrgAction } from '@/entities/organization/server'
 
 export const createLabelAction = createOrgAction(
   CreateLabelDtoSchema,

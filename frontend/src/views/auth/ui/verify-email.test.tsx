@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@/shared/lib/test/test-utils'
+import { render, screen } from '@/shared/lib/test'
 import { VerifyEmail } from './verify-email'
 
 vi.mock('@/features/auth', async (importOriginal) => {

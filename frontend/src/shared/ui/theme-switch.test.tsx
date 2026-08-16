@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { ThemeProvider, useTheme } from '@/shared/lib/providers'
-import { render, screen } from '@/shared/lib/test/test-utils'
+import { render, screen } from '@/shared/lib/test'
 import { ThemeSwitch } from './theme-switch'
 
 function ThemeConsumer() {

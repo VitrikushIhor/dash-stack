@@ -3,9 +3,9 @@
 import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { createOrgAction } from '@/shared/lib/actions/org-action-builder'
 import { UpdateLabelDtoSchema } from '@/entities/label'
 import { labelServerApi } from '@/entities/label/server'
+import { createOrgAction } from '@/entities/organization/server'
 
 const UpdateLabelInputSchema = z.object({
   id: z.string(),

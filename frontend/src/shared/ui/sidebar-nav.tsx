@@ -3,7 +3,7 @@
 import { type JSX } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { buttonVariants } from '@/shared/ui/core/button'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'

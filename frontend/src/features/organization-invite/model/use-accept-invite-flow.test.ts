@@ -1,6 +1,6 @@
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import { type Membership, OrgRole } from '@/entities/organization'
 import { acceptInviteAction } from '../api/actions/accept-invite.action'
 import { useAcceptInviteFlow } from './use-accept-invite-flow'

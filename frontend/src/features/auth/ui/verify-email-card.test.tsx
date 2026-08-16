@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ROUTES } from '@/shared/config/constants/routes'
-import { render, screen, waitFor } from '@/shared/lib/test/test-utils'
+import { ROUTES } from '@/shared/config'
+import { render, screen, waitFor } from '@/shared/lib/test'
 import { VerifyEmailCard } from './verify-email-card'
 
 const mockVerifyEmailAction = vi.fn()

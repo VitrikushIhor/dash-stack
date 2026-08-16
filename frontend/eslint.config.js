@@ -56,6 +56,14 @@ export default defineConfig(
         },
       ],
       'no-duplicate-imports': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ExportAllDeclaration',
+          message:
+            'Wildcard exports (`export * from ...`) are forbidden. Use explicit named exports instead.',
+        },
+      ],
     },
   },
   eslintConfigPrettier

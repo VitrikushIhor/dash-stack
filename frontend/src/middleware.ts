@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 
 const PROTECTED_PATHS = [
   ROUTES.task,

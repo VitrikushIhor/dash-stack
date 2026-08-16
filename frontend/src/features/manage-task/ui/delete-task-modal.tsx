@@ -1,7 +1,7 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import { useAction } from '@/shared/lib/hooks/use-action'
+import { useAction } from '@/shared/lib'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { useTaskSearchParams } from '../model/task-search-params'
 import { useTaskQuery } from '../model/use-task-query'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ROUTES } from '@/shared/config/constants/routes'
+import { ROUTES } from '@/shared/config'
 import {
   cn,
   getInitials,

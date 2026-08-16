@@ -1,7 +1,6 @@
 import { cn } from '@/shared/lib/utils'
 import { Card, CardContent } from '@/shared/ui/core/card'
-import type { LabelDto } from '@/entities/label'
-import { labelColorStyles } from '@/entities/label/model/types'
+import { type LabelDto, labelColorStyles } from '@/entities/label'
 import {
   CreateLabelButton,
   LabelRowActions,
