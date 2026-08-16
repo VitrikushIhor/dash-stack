@@ -98,12 +98,12 @@ describe('getPageNumbers', () => {
 
 describe('sanitizeRedirectUrl', () => {
   it('returns a valid relative path as-is', () => {
-    expect(sanitizeRedirectUrl(ROUTES.dashboard)).toBe(ROUTES.dashboard)
+    expect(sanitizeRedirectUrl(ROUTES.organizations)).toBe(ROUTES.organizations)
     expect(sanitizeRedirectUrl('/settings/profile')).toBe('/settings/profile')
   })
 
-  it('defaults to ROUTES.dashboard for absolute URLs or invalid paths', () => {
-    const defaultValue = ROUTES.dashboard
+  it('defaults to fallback for absolute URLs or invalid paths', () => {
+    const defaultValue = ROUTES.organizations
     expect(
       sanitizeRedirectUrl('https://evil-phishing-site.com', defaultValue)
     ).toBe(defaultValue)
@@ -114,8 +114,8 @@ describe('sanitizeRedirectUrl', () => {
     expect(sanitizeRedirectUrl('/\\evil.com', defaultValue)).toBe(defaultValue)
   })
 
-  it('defaults to ROUTES.dashboard when URL is empty/null/undefined', () => {
-    const defaultValue = ROUTES.dashboard
+  it('defaults to fallback when URL is empty/null/undefined', () => {
+    const defaultValue = ROUTES.organizations
     expect(sanitizeRedirectUrl(undefined, defaultValue)).toBe(defaultValue)
     expect(sanitizeRedirectUrl(null, defaultValue)).toBe(defaultValue)
     expect(sanitizeRedirectUrl('', defaultValue)).toBe(defaultValue)

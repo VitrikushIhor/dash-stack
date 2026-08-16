@@ -105,7 +105,7 @@ export function getUserDisplayName(
 
 export function sanitizeRedirectUrl(
   url: string | undefined | null,
-  fallback: string = ROUTES.dashboard
+  fallback: string = ROUTES.organizations
 ): string {
   if (!url || typeof url !== 'string') return fallback
   const trimmed = url.trim()

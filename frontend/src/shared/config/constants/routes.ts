@@ -11,7 +11,6 @@ export const ROUTES = {
   // App
   organizations: '/organizations',
   createOrganization: '/create-organization',
-  dashboard: '/dashboard',
   task: '/task',
   calendar: '/calendar',
   settings: '/settings',

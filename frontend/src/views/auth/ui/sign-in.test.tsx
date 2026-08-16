@@ -42,13 +42,10 @@ describe('SignIn Page View', () => {
   })
 
   it('passes redirectTo parameter down to SignInForm', () => {
-    render(<SignIn redirectTo='/dashboard/projects' />)
+    render(<SignIn redirectTo='/task' />)
 
     const formElement = screen.getByTestId('sign-in-form')
     expect(formElement).toBeInTheDocument()
-    expect(formElement).toHaveAttribute(
-      'data-redirect-to',
-      '/dashboard/projects'
-    )
+    expect(formElement).toHaveAttribute('data-redirect-to', '/task')
   })
 })

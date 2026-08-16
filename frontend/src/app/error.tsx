@@ -30,7 +30,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
     >
       <Button onClick={() => reset()}>Try Again</Button>
       <Button variant='outline' asChild>
-        <Link href={ROUTES.dashboard}>Back to Home</Link>
+        <Link href={ROUTES.home}>Back to Home</Link>
       </Button>
     </ErrorState>
   )

@@ -16,7 +16,7 @@ export default function NotFound() {
       }
     >
       <Button asChild>
-        <Link href={ROUTES.dashboard}>Back to Home</Link>
+        <Link href={ROUTES.home}>Back to Home</Link>
       </Button>
     </ErrorState>
   )

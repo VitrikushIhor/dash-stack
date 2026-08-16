@@ -16,7 +16,7 @@ export default function Forbidden() {
       }
     >
       <Button variant='outline' asChild>
-        <Link href={ROUTES.dashboard}>Back to Home</Link>
+        <Link href={ROUTES.home}>Back to Home</Link>
       </Button>
     </ErrorState>
   )

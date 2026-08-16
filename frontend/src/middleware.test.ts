@@ -17,18 +17,18 @@ function createNextRequest(
 describe('Next.js Route Protection Middleware', () => {
   describe('Protected Routes', () => {
     it('redirects unauthenticated user from protected path to sign-in with redirect query param', () => {
-      const req = createNextRequest(ROUTES.dashboard)
+      const req = createNextRequest(ROUTES.task)
 
       const res = middleware(req)
 
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toBe(
-        'http://localhost:3000/sign-in?redirect=%2Fdashboard'
+        'http://localhost:3000/sign-in?redirect=%2Ftask'
       )
     })
 
     it('allows access to protected route when access_token is present', () => {
-      const req = createNextRequest(ROUTES.dashboard, {
+      const req = createNextRequest(ROUTES.task, {
         access_token: 'valid-access-token',
       })
 

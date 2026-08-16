@@ -1,5 +1,4 @@
 import {
-  LayoutDashboard,
   Monitor,
   Bell,
   Palette,
@@ -19,11 +18,6 @@ export const sidebarData: SidebarData = {
     {
       title: 'General',
       items: [
-        {
-          title: 'Dashboard',
-          url: ROUTES.dashboard,
-          icon: LayoutDashboard,
-        },
         {
           title: 'Organizations',
           url: ROUTES.organizations,

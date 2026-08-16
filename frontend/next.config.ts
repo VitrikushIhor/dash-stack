@@ -31,7 +31,6 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-switch',
       '@radix-ui/react-tabs',
       '@radix-ui/react-tooltip',
-      'recharts',
       'date-fns',
       '@dnd-kit/core',
       '@dnd-kit/sortable',

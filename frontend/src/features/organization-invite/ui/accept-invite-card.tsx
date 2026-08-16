@@ -46,7 +46,7 @@ export function AcceptInviteCard({ token }: AcceptInviteCardProps) {
           <>
             <CheckCircle2 className='h-12 w-12 text-green-500' />
             <p className='text-muted-foreground text-center text-sm'>
-              You have joined the organization. Redirecting to dashboard...
+              You have joined the organization. Redirecting to organizations...
             </p>
             <Button onClick={handleContinue} className='mt-2'>
               Continue now
