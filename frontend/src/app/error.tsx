@@ -11,7 +11,7 @@ type ErrorPageProps = {
   reset: () => void
 }
 
-export default function Error({ error, reset }: ErrorPageProps) {
+export default function ErrorBoundary({ error, reset }: ErrorPageProps) {
   useEffect(() => {
     // TODO: Send to observability platform Sentry
     // eslint-disable-next-line no-console

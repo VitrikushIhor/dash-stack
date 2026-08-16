@@ -19,6 +19,7 @@ export function LandingNavbarMobile({ navLinks }: LandingNavbarMobileProps) {
   return (
     <>
       <button
+        type='button'
         className='text-muted-foreground hover:text-foreground cursor-pointer border-none bg-transparent p-1 md:hidden'
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label='Toggle menu'

@@ -236,7 +236,8 @@ export function calculateMonthEventPositions(
     occupiedPositions[day.toISOString()] = [false, false, false]
   })
 
-  const sortedEvents = [...singleDayTasks].sort((a, b) => {
+  const sortedEvents = [...singleDayTasks]
+  sortedEvents.sort((a, b) => {
     const anchorA = getTaskCalendarAnchor(a)
     const anchorB = getTaskCalendarAnchor(b)
     if (!anchorA || !anchorB) return 0

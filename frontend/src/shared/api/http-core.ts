@@ -60,16 +60,17 @@ export function createHttpClient(config: HttpClientConfig) {
       ? endpoint
       : `/${endpoint}`
 
+    let requestBody: BodyInit | undefined = undefined
+    if (body) {
+      requestBody = isFormData ? (body as FormData) : JSON.stringify(body)
+    }
+
     const response = await fetch(
       `${config.baseURL}${normalizedEndpoint}${buildQueryString(params)}`,
       {
         method,
         headers,
-        body: body
-          ? isFormData
-            ? (body as FormData)
-            : JSON.stringify(body)
-          : undefined,
+        body: requestBody,
         cache,
         next,
       }

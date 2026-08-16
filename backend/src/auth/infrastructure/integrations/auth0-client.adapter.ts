@@ -58,7 +58,7 @@ export class Auth0ClientAdapter implements Auth0ClientPort {
       throw new UnauthorizedException(AUTH_ERRORS.AUTH0_DOMAIN_NOT_CONFIGURED);
     }
 
-    return rawDomain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    return rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
   private async fetchUserInfo(
