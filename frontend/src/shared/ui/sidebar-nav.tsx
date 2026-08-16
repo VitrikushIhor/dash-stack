@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type JSX } from 'react'
+import { type JSX } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ROUTES } from '@/shared/config/constants/routes'
@@ -26,17 +26,18 @@ type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const [val, setVal] = useState(pathname ?? ROUTES.settings)
 
-  const handleSelect = (e: string) => {
-    setVal(e)
-    router.push(e)
+  const handleSelect = (url: string) => {
+    router.push(url)
   }
 
   return (
     <>
       <div className='p-1 md:hidden'>
-        <Select value={val} onValueChange={handleSelect}>
+        <Select
+          value={pathname ?? ROUTES.settings}
+          onValueChange={handleSelect}
+        >
           <SelectTrigger className='h-12 sm:w-48'>
             <SelectValue placeholder='Theme' />
           </SelectTrigger>

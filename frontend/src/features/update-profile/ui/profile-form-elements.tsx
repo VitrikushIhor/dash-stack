@@ -15,10 +15,10 @@ import {
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
 import { DatePicker } from '@/shared/ui/date-picker'
-import type { ProfileFormValues } from '../model/profile.schema'
+import type { UpdateProfileFormValues } from '../model/update-profile.schema'
 
 interface ProfileFormElementsProps {
-  form: UseFormReturn<ProfileFormValues>
+  form: UseFormReturn<UpdateProfileFormValues>
   fields: Record<'id', string>[]
   append: (value: { value: string }) => void
   remove: (index: number) => void

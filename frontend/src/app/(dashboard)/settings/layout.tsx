@@ -1,5 +1,3 @@
-'use client'
-
 import { Monitor, Bell, Palette, UserCog } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { Separator } from '@/shared/ui/core/separator'
@@ -14,22 +12,26 @@ const sidebarNavItems = [
   },
   {
     title: 'Appearance',
-    href: '/settings/appearance',
+    href: ROUTES.settingsAppearance,
     icon: <Palette size={18} />,
   },
   {
     title: 'Notifications',
-    href: '/settings/notifications',
+    href: ROUTES.settingsNotifications,
     icon: <Bell size={18} />,
   },
   {
     title: 'Display',
-    href: '/settings/display',
+    href: ROUTES.settingsDisplay,
     icon: <Monitor size={18} />,
   },
 ]
 
-export function Settings({ children }: { children?: React.ReactNode }) {
+export default function SettingsLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <Main fixed>
       <div className='space-y-0.5'>
@@ -45,7 +47,9 @@ export function Settings({ children }: { children?: React.ReactNode }) {
         <aside className='top-0 lg:sticky lg:w-1/5'>
           <SidebarNav items={sidebarNavItems} />
         </aside>
-        <div className='flex w-full overflow-y-hidden p-1'>{children}</div>
+        <div className='faded-bottom flex w-full flex-1 overflow-y-auto scroll-smooth p-1 pe-4 pb-12'>
+          <div className='w-full lg:max-w-5xl'>{children}</div>
+        </div>
       </div>
     </Main>
   )

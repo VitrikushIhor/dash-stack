@@ -14,6 +14,9 @@ export const ROUTES = {
   task: '/task',
   calendar: '/calendar',
   settings: '/settings',
+  settingsAppearance: '/settings/appearance',
+  settingsNotifications: '/settings/notifications',
+  settingsDisplay: '/settings/display',
   acceptInvite: '/accept-invite',
 
   // Legal

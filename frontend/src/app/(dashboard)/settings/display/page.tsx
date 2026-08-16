@@ -1,7 +1,5 @@
-import { SettingsDisplay } from '@/views/settings'
+import { DisplayPage } from '@/views/settings'
 
-export const dynamic = 'force-dynamic'
-
-export default function SettingsDisplayRoute() {
-  return <SettingsDisplay />
+export default function SettingsDisplayPage() {
+  return <DisplayPage />
 }

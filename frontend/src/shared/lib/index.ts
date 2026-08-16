@@ -7,5 +7,4 @@ export * from './hooks/use-dialog-state'
 export * from './hooks/use-mobile'
 
 export * from './logger'
-export * from './show-submitted-data'
 export * from './utils'

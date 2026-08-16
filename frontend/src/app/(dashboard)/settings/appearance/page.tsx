@@ -1,9 +1,5 @@
-'use client'
+import { AppearancePage } from '@/views/settings'
 
-import { SettingsAppearance } from '@/views/settings'
-
-export const dynamic = 'force-dynamic'
-
-export default function SettingsAppearanceRoute() {
-  return <SettingsAppearance />
+export default function SettingsAppearancePage() {
+  return <AppearancePage />
 }

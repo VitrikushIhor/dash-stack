@@ -1,11 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config/constants/routes'
-import { showSubmittedData } from '@/shared/lib/show-submitted-data'
 import { Button } from '@/shared/ui/core/button'
 import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
@@ -19,43 +18,30 @@ import {
 } from '@/shared/ui/core/form'
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import { Switch } from '@/shared/ui/core/switch'
-
-const notificationsFormSchema = z.object({
-  type: z.enum(['all', 'mentions', 'none'], {
-    error: (iss) =>
-      iss.input === undefined
-        ? 'Please select a notification type.'
-        : undefined,
-  }),
-  mobile: z.boolean().default(false).optional(),
-  communication_emails: z.boolean().default(false).optional(),
-  social_emails: z.boolean().default(false).optional(),
-  marketing_emails: z.boolean().default(false).optional(),
-  security_emails: z.boolean(),
-})
-
-type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
-
-// This can come from your database or API.
-const defaultValues: Partial<NotificationsFormValues> = {
-  communication_emails: false,
-  marketing_emails: false,
-  social_emails: true,
-  security_emails: true,
-}
+import {
+  notificationsFormSchema,
+  notificationsDefaultValues,
+  type NotificationsFormValues,
+  type NotificationsFormInput,
+} from '../model/notifications.schema'
 
 export function NotificationsForm() {
-  const form = useForm<NotificationsFormValues>({
+  const form = useForm<
+    NotificationsFormInput,
+    unknown,
+    NotificationsFormValues
+  >({
     resolver: zodResolver(notificationsFormSchema),
-    defaultValues,
+    defaultValues: notificationsDefaultValues,
   })
+
+  function onSubmit(_data: NotificationsFormValues) {
+    toast.success('Notification preferences updated.')
+  }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
-        className='space-y-8'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
           name='type'

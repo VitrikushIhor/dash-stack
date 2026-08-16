@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { userValidationRules } from '@/entities/user'
 
 const avatarSchema = z.discriminatedUnion('kind', [
   z.object({
@@ -19,23 +20,12 @@ const avatarSchema = z.discriminatedUnion('kind', [
 
 export type AvatarValue = z.infer<typeof avatarSchema>
 
-export const profileFormSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, 'First Name must be at least 2 characters.')
-    .max(30, 'First Name must not be longer than 30 characters.'),
-  lastName: z
-    .string()
-    .min(2, 'Last Name must be at least 2 characters.')
-    .max(30, 'Last Name must not be longer than 30 characters.'),
+export const UpdateProfileSchema = z.object({
+  firstName: userValidationRules.firstName,
+  lastName: userValidationRules.lastName,
+  email: userValidationRules.email,
+  bio: userValidationRules.bio,
   dob: z.date().optional(),
-  email: z
-    .string({
-      message: 'Please enter an email address.',
-    })
-    .min(1, 'Please enter an email address.')
-    .email('Please enter a valid email address.'),
-  bio: z.string().max(160, 'Bio must not be longer than 160 characters.'),
   urls: z
     .array(
       z.object({
@@ -46,9 +36,9 @@ export const profileFormSchema = z.object({
   avatar: avatarSchema,
 })
 
-export type ProfileFormValues = z.infer<typeof profileFormSchema>
+export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>
 
-export const defaultProfileValues: Partial<ProfileFormValues> = {
+export const defaultProfileValues: Partial<UpdateProfileFormValues> = {
   firstName: '',
   lastName: '',
   email: '',
