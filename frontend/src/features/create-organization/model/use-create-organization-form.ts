@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ROUTES } from '@/shared/config'
 import {
-  CreateOrgSchema,
   type CreateOrgFormValues,
+  CreateOrgSchema,
 } from './create-organization.schema'
 import { useCreateOrganization } from './use-create-organization'
 

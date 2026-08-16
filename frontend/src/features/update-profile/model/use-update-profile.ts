@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
-import { useUploadImage, handleServerError } from '@/shared/api'
-import type { User, UpdateUserDto } from '@/entities/user'
+import { handleServerError, useUploadImage } from '@/shared/api'
+import type { UpdateUserDto, User } from '@/entities/user'
 import { updateProfileAction } from '../api/update-profile.action'
 import type {
-  UpdateProfileFormValues,
   AvatarValue,
+  UpdateProfileFormValues,
 } from './update-profile.schema'
 
 export const useUpdateProfile = () => {

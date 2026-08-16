@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAction } from '@/shared/lib'
 import {
-  CreateLabelDtoSchema,
   type CreateLabelDto,
+  CreateLabelDtoSchema,
   type LabelDto,
 } from '@/entities/label'
 import { createLabelAction } from '../api/create-label.action'

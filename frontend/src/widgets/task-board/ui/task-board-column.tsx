@@ -12,9 +12,9 @@ import { Button } from '@/shared/ui/core/button'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { KanbanColumn, KanbanColumnHandle } from '@/shared/ui/kanban'
 import {
+  STATUS_CONFIG,
   type Task,
   TaskStatusEnum,
-  STATUS_CONFIG,
   TaskViewMode,
 } from '@/entities/task'
 import { useTaskSearchParams } from '@/features/manage-task'

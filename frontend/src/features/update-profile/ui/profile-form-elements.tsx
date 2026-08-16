@@ -1,5 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { User, Mail, Link as LinkIcon, FileText } from 'lucide-react'
+import { FileText, Link as LinkIcon, Mail, User } from 'lucide-react'
 import { getFileUrl } from '@/shared/api'
 import { cn } from '@/shared/lib/utils'
 import { AvatarUpload } from '@/shared/ui/avatar-upload'

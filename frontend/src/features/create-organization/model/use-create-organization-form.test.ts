@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation'
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCreateOrganization } from './use-create-organization'
 import { useCreateOrganizationForm } from './use-create-organization-form'
 

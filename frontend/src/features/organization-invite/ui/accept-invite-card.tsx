@@ -10,8 +10,8 @@ import {
   CardTitle,
 } from '@/shared/ui/core/card'
 import {
-  useAcceptInviteFlow,
   type AcceptInviteFlowStatus,
+  useAcceptInviteFlow,
 } from '../model/use-accept-invite-flow'
 
 interface AcceptInviteCardProps {

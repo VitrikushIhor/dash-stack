@@ -1,9 +1,9 @@
-import { api, type PaginatedResult, type HttpClient } from '@/shared/api'
+import { type HttpClient, type PaginatedResult, api } from '@/shared/api'
 import {
-  type Task,
   type CreateTaskDto,
-  type UpdateTaskDto,
+  type Task,
   type TaskStatusEnum,
+  type UpdateTaskDto,
 } from '../model/types'
 
 export interface TaskFilters {

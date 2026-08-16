@@ -1,12 +1,12 @@
 import { useRouter } from 'next/navigation'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SidebarProvider } from '@/shared/ui/core/sidebar'
 import {
-  type UserMembership,
-  type OrganizationSummary,
   OrgRole,
+  type OrganizationSummary,
+  type UserMembership,
 } from '@/entities/organization'
 import { setActiveOrganizationAction } from '@/features/switch-organization/server'
 import { TeamSwitcherUI } from './team-switcher-ui'

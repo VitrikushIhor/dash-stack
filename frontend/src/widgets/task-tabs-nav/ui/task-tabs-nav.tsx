@@ -1,6 +1,6 @@
 'use client'
 
-import { UrlTabsNav, type UrlTabProps } from '@/shared/ui/core/url-tabs-nav'
+import { type UrlTabProps, UrlTabsNav } from '@/shared/ui/core/url-tabs-nav'
 
 const tabs: UrlTabProps[] = [
   {

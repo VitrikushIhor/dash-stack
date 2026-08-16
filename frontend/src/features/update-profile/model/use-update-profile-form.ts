@@ -4,8 +4,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type User } from '@/entities/user'
 import {
-  UpdateProfileSchema,
   type UpdateProfileFormValues,
+  UpdateProfileSchema,
 } from './update-profile.schema'
 import { useUpdateProfile } from './use-update-profile'
 

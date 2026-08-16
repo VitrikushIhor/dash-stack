@@ -18,8 +18,8 @@ import {
 } from '@/shared/ui/core/form'
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import {
-  appearanceFormSchema,
   type AppearanceFormValues,
+  appearanceFormSchema,
 } from '../model/appearance.schema'
 
 const themes = [

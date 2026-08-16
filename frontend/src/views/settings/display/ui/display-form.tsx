@@ -15,9 +15,9 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import {
-  displayFormSchema,
-  displayDefaultValues,
   type DisplayFormValues,
+  displayDefaultValues,
+  displayFormSchema,
 } from '../model/display.schema'
 import { displayItems } from './display-items.config'
 

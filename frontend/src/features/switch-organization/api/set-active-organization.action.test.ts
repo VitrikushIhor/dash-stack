@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { cookies } from 'next/headers'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import { setActiveOrganizationAction } from './set-active-organization.action'
 

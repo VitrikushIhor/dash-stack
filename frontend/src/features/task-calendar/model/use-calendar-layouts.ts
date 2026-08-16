@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { startOfWeek, parseISO, isSameDay } from 'date-fns'
+import { isSameDay, parseISO, startOfWeek } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import {
   calculateMonthEventPositions,

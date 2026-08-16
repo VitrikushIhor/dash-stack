@@ -7,10 +7,10 @@ import { type Task } from '@/entities/task'
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { updateTaskAction } from '@/features/manage-task/server'
 import {
-  useCalendarSearchParams,
   CalendarHeader,
   CalendarWeekView,
   DndProviderWrapper,
+  useCalendarSearchParams,
 } from '@/features/task-calendar'
 
 interface Props {

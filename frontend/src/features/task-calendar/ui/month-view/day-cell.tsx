@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { isToday, startOfDay, format } from 'date-fns'
+import { format, isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'

@@ -2,8 +2,6 @@ import { toast } from 'sonner'
 import { logger } from '@/shared/lib'
 import { ApiError } from './api-error'
 
-export { ApiError, extractErrorMessage } from './api-error'
-
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof ApiError) {
     return error.message

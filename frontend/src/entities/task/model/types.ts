@@ -1,4 +1,4 @@
-import { type OrgRole, type LabelColor } from '@/shared/model'
+import { type LabelColor, type OrgRole } from '@/shared/model'
 
 export const TaskStatusEnum = {
   PLANNED: 'PLANNED',

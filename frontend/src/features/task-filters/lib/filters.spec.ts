@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { type Membership, OrgRole } from '@/shared/model'
 import { type Label } from '@/entities/label'
 import { generateFilterOptions } from './filters'

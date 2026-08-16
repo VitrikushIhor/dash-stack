@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { Mail, ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Mail } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { getInitials } from '@/shared/lib/utils'
 import {
-  formatPosition,
   formatJoinedDate,
-  getRoleVariant,
+  formatPosition,
   getMemberDisplayName,
+  getRoleVariant,
 } from '@/shared/model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'

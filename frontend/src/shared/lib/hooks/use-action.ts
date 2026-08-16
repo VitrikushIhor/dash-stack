@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import { toast } from 'sonner'
-import { handleServerError, type ActionState } from '@/shared/api'
+import { type ActionState, handleServerError } from '@/shared/api'
 
 interface UseActionOptions<TOutput> {
   onSuccess?: (data: TOutput) => void

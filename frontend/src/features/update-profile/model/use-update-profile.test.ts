@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { toast } from 'sonner'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { handleServerError } from '@/shared/api'
 import { type User } from '@/entities/user'
 import { updateProfileAction } from '../api/update-profile.action'

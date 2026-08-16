@@ -1,12 +1,12 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
-import { getErrorMessage, ApiError, type ActionState } from '@/shared/api'
+import { type ActionState, ApiError, getErrorMessage } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import {
-  type UpdateOrganizationDto,
   type Organization,
   OrganizationIdSchema,
+  type UpdateOrganizationDto,
   UpdateOrganizationDtoSchema,
 } from '@/entities/organization'
 import { organizationServerApi } from '@/entities/organization/server'

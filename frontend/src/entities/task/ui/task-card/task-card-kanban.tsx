@@ -4,7 +4,7 @@ import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Badge } from '@/shared/ui/core/badge'
 import { Card, CardContent, CardHeader } from '@/shared/ui/core/card'
 import { TaskCardActions } from '../task-card-actions'
-import { TaskDate, TaskProgress, TaskAttachments } from './task-card-elements'
+import { TaskAttachments, TaskDate, TaskProgress } from './task-card-elements'
 import { type TaskCardProps } from './task-card-list'
 import { useTaskCardData } from './use-task-card-data'
 

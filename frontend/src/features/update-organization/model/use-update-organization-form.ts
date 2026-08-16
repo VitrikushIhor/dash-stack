@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Organization } from '@/entities/organization'
 import {
-  UpdateOrgSchema,
   type UpdateOrgFormValues,
+  UpdateOrgSchema,
 } from './update-organization.schema'
 import { useUpdateOrganization } from './use-update-organization'
 

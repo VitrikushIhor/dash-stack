@@ -62,11 +62,15 @@ jobs:
       - name: Run ESLint
         run: npm run lint -w frontend
 
+      - name: Run Steiger (FSD architecture linter)
+        run: npm run lint:fsd -w frontend
+
       - name: Run TypeScript type check
         run: npm run type-check -w frontend
 
       - name: Check code formatting
         run: npm run format:check -w frontend
+
 
   # ============================================
   # LINT - BACKEND

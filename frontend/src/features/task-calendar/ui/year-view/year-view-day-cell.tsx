@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation'
-import { isToday, format } from 'date-fns'
+import { format, isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'

@@ -1,28 +1,28 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
-  useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type OnChangeFn,
+  type PaginationState,
+  type RowSelectionState,
+  type SortingState,
+  type VisibilityState,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  type SortingState,
-  type VisibilityState,
-  type RowSelectionState,
-  type ColumnFiltersState,
-  type PaginationState,
-  type OnChangeFn,
-  type ColumnDef,
+  useReactTable,
 } from '@tanstack/react-table'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
 import { type Task } from '@/entities/task'
 import { useTasksTableSearchParams } from '@/features/task-filters'
 import {
-  mapSearchParamsToColumnFilters,
   mapColumnFiltersToSearchParams,
+  mapSearchParamsToColumnFilters,
 } from '../lib/filters'
 
 /* eslint-disable react-hooks/incompatible-library */

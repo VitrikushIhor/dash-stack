@@ -1,8 +1,8 @@
 import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { OrgRole, type Label } from '@/shared/model'
-import { TaskStatusEnum, type Task } from '../model/types'
+import { describe, expect, it, vi } from 'vitest'
+import { type Label, OrgRole } from '@/shared/model'
+import { type Task, TaskStatusEnum } from '../model/types'
 import { TaskCardKanban } from './task-card'
 
 // Mock Next.js Link component

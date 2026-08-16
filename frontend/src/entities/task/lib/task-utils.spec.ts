@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { type Task } from '../model/types'
 import {
   calculateTaskProgress,
-  isTaskOverdue,
-  isTaskCompleted,
-  getTaskEffectiveStart,
   getTaskCalendarAnchor,
+  getTaskEffectiveStart,
   hasTaskDateRange,
+  isTaskCompleted,
+  isTaskOverdue,
 } from './task-utils'
 
 describe('task-utils', () => {

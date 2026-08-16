@@ -1,8 +1,8 @@
 import { type HttpClient } from '@/shared/api'
 import { type Membership } from '@/shared/model'
 import {
-  type Invitation,
   type CreateInvitationDto,
+  type Invitation,
 } from '@/entities/organization'
 
 export const createInvitationApi = (client: HttpClient) => ({

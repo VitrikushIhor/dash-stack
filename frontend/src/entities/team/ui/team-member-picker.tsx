@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, memo } from 'react'
+import { memo, useState } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { type Membership } from '@/shared/model'
 import { AvatarGroup } from '@/shared/ui/avatar-group'

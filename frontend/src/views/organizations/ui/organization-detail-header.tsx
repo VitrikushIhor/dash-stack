@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
-import { OrganizationLogo, type Organization } from '@/entities/organization'
+import { type Organization, OrganizationLogo } from '@/entities/organization'
 
 interface OrganizationDetailHeaderProps {
   organization: Organization

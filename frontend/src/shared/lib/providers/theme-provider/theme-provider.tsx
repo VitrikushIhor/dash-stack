@@ -3,15 +3,15 @@
 import React from 'react'
 import {
   ThemeProvider as NextThemesProvider,
-  useTheme as useNextTheme,
   type ThemeProviderProps as NextThemesProviderProps,
+  useTheme as useNextTheme,
 } from 'next-themes'
 import {
   DEFAULT_THEME,
-  isResolvedTheme,
-  isTheme,
   type ResolvedTheme,
   type Theme,
+  isResolvedTheme,
+  isTheme,
 } from './theme-utils'
 
 export type ThemeProviderProps = NextThemesProviderProps

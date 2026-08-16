@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   format,
+  getDaysInMonth,
   isSameDay,
   parseISO,
-  getDaysInMonth,
   startOfMonth,
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'

@@ -2,12 +2,12 @@
 
 import * as React from 'react'
 import {
-  useFormContext,
   type FieldPath,
   type FieldValues,
   type RegisterOptions,
+  useFormContext,
 } from 'react-hook-form'
-import { User, Building2 } from 'lucide-react'
+import { Building2, User } from 'lucide-react'
 import {
   FormControl,
   FormDescription,

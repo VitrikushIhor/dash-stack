@@ -1,12 +1,12 @@
 'use client'
 
 import {
+  type PropsWithChildren,
   createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
-  type PropsWithChildren,
 } from 'react'
 import { DirectionProvider as RadixDirectionProvider } from '@radix-ui/react-direction'
 import { getCookie, removeCookie, setCookie } from '@/shared/lib/cookies'
@@ -14,8 +14,8 @@ import {
   DEFAULT_DIRECTION,
   DIRECTION_COOKIE_MAX_AGE,
   DIRECTION_COOKIE_NAME,
-  isDirection,
   type Direction,
+  isDirection,
 } from './direction-utils'
 
 type DirectionContextValue = {

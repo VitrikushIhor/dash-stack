@@ -6,9 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useAction } from '@/shared/lib'
 import { resetPasswordAction } from '../../api/actions/reset-password.action'
 import {
+  type TResetPasswordSchema,
   resetPasswordDefaultValues,
   resetPasswordSchema,
-  type TResetPasswordSchema,
 } from '../schema/reset-password.schema'
 
 interface UseResetPasswordFormProps {

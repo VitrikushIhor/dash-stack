@@ -1,6 +1,6 @@
 import { type Label } from '@/entities/label'
 import { type Membership } from '@/entities/organization'
-import { type TaskStatusEnum, STATUS_CONFIG } from '@/entities/task'
+import { STATUS_CONFIG, type TaskStatusEnum } from '@/entities/task'
 
 export function generateFilterOptions(
   members: Membership[],

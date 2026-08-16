@@ -1,5 +1,5 @@
 import { revalidatePath } from 'next/cache'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
 import { ROUTES } from '@/shared/config'
 import { userServerApi } from '@/entities/user/server'

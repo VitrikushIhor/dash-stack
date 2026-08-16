@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { parseISO, format, startOfDay, isSameMonth } from 'date-fns'
+import { format, isSameMonth, parseISO, startOfDay } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'

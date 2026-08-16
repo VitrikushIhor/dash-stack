@@ -5,9 +5,9 @@ import { Button } from '@/shared/ui/core/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/shared/ui/core/card'
 import { CheckIcon } from '@/shared/ui/icons'
 import { Reveal } from '@/shared/ui/reveal'

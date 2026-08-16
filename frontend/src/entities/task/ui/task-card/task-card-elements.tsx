@@ -1,4 +1,4 @@
-import { Calendar, Paperclip, ListTodo } from 'lucide-react'
+import { Calendar, ListTodo, Paperclip } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
 export const TaskDate = ({

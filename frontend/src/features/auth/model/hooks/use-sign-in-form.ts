@@ -9,9 +9,9 @@ import { useAction } from '@/shared/lib'
 import { sanitizeRedirectUrl } from '@/shared/lib/utils'
 import { signInAction } from '../../api/actions/sign-in.action'
 import {
+  type TSignInSchema,
   signInDefaultValues,
   signInSchema,
-  type TSignInSchema,
 } from '../schema/sign-in.schema'
 
 interface UseSignInFormProps {

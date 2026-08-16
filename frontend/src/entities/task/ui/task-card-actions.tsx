@@ -1,4 +1,4 @@
-import { MoreVertical, MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, MoreVertical } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,

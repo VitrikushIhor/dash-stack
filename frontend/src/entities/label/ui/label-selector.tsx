@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback, useMemo, memo } from 'react'
-import { Plus, Check, Tag } from 'lucide-react'
+import { memo, useCallback, useMemo, useState } from 'react'
+import { Check, Plus, Tag } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from '@/shared/ui/core/popover'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { labelColorStyles, type Label } from '../model/types'
+import { type Label, labelColorStyles } from '../model/types'
 import { LabelBadge } from './label-badge'
 
 interface LabelSelectorProps {

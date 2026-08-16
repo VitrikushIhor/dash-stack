@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react'
-import { render, type RenderOptions } from '@testing-library/react'
+import { type RenderOptions, render } from '@testing-library/react'
 
 interface WrapperProps {
   children: ReactNode
@@ -21,6 +21,5 @@ export {
   act,
   cleanup,
   within,
-  renderHook,
 } from '@testing-library/react'
 export { customRender as render }

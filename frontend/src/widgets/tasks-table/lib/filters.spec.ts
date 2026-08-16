@@ -1,9 +1,9 @@
 import { type ColumnFiltersState } from '@tanstack/react-table'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  parseDateSafe,
-  mapSearchParamsToColumnFilters,
   mapColumnFiltersToSearchParams,
+  mapSearchParamsToColumnFilters,
+  parseDateSafe,
 } from './filters'
 
 describe('tasks-table filters', () => {

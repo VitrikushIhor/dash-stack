@@ -5,9 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useAction } from '@/shared/lib'
 import { signUpAction } from '../../api/actions/sign-up.action'
 import {
+  type TSignUpSchema,
   signUpDefaultValues,
   signUpSchema,
-  type TSignUpSchema,
 } from '../schema/sign-up.schema'
 
 interface UseSignUpFormProps {

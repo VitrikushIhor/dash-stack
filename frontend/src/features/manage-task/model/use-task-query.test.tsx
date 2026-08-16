@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TaskStatusEnum, type Task } from '@/entities/task'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { type Task, TaskStatusEnum } from '@/entities/task'
 import { getTaskAction } from '../server'
 import { useTaskQuery } from './use-task-query'
 

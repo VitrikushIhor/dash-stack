@@ -1,4 +1,4 @@
-import { LineChart, BarChart3, Activity, PieChart } from 'lucide-react'
+import { Activity, BarChart3, LineChart, PieChart } from 'lucide-react'
 import { Card } from '@/shared/ui/core/card'
 import { Reveal } from '@/shared/ui/reveal'
 

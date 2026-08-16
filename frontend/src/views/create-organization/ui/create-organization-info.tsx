@@ -1,4 +1,4 @@
-import { Building2, Users, LineChart } from 'lucide-react'
+import { Building2, LineChart, Users } from 'lucide-react'
 
 export function CreateOrganizationInfo() {
   return (

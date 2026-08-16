@@ -6,9 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useAction } from '@/shared/lib'
 import { forgotPasswordAction } from '../../api/actions/forgot-password.action'
 import {
+  type TForgotPasswordSchema,
   forgotPasswordDefaultValues,
   forgotPasswordSchema,
-  type TForgotPasswordSchema,
 } from '../schema/forgot-password.schema'
 
 export function useForgotPasswordForm() {

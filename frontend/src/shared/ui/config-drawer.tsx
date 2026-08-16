@@ -1,9 +1,9 @@
 import { type SVGProps } from 'react'
-import { Root as Radio, Item } from '@radix-ui/react-radio-group'
+import { Item, Root as Radio } from '@radix-ui/react-radio-group'
 import { CircleCheck, RotateCcw, Settings } from 'lucide-react'
 import {
-  useDirection,
   type Collapsible,
+  useDirection,
   useLayout,
   useTheme,
 } from '@/shared/lib/providers'

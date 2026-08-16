@@ -1,5 +1,5 @@
 import { revalidateTag } from 'next/cache'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import { organizationServerApi } from '@/entities/organization/server'

@@ -3,9 +3,9 @@ import { Inter } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import {
   DirectionProvider,
+  DirectionScript,
   QueryProvider,
   ThemeProvider,
-  DirectionScript,
 } from '@/shared/lib/providers'
 import '@/shared/styles/index.css'
 import { Toaster } from '@/shared/ui/core/sonner'

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useUploadImage, handleServerError, resolveLogoUrl } from '@/shared/api'
+import { handleServerError, resolveLogoUrl, useUploadImage } from '@/shared/api'
 import { createOrganizationAction } from '../api/create-organization.action'
 import type { CreateOrgFormValues } from './create-organization.schema'
 

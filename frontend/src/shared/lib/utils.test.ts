@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { ROUTES } from '@/shared/config'
 import {
   cn,
+  formatDate,
   getInitials,
   getPageNumbers,
   sanitizeRedirectUrl,
   stringToColor,
-  formatDate,
 } from './utils'
 
 describe('cn (className merge utility)', () => {

@@ -19,8 +19,8 @@ import {
 } from '@/shared/ui/core/sidebar'
 import {
   OrganizationLogo,
-  type UserMembership,
   type OrganizationSummary,
+  type UserMembership,
 } from '@/entities/organization'
 import { setActiveOrganizationAction } from '@/features/switch-organization/server'
 

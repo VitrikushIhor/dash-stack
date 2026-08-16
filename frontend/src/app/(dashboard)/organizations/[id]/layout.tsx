@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
-import { OrganizationDetailHeader } from '@/views/organizations'
 import { getOrganization } from '@/entities/organization/server'
 import { Main } from '@/widgets/layout'
 import { OrganizationTabsNav } from '@/widgets/organization-detail-tabs'
+import { OrganizationDetailHeader } from '@/views/organizations'
 
 interface LayoutProps {
   children: React.ReactNode

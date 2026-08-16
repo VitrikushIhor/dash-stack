@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileFromKey } from '@/shared/api'
 import { type Task, TaskStatusEnum } from '@/entities/task'
-import { taskFormSchema, type TaskFormValues } from './create-task-schema'
+import { type TaskFormValues, taskFormSchema } from './create-task-schema'
 
 function hydrateAttachments(attachments: string[]): File[] {
   return attachments.map((key) => createFileFromKey(key))

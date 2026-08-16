@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type OrganizationSummary } from '@/entities/organization'
 import { setActiveOrganizationAction } from '../api/set-active-organization.action'
 import { OrganizationCard } from './organization-card'

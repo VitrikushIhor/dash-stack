@@ -1,15 +1,15 @@
 'use client'
 
-import { useOptimistic, useTransition, type ReactNode } from 'react'
+import { type ReactNode, useOptimistic, useTransition } from 'react'
 import { parseISO, set } from 'date-fns'
 import {
   DndContext,
   type DragEndEvent,
   MouseSensor,
+  PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
-  PointerSensor,
 } from '@dnd-kit/core'
 import { toast } from 'sonner'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'

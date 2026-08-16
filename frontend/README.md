@@ -1,172 +1,195 @@
-# Dash Stack Frontend
+<div align="center">
 
-Production-ready React application built with modern technologies and Feature-Sliced Design architecture.
+# ⚡ Dash Stack Frontend
 
-## 🚀 Tech Stack
+**Production-Grade, Enterprise Next.js 15 Application with Feature-Sliced Design (FSD)**
 
-- **Framework**: React 19 + TypeScript
-- **Routing**: TanStack Router
-- **State Management**: Zustand
-- **Data Fetching**: TanStack Query
-- **Styling**: TailwindCSS
-- **Forms**: React Hook Form + Zod
-- **UI Components**: Radix UI + Shadcn/ui
-- **Build Tool**: Vite
-- **Architecture**: Feature-Sliced Design (FSD)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Architecture: FSD](https://img.shields.io/badge/Architecture-FSD_v2.1-orange?style=for-the-badge&logo=buffer&logoColor=white)](https://feature-sliced.design/)
+[![Vitest](https://img.shields.io/badge/Tests-75%20passed%20%7C%20327%20tests-green?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![ESLint](https://img.shields.io/badge/ESLint-9.37_Flat_Config-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
 
-## 📁 Project Structure
+<p align="center">
+  A scalable, type-safe full-stack frontend architecture featuring multi-tenant workspace management, real-time optimistic task boards, role-based access control (RBAC), and full bidirectional (LTR/RTL) design support.
+</p>
+
+[Architecture Guide](./ARCHITECTURE.md) • [Getting Started](#-getting-started) • [Tech Stack](#-technology-stack) • [Scripts](#-developer-scripts) • [Quality Gates](#-quality-gates--ci)
+
+</div>
+
+---
+
+## 🌟 Enterprise Highlights
+
+- **🏢 Multi-Tenant Workspace Architecture**: Seamless active organization switching, team invitation flows, and role-based permissions (Owner, Admin, Member).
+- **📋 Advanced Task & Kanban Suite**: Drag-and-drop Kanban board (`@dnd-kit`), filterable data tables (`@tanstack/react-table`), labels management, and bulk batch operations.
+- **🌐 Universal Bidirectional Layout (LTR / RTL)**: Built-in support for RTL scripts (Arabic, Hebrew) and dynamic theme switching (Dark, Light, System) via persistent cookies.
+- **⚡ Server-First Architecture**: Next.js 15 Server Actions guarded by `createAction` and `createOrgAction` with runtime Zod validation and HttpOnly session cookies.
+- **🔗 Type-Safe URL State**: URL search parameter synchronization powered by `nuqs` for bookmarkable, shareable views and filter states.
+- **🛡️ Zero-Trust Security**: Enterprise HTTP security headers (HSTS, CSP, X-Frame-Options, nosniff), automated FSD boundary enforcement, and health monitoring probes (`/api/health`).
+
+---
+
+## 🚀 Technology Stack
+
+| Domain                  | Technology                                                                                                           | Description                                                              |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------- |
+| **Core Framework**      | [Next.js 15 (App Router)](https://nextjs.org/)                                                                       | Hybrid SSR/SSG, Server Components, Server Actions, Standalone output     |
+| **UI Library**          | [React 19](https://react.dev/) + [TypeScript 5](https://www.typescriptlang.org/)                                     | Modern React with Server Actions, compiler optimizations, strict types   |
+| **Design System**       | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)                                    | Radix UI primitives, design tokens, responsive typography                |
+| **Architecture**        | [Feature-Sliced Design](https://feature-sliced.design/) + [Steiger](https://github.com/feature-sliced/steiger)       | Strict 6-layer modular architecture with automated boundary linter       |
+| **Server State**        | [TanStack Query v5](https://tanstack.com/query)                                                                      | Asynchronous cache, optimistic updates, background revalidation          |
+| **Client & Form State** | [Zustand](https://zustand-demo.pmnd.rs/) + [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | Transient state, uncontrolled high-performance forms, schema validation  |
+| **Data Tables & DND**   | [TanStack Table v8](https://tanstack.com/table) + [@dnd-kit](https://dndkit.com/)                                    | Virtualized tables, column sorting/filtering, accessible drag-and-drop   |
+| **Testing Suite**       | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/)                                      | Fast unit/integration test runner with jsdom and code coverage           |
+| **Quality Tooling**     | [ESLint 9](https://eslint.org/) + [Prettier](https://prettier.io/) + [Knip](https://knip.dev/)                       | Flat config, import sorting, Tailwind class sorting, dead-code detection |
+
+---
+
+## 📁 Architecture Overview
+
+> 📖 **Deep Dive**: For full diagrams, data flow lifecycles, and import rules, refer to the **[Architecture Guide (ARCHITECTURE.md)](./ARCHITECTURE.md)**.
 
 ```
-src/
-├── app/          # App shell (providers, routing, init, styles)
-├── pages/        # Route-level compositions
-├── widgets/      # Page fragments composed from features/entities
-├── features/     # User-visible interactions (use cases)
-├── entities/     # Business entities
-└── shared/       # UI kit, libs, utils, config
+frontend/src/
+├── app/          # Next.js App Router (pages, root layouts, proxy handlers, middleware)
+├── views/        # Page-level compositions connecting widgets and features to routes
+├── widgets/      # Autonomous, composite UI blocks (Header, Sidebar, TasksTable, TaskBoard)
+├── features/     # User interactions & use cases (Auth, ManageTask, ManageLabel, InviteMember)
+├── entities/     # Domain business logic & models (User, Organization, Task, Label)
+└── shared/       # Reusable UI primitives (ui/core/*), API client, providers, test utilities
 ```
+
+### 📐 Public API & Import Golden Rules
+
+1. **Unidirectional Flow**: `app` ➔ `views` ➔ `widgets` ➔ `features` ➔ `entities` ➔ `shared`.
+2. **Explicit Named Exports**: Wildcard exports (`export *`) are strictly banned and enforced via ESLint.
+3. **Optimized Tree-Shaking**: UI core components are imported directly from `@/shared/ui/core/<component>` to prevent Radix bundle bloat.
+4. **Server Isolation**: Server-only queries and action builders reside in `*.server.ts` and are exposed via `@/.../server`.
+
+---
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- **Node.js**: `v20.0.0` or higher
+- **npm**: `v10.0.0` or higher (or pnpm/yarn)
+- **Docker** (Optional, for containerized local runs)
 
-### Installation
+### 1. Installation
 
 ```bash
-# Install dependencies
+# Clone the repository and navigate to frontend (or monorepo root)
+cd frontend
+
+# Install exact dependencies
 npm install
+```
 
-# Copy environment variables
+### 2. Environment Configuration
+
+Copy the example environment file and configure backend endpoints:
+
+```bash
 cp .env.example .env
+```
 
-# Start development server
+| Variable                | Description                          | Default                     |
+| :---------------------- | :----------------------------------- | :-------------------------- |
+| `NEXT_PUBLIC_API_URL`   | Backend REST API base URL            | `http://localhost:8000/api` |
+| `NEXT_PUBLIC_APP_URL`   | Frontend application URL             | `http://localhost:3000`     |
+| `AWS_CLOUDFRONT_DOMAIN` | CDN domain for uploaded media assets | Optional                    |
+
+### 3. Development Server
+
+Start the development server with Next.js Turbopack:
+
+```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## 📜 Available Scripts
+---
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint errors automatically
-- `npm run type-check` - Run TypeScript type checking
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
-- `npm run knip` - Find unused files and dependencies
-- `npm run audit` - Check for security vulnerabilities
+## 📜 Developer Scripts
 
-## 🏗️ Build for Production
+| Command                 | Description                                     | Purpose                        |
+| :---------------------- | :---------------------------------------------- | :----------------------------- |
+| `npm run dev`           | Start development server with Turbopack         | Local rapid development        |
+| `npm run build`         | Build standalone production bundle              | Production artifact creation   |
+| `npm run start`         | Run production Next.js standalone server        | Production runtime             |
+| `npm run validate`      | **Run full CI validation suite**                | **Pre-push verification**      |
+| `npm run lint`          | Execute ESLint CLI check                        | Code style & rule verification |
+| `npm run lint:fix`      | Automatically fix ESLint violations             | Auto-remediation               |
+| `npm run lint:fsd`      | Run Steiger architectural linter                | FSD layer boundary check       |
+| `npm run type-check`    | Run strict TypeScript compiler (`tsc --noEmit`) | Type safety check              |
+| `npm run format`        | Format codebase via Prettier                    | Code formatting                |
+| `npm run format:check`  | Check code formatting compliance                | CI formatting gate             |
+| `npm run test`          | Run Vitest unit & integration test suite        | Quality assurance              |
+| `npm run test:watch`    | Run Vitest in interactive watch mode            | Test-driven development        |
+| `npm run test:coverage` | Generate code coverage report                   | Coverage analysis              |
+| `npm run knip`          | Scan for unused files, exports & dependencies   | Dead code elimination          |
+
+---
+
+## 🧪 Quality Gates & CI
+
+Before any code is merged into `dev` or `main`, it must pass the unified validation command:
 
 ```bash
-# Build the application
-npm run build
-
-# Preview the production build
-npm run preview
+npm run validate
 ```
 
-## 🔒 Environment Variables
+This single command runs all quality gates in sequence:
+$$\text{TypeScript Check} \longrightarrow \text{ESLint 9} \longrightarrow \text{Steiger FSD} \longrightarrow \text{Prettier} \longrightarrow \text{Vitest Suite (327 tests)}$$
 
-Create a `.env` file in the root directory based on `.env.example`:
+---
 
-```env
-VITE_API_URL=your_api_url
-VITE_APP_NAME=Your App Name
-```
+## 🐳 Production Deployment & Docker
 
-## 🧪 Code Quality
+The project uses Next.js standalone output (`output: 'standalone'`) for ultra-lightweight Docker images:
 
-This project uses:
-
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **TypeScript** for type safety
-- **Husky** for Git hooks
-- **lint-staged** for pre-commit checks
-
-### Pre-commit Hooks
-
-Before each commit, the following checks run automatically:
-
-- ESLint fixes
-- Prettier formatting
-- Type checking (on push)
-
-## 🏛️ Architecture (Feature-Sliced Design)
-
-This project follows [Feature-Sliced Design](https://feature-sliced.design/) principles:
-
-- **app/** - Application initialization, providers, routing
-- **pages/** - Route-level page compositions
-- **widgets/** - Complex UI compositions
-- **features/** - User interactions (use cases)
-- **entities/** - Business entities
-- **shared/** - Reusable UI components, utilities, configs
-
-### Import Rules
-
-- Layers can only import from lower layers
-- No circular dependencies
-- Use barrel exports (index.ts) for public API
-
-## 📦 Dependencies
-
-### Production
-
-- React 19
-- TanStack Router, Query, Table
-- Zustand
-- React Hook Form
-- Zod
-- TailwindCSS
-- Radix UI
-
-### Development
-
-- TypeScript
-- ESLint
-- Prettier
-- Husky
-- Vite
-
-## 🔐 Security
-
-- Regular security audits: `npm run audit`
-- Environment variables for sensitive data
-- No secrets in version control
-
-## 🚢 Deployment
-
-### Build
+### 1. Build Standalone Locally
 
 ```bash
 npm run build
 ```
 
-The production build will be in the `dist/` directory.
+### 2. Build & Run with Docker
 
-### Environment Setup
+```bash
+# Build Docker image
+docker build -t dash-stack-frontend .
 
-Ensure all environment variables are set in your deployment platform.
+# Run container with port forwarding
+docker run -p 3000:3000 --env-file ../.env dash-stack-frontend
+```
 
-## 📝 Contributing
+### 3. Container Healthcheck Probe
 
-1. Create a feature branch
-2. Make your changes
-3. Ensure all checks pass (`npm run lint`, `npm run type-check`)
-4. Commit your changes (pre-commit hooks will run automatically)
-5. Push and create a Pull Request
+The application exposes a native healthcheck endpoint for load balancers and container orchestrators:
 
-## 📄 License
+```bash
+curl -f http://localhost:3000/api/health
+# Response: {"status":"ok","timestamp":"2026-08-16T17:00:00.000Z","uptime":120.4}
+```
 
-[Your License Here]
+---
 
-## 👥 Team
+## 🤝 Contributing & Code Standards
 
-[Your Team Info Here]
+1. **Branching**: Create feature branches from `dev` (`feature/<scope>-<description>`, `fix/<scope>-<description>`).
+2. **Commit Convention**: Strictly follow Conventional Commits (`feat(task): ...`, `fix(auth): ...`, `refactor(frontend): ...`).
+3. **FSD Compliance**: Slices must remain autonomous. Run `npm run lint:fsd` before committing.
+4. **Pull Requests**: Ensure `npm run validate` passes with 0 errors and 0 warnings before opening a PR.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for scalable, enterprise-grade web development.</sub>
+</div>

@@ -1,5 +1,5 @@
-import { fetchTaskViewData, TaskListPageView } from '@/views/task'
 import { DEFAULT_PAGE, MAX_TASKS_PER_PAGE } from '@/shared/config'
+import { TaskListPageView, fetchTaskViewData } from '@/views/task'
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>

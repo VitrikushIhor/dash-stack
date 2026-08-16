@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { createAction } from '@/shared/lib'
-import { clearAuthCookies, COOKIE_CONFIG } from '@/shared/lib/session-cookies'
+import { COOKIE_CONFIG, clearAuthCookies } from '@/shared/lib/session-cookies'
 import { authServerApi } from '../auth-api.server'
 
 export const logoutAction = createAction(

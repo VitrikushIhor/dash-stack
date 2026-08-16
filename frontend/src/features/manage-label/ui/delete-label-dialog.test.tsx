@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useAction } from '@/shared/lib'
 import { type LabelDto } from '@/entities/label'
 import { useLabelSearchParams } from '../model/label-search-params'

@@ -19,10 +19,10 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import { Switch } from '@/shared/ui/core/switch'
 import {
-  notificationsFormSchema,
-  notificationsDefaultValues,
-  type NotificationsFormValues,
   type NotificationsFormInput,
+  type NotificationsFormValues,
+  notificationsDefaultValues,
+  notificationsFormSchema,
 } from '../model/notifications.schema'
 
 export function NotificationsForm() {

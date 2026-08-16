@@ -16,10 +16,10 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
 import { DataTableBulkActions } from '@/shared/ui/data-table'
-import { type TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
+import { STATUS_CONFIG, type Task, type TaskStatusEnum } from '@/entities/task'
 import {
-  bulkUpdateTasksAction,
   bulkDeleteTasksAction,
+  bulkUpdateTasksAction,
 } from '@/features/manage-task/server'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 

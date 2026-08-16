@@ -1,17 +1,17 @@
 import type * as React from 'react'
 import {
   type Column,
-  flexRender,
   type Table as TanstackTable,
+  flexRender,
 } from '@tanstack/react-table'
 import { cn } from '@/shared/lib/utils'
 import {
-  TableRow,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  TableRow,
 } from '@/shared/ui/core/table'
 import { DataTablePagination } from './pagination'
 

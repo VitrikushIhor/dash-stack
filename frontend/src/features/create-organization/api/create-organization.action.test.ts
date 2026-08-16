@@ -1,6 +1,6 @@
 import { revalidateTag } from 'next/cache'
 import { cookies } from 'next/headers'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
 import { organizationServerApi } from '@/entities/organization/server'
 import { createOrganizationAction } from './create-organization.action'

@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type Organization } from '@/entities/organization'
 import { useUpdateOrganization } from './use-update-organization'
 import { useUpdateOrganizationForm } from './use-update-organization-form'

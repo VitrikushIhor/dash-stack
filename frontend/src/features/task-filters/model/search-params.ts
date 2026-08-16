@@ -1,4 +1,4 @@
-import { parseAsString, parseAsInteger, parseAsArrayOf } from 'nuqs/server'
+import { parseAsArrayOf, parseAsInteger, parseAsString } from 'nuqs/server'
 
 export const tasksTableSearchParams = {
   filter: parseAsString.withDefault(''),

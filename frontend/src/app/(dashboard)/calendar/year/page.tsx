@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
-import { CalendarYearPage } from '@/views/calendar/ui/calendar-year-page'
 import { Skeleton } from '@/shared/ui/core/skeleton'
+import { CalendarYearPage } from '@/views/calendar/ui/calendar-year-page'
 
 interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>

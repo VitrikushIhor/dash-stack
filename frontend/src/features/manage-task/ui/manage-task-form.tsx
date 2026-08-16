@@ -1,7 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
-import { useAttachments, useAction, logger } from '@/shared/lib'
+import { logger, useAction, useAttachments } from '@/shared/lib'
 import { type Membership } from '@/shared/model'
 import { type Label } from '@/entities/label'
 import { type Task, type TaskStatusEnum } from '@/entities/task'

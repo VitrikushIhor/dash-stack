@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type User } from '@/entities/user'
 import { useUpdateProfile } from './use-update-profile'
 import { useUpdateProfileForm } from './use-update-profile-form'

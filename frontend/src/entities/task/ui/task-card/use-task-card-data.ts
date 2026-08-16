@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { calculateTaskProgress, isTaskOverdue } from '../../lib/task-utils'
-import { TaskStatusEnum, type Task } from '../../model/types'
+import { type Task, TaskStatusEnum } from '../../model/types'
 
 export function useTaskCardData(task: Task) {
   const { totalItems, completedItems } = calculateTaskProgress(task)

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { format } from 'date-fns'
-import { List, Columns, Grid2x2, Grid3x3, CalendarRange } from 'lucide-react'
+import { CalendarRange, Columns, Grid2x2, Grid3x3, List } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import { useCalendarSearchParams } from '@/features/task-calendar'
 

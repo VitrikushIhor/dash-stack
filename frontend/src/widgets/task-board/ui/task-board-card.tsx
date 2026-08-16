@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 import { KanbanItem } from '@/shared/ui/kanban'
-import { TaskCard, type Task, type TaskViewMode } from '@/entities/task'
+import { type Task, TaskCard, type TaskViewMode } from '@/entities/task'
 
 interface BoardCardProps extends Omit<
   React.ComponentProps<typeof KanbanItem>,

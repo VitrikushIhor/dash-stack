@@ -1,4 +1,4 @@
-import { parseAsStringEnum, parseAsIsoDate } from 'nuqs/server'
+import { parseAsIsoDate, parseAsStringEnum } from 'nuqs/server'
 import { CALENDAR_VIEWS } from './calendar-types'
 
 export const calendarParsers = {

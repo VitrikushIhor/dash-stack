@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { act, renderHook } from '@testing-library/react'
 import { toast } from 'sonner'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { handleServerError } from '@/shared/api'
 import { deleteOrganizationAction } from '../api/delete-organization.action'
 import { useDeleteOrganization } from './use-delete-organization'

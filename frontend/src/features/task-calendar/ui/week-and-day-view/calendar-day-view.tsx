@@ -1,4 +1,4 @@
-import { parseISO, format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'

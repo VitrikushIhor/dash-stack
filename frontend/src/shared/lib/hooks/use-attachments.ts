@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { storageApi, attachServerData } from '@/shared/api'
+import { attachServerData, storageApi } from '@/shared/api'
 import { type FileUploadProps } from '@/shared/ui/file-upload'
 
 /** Pseudo-progress simulation interval (ms) */

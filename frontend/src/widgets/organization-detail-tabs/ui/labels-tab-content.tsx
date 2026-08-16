@@ -3,8 +3,8 @@ import { Card, CardContent } from '@/shared/ui/core/card'
 import { type LabelDto, labelColorStyles } from '@/entities/label'
 import {
   CreateLabelButton,
-  LabelRowActions,
   LabelModals,
+  LabelRowActions,
 } from '@/features/manage-label'
 
 interface LabelsTabContentProps {

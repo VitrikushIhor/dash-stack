@@ -1,4 +1,4 @@
-import { format, differenceInMinutes, parseISO } from 'date-fns'
+import { differenceInMinutes, format, parseISO } from 'date-fns'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/lib/utils'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'

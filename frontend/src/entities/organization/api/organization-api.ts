@@ -1,8 +1,8 @@
 import { type HttpClient, api } from '@/shared/api'
 import { type Membership } from '@/shared/model'
 import {
-  type Organization,
   type CreateOrganizationDto,
+  type Organization,
   type UpdateOrganizationDto,
   type UserMembership,
 } from '../model/types/organization.types'

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Users, Shield, ArrowRight } from 'lucide-react'
+import { ArrowRight, Shield, Users } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import {
   Card,

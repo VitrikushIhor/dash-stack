@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { type FilterFn, type Row, type Column } from '@tanstack/react-table'
+import { type Column, type FilterFn, type Row } from '@tanstack/react-table'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'

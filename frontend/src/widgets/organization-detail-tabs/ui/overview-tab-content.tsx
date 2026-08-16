@@ -1,4 +1,4 @@
-import { Users, Briefcase, Calendar } from 'lucide-react'
+import { Briefcase, Calendar, Users } from 'lucide-react'
 import { formatDate } from '@/shared/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/core/card'
 import type { Organization } from '@/entities/organization'

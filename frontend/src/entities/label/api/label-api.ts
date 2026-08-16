@@ -1,7 +1,7 @@
 import { type HttpClient } from '@/shared/api'
 import {
-  type LabelDto,
   type CreateLabelDto,
+  type LabelDto,
   type UpdateLabelDto,
 } from '../model/label.schema'
 

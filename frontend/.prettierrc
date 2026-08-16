@@ -8,6 +8,8 @@
   "trailingComma": "es5",
   "bracketSpacing": true,
   "endOfLine": "lf",
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true,
   "plugins": [
     "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
@@ -21,10 +23,8 @@
     "^next/(.*)$",
     "^globals$",
     "^zod$",
-    "^axios$",
     "^date-fns$",
     "^react-hook-form$",
-    "^use-intl$",
     "^@radix-ui/(.*)$",
     "^@hookform/resolvers/zod$",
     "^@tanstack/react-query$",
@@ -34,7 +34,7 @@
     "^@/entities/(.*)$",
     "^@/features/(.*)$",
     "^@/widgets/(.*)$",
-    "^@/pages/(.*)$",
+    "^@/views/(.*)$",
     "^@/app/(.*)$",
     "^[./]"
   ]

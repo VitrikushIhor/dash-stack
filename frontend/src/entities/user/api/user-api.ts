@@ -1,4 +1,4 @@
-import { api, type HttpClient } from '@/shared/api'
+import { type HttpClient, api } from '@/shared/api'
 import { type UpdateUserDto } from '../model/schemas/user.schema'
 import { type User } from '../model/types'
 

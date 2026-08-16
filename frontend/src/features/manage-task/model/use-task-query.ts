@@ -1,4 +1,4 @@
-import { useQuery, type UseQueryResult, skipToken } from '@tanstack/react-query'
+import { type UseQueryResult, skipToken, useQuery } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/shared/api'
 import { type Task } from '@/entities/task'
 import { getTaskAction } from '../server'

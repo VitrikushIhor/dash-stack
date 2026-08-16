@@ -6,18 +6,18 @@ import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
   DataTableColumnHeader,
-  dateRangeFilterFn,
   TablePlaceholder,
+  dateRangeFilterFn,
 } from '@/shared/ui/data-table'
 import { LabelBadge } from '@/entities/label'
 import {
-  type TaskStatusEnum,
   type Task,
-  type TaskLabel,
   type TaskAssignee,
+  type TaskLabel,
+  TaskStatusBadge,
+  type TaskStatusEnum,
   calculateTaskProgress,
   isTaskOverdue as checkOverdue,
-  TaskStatusBadge,
 } from '@/entities/task'
 import { TaskTableRowActions } from './task-table-row-actions'
 

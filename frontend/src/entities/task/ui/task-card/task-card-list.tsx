@@ -7,7 +7,7 @@ import { LabelBadge } from '@/shared/ui/label-badge'
 import { STATUS_CONFIG } from '../../model/task-status-config'
 import { type Task } from '../../model/types'
 import { TaskCardActions } from '../task-card-actions'
-import { TaskDate, TaskProgress, TaskAttachments } from './task-card-elements'
+import { TaskAttachments, TaskDate, TaskProgress } from './task-card-elements'
 import { useTaskCardData } from './use-task-card-data'
 
 export interface TaskCardProps {

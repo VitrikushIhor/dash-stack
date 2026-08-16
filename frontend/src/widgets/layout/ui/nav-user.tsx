@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react'
 import { getFileUrl } from '@/shared/api'
 import { ROUTES } from '@/shared/config'
-import { getUserInitials, getUserDisplayName } from '@/shared/lib/utils'
+import { getUserDisplayName, getUserInitials } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import {
   DropdownMenu,

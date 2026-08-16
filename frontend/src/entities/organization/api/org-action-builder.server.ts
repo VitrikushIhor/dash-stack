@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { getErrorMessage, ApiError, type ActionState } from '@/shared/api'
+import { type ActionState, ApiError, getErrorMessage } from '@/shared/api'
 import type { OrganizationSummary } from '../model/types/organization.types'
 import { getActiveOrganization } from './queries/get-active-organization.server'
 

@@ -2,9 +2,9 @@ import { cookies } from 'next/headers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { serverApi } from '@/shared/api/server'
 import {
-  setAuthCookies,
-  clearAuthCookies,
   COOKIE_CONFIG,
+  clearAuthCookies,
+  setAuthCookies,
 } from '@/shared/lib/session-cookies'
 import { forgotPasswordAction } from './forgot-password.action'
 import { logoutAction } from './logout.action'

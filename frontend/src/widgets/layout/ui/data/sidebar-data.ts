@@ -1,9 +1,9 @@
 import {
+  Calendar,
+  ClipboardList,
   Settings,
   ShieldCheck,
   UsersRound,
-  ClipboardList,
-  Calendar,
 } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { type SidebarData } from '../types'
