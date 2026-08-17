@@ -1,5 +1,5 @@
 {
-  "name": "nestjs-prisma-client-starter",
+  "name": "backend",
   "version": "0.0.1",
   "description": "NestJS Prisma Client Starter Project",
   "author": "Vitrikush Ihor",
@@ -13,8 +13,8 @@
   ],
   "lint-staged": {
     "*.ts": [
-      "npm run format",
-      "npm run lint:staged"
+      "pnpm run format",
+      "pnpm run lint:staged"
     ]
   },
   "repository": {
@@ -24,7 +24,7 @@
   "scripts": {
     "build": "nest build",
     "type-check": "tsc --noEmit",
-    "validate": "npm run type-check && npm run test",
+    "validate": "pnpm run type-check && pnpm run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "start": "nest start",
@@ -35,28 +35,28 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:staged": "eslint --fix",
-    "migrate:dev": "prisma migrate dev --preview-feature",
-    "migrate:dev:create": "prisma migrate dev --create-only --preview-feature",
-    "migrate:reset": "prisma migrate reset --preview-feature",
-    "migrate:deploy": "npx prisma migrate deploy --preview-feature",
-    "migrate:status": "npx prisma migrate status --preview-feature",
-    "migrate:resolve": "npx prisma migrate resolve --preview-feature",
-    "prisma:studio": "npx prisma studio",
-    "prisma:generate": "npx prisma generate",
-    "prisma:generate:watch": "npx prisma generate --watch",
+    "migrate:dev": "pnpm exec prisma migrate dev",
+    "migrate:dev:create": "pnpm exec prisma migrate dev --create-only",
+    "migrate:reset": "pnpm exec prisma migrate reset",
+    "migrate:deploy": "pnpm exec prisma migrate deploy",
+    "migrate:status": "pnpm exec prisma migrate status",
+    "migrate:resolve": "pnpm exec prisma migrate resolve",
+    "prisma:studio": "pnpm exec prisma studio",
+    "prisma:generate": "pnpm exec prisma generate",
+    "prisma:generate:watch": "pnpm exec prisma generate --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "start:db": "npm run docker:db && npm run prisma:generate && npm run seed",
-    "seed": "prisma db seed",
-    "postinstall": "npm run prisma:generate",
-    "docker:migrate": "docker-compose -f docker-compose.migrate.yml up -d",
-    "docker:db": "docker-compose -f docker-compose.db.yml up -d",
-    "docker:seed": "docker exec -it nest-api npm run seed",
-    "docker": "docker-compose up -d",
-    "docker:build": "docker-compose build"
+    "start:db": "pnpm run docker:db && pnpm run prisma:generate && pnpm run seed",
+    "seed": "pnpm exec prisma db seed",
+    "postinstall": "pnpm run prisma:generate",
+    "docker:migrate": "docker compose -f docker-compose.migrate.yml up -d",
+    "docker:db": "docker compose -f docker-compose.db.yml up -d",
+    "docker:seed": "docker exec -it nest-api pnpm run seed",
+    "docker": "docker compose up -d",
+    "docker:build": "docker compose build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1070.0",

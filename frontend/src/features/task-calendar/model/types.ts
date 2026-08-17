@@ -1,11 +1,5 @@
 export type TEventColor =
-  | 'blue'
-  | 'green'
-  | 'red'
-  | 'yellow'
-  | 'purple'
-  | 'gray'
-  | 'orange'
+  'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'gray' | 'orange'
 export type TBadgeColor = TEventColor | `${TEventColor}-dot`
 export type TBadgeVariant = 'dot' | 'colored' | 'mixed'
 

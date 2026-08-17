@@ -62,7 +62,7 @@ export function SignInForm({
               <FormMessage />
               <Link
                 href={ROUTES.forgotPassword}
-                className='text-muted-foreground inset-e-0 absolute -top-0.5 text-sm font-medium hover:opacity-75'
+                className='text-muted-foreground absolute inset-e-0 -top-0.5 text-sm font-medium hover:opacity-75'
               >
                 Forgot password?
               </Link>

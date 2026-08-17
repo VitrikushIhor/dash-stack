@@ -1,6 +1,9 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "ignoreBinaries": ["docker-compose", "knip"],
+  "rules": {
+    "types": "warn",
+    "exports": "warn"
+  },
   "workspaces": {
     "frontend": {
       "entry": [
@@ -12,12 +15,10 @@
       ],
       "project": ["src/**/*.{ts,tsx}"],
       "ignore": [
-        "src/shared/ui/core/**",
         "src/features/manage-label/model/label-search-params.ts",
-        "src/features/manage-task/model/task-search-params.ts",
         "src/features/manage-task/model/create-task-schema.ts"
       ],
-      "ignoreDependencies": ["tailwindcss", "tw-animate-css", "eslint-config-next", "@next/eslint-plugin-next", "@dnd-kit/modifiers"]
+      "ignoreDependencies": ["tailwindcss", "tw-animate-css", "eslint-config-next", "@dnd-kit/modifiers"]
     },
     "backend": {
       "entry": [

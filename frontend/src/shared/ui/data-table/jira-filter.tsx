@@ -90,8 +90,7 @@ export function DataTableJiraFilter<TData>({
               {filters.map((filter) => {
                 const column = table.getColumn(filter.columnId)
                 const filterValue = column?.getFilterValue() as
-                  | string[]
-                  | undefined
+                  string[] | undefined
                 const isActive = filterValue && filterValue.length > 0
 
                 return (

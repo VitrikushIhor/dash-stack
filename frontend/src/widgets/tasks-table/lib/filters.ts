@@ -46,17 +46,13 @@ export function mapColumnFiltersToSearchParams(filters: ColumnFiltersState): {
   dueDate: string[] | null
 } {
   const statusFilter = filters.find((f) => f.id === 'status')?.value as
-    | string[]
-    | undefined
+    string[] | undefined
   const labelFilter = filters.find((f) => f.id === 'label')?.value as
-    | string[]
-    | undefined
+    string[] | undefined
   const membersFilter = filters.find((f) => f.id === 'assignees')?.value as
-    | string[]
-    | undefined
+    string[] | undefined
   const dueDateFilter = filters.find((f) => f.id === 'dueDate')?.value as
-    | Date[]
-    | undefined
+    Date[] | undefined
 
   let dueDateStrings: string[] = []
   if (Array.isArray(dueDateFilter)) {

@@ -2,46 +2,60 @@
   "name": "dash-stack",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
-    "dev:frontend": "npm run dev -w frontend",
-    "dev:backend": "npm run dev -w backend",
-    "build:frontend": "npm run build -w frontend",
-    "build:backend": "npm run build -w backend",
-    "lint:frontend": "npm run lint -w frontend",
-    "lint:backend": "npm run lint -w backend",
-    "lint": "npm run lint:frontend && npm run lint:backend",
-    "format:frontend": "npm run format -w frontend",
-    "format:backend": "npm run format -w backend",
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "build:frontend": "pnpm --filter frontend run build",
+    "build:backend": "pnpm --filter backend run build",
+    "lint:frontend": "pnpm --filter frontend run lint",
+    "lint:backend": "pnpm --filter backend run lint",
+    "lint": "pnpm run lint:frontend && pnpm run lint:backend",
+    "format:frontend": "pnpm --filter frontend run format",
+    "format:backend": "pnpm --filter backend run format",
     "prepare": "husky",
-    "docker:up": "docker-compose up -d",
-    "docker:up:build": "docker-compose up -d --build",
-    "docker:down": "docker-compose down",
-    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
-    "docker:dev:build": "docker-compose -f docker-compose.dev.yml up --build",
-    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:ps": "docker-compose ps",
+    "docker:up": "docker compose --env-file backend/.env --env-file frontend/.env up -d",
+    "docker:up:build": "docker compose --env-file backend/.env --env-file frontend/.env up -d --build",
+    "docker:down": "docker compose --env-file backend/.env --env-file frontend/.env down",
+    "docker:dev": "docker compose --env-file backend/.env --env-file frontend/.env -f docker-compose.dev.yml up",
+    "docker:dev:build": "docker compose --env-file backend/.env --env-file frontend/.env -f docker-compose.dev.yml up --build",
+    "docker:dev:down": "docker compose --env-file backend/.env --env-file frontend/.env -f docker-compose.dev.yml down",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
     "knip": "knip"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.3",
     "@commitlint/config-conventional": "^20.5.3",
     "husky": "^9.1.7",
+    "knip": "^5.88.1",
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
     "frontend/**/*.{ts,tsx}": [
-      "npm run lint:fix -w frontend",
-      "npm run format -w frontend",
-      "npm run test:related -w frontend"
+      "pnpm --filter frontend run lint:fix",
+      "pnpm --filter frontend run format",
+      "pnpm --filter frontend run test:related"
     ],
     "backend/**/*.ts": [
-      "npm run lint -w backend",
-      "npm run format -w backend"
+      "pnpm --filter backend run lint",
+      "pnpm --filter backend run format"
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@swc/core",
+      "bcrypt",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ],
+    "ignoredBuiltDependencies": [
+      "@scarf/scarf"
     ]
   }
 }

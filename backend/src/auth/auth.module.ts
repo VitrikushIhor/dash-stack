@@ -46,10 +46,7 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
           secret: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
           signOptions: {
             expiresIn: (securityConfig?.expiresIn ?? '2m') as
-              | `${number}m`
-              | `${number}s`
-              | `${number}h`
-              | `${number}d`,
+              `${number}m` | `${number}s` | `${number}h` | `${number}d`,
           },
         };
       },

@@ -1,10 +1,6 @@
-import { config } from 'dotenv'
 import { resolve } from 'path'
 import type { NextConfig } from 'next'
 import { env } from './src/shared/config/env'
-
-// Load .env from root monorepo
-config({ path: resolve(__dirname, '../.env') })
 
 const nextConfig: NextConfig = {
   output: 'standalone',

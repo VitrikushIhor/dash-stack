@@ -72,7 +72,7 @@
 
 ## 📦 Workspaces
 
-The monorepo is managed via **npm Workspaces** across two dedicated services:
+The monorepo is managed via **pnpm Workspaces** across two dedicated services:
 
 | Workspace | Architecture | Guide & Documentation | Description |
 | :--- | :--- | :--- | :--- |
@@ -86,7 +86,7 @@ The monorepo is managed via **npm Workspaces** across two dedicated services:
 ### Prerequisites
 
 - **Node.js**: `v20.x` or `v22.x`
-- **npm**: `v10+`
+- **pnpm**: `v10.34.5+` (enable via `corepack enable`)
 - **Docker & Docker Compose**: For local PostgreSQL database
 
 ### 1. Clone the repository
@@ -99,21 +99,24 @@ cd dash-stack
 ### 2. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Configure Environment Variables
 
-Copy the root environment template:
+Copy the environment templates for each service:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
+
+Edit `backend/.env` and `frontend/.env` with your actual credentials.
 
 ### 4. Start PostgreSQL Database
 
 ```bash
-npm run docker:dev
+pnpm run docker:dev
 ```
 
 Or run standalone PostgreSQL:
@@ -126,18 +129,18 @@ docker compose -f docker-compose.dev.yml up postgres -d
 
 ```bash
 # Run Prisma migrations
-npx prisma migrate dev --workspace=backend
+pnpm --filter backend exec prisma migrate dev
 
 # Seed database with demo accounts and tasks
-npm run seed -w backend
+pnpm --filter backend run seed
 ```
 
 ### 6. Start Development Servers
 
 ```bash
 # In separate terminals (or concurrently):
-npm run dev:frontend   # http://localhost:3000
-npm run dev:backend    # http://localhost:8000
+pnpm run dev:frontend   # http://localhost:3000
+pnpm run dev:backend    # http://localhost:8000
 ```
 
 * **Frontend Application**: [http://localhost:3000](http://localhost:3000)
@@ -153,24 +156,24 @@ npm run dev:backend    # http://localhost:8000
 
 | Command | Description |
 | :--- | :--- |
-| `npm run dev:frontend` | Start Next.js frontend development server with Turbopack |
-| `npm run dev:backend` | Start NestJS backend development server with SWC hot-reload |
-| `npm run build:frontend` | Build Next.js production standalone bundle |
-| `npm run build:backend` | Build NestJS production bundle via Nest CLI & SWC |
+| `pnpm run dev:frontend` | Start Next.js frontend development server with Turbopack |
+| `pnpm run dev:backend` | Start NestJS backend development server with SWC hot-reload |
+| `pnpm run build:frontend` | Build Next.js production standalone bundle |
+| `pnpm run build:backend` | Build NestJS production bundle via Nest CLI & SWC |
 
 ### Testing & Quality Assurance
 
 | Command | Description |
 | :--- | :--- |
-| `npm run test -w frontend` | Run all 75 Vitest frontend test suites (327 tests) |
-| `npm run test -w backend` | Run all 51 Jest backend test suites (284 tests) |
-| `npm run lint` | Run ESLint 9 Flat Config across both frontend and backend |
-| `npm run lint:frontend` | Run frontend ESLint checks |
-| `npm run lint:backend` | Run backend ESLint checks |
-| `npm run lint:fsd -w frontend`| Run Steiger FSD architectural linter on frontend |
-| `npm run format:frontend` | Format frontend files via Prettier |
-| `npm run format:backend` | Format backend files via Prettier |
-| `npm run knip` | Scan monorepo for unused exports, types, and dependencies |
+| `pnpm --filter frontend run test` | Run all 75 Vitest frontend test suites (327 tests) |
+| `pnpm --filter backend run test` | Run all 51 Jest backend test suites (284 tests) |
+| `pnpm run lint` | Run ESLint 9 Flat Config across both frontend and backend |
+| `pnpm run lint:frontend` | Run frontend ESLint checks |
+| `pnpm run lint:backend` | Run backend ESLint checks |
+| `pnpm --filter frontend run lint:fsd` | Run Steiger FSD architectural linter on frontend |
+| `pnpm run format:frontend` | Format frontend files via Prettier |
+| `pnpm run format:backend` | Format backend files via Prettier |
+| `pnpm run knip` | Scan monorepo for unused exports, types, and dependencies |
 
 ---
 
@@ -180,14 +183,14 @@ npm run dev:backend    # http://localhost:8000
 
 ```bash
 # Starts PostgreSQL, Backend (hot-reload), and Frontend (hot-reload)
-npm run docker:dev:build
+pnpm run docker:dev:build
 ```
 
 ### Production Environment
 
 ```bash
 # Builds optimized Next.js Standalone and NestJS production containers
-npm run docker:up:build
+pnpm run docker:up:build
 ```
 
 | Service | Port | Endpoint |

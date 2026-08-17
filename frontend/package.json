@@ -17,10 +17,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:related": "vitest related --run --passWithNoTests",
-    "knip": "npm run knip --prefix ..",
-    "audit": "npm audit --audit-level=moderate",
-    "audit:fix": "npm audit fix",
-    "validate": "npm run type-check && npm run lint && npm run lint:fsd && npm run format:check && npm run knip"
+    "knip": "pnpm --filter dash-stack run knip",
+    "audit": "pnpm audit --audit-level=moderate",
+    "audit:fix": "pnpm audit --fix",
+    "validate": "pnpm run type-check && pnpm run lint && pnpm run lint:fsd && pnpm run format:check && pnpm run knip"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -74,6 +74,7 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@feature-sliced/steiger-plugin": "^0.7.0",
+    "@next/eslint-plugin-next": "^15.1.7",
     "@tanstack/eslint-plugin-query": "^5.91.0",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -85,7 +86,6 @@
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-v8": "^4.0.17",
-    "dotenv": "^17.4.2",
     "eslint": "^9.37.0",
     "eslint-config-next": "^15.1.7",
     "eslint-config-prettier": "^10.1.8",

@@ -105,8 +105,7 @@ describe('DeleteLabelDialog', () => {
     let capturedOnSuccess: ((data: boolean) => void) | undefined
     vi.mocked(useAction).mockImplementation((_action, options) => {
       capturedOnSuccess = options?.onSuccess as
-        | ((data: boolean) => void)
-        | undefined
+        ((data: boolean) => void) | undefined
       return {
         execute: mockExecute,
         isPending: false,
