@@ -27,6 +27,7 @@ import {
 import { useLabelForm } from '../model/use-label-form'
 
 interface LabelFormProps {
+  slug: string
   initialData?: LabelDto | null
   onSuccess?: () => void
   submitLabel?: string
@@ -34,12 +35,17 @@ interface LabelFormProps {
 }
 
 export const LabelForm = ({
+  slug,
   initialData,
   onSuccess,
   submitLabel = 'Save',
   className = '',
 }: LabelFormProps) => {
-  const { form, onSubmit, isPending } = useLabelForm({ initialData, onSuccess })
+  const { form, onSubmit, isPending } = useLabelForm({
+    slug,
+    initialData,
+    onSuccess,
+  })
 
   useEffect(() => {
     if (initialData) {

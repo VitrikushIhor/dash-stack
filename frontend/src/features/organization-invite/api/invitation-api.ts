@@ -6,15 +6,15 @@ import {
 } from '@/entities/organization'
 
 export const createInvitationApi = (client: HttpClient) => ({
-  sendInvite: ({ orgId, dto }: { orgId: string; dto: CreateInvitationDto }) =>
-    client.post<Invitation>(`/organizations/${orgId}/invitations`, dto),
+  sendInvite: ({ slug, dto }: { slug: string; dto: CreateInvitationDto }) =>
+    client.post<Invitation>(`/organizations/${slug}/invitations`, dto),
 
-  listPending: (orgId: string) =>
-    client.get<Invitation[]>(`/organizations/${orgId}/invitations`),
+  listPending: (slug: string) =>
+    client.get<Invitation[]>(`/organizations/${slug}/invitations`),
 
-  revokeInvite: ({ orgId, id }: { orgId: string; id: string }) =>
+  revokeInvite: ({ slug, id }: { slug: string; id: string }) =>
     client.delete<{ message: string }>(
-      `/organizations/${orgId}/invitations/${id}`
+      `/organizations/${slug}/invitations/${id}`
     ),
 
   acceptInvite: (token: string) =>

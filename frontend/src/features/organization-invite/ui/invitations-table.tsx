@@ -15,12 +15,12 @@ import { invitationsTableColumns } from './invitations-table-columns'
 /* eslint-disable react-hooks/incompatible-library */
 
 interface InvitationsTableProps {
-  orgId: string
+  slug: string
   invitations: Invitation[]
 }
 
 export const InvitationsTable = ({
-  orgId,
+  slug,
   invitations,
 }: InvitationsTableProps) => {
   const { revokeInvite, isPending: isRevokingAction } = useRevokeInvite()
@@ -41,7 +41,7 @@ export const InvitationsTable = ({
     meta: {
       revokeInvite: (id: string) => {
         setRevokingId(id)
-        revokeInvite(orgId, id)
+        revokeInvite(slug, id)
       },
       revokingId,
     },

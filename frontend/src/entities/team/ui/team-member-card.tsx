@@ -14,20 +14,20 @@ import { Card, CardContent } from '@/shared/ui/core/card'
 
 interface TeamMemberCardProps {
   membership: Membership
-  orgId: string
+  slug: string
 }
 
-export const TeamMemberCard = ({ membership, orgId }: TeamMemberCardProps) => {
+export const TeamMemberCard = ({ membership, slug }: TeamMemberCardProps) => {
   const { user, role, position } = membership
   const displayName = getMemberDisplayName(user)
   const displayRole = position ? formatPosition(position) : role
   const initials = getInitials(displayName)
 
-  const targetOrgId = orgId || membership.orgId || ''
+  const targetSlug = slug || membership.organization?.slug || ''
 
   return (
     <Link
-      href={`${ROUTES.organizations}/${targetOrgId}/members/${user.id}`}
+      href={ROUTES.orgMemberDetail(targetSlug, user.id)}
       className='block no-underline'
     >
       <Card className='group relative overflow-hidden transition-all duration-300 hover:shadow-lg'>

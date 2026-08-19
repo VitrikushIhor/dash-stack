@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import { labelColorNames } from './types'
 
+export const LabelIdSchema = z.string().min(1, 'Label ID is required')
+
 export const labelSchema = z.object({
-  id: z.string().min(1, 'Label ID is required'),
+  id: LabelIdSchema,
   name: z
     .string()
     .min(1, 'Name is required')

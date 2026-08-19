@@ -8,7 +8,7 @@ import {
 import { ROUTES } from '@/shared/config'
 import { type SidebarData } from '../types'
 
-export const sidebarData: SidebarData = {
+export const getSidebarData = (slug?: string): SidebarData => ({
   navGroups: [
     {
       title: 'General',
@@ -18,16 +18,20 @@ export const sidebarData: SidebarData = {
           url: ROUTES.organizations,
           icon: UsersRound,
         },
-        {
-          title: 'Tasks',
-          url: ROUTES.task,
-          icon: ClipboardList,
-        },
-        {
-          title: 'Calendar',
-          url: ROUTES.calendar,
-          icon: Calendar,
-        },
+        ...(slug
+          ? [
+              {
+                title: 'Tasks',
+                url: ROUTES.orgTasks(slug),
+                icon: ClipboardList,
+              },
+              {
+                title: 'Calendar',
+                url: ROUTES.orgCalendar(slug),
+                icon: Calendar,
+              },
+            ]
+          : []),
       ],
     },
 
@@ -69,4 +73,6 @@ export const sidebarData: SidebarData = {
       ],
     },
   ],
-}
+})
+
+export const sidebarData: SidebarData = getSidebarData()

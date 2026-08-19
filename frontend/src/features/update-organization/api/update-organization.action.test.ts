@@ -16,7 +16,7 @@ vi.mock('@/entities/organization/server', () => ({
 }))
 
 describe('updateOrganizationAction', () => {
-  const validOrgId = 'cju1234567890123456789012'
+  const validSlug = 'acme-corp'
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -24,7 +24,7 @@ describe('updateOrganizationAction', () => {
 
   it('successfully updates an organization and revalidates relevant cache tags', async () => {
     const mockUpdatedOrg = {
-      id: validOrgId,
+      id: 'cju1234567890123456789012',
       name: 'Updated Name',
       slug: 'updated-name',
       description: 'Updated Description',
@@ -34,7 +34,7 @@ describe('updateOrganizationAction', () => {
     }
     vi.mocked(organizationServerApi.update).mockResolvedValue(mockUpdatedOrg)
 
-    const result = await updateOrganizationAction(validOrgId, {
+    const result = await updateOrganizationAction(validSlug, {
       name: 'Updated Name',
       description: 'Updated Description',
     })
@@ -45,7 +45,7 @@ describe('updateOrganizationAction', () => {
     }
     expect(revalidateTag).toHaveBeenCalledWith(SERVER_CACHE_TAGS.organizations)
     expect(revalidateTag).toHaveBeenCalledWith(
-      SERVER_CACHE_TAGS.orgDetail(validOrgId)
+      SERVER_CACHE_TAGS.orgDetail(validSlug)
     )
   })
 
@@ -63,7 +63,7 @@ describe('updateOrganizationAction', () => {
       new ApiError(403, 'Permission denied')
     )
 
-    const result = await updateOrganizationAction(validOrgId, {
+    const result = await updateOrganizationAction(validSlug, {
       name: 'Forbidden Name',
     })
 

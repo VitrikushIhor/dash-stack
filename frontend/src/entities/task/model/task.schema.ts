@@ -2,8 +2,10 @@ import { z } from 'zod'
 import { labelColorNames } from '@/shared/model'
 import { TaskStatusEnum } from './types'
 
+export const TaskIdSchema = z.string().min(1, 'Task ID is required')
+
 export const CreateTaskDtoSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   status: z.nativeEnum(TaskStatusEnum).optional(),
   startDate: z.string().optional(),
@@ -38,10 +40,12 @@ export const UpdateTaskDtoSchema = CreateTaskDtoSchema.partial().extend({
 })
 
 export const BulkUpdateTasksDtoSchema = z.object({
-  ids: z.array(z.string().min(1)),
+  ids: z.array(TaskIdSchema).min(1, 'At least one task ID is required'),
   data: z.object({
     status: z.nativeEnum(TaskStatusEnum).optional(),
   }),
 })
 
-export const BulkDeleteTasksDtoSchema = z.array(z.string().min(1))
+export const BulkDeleteTasksDtoSchema = z
+  .array(TaskIdSchema)
+  .min(1, 'At least one task ID is required')

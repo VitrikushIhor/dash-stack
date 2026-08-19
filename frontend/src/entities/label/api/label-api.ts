@@ -7,20 +7,17 @@ import {
 
 export function createLabelApi(client: HttpClient) {
   return {
-    findAll: (orgId: string) => {
-      return client.get<LabelDto[]>(`/organizations/${orgId}/labels`)
+    findAll: (slug: string) => {
+      return client.get<LabelDto[]>(`/organizations/${slug}/labels`)
     },
-    create: (orgId: string, data: CreateLabelDto) => {
-      return client.post<LabelDto>(`/organizations/${orgId}/labels`, data)
+    create: (slug: string, data: CreateLabelDto) => {
+      return client.post<LabelDto>(`/organizations/${slug}/labels`, data)
     },
-    update: (orgId: string, id: string, data: UpdateLabelDto) => {
-      return client.patch<LabelDto>(
-        `/organizations/${orgId}/labels/${id}`,
-        data
-      )
+    update: (slug: string, id: string, data: UpdateLabelDto) => {
+      return client.patch<LabelDto>(`/organizations/${slug}/labels/${id}`, data)
     },
-    delete: (orgId: string, id: string) => {
-      return client.delete<void>(`/organizations/${orgId}/labels/${id}`)
+    delete: (slug: string, id: string) => {
+      return client.delete<void>(`/organizations/${slug}/labels/${id}`)
     },
   }
 }

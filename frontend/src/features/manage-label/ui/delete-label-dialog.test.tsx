@@ -60,7 +60,7 @@ describe('DeleteLabelDialog', () => {
   })
 
   it('does not render when delete-label is not set', () => {
-    render(<DeleteLabelDialog labels={mockLabels} />)
+    render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
     const dialog = screen.queryByRole('alertdialog')
     expect(dialog).not.toBeInTheDocument()
   })
@@ -71,7 +71,7 @@ describe('DeleteLabelDialog', () => {
       mockSetParams,
     ])
 
-    render(<DeleteLabelDialog labels={mockLabels} />)
+    render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
     expect(screen.getByText(/Delete Label/i)).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('DeleteLabelDialog', () => {
       mockSetParams,
     ])
 
-    render(<DeleteLabelDialog labels={mockLabels} />)
+    render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i })
     await user.click(cancelButton)
@@ -116,13 +116,13 @@ describe('DeleteLabelDialog', () => {
       capturedOnSuccess?.(true)
     })
 
-    render(<DeleteLabelDialog labels={mockLabels} />)
+    render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     const confirmButton = screen.getByRole('button', { name: /delete/i })
     await user.click(confirmButton)
 
     await waitFor(() => {
-      expect(mockExecute).toHaveBeenCalledWith({ id: '1' })
+      expect(mockExecute).toHaveBeenCalledWith({ slug: 'org-1', id: '1' })
     })
 
     expect(mockSetParams).toHaveBeenCalledWith({ 'delete-label': null })
@@ -140,7 +140,7 @@ describe('DeleteLabelDialog', () => {
       isPending: true,
     })
 
-    render(<DeleteLabelDialog labels={mockLabels} />)
+    render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i })
     const confirmButton = screen.getByRole('button', { name: /deleting/i })

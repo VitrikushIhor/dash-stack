@@ -10,18 +10,23 @@ import { ManageTaskForm } from './manage-task-form'
 import { TaskModalView } from './task-modal-view'
 
 interface ManageTaskModalProps {
+  slug: string
   labels: Label[]
   members: Membership[]
 }
 
-export const ManageTaskModal = ({ labels, members }: ManageTaskModalProps) => {
+export const ManageTaskModal = ({
+  slug,
+  labels,
+  members,
+}: ManageTaskModalProps) => {
   const [{ 'create-task': create, 'update-task': updateId }, setParams] =
     useTaskSearchParams()
 
   const isCreate = create === true
   const isOpen = !!updateId || isCreate
 
-  const { data: fetchedTask, isLoading } = useTaskQuery(updateId || null)
+  const { data: fetchedTask, isLoading } = useTaskQuery(slug, updateId || null)
 
   const selectedTask = updateId ? (fetchedTask ?? null) : null
 
@@ -45,6 +50,7 @@ export const ManageTaskModal = ({ labels, members }: ManageTaskModalProps) => {
       ) : (
         <ManageTaskForm
           key={`${isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}-${selectedTask?.id || 'new'}-${isOpen}`}
+          slug={slug}
           mode={isCreate ? ManageTaskMode.CREATE : ManageTaskMode.EDIT}
           selectedTask={selectedTask}
           close={close}

@@ -7,12 +7,12 @@ import { InviteFormSchema, type InviteFormValues } from './invitation.schema'
 import { useSendInvite } from './use-send-invite'
 
 interface UseInviteMemberFormProps {
-  orgId: string
+  slug: string
   onSuccess?: () => void
 }
 
 export function useInviteMemberForm({
-  orgId,
+  slug,
   onSuccess,
 }: UseInviteMemberFormProps) {
   const { sendInvite, isPending } = useSendInvite()
@@ -23,7 +23,7 @@ export function useInviteMemberForm({
   })
 
   const onSubmit = (values: InviteFormValues) => {
-    sendInvite(orgId, values, {
+    sendInvite(slug, values, {
       onSuccess: () => {
         form.reset()
         onSuccess?.()

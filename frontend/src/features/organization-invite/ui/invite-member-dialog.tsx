@@ -29,18 +29,11 @@ import {
 import { useInviteMemberForm } from '../model/use-invite-member-form'
 import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
 
-interface InviteMemberDialogProps {
-  orgId?: string
-}
-
-export const InviteMemberDialog = ({
-  orgId: propOrgId,
-}: InviteMemberDialogProps = {}) => {
-  const { isOpen, orgId: storeOrgId, close } = useInviteMemberModalStore()
-  const activeOrgId = propOrgId || storeOrgId || ''
+export const InviteMemberDialog = () => {
+  const { isOpen, slug, close } = useInviteMemberModalStore()
 
   const { form, onSubmit, isPending } = useInviteMemberForm({
-    orgId: activeOrgId,
+    slug: slug ?? '',
     onSuccess: () => {
       close()
     },

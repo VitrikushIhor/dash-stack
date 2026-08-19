@@ -7,12 +7,16 @@ import { useTaskSearchParams } from '../model/task-search-params'
 import { useTaskQuery } from '../model/use-task-query'
 import { deleteTaskAction } from '../server'
 
-export const DeleteTaskModal = () => {
+interface DeleteTaskModalProps {
+  slug: string
+}
+
+export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
   const [{ 'delete-task': deleteId }, setParams] = useTaskSearchParams()
 
   const isOpen = !!deleteId
 
-  const { data: fetchedTask, isLoading } = useTaskQuery(deleteId)
+  const { data: fetchedTask, isLoading } = useTaskQuery(slug, deleteId)
   const selectedTask = deleteId ? (fetchedTask ?? null) : null
 
   const close = () => {
@@ -28,7 +32,7 @@ export const DeleteTaskModal = () => {
 
   const handleDelete = async () => {
     if (!selectedTask) return
-    await executeDelete({ id: selectedTask.id })
+    await executeDelete({ slug, id: selectedTask.id })
   }
 
   return (

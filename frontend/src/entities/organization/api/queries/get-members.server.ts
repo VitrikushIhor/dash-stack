@@ -2,7 +2,7 @@ import { cache } from 'react'
 import 'server-only'
 import { getErrorMessage } from '@/shared/api'
 import { type Membership } from '@/shared/model'
-import { OrganizationIdSchema } from '../../model/schemas/organization.schema'
+import { OrganizationSlugSchema } from '../../model/schemas/organization.schema'
 import { organizationServerApi } from '../organization-api.server'
 
 type GetOrganizationMembersResponse = {
@@ -11,10 +11,10 @@ type GetOrganizationMembersResponse = {
 }
 
 export const getOrganizationMembers = cache(
-  async (orgId: string): Promise<GetOrganizationMembersResponse> => {
+  async (slug: string): Promise<GetOrganizationMembersResponse> => {
     try {
-      const validOrgId = OrganizationIdSchema.parse(orgId)
-      const data = await organizationServerApi.getMembers(validOrgId)
+      const validSlug = OrganizationSlugSchema.parse(slug)
+      const data = await organizationServerApi.getMembers(validSlug)
       return { data, error: null }
     } catch (error) {
       return { data: null, error: getErrorMessage(error) }

@@ -3,18 +3,18 @@
 import { revalidateTag } from 'next/cache'
 import { type ActionState, ApiError, getErrorMessage } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { OrganizationIdSchema } from '@/entities/organization'
+import { OrganizationSlugSchema } from '@/entities/organization'
 import { organizationServerApi } from '@/entities/organization/server'
 
 export async function deleteOrganizationAction(
-  orgId: string
+  slug: string
 ): Promise<ActionState<{ message: string }>> {
   try {
-    const validOrgId = OrganizationIdSchema.parse(orgId)
-    const res = await organizationServerApi.delete(validOrgId)
+    const validSlug = OrganizationSlugSchema.parse(slug)
+    const res = await organizationServerApi.delete(validSlug)
 
     revalidateTag(SERVER_CACHE_TAGS.organizations)
-    revalidateTag(SERVER_CACHE_TAGS.orgDetail(validOrgId))
+    revalidateTag(SERVER_CACHE_TAGS.orgDetail(validSlug))
     return { success: true, data: res }
   } catch (error) {
     if (error instanceof ApiError) {

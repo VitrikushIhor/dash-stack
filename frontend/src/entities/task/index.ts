@@ -10,6 +10,7 @@ export type {
 } from './model/types'
 export { TaskStatusEnum, TaskViewMode } from './model/types'
 export {
+  TaskIdSchema,
   CreateTaskDtoSchema,
   UpdateTaskDtoSchema,
   BulkUpdateTasksDtoSchema,

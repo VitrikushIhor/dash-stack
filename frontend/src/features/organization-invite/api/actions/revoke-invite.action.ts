@@ -5,24 +5,24 @@ import { type ActionState, ApiError, getErrorMessage } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import {
   InvitationIdSchema,
-  OrganizationIdSchema,
+  OrganizationSlugSchema,
 } from '@/entities/organization'
 import { invitationServerApi } from '../invitation-api.server'
 
 export async function revokeInviteAction(
-  orgId: string,
+  slug: string,
   invitationId: string
 ): Promise<ActionState> {
   try {
-    const validOrgId = OrganizationIdSchema.parse(orgId)
+    const validSlug = OrganizationSlugSchema.parse(slug)
     const validInvitationId = InvitationIdSchema.parse(invitationId)
 
     await invitationServerApi.revokeInvite({
-      orgId: validOrgId,
+      slug: validSlug,
       id: validInvitationId,
     })
 
-    revalidateTag(SERVER_CACHE_TAGS.orgMembers(orgId))
+    revalidateTag(SERVER_CACHE_TAGS.orgMembers(validSlug))
 
     return { success: true, data: undefined }
   } catch (error) {

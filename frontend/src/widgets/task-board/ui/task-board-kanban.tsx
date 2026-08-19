@@ -7,17 +7,18 @@ import { TaskBoardCard } from './task-board-card'
 import { TaskBoardColumn } from './task-board-column'
 
 interface TaskBoardKanbanProps {
+  slug?: string
   tasks: Task[]
 }
 
-export function TaskBoardKanban({ tasks }: TaskBoardKanbanProps) {
+export function TaskBoardKanban({ slug, tasks }: TaskBoardKanbanProps) {
   const {
     displayColumns,
     handleValueChange,
     handleDragStart,
     handleDragEnd,
     handleDragCancel,
-  } = useTaskBoard(tasks)
+  } = useTaskBoard(tasks, slug)
 
   return (
     <Kanban

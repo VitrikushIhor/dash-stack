@@ -68,7 +68,10 @@ export function MembersTabContent({
         </div>
 
         {canManage && (
-          <Button className='gap-2' onClick={() => openInvite(organization.id)}>
+          <Button
+            className='gap-2'
+            onClick={() => openInvite(organization.slug)}
+          >
             <Plus className='h-4 w-4' />
             Invite Member
           </Button>

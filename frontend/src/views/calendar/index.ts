@@ -1,3 +1,4 @@
+export { CalendarViewClient } from './ui/calendar-view-client'
 export { CalendarMonthPage } from './ui/calendar-month-page'
 export { CalendarWeekPage } from './ui/calendar-week-page'
 export { CalendarDayPage } from './ui/calendar-day-page'

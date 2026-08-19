@@ -1,20 +1,20 @@
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import 'server-only'
-import { getActiveOrganization } from '@/entities/organization/server'
+import { getOrganizationBySlug } from '@/entities/organization/server'
 import { getTasksUnpaginated } from '@/entities/task/server'
 import { type TCalendarView } from '@/features/task-calendar'
 import { calendarSearchParamsCache } from '@/features/task-calendar/model/calendar-search-params.server'
 import { getVisibleRange } from './get-visible-range'
 
 export async function fetchCalendarTasks(
+  slug: string,
   view: TCalendarView,
   searchParams: Promise<Record<string, string | string[] | undefined>>
 ) {
-  const activeOrgResult = await getActiveOrganization()
-  const activeOrgId = activeOrgResult.activeOrg?.id
+  const orgResult = await getOrganizationBySlug(slug)
 
-  if (!activeOrgId) {
-    redirect('/')
+  if (orgResult.error || !orgResult.data) {
+    notFound()
   }
 
   const parsedParams = await calendarSearchParamsCache.parse(searchParams)
@@ -22,12 +22,14 @@ export async function fetchCalendarTasks(
 
   const range = getVisibleRange(view, date)
 
-  const tasksResult = await getTasksUnpaginated(activeOrgId, {
+  const tasksResult = await getTasksUnpaginated(slug, {
     ...range,
   })
 
   return {
     tasks: tasksResult.data || [],
     date,
+    slug: slug,
+    error: tasksResult.error ?? null,
   }
 }

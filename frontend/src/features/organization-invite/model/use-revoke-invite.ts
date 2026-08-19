@@ -10,9 +10,9 @@ export function useRevokeInvite() {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const revokeInvite = (orgId: string, invitationId: string) => {
+  const revokeInvite = (slug: string, invitationId: string) => {
     startTransition(async () => {
-      const result = await revokeInviteAction(orgId, invitationId)
+      const result = await revokeInviteAction(slug, invitationId)
       if (!result.success) {
         handleServerError(result.error)
         return

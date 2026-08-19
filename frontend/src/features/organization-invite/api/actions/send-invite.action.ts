@@ -6,25 +6,25 @@ import { SERVER_CACHE_TAGS } from '@/shared/config'
 import {
   type CreateInvitationDto,
   type Invitation,
-  OrganizationIdSchema,
+  OrganizationSlugSchema,
   SendInviteDtoSchema,
 } from '@/entities/organization'
 import { invitationServerApi } from '../invitation-api.server'
 
 export async function sendInviteAction(
-  orgId: string,
+  slug: string,
   dto: CreateInvitationDto
 ): Promise<ActionState<Invitation>> {
   try {
-    const validOrgId = OrganizationIdSchema.parse(orgId)
+    const validSlug = OrganizationSlugSchema.parse(slug)
     const validDto = SendInviteDtoSchema.parse(dto)
 
     const res = await invitationServerApi.sendInvite({
-      orgId: validOrgId,
+      slug: validSlug,
       dto: validDto,
     })
 
-    revalidateTag(SERVER_CACHE_TAGS.orgMembers(orgId))
+    revalidateTag(SERVER_CACHE_TAGS.orgMembers(validSlug))
 
     return { success: true, data: res }
   } catch (error) {

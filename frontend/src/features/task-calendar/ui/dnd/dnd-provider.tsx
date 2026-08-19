@@ -17,7 +17,7 @@ import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
   tasks: Task[]
-  onTaskUpdate: (id: string, data: Partial<Task>) => void
+  onTaskUpdate: (id: string, data: Partial<Task>) => void | Promise<void>
   children: (optimisticTasks: Task[]) => ReactNode
 }
 
@@ -82,12 +82,16 @@ export function DndProviderWrapper({
     const newDueDateISO = newStartDate.toISOString()
     if (droppedEvent.dueDate === newDueDateISO) return
 
-    startTransition(() => {
+    startTransition(async () => {
       setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
 
       try {
-        onTaskUpdate(droppedEvent.id, { dueDate: newDueDateISO })
+        await onTaskUpdate(droppedEvent.id, { dueDate: newDueDateISO })
       } catch (error) {
+        setOptimisticTasks({
+          id: droppedEvent.id,
+          dueDate: droppedEvent.dueDate,
+        })
         // eslint-disable-next-line no-console
         console.error('[Calendar DnD Error]', error)
         toast.error('Failed to update task date.')

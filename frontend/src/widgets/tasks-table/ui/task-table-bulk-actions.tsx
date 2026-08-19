@@ -24,10 +24,12 @@ import {
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {
+  slug: string
   table: Table<TData>
 }
 
 export function TaskTableBulkActions<TData>({
+  slug,
   table,
 }: TaskTableBulkActionsProps<TData>) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -51,10 +53,12 @@ export function TaskTableBulkActions<TData>({
   )
 
   const handleBulkStatusChange = async (status: string) => {
+    if (!slug) return
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
     const toastId = toast.loading('Updating status...')
 
     const result = await executeBulkUpdate({
+      slug,
       ids: selectedIds,
       data: { status: status as TaskStatusEnum },
     })
@@ -70,10 +74,14 @@ export function TaskTableBulkActions<TData>({
   }
 
   const handleBulkDelete = async () => {
+    if (!slug) return
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
     const toastId = toast.loading('Deleting tasks...')
 
-    const result = await executeBulkDelete(selectedIds)
+    const result = await executeBulkDelete({
+      slug,
+      ids: selectedIds,
+    })
 
     if (result !== undefined) {
       toast.success(
@@ -147,9 +155,7 @@ export function TaskTableBulkActions<TData>({
 
       <TasksBulkDeleteDialog
         open={showDeleteConfirm}
-        onOpenChange={(open) => {
-          setShowDeleteConfirm(!open)
-        }}
+        onOpenChange={setShowDeleteConfirm}
         table={table}
         handleDelete={handleBulkDelete}
       />

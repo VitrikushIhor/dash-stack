@@ -10,9 +10,9 @@ type GetOrganizationLabelsResponse = {
 }
 
 export const getOrganizationLabels = cache(
-  async (orgId: string): Promise<GetOrganizationLabelsResponse> => {
+  async (slug: string): Promise<GetOrganizationLabelsResponse> => {
     try {
-      const data = await labelServerApi.findAll(orgId)
+      const data = await labelServerApi.findAll(slug)
       return { data, error: null }
     } catch (error) {
       return { data: null, error: getErrorMessage(error) }

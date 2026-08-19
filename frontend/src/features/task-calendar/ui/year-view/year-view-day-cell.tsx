@@ -1,8 +1,8 @@
-import { useRouter } from 'next/navigation'
-import { format, isToday } from 'date-fns'
+import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
+import { useCalendarNavigation } from '../../lib/navigation'
 
 interface IProps {
   selectedDate: Date
@@ -17,13 +17,13 @@ export function YearViewDayCell({
   tasks,
   selectedDate: _selectedDate,
 }: IProps) {
-  const router = useRouter()
+  const { navigateToDay } = useCalendarNavigation()
 
   const maxIndicators = 3
   const eventCount = tasks.length
 
   const handleClick = () => {
-    router.push(`/calendar/day?date=${format(date, 'yyyy-MM-dd')}`)
+    navigateToDay(date)
   }
 
   return (

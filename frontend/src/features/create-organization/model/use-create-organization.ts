@@ -3,8 +3,13 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { handleServerError, resolveLogoUrl, useUploadImage } from '@/shared/api'
+import type { Organization } from '@/entities/organization'
 import { createOrganizationAction } from '../api/create-organization.action'
 import type { CreateOrgFormValues } from './create-organization.schema'
+
+interface CreateOrgOptions {
+  onSuccess?: (organization: Organization) => void
+}
 
 export const useCreateOrganization = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -12,7 +17,7 @@ export const useCreateOrganization = () => {
 
   const createOrganization = async (
     values: CreateOrgFormValues,
-    options?: { onSuccess?: () => void }
+    options?: CreateOrgOptions
   ): Promise<boolean> => {
     setIsSubmitting(true)
 
@@ -47,7 +52,7 @@ export const useCreateOrganization = () => {
       }
 
       toast.success(`Organization ${values.name} created successfully!`)
-      options?.onSuccess?.()
+      options?.onSuccess?.(orgResult.data)
       return true
     } finally {
       setIsSubmitting(false)

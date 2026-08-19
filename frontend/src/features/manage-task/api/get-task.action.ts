@@ -1,12 +1,17 @@
 'use server'
 
 import { z } from 'zod'
-import { createOrgAction } from '@/entities/organization/server'
+import { createAction } from '@/shared/lib'
+import { OrganizationSlugSchema } from '@/entities/organization'
+import { TaskIdSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
 
-export const getTaskAction = createOrgAction(
-  z.object({ id: z.string() }),
-  async ({ id }, { activeOrg }) => {
-    return taskServerApi.findById(activeOrg.id, id)
+export const getTaskAction = createAction(
+  z.object({
+    slug: OrganizationSlugSchema,
+    id: TaskIdSchema,
+  }),
+  async ({ slug, id }) => {
+    return taskServerApi.findById(slug, id)
   }
 )

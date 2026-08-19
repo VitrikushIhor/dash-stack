@@ -12,10 +12,38 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'
 import { DataTableColumnHeader } from '@/shared/ui/data-table'
+import { useOrgSlug } from '../../model/hooks/use-org-slug'
 import {
   type Membership,
   type OrgRole,
 } from '../../model/types/organization.types'
+
+function MemberCell({ membership }: { membership: Membership }) {
+  const routeSlug = useOrgSlug()
+  const slug = membership.organization?.slug ?? routeSlug ?? ''
+  const { user } = membership
+  const userId = user?.id
+
+  if (!userId) return null
+
+  return (
+    <Link
+      href={ROUTES.orgMemberDetail(slug, userId)}
+      className='flex items-center gap-3 hover:underline'
+    >
+      <Avatar className='h-8 w-8'>
+        <AvatarImage src={user.avatar} />
+        <AvatarFallback>
+          {getInitials(getMemberDisplayName(user))}
+        </AvatarFallback>
+      </Avatar>
+      <div className='flex flex-col'>
+        <span className='font-medium'>{getMemberDisplayName(user)}</span>
+        <span className='text-muted-foreground text-xs'>{user.email}</span>
+      </div>
+    </Link>
+  )
+}
 
 export const membersTableColumns: ColumnDef<Membership>[] = [
   {
@@ -23,30 +51,7 @@ export const membersTableColumns: ColumnDef<Membership>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Member' />
     ),
-    cell: ({ row }) => {
-      const { user, orgId } = row.original
-      const userId = user?.id
-
-      if (!userId) return null
-
-      return (
-        <Link
-          href={`${ROUTES.organizations}/${orgId || ''}/members/${userId}`}
-          className='flex items-center gap-3 hover:underline'
-        >
-          <Avatar className='h-8 w-8'>
-            <AvatarImage src={user.avatar} />
-            <AvatarFallback>
-              {getInitials(getMemberDisplayName(user))}
-            </AvatarFallback>
-          </Avatar>
-          <div className='flex flex-col'>
-            <span className='font-medium'>{getMemberDisplayName(user)}</span>
-            <span className='text-muted-foreground text-xs'>{user.email}</span>
-          </div>
-        </Link>
-      )
-    },
+    cell: ({ row }) => <MemberCell membership={row.original} />,
   },
   {
     accessorKey: 'role',

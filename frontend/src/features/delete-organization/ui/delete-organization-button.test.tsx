@@ -20,7 +20,7 @@ describe('DeleteOrganizationButton', () => {
   })
 
   it('renders trigger button for organization deletion', () => {
-    render(<DeleteOrganizationButton orgId='org-1' />)
+    render(<DeleteOrganizationButton slug='org-1' />)
 
     expect(
       screen.getByRole('button', { name: /delete organization/i })
@@ -29,7 +29,7 @@ describe('DeleteOrganizationButton', () => {
 
   it('opens confirmation modal and triggers deletion when confirmed', async () => {
     const user = userEvent.setup()
-    render(<DeleteOrganizationButton orgId='org-1' />)
+    render(<DeleteOrganizationButton slug='org-1' />)
 
     const triggerBtn = screen.getByRole('button', {
       name: /delete organization/i,

@@ -1,16 +1,21 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
+import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { createOrgAction } from '@/entities/organization/server'
+import { createAction } from '@/shared/lib'
+import { OrganizationSlugSchema } from '@/entities/organization'
 import { CreateTaskDtoSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
 
-export const createTaskAction = createOrgAction(
-  CreateTaskDtoSchema,
-  async (dto, { activeOrg }) => {
-    const res = await taskServerApi.create(activeOrg.id, dto)
-    revalidateTag(SERVER_CACHE_TAGS.tasks(activeOrg.id))
+export const createTaskAction = createAction(
+  z.object({
+    slug: OrganizationSlugSchema,
+    data: CreateTaskDtoSchema,
+  }),
+  async ({ slug, data }) => {
+    const res = await taskServerApi.create(slug, data)
+    revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
     return res
   }
 )

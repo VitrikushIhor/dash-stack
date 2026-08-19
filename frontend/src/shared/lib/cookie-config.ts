@@ -7,10 +7,6 @@ export const COOKIE_CONFIG = {
     name: 'refresh_token',
     maxAge: 60 * 60 * 24 * 7, // 7 days
   },
-  ACTIVE_ORG_ID: {
-    name: 'active_org_id',
-    maxAge: 60 * 60 * 24 * 365, // 1 year
-  },
   DIRECTION: {
     name: 'dir',
     maxAge: 60 * 60 * 24 * 365, // 1 year

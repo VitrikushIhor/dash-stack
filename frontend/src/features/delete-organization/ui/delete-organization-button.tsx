@@ -16,16 +16,16 @@ import { Button } from '@/shared/ui/core/button'
 import { useDeleteOrganization } from '../model/use-delete-organization'
 
 interface DeleteOrganizationButtonProps {
-  orgId: string
+  slug: string
 }
 
 export const DeleteOrganizationButton = ({
-  orgId,
+  slug,
 }: DeleteOrganizationButtonProps) => {
   const { deleteOrganization, isPending } = useDeleteOrganization()
 
   const handleDelete = () => {
-    deleteOrganization(orgId)
+    deleteOrganization(slug)
   }
 
   return (
