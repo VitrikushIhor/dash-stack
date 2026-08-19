@@ -25,7 +25,7 @@ COPY backend/ ./backend/
 RUN pnpm --filter backend run build
 
 # Deploy isolated backend workspace with production dependencies
-RUN pnpm --filter backend --prod deploy /app/pruned
+RUN pnpm --filter backend --prod deploy --legacy /app/pruned
 
 FROM base AS runner
 WORKDIR /app/backend
