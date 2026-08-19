@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../organization/domain/enums/org-role.enum';
 import {
   InvitationRepositoryPort,
   CreateInvitationData,

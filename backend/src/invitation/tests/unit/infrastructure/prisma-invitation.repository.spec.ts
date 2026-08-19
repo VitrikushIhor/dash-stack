@@ -1,5 +1,5 @@
 import { PrismaInvitationRepository } from '../../../infrastructure/persistence/prisma-invitation.repository';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 
 const mockPrismaInvitation = (overrides?: Record<string, unknown>) => ({
   id: 'inv-1',

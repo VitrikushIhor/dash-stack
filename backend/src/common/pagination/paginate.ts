@@ -10,7 +10,7 @@ const MAX_PER_PAGE = 100;
 export async function paginate<T, FindManyArgs extends { where?: W }, W = FindManyArgs['where']>(
   delegate: {
     count: (args: { where?: W }) => Promise<number>;
-    findMany: (args: FindManyArgs & { skip?: number; take?: number }) => Promise<T[]>;
+    findMany: (args: FindManyArgs & { skip?: number; take?: number }) => Promise<unknown[]>;
   },
   args: FindManyArgs,
   options: PaginateOptions,
@@ -32,7 +32,7 @@ export async function paginate<T, FindManyArgs extends { where?: W }, W = FindMa
   const currentPage = page;
 
   return {
-    data,
+    data: data as T[],
     meta: {
       total,
       lastPage,

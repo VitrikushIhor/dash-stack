@@ -1,7 +1,7 @@
 import { RevokeInviteUseCase } from '../../../application/use-cases/revoke-invite.use-case';
 import { InvitationRepositoryPort } from '../../../application/ports/invitation.repository.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 import { InvitationNotInOrgException } from '../../../domain/exceptions/invitation-not-found.exception';
 
 const mockInvitation = (

@@ -12,6 +12,7 @@ import { OrganizationSlugService } from './application/services/organization-slu
 
 import { FindUserMembershipsUseCase } from './application/use-cases/find-user-memberships.use-case';
 import { CountUserOrganizationsUseCase } from './application/use-cases/count-user-organizations.use-case';
+import { ResolveTenantContextUseCase } from './application/use-cases/resolve-tenant-context.use-case';
 
 @Module({
   controllers: [OrganizationController],
@@ -30,11 +31,13 @@ import { CountUserOrganizationsUseCase } from './application/use-cases/count-use
     FindOrganizationMemberUseCase,
     FindUserMembershipsUseCase,
     CountUserOrganizationsUseCase,
+    ResolveTenantContextUseCase,
   ],
   exports: [
     'OrganizationRepositoryPort',
     FindUserMembershipsUseCase,
     CountUserOrganizationsUseCase,
+    ResolveTenantContextUseCase,
   ],
 })
 export class OrganizationModule {}

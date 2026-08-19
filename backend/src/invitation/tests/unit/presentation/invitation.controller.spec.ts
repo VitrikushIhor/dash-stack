@@ -2,12 +2,13 @@ import { InvitationController } from '../../../presentation/controllers/invitati
 import { SendInviteUseCase } from '../../../application/use-cases/send-invite.use-case';
 import { ListPendingInvitationsUseCase } from '../../../application/use-cases/list-pending-invitations.use-case';
 import { RevokeInviteUseCase } from '../../../application/use-cases/revoke-invite.use-case';
-import { OrgRole, User } from '@prisma/client';
+import { AuthUser } from '../../../../common/decorators/user.decorator';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 
-const mockUser = {
+const mockUser: AuthUser = {
   id: 'user-1',
   email: 'admin@example.com',
-} as User;
+};
 
 describe('InvitationController', () => {
   let controller: InvitationController;
@@ -45,7 +46,7 @@ describe('InvitationController', () => {
       const dto = { email: 'test@test.com', role: OrgRole.ADMIN };
       sendInviteUseCase.execute.mockResolvedValue({} as any);
 
-      await controller.sendInvite('org-abc', { ...mockUser, id: 'admin-5' } as User, dto);
+      await controller.sendInvite('org-abc', { ...mockUser, id: 'admin-5' } as AuthUser, dto);
 
       expect(sendInviteUseCase.execute).toHaveBeenCalledWith(
         'org-abc',

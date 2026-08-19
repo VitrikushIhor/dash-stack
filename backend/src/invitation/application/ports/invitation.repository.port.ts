@@ -1,4 +1,4 @@
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../organization/domain/enums/org-role.enum';
 import { PendingInvitationReadModel } from '../read-models/pending-invitation.read-model';
 
 export interface CreateInvitationData {

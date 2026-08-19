@@ -11,8 +11,10 @@ import { FindAllTasksUseCase } from './application/use-cases/find-all-tasks.use-
 import { FindAllTasksUnpaginatedUseCase } from './application/use-cases/find-all-tasks-unpaginated.use-case';
 import { TaskController } from './presentation/task.controller';
 import { TaskAssigneeValidatorService } from './application/services/task-assignee-validator.service';
+import { OrganizationModule } from '../organization/organization.module';
 
 @Module({
+  imports: [OrganizationModule],
   controllers: [TaskController],
   providers: [
     CreateTaskUseCase,

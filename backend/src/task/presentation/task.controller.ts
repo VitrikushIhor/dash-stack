@@ -12,8 +12,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import { MembershipRoleGuard, RequireOrgRole } from '../../common/guards/membership-role.guard';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../organization/domain/enums/org-role.enum';
+import { TenantId } from '../../organization/presentation/decorators/tenant.decorator';
+import { RequireTenantRole } from '../../organization/presentation/decorators/require-tenant-role.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateTaskUseCase } from '../application/use-cases/create-task.use-case';
 import { UpdateTaskUseCase } from '../application/use-cases/update-task.use-case';
@@ -33,8 +34,8 @@ import { UpdateTaskCommand } from '../application/commands/update-task.command';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
-@Controller('organizations/:orgId/tasks')
-@UseGuards(JwtAuthGuard, MembershipRoleGuard)
+@Controller('organizations/:slug/tasks')
+@UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(
     private readonly createTaskUseCase: CreateTaskUseCase,
@@ -48,9 +49,9 @@ export class TaskController {
   ) {}
 
   @Post()
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Create a new task' })
-  create(@Param('orgId') orgId: string, @Body() dto: CreateTaskDto) {
+  create(@TenantId() orgId: string, @Body() dto: CreateTaskDto) {
     const command: CreateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -72,49 +73,49 @@ export class TaskController {
   }
 
   @Get()
-  @RequireOrgRole(OrgRole.GUEST)
+  @RequireTenantRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'List all tasks for an organization (paginated)' })
-  findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
+  findAll(@TenantId() orgId: string, @Query() dto: FindAllTasksDto) {
     return this.findAllTasksUseCase.execute(orgId, dto);
   }
 
   @Get('all')
-  @RequireOrgRole(OrgRole.GUEST)
+  @RequireTenantRole(OrgRole.GUEST)
   @ApiOperation({
     summary: 'List all tasks for an organization without pagination',
   })
-  findAllUnpaginated(@Param('orgId') orgId: string, @Query() dto: FindAllTasksUnpaginatedDto) {
+  findAllUnpaginated(@TenantId() orgId: string, @Query() dto: FindAllTasksUnpaginatedDto) {
     return this.findAllTasksUnpaginatedUseCase.execute(orgId, dto);
   }
 
   @Patch('bulk/update')
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Bulk update tasks' })
   @ApiBody({ type: BulkUpdateTasksDto })
-  async updateMany(@Param('orgId') orgId: string, @Body() dto: BulkUpdateTasksDto) {
+  async updateMany(@TenantId() orgId: string, @Body() dto: BulkUpdateTasksDto) {
     return this.bulkUpdateTaskStatusUseCase.execute(orgId, dto.ids, dto.status);
   }
 
   @Delete('bulk')
-  @RequireOrgRole(OrgRole.ADMIN)
+  @RequireTenantRole(OrgRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Bulk delete tasks' })
   @ApiBody({ type: BulkDeleteTasksDto })
-  async deleteMany(@Param('orgId') orgId: string, @Body() dto: BulkDeleteTasksDto) {
+  async deleteMany(@TenantId() orgId: string, @Body() dto: BulkDeleteTasksDto) {
     await this.deleteManyTasksUseCase.execute(orgId, dto.ids);
   }
 
   @Get(':id')
-  @RequireOrgRole(OrgRole.GUEST)
+  @RequireTenantRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'Get task by ID' })
-  findById(@Param('orgId') orgId: string, @Param('id') id: string) {
+  findById(@TenantId() orgId: string, @Param('id') id: string) {
     return this.findTaskByIdUseCase.execute(id, orgId);
   }
 
   @Patch(':id')
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Update a task' })
-  update(@Param('orgId') orgId: string, @Param('id') id: string, @Body() dto: UpdateTaskDto) {
+  update(@TenantId() orgId: string, @Param('id') id: string, @Body() dto: UpdateTaskDto) {
     const command: UpdateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -136,10 +137,10 @@ export class TaskController {
   }
 
   @Delete(':id')
-  @RequireOrgRole(OrgRole.ADMIN)
+  @RequireTenantRole(OrgRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a task' })
-  async delete(@Param('orgId') orgId: string, @Param('id') id: string) {
+  async delete(@TenantId() orgId: string, @Param('id') id: string) {
     await this.deleteTaskUseCase.execute(id, orgId);
   }
 }

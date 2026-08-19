@@ -23,7 +23,7 @@ export class PrismaVerificationTokenRepository implements VerificationTokenRepos
       id: token.id,
       email: token.email,
       token: token.token,
-      type: token.type as unknown as AuthTokenType,
+      type: token.type as AuthTokenType,
       expires: token.expires,
     };
   }

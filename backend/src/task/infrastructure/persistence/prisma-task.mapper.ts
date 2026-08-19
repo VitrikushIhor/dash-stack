@@ -28,11 +28,11 @@ export interface PrismaTaskWithRelations {
   updatedAt: Date;
   assignees: Array<{
     id: string;
-    user?: {
+    user: {
       id: string;
       firstName: string;
-      email?: string | null;
-      avatar?: string | null;
+      email: string | null;
+      avatar: string | null;
     } | null;
   }>;
   label: {
