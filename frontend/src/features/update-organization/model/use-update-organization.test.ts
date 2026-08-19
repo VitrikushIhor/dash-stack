@@ -75,7 +75,7 @@ describe('useUpdateOrganization', () => {
     })
 
     expect(success).toBe(true)
-    expect(updateOrganizationAction).toHaveBeenCalledWith('org-100', {
+    expect(updateOrganizationAction).toHaveBeenCalledWith('original-name', {
       name: 'Brand New Name',
     })
     expect(toast.success).toHaveBeenCalledWith(

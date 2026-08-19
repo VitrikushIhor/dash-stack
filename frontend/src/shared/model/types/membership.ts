@@ -23,4 +23,9 @@ export interface Membership {
     firstName?: string
     avatar?: string
   }
+  organization?: {
+    id: string
+    name: string
+    slug: string
+  }
 }

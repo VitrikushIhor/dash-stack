@@ -3,13 +3,20 @@
 import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
-import { createOrgAction } from '@/entities/organization/server'
+import { createAction } from '@/shared/lib'
+import { OrganizationSlugSchema } from '@/entities/organization'
+import { TaskIdSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
 
-export const deleteTaskAction = createOrgAction(
-  z.object({ id: z.string() }),
-  async ({ id }, { activeOrg }) => {
-    await taskServerApi.delete(activeOrg.id, id)
-    revalidateTag(SERVER_CACHE_TAGS.tasks(activeOrg.id))
+export const deleteTaskAction = createAction(
+  z.object({
+    slug: OrganizationSlugSchema,
+    id: TaskIdSchema,
+  }),
+  async ({ slug, id }) => {
+    const res = await taskServerApi.delete(slug, id)
+    revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
+    revalidateTag(SERVER_CACHE_TAGS.taskDetail(id))
+    return res
   }
 )

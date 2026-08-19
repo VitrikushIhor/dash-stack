@@ -11,11 +11,11 @@ type GetTasksResponse = {
 }
 
 export const getOrganizationTasks = async (
-  orgId: string,
+  slug: string,
   filters?: TaskFilters
 ): Promise<GetTasksResponse> => {
   try {
-    const result = await taskServerApi.findAll(orgId, filters)
+    const result = await taskServerApi.findAll(slug, filters)
     return { data: result.data, meta: result.meta, error: null }
   } catch (error) {
     return { data: null, meta: null, error: getErrorMessage(error) }
@@ -28,11 +28,11 @@ type GetTasksUnpaginatedResponse = {
 }
 
 export const getTasksUnpaginated = async (
-  orgId: string,
+  slug: string,
   filters?: Omit<TaskFilters, 'page' | 'perPage'>
 ): Promise<GetTasksUnpaginatedResponse> => {
   try {
-    const result = await taskServerApi.findAllUnpaginated(orgId, filters)
+    const result = await taskServerApi.findAllUnpaginated(slug, filters)
     return { data: result, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

@@ -18,11 +18,11 @@ export const useDeleteOrganization = (
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
 
-  const deleteOrganization = async (orgId: string): Promise<boolean> => {
+  const deleteOrganization = async (slug: string): Promise<boolean> => {
     setIsDeleting(true)
 
     try {
-      const result = await deleteOrganizationAction(orgId)
+      const result = await deleteOrganizationAction(slug)
 
       if (!result.success) {
         handleServerError(

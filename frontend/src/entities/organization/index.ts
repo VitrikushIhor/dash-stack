@@ -12,12 +12,14 @@ export { organizationApi } from './api/organization-api'
 export { organizationKeys } from './api/organization-query-keys'
 
 // Hooks
+export { useOrgSlug } from './model/hooks/use-org-slug'
 export { useOrganizationPermission } from './model/hooks/use-organization-permission'
 export { OrganizationLogo } from './ui/organization-logo'
 export { MemberDetailView } from './ui/member-detail-view'
 export {
   BaseOrgSchema,
   OrganizationIdSchema,
+  OrganizationSlugSchema,
   OrganizationUserIdSchema,
   UpdateOrganizationDtoSchema,
   CreateOrganizationDtoSchema,

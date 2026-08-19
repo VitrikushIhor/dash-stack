@@ -58,7 +58,7 @@ export const useUpdateOrganization = () => {
         return true
       }
 
-      const result = await updateOrganizationAction(organization.id, dto)
+      const result = await updateOrganizationAction(organization.slug, dto)
 
       if (!result.success) {
         handleServerError(

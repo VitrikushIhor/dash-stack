@@ -30,7 +30,7 @@ export function SettingsTabContent({ organization }: SettingsTabContentProps) {
               Permanently remove this organization and all its associated data.
             </p>
           </div>
-          <DeleteOrganizationButton orgId={organization.id} />
+          <DeleteOrganizationButton slug={organization.slug} />
         </CardContent>
       </Card>
     </div>

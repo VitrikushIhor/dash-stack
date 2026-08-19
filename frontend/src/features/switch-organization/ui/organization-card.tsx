@@ -13,7 +13,6 @@ import {
   OrganizationLogo,
   type OrganizationSummary,
 } from '@/entities/organization'
-import { setActiveOrganizationAction } from '../api/set-active-organization.action'
 
 export interface OrganizationCardProps {
   organization: OrganizationSummary
@@ -31,14 +30,13 @@ export function OrganizationCard({
   const members = memberCount ?? organization.stats?.members ?? 0
   const displayRole = role || 'Member'
 
-  const handleClick = async () => {
-    await setActiveOrganizationAction(organization.id)
+  const handleClick = () => {
     onSelect?.(organization)
   }
 
   return (
     <Link
-      href={`${ROUTES.organizations}/${organization.id}`}
+      href={ROUTES.orgOverview(organization.slug)}
       onClick={handleClick}
       className='group focus-visible:ring-ring block rounded-xl transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
     >

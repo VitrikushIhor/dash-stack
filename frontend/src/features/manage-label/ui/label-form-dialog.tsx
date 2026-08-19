@@ -12,10 +12,11 @@ import { useLabelSearchParams } from '../model/label-search-params'
 import { LabelForm } from './label-form'
 
 interface LabelFormDialogProps {
+  slug: string
   labels: LabelDto[]
 }
 
-export const LabelFormDialog = ({ labels }: LabelFormDialogProps) => {
+export const LabelFormDialog = ({ slug, labels }: LabelFormDialogProps) => {
   const [{ 'create-label': create, 'update-label': updateId }, setParams] =
     useLabelSearchParams()
 
@@ -42,6 +43,7 @@ export const LabelFormDialog = ({ labels }: LabelFormDialogProps) => {
         </DialogHeader>
         <div className='py-4'>
           <LabelForm
+            slug={slug}
             initialData={activeLabel}
             onSuccess={closeForm}
             submitLabel={isUpdate ? 'Save' : 'Create'}

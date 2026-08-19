@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { OrganizationModule } from '../organization/organization.module';
 
 import { LabelController } from './presentation/label.controller';
 import { CreateLabelUseCase } from './application/use-cases/create-label.use-case';
@@ -8,6 +9,7 @@ import { FindAllLabelsUseCase } from './application/use-cases/find-all-labels.us
 import { PrismaLabelRepository } from './infrastructure/persistence/prisma-label.repository';
 
 @Module({
+  imports: [OrganizationModule],
   controllers: [LabelController],
   providers: [
     CreateLabelUseCase,

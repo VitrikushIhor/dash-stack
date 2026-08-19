@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config'
 import { useCreateOrganization } from './use-create-organization'
 import { useCreateOrganizationForm } from './use-create-organization-form'
 
@@ -40,9 +41,15 @@ describe('useCreateOrganizationForm', () => {
     expect(result.current.isPending).toBe(false)
   })
 
-  it('resets form, triggers onSuccess, and redirects to organizations on successful submission', async () => {
+  it('resets form, triggers onSuccess, and redirects to new org tasks workspace on successful submission', async () => {
     mockCreateOrganization.mockImplementation(async (_values, options) => {
-      options?.onSuccess?.()
+      options?.onSuccess?.({
+        id: 'org-1',
+        name: 'Valid Organization',
+        slug: 'valid-org',
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+      })
       return true
     })
 
@@ -61,6 +68,6 @@ describe('useCreateOrganizationForm', () => {
       expect.any(Object)
     )
     expect(onSuccessMock).toHaveBeenCalledTimes(1)
-    expect(mockReplace).toHaveBeenCalledWith('/organizations')
+    expect(mockReplace).toHaveBeenCalledWith(ROUTES.orgTasks('valid-org'))
   })
 })

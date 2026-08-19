@@ -15,16 +15,18 @@ const DeleteTaskModal = dynamic(
 )
 
 export function TaskModals({
+  slug,
   labels,
   members,
 }: {
+  slug: string
   labels: Label[]
   members: Membership[]
 }) {
   return (
     <>
-      <ManageTaskModal labels={labels} members={members} />
-      <DeleteTaskModal />
+      <ManageTaskModal slug={slug} labels={labels} members={members} />
+      <DeleteTaskModal slug={slug} />
     </>
   )
 }

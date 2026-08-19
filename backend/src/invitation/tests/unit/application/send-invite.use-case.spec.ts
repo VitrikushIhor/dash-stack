@@ -3,7 +3,7 @@ import { InvitationRepositoryPort } from '../../../application/ports/invitation.
 import { InvitationMailerPort } from '../../../application/ports/invitation-mailer.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
 import { SendInviteCommand } from '../../../application/commands/send-invite.command';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 import {
   AlreadyMemberException,
   InvitationAlreadySentException,

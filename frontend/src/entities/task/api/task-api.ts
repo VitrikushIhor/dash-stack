@@ -22,7 +22,7 @@ export interface TaskFilters {
 export function createTaskApi(client: HttpClient) {
   return {
     findAll: (
-      orgId: string,
+      slug: string,
       filters?: TaskFilters
     ): Promise<PaginatedResult<Task>> => {
       const params: Record<string, string | undefined> = {
@@ -38,16 +38,13 @@ export function createTaskApi(client: HttpClient) {
         perPage: filters?.perPage?.toString(),
       }
 
-      return client.get<PaginatedResult<Task>>(
-        `/organizations/${orgId}/tasks`,
-        {
-          params,
-        }
-      )
+      return client.get<PaginatedResult<Task>>(`/organizations/${slug}/tasks`, {
+        params,
+      })
     },
 
     findAllUnpaginated: (
-      orgId: string,
+      slug: string,
       filters?: Omit<TaskFilters, 'page' | 'perPage'>
     ): Promise<Task[]> => {
       const params: Record<string, string | undefined> = {
@@ -61,35 +58,35 @@ export function createTaskApi(client: HttpClient) {
         labelNames: filters?.labelNames?.join(','),
       }
 
-      return client.get<Task[]>(`/organizations/${orgId}/tasks/all`, {
+      return client.get<Task[]>(`/organizations/${slug}/tasks/all`, {
         params,
       })
     },
 
-    findById: (orgId: string, id: string): Promise<Task> =>
-      client.get<Task>(`/organizations/${orgId}/tasks/${id}`),
+    findById: (slug: string, id: string): Promise<Task> =>
+      client.get<Task>(`/organizations/${slug}/tasks/${id}`),
 
-    create: (orgId: string, data: CreateTaskDto): Promise<Task> =>
-      client.post<Task>(`/organizations/${orgId}/tasks`, data),
+    create: (slug: string, data: CreateTaskDto): Promise<Task> =>
+      client.post<Task>(`/organizations/${slug}/tasks`, data),
 
-    update: (orgId: string, id: string, data: UpdateTaskDto): Promise<Task> =>
-      client.patch<Task>(`/organizations/${orgId}/tasks/${id}`, data),
+    update: (slug: string, id: string, data: UpdateTaskDto): Promise<Task> =>
+      client.patch<Task>(`/organizations/${slug}/tasks/${id}`, data),
 
-    delete: (orgId: string, id: string): Promise<void> =>
-      client.delete<void>(`/organizations/${orgId}/tasks/${id}`),
+    delete: (slug: string, id: string): Promise<void> =>
+      client.delete<void>(`/organizations/${slug}/tasks/${id}`),
 
     bulkUpdate: (
-      orgId: string,
+      slug: string,
       ids: string[],
       data: Partial<Pick<UpdateTaskDto, 'status'>>
     ): Promise<void> =>
-      client.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, {
+      client.patch<void>(`/organizations/${slug}/tasks/bulk/update`, {
         ids,
         ...data,
       }),
 
-    bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
-      client.delete<void>(`/organizations/${orgId}/tasks/bulk`, {
+    bulkDelete: (slug: string, ids: string[]): Promise<void> =>
+      client.delete<void>(`/organizations/${slug}/tasks/bulk`, {
         body: { ids },
       }),
   }

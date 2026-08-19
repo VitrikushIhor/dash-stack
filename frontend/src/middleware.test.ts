@@ -17,18 +17,31 @@ function createNextRequest(
 describe('Next.js Route Protection Middleware', () => {
   describe('Protected Routes', () => {
     it('redirects unauthenticated user from protected path to sign-in with redirect query param', () => {
-      const req = createNextRequest(ROUTES.task)
+      const req = createNextRequest(ROUTES.organizations)
 
       const res = middleware(req)
 
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toBe(
-        'http://localhost:3000/sign-in?redirect=%2Ftask'
+        'http://localhost:3000/sign-in?redirect=%2Forganizations'
+      )
+    })
+
+    it('preserves query parameters and invite tokens when redirecting unauthenticated users to sign-in', () => {
+      const req = createNextRequest(
+        '/accept-invite?token=SECRET_INVITE_TOKEN_123'
+      )
+
+      const res = middleware(req)
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toBe(
+        'http://localhost:3000/sign-in?redirect=%2Faccept-invite%3Ftoken%3DSECRET_INVITE_TOKEN_123'
       )
     })
 
     it('allows access to protected route when access_token is present', () => {
-      const req = createNextRequest(ROUTES.task, {
+      const req = createNextRequest(ROUTES.organizations, {
         access_token: 'valid-access-token',
       })
 
@@ -57,6 +70,17 @@ describe('Next.js Route Protection Middleware', () => {
         'http://localhost:3000/sign-in?redirect=%2Forganizations%2F123%2Fmembers'
       )
     })
+
+    it('protects slug-based tenant routes like /organizations/acme/tasks', () => {
+      const req = createNextRequest(ROUTES.orgTasks('acme'))
+
+      const res = middleware(req)
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toBe(
+        'http://localhost:3000/sign-in?redirect=%2Forganizations%2Facme%2Ftasks'
+      )
+    })
   })
 
   describe('Auth Routes (Login/Signup)', () => {
@@ -64,6 +88,38 @@ describe('Next.js Route Protection Middleware', () => {
       const req = createNextRequest(ROUTES.signIn, {
         access_token: 'valid-access-token',
       })
+
+      const res = middleware(req)
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toBe(
+        'http://localhost:3000/organizations'
+      )
+    })
+
+    it('redirects authenticated user to safe redirect param target', () => {
+      const req = createNextRequest(
+        `${ROUTES.signIn}?redirect=%2Forganizations%2Facme%2Ftasks`,
+        {
+          access_token: 'valid-access-token',
+        }
+      )
+
+      const res = middleware(req)
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toBe(
+        'http://localhost:3000/organizations/acme/tasks'
+      )
+    })
+
+    it('sanitizes malicious open redirect to fallback /organizations', () => {
+      const req = createNextRequest(
+        `${ROUTES.signIn}?redirect=%2F%2Fevil.com%2Fphish`,
+        {
+          access_token: 'valid-access-token',
+        }
+      )
 
       const res = middleware(req)
 

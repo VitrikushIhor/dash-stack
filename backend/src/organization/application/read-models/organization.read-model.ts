@@ -1,4 +1,4 @@
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../domain/enums/org-role.enum';
 
 export interface OrganizationReadModel {
   id: string;

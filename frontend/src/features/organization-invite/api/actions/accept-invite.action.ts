@@ -17,9 +17,10 @@ export async function acceptInviteAction(
 
     revalidateTag(SERVER_CACHE_TAGS.organizations)
 
-    if (result?.orgId) {
-      revalidateTag(SERVER_CACHE_TAGS.orgDetail(result.orgId))
-      revalidateTag(SERVER_CACHE_TAGS.orgMembers(result.orgId))
+    const slug = result?.organization?.slug
+    if (slug) {
+      revalidateTag(SERVER_CACHE_TAGS.orgDetail(slug))
+      revalidateTag(SERVER_CACHE_TAGS.orgMembers(slug))
     }
 
     return { success: true, data: result }

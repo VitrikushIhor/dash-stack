@@ -2,7 +2,7 @@ import { AcceptInviteUseCase } from '../../../application/use-cases/accept-invit
 import { InvitationRepositoryPort } from '../../../application/ports/invitation.repository.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
 import { AcceptInviteCommand } from '../../../application/commands/accept-invite.command';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 import { InvitationNotFoundException } from '../../../domain/exceptions/invitation-not-found.exception';
 import {
   InvitationEmailMismatchException,

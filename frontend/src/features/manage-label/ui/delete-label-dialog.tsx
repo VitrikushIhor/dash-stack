@@ -17,10 +17,11 @@ import { deleteLabelAction } from '../api/delete-label.action'
 import { useLabelSearchParams } from '../model/label-search-params'
 
 interface DeleteLabelDialogProps {
+  slug: string
   labels: LabelDto[]
 }
 
-export const DeleteLabelDialog = ({ labels }: DeleteLabelDialogProps) => {
+export const DeleteLabelDialog = ({ slug, labels }: DeleteLabelDialogProps) => {
   const [{ 'delete-label': deleteId }, setParams] = useLabelSearchParams()
   const router = useRouter()
 
@@ -41,7 +42,7 @@ export const DeleteLabelDialog = ({ labels }: DeleteLabelDialogProps) => {
 
   const onConfirm = async () => {
     if (!activeLabel) return
-    await execute({ id: activeLabel.id })
+    await execute({ slug, id: activeLabel.id })
   }
 
   return (

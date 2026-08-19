@@ -44,7 +44,7 @@ describe('InviteMemberDialog', () => {
 
     vi.mocked(useInviteMemberModalStore).mockReturnValue({
       isOpen: true,
-      orgId: 'org-1',
+      slug: 'org-1',
       close: mockClose,
       open: vi.fn(),
     })
@@ -75,7 +75,7 @@ describe('InviteMemberDialog', () => {
   it('does not render when closed', () => {
     vi.mocked(useInviteMemberModalStore).mockReturnValue({
       isOpen: false,
-      orgId: 'org-1',
+      slug: 'org-1',
       close: mockClose,
       open: vi.fn(),
     })

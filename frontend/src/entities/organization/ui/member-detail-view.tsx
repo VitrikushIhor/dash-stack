@@ -16,12 +16,12 @@ import { type Membership } from '../model/types/organization.types'
 
 interface MemberDetailViewProps {
   membership: Membership
-  orgId: string
+  slug: string
 }
 
 export const MemberDetailView = ({
   membership,
-  orgId,
+  slug,
 }: MemberDetailViewProps) => {
   const { user, role, position, joinedAt } = membership
   const displayName = getMemberDisplayName(user)
@@ -32,10 +32,7 @@ export const MemberDetailView = ({
     <div className='space-y-6'>
       <div className='flex items-center gap-4'>
         <Button asChild variant='ghost' size='icon' className='rounded-lg'>
-          <Link
-            href={`${ROUTES.organizations}/${orgId}`}
-            aria-label='Back to organization'
-          >
+          <Link href={ROUTES.orgMembers(slug)} aria-label='Back to members'>
             <ArrowLeft className='h-4 w-4' />
           </Link>
         </Button>

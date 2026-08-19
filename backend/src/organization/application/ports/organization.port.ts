@@ -1,5 +1,6 @@
 import { OrganizationReadModel } from '../read-models/organization.read-model';
 import { UserMembershipReadModel } from '../../../user/application/read-models/user-membership.read-model';
+import { TenantContextReadModel } from '../read-models/tenant-context.read-model';
 
 export interface CreateOrganizationData {
   name: string;
@@ -34,4 +35,8 @@ export interface OrganizationRepositoryPort {
   findOrganizationMembers(orgId: string): Promise<OrganizationMember[]>;
   findOrganizationMember(orgId: string, userId: string): Promise<OrganizationMember | null>;
   existsBySlug(slug: string): Promise<boolean>;
+  findMembershipBySlugAndUserId(
+    slug: string,
+    userId: string,
+  ): Promise<TenantContextReadModel | null>;
 }

@@ -1,23 +1,22 @@
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import 'server-only'
-import { getActiveOrganization } from '@/entities/organization/server'
+import { getOrganizationBySlug } from '@/entities/organization/server'
 import { getOrganizationTasks } from '@/entities/task/server'
 import { getParsedTaskFilters } from '@/widgets/tasks-table/lib/parse-task-search-params.server'
 
 export async function fetchTaskViewData(
+  slug: string,
   searchParams: Promise<Record<string, string | string[] | undefined>>,
   defaultPagination?: { page: number; perPage: number }
 ) {
-  const activeOrgResult = await getActiveOrganization()
-  const activeOrgId = activeOrgResult.activeOrg?.id
+  const orgResult = await getOrganizationBySlug(slug)
 
-  if (!activeOrgId) {
-    redirect('/')
+  if (orgResult.error || !orgResult.data) {
+    notFound()
   }
 
   const filters = getParsedTaskFilters(await searchParams, defaultPagination)
-
-  const tasksResult = await getOrganizationTasks(activeOrgId, filters)
+  const tasksResult = await getOrganizationTasks(slug, filters)
 
   const tasks = tasksResult.data || []
   const pageCount = tasksResult.meta?.lastPage ?? -1
@@ -25,5 +24,7 @@ export async function fetchTaskViewData(
   return {
     tasks,
     pageCount,
+    slug: slug,
+    error: tasksResult.error ?? null,
   }
 }

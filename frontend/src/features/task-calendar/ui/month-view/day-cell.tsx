@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { format, isToday, startOfDay } from 'date-fns'
+import { isToday, startOfDay } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
 import { getMonthCellEvents } from '../../lib/helpers'
+import { useCalendarNavigation } from '../../lib/navigation'
 import { type ICalendarCell } from '../../model/types'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { MonthTaskBadge } from './month-task-badge'
@@ -27,7 +27,7 @@ export function DayCell({
   selectedDate: _selectedDate,
   onTaskClick,
 }: IProps) {
-  const router = useRouter()
+  const { navigateToDay } = useCalendarNavigation()
 
   const { day, currentMonth, date } = cell
 
@@ -38,7 +38,7 @@ export function DayCell({
   const isSunday = date.getDay() === 0
 
   const handleClick = () => {
-    router.push(`/calendar/day?date=${format(date, 'yyyy-MM-dd')}`)
+    navigateToDay(date)
   }
 
   return (

@@ -21,8 +21,8 @@ import {
   OrganizationLogo,
   type OrganizationSummary,
   type UserMembership,
+  useOrgSlug,
 } from '@/entities/organization'
-import { setActiveOrganizationAction } from '@/features/switch-organization/server'
 
 type Props = {
   activeOrg: OrganizationSummary
@@ -31,15 +31,19 @@ type Props = {
 
 export function TeamSwitcherUI({ activeOrg, memberships }: Props) {
   const router = useRouter()
+  const currentSlug = useOrgSlug()
   const { isMobile } = useSidebar()
 
-  const handleOrgSelect = async (orgId: string) => {
-    await setActiveOrganizationAction(orgId)
-    router.push(`${ROUTES.organizations}/${orgId}`)
+  const currentOrg =
+    memberships?.find((m) => m.organization.slug === currentSlug)
+      ?.organization ?? activeOrg
+
+  const handleOrgSelect = (slug: string) => {
+    router.push(ROUTES.orgTasks(slug))
   }
 
   const handleCreateOrg = () => {
-    router.push(ROUTES.organizations)
+    router.push(ROUTES.createOrganization)
   }
 
   return (
@@ -52,15 +56,17 @@ export function TeamSwitcherUI({ activeOrg, memberships }: Props) {
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
               <OrganizationLogo
-                name={activeOrg.name}
-                logo={activeOrg.logo}
+                name={currentOrg.name}
+                logo={currentOrg.logo}
                 size={32}
                 className='bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-lg text-xs'
               />
               <div className='grid flex-1 text-start text-sm leading-tight'>
-                <span className='truncate font-semibold'>{activeOrg.name}</span>
+                <span className='truncate font-semibold'>
+                  {currentOrg.name}
+                </span>
                 <span className='text-sidebar-foreground/70 truncate text-xs'>
-                  {activeOrg.slug}
+                  {currentOrg.slug}
                 </span>
               </div>
               <ChevronsUpDown className='ml-auto' />
@@ -86,7 +92,7 @@ function TeamSwitcherList({
 }: {
   memberships: UserMembership[] | undefined
   isMobile: boolean
-  onSelect: (id: string) => void
+  onSelect: (slug: string) => void
   onCreate: () => void
 }) {
   return (
@@ -102,7 +108,7 @@ function TeamSwitcherList({
       {memberships?.map((membership) => (
         <DropdownMenuItem
           key={membership.organization.id}
-          onClick={() => onSelect(membership.organization.id)}
+          onClick={() => onSelect(membership.organization.slug)}
           className='gap-2 p-2'
         >
           <OrganizationLogo

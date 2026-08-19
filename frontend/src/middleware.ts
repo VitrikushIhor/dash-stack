@@ -2,8 +2,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { ROUTES } from '@/shared/config'
 
 const PROTECTED_PATHS = [
-  ROUTES.task,
-  ROUTES.calendar,
   ROUTES.settings,
   ROUTES.organizations,
   ROUTES.acceptInvite,
@@ -16,6 +14,25 @@ const AUTH_PATHS = [
   ROUTES.forgotPassword,
   ROUTES.resetPassword,
 ]
+
+export function isSafeRedirectPath(path: string | null | undefined): boolean {
+  if (!path || typeof path !== 'string') return false
+  if (
+    !path.startsWith('/') ||
+    path.startsWith('//') ||
+    path.startsWith('/\\')
+  ) {
+    return false
+  }
+  if (
+    path.includes('\\') ||
+    path.toLowerCase().includes('javascript:') ||
+    path.toLowerCase().includes('data:')
+  ) {
+    return false
+  }
+  return true
+}
 
 export function middleware(req: NextRequest) {
   const accessToken = req.cookies.get('access_token')?.value
@@ -32,12 +49,17 @@ export function middleware(req: NextRequest) {
 
   if (isProtected && !isAuthenticated) {
     const signInUrl = new URL(ROUTES.signIn, req.url)
-    signInUrl.searchParams.set('redirect', pathname)
+    const targetUrl = req.nextUrl.pathname + req.nextUrl.search
+    signInUrl.searchParams.set('redirect', targetUrl)
     return NextResponse.redirect(signInUrl)
   }
 
   if (isAuthPage && isAuthenticated) {
-    return NextResponse.redirect(new URL(ROUTES.organizations, req.url))
+    const redirectParam = req.nextUrl.searchParams.get('redirect')
+    const targetPath = isSafeRedirectPath(redirectParam)
+      ? redirectParam!
+      : ROUTES.organizations
+    return NextResponse.redirect(new URL(targetPath, req.url))
   }
 
   return NextResponse.next()

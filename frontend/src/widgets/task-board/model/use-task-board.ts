@@ -13,7 +13,7 @@ import { type Task, type TaskStatusEnum } from '@/entities/task'
 import { updateTaskAction } from '@/features/manage-task/server'
 import { groupTasksByStatus } from './utils'
 
-export function useTaskBoard(tasks: Task[]) {
+export function useTaskBoard(tasks: Task[], slug?: string) {
   const groupedTask = useMemo(() => groupTasksByStatus(tasks), [tasks])
 
   const [optimisticColumns, setOptimisticColumns] = useOptimistic(
@@ -71,10 +71,13 @@ export function useTaskBoard(tasks: Task[]) {
     }
 
     if (movedTask && targetColumnId) {
+      const effectiveSlug = slug || ''
+
       startTransition(async () => {
         setOptimisticColumns(currentDragState)
 
         const result = await updateTaskAction({
+          slug: effectiveSlug,
           id: movedTask!.id,
           data: { status: targetColumnId! },
         })
@@ -85,7 +88,7 @@ export function useTaskBoard(tasks: Task[]) {
         }
       })
     }
-  }, [dragState, setOptimisticColumns])
+  }, [dragState, slug, setOptimisticColumns])
 
   return {
     displayColumns,

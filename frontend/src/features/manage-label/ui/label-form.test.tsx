@@ -78,7 +78,7 @@ describe('LabelForm', () => {
   })
 
   it('renders correctly for creating a new label with disabled submit button', () => {
-    render(<LabelForm />)
+    render(<LabelForm slug='org-1' />)
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
     expect(nameInput).toHaveValue('')
@@ -94,7 +94,9 @@ describe('LabelForm', () => {
       color: 'red',
       organizationId: 'org-1',
     }
-    render(<LabelForm initialData={initialData} submitLabel='Update' />)
+    render(
+      <LabelForm slug='org-1' initialData={initialData} submitLabel='Update' />
+    )
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
     expect(nameInput).toHaveValue('Bug')
@@ -105,7 +107,7 @@ describe('LabelForm', () => {
 
   it('enables the submit button when the user types in the name field', async () => {
     const user = userEvent.setup()
-    render(<LabelForm />)
+    render(<LabelForm slug='org-1' />)
 
     const submitButton = screen.getByRole('button', { name: /save/i })
     expect(submitButton).toBeDisabled()
@@ -156,7 +158,7 @@ describe('LabelForm', () => {
       capturedOnSuccess?.()
     })
 
-    render(<LabelForm onSuccess={onSuccessMock} />)
+    render(<LabelForm slug='org-1' onSuccess={onSuccessMock} />)
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
     await user.type(nameInput, 'New Label')
@@ -172,8 +174,11 @@ describe('LabelForm', () => {
 
     await waitFor(() => {
       expect(mockCreateExecute).toHaveBeenCalledWith({
-        name: 'New Label',
-        color: 'blue',
+        slug: 'org-1',
+        data: {
+          name: 'New Label',
+          color: 'blue',
+        },
       })
     })
 
@@ -190,7 +195,7 @@ describe('LabelForm', () => {
       organizationId: 'org-1',
     }
 
-    render(<LabelForm initialData={initialData} />)
+    render(<LabelForm slug='org-1' initialData={initialData} />)
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
 
@@ -202,8 +207,9 @@ describe('LabelForm', () => {
 
     await waitFor(() => {
       expect(mockUpdateExecute).toHaveBeenCalledWith({
+        slug: 'org-1',
         id: 'label-123',
-        dto: { name: 'Updated Name', color: 'red' },
+        data: { name: 'Updated Name', color: 'red' },
       })
     })
   })
@@ -214,7 +220,7 @@ describe('LabelForm', () => {
       isPending: true,
     })
 
-    render(<LabelForm />)
+    render(<LabelForm slug='org-1' />)
 
     const submitButton = screen.getByRole('button', { name: /saving/i })
     expect(submitButton).toBeDisabled()

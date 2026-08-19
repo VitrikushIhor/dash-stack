@@ -9,9 +9,11 @@ import {
 } from '../../application/ports/task.repository.port';
 import { TaskReadModel } from '../../application/read-models/task.read-model';
 import { PrismaTaskMapper, PrismaTaskWithRelations } from './prisma-task.mapper';
+import { OrderDirection } from '../../../common/order/order-direction';
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
 import { paginate } from '../../../common/pagination/paginate';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaTaskRepository implements TaskRepositoryPort, MembershipRepositoryPort {
@@ -77,21 +79,19 @@ export class PrismaTaskRepository implements TaskRepositoryPort, MembershipRepos
   ): Promise<PaginatedResult<TaskReadModel>> {
     const { page, perPage } = filters;
 
-    const paginated = await paginate(
+    const paginated = await paginate<PrismaTaskWithRelations, Prisma.TaskFindManyArgs>(
       this.prisma.task,
       {
         where: this.buildWhereClause(organizationId, filters),
         include: this.taskInclude,
-        orderBy: [{ createdAt: 'desc' as const }, { updatedAt: 'desc' as const }],
+        orderBy: [{ createdAt: OrderDirection.desc }, { updatedAt: OrderDirection.desc }],
       },
       { page, perPage },
     );
 
     return {
       ...paginated,
-      data: paginated.data.map((task) =>
-        PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
-      ),
+      data: paginated.data.map((task) => PrismaTaskMapper.toDomain(task)),
     };
   }
 
@@ -102,12 +102,10 @@ export class PrismaTaskRepository implements TaskRepositoryPort, MembershipRepos
     const tasks = await this.prisma.task.findMany({
       where: this.buildWhereClause(organizationId, filters),
       include: this.taskInclude,
-      orderBy: [{ createdAt: 'desc' as const }, { updatedAt: 'desc' as const }],
+      orderBy: [{ createdAt: OrderDirection.desc }, { updatedAt: OrderDirection.desc }],
     });
 
-    return tasks.map((task) =>
-      PrismaTaskMapper.toDomain(task as unknown as PrismaTaskWithRelations),
-    );
+    return tasks.map((task) => PrismaTaskMapper.toDomain(task));
   }
 
   async findById(id: string, organizationId: string): Promise<TaskReadModel | null> {

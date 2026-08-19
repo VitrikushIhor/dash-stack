@@ -104,7 +104,7 @@ describe('useTaskBoard', () => {
       actionPromise as unknown as ReturnType<typeof updateTaskAction>
     )
 
-    const { result } = renderHook(() => useTaskBoard(mockTasks))
+    const { result } = renderHook(() => useTaskBoard(mockTasks, 'org-1'))
 
     act(() => {
       result.current.handleDragStart()
@@ -120,6 +120,7 @@ describe('useTaskBoard', () => {
     })
 
     expect(updateTaskAction).toHaveBeenCalledWith({
+      slug: 'org-1',
       id: 'task-1',
       data: { status: TaskStatusEnum.UPCOMING },
     })
@@ -140,7 +141,7 @@ describe('useTaskBoard', () => {
       error: 'Failed',
     })
 
-    const { result } = renderHook(() => useTaskBoard(mockTasks))
+    const { result } = renderHook(() => useTaskBoard(mockTasks, 'org-1'))
 
     act(() => {
       result.current.handleDragStart()

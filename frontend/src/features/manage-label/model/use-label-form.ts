@@ -13,14 +13,16 @@ import { createLabelAction } from '../api/create-label.action'
 import { updateLabelAction } from '../api/update-label.action'
 
 interface UseLabelFormProps {
+  slug: string
   initialData?: LabelDto | null
   onSuccess?: () => void
 }
 
 export const useLabelForm = ({
+  slug,
   initialData,
   onSuccess,
-}: UseLabelFormProps = {}) => {
+}: UseLabelFormProps) => {
   const router = useRouter()
 
   const handleSuccess = () => {
@@ -56,9 +58,9 @@ export const useLabelForm = ({
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (initialData) {
-      await updateLabel({ id: initialData.id, dto: values })
+      await updateLabel({ slug, id: initialData.id, data: values })
     } else {
-      await createLabel(values)
+      await createLabel({ slug, data: values })
     }
   })
 

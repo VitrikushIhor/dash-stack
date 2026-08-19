@@ -14,12 +14,15 @@ import {
   CommandSeparator,
 } from '@/shared/ui/core/command'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { sidebarData } from './data/sidebar-data'
+import { useOrgSlug } from '@/entities/organization'
+import { getSidebarData } from './data/sidebar-data'
 import { type NavCollapsible, type NavLink } from './types'
 
 export function CommandMenu() {
   const { setTheme } = useTheme()
   const { open, setOpen } = useSearch()
+  const slug = useOrgSlug()
+  const currentSidebarData = getSidebarData(slug)
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -35,7 +38,7 @@ export function CommandMenu() {
       <CommandList>
         <ScrollArea type='hover' className='h-72 pe-1'>
           <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
+          {currentSidebarData.navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) =>
                 navItem.url ? (

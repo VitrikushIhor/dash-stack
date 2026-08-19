@@ -5,15 +5,15 @@ import { Main } from '@/widgets/layout'
 import { MemberNotFoundState } from './member-not-found-state'
 
 interface MemberDetailPageProps {
-  orgId: string
+  slug: string
   userId: string
 }
 
 export async function MemberDetailPage({
-  orgId,
+  slug,
   userId,
 }: MemberDetailPageProps) {
-  const { data, error } = await getMember({ orgId, userId })
+  const { data, error } = await getMember({ slug, userId })
 
   if (error) {
     return (
@@ -26,14 +26,14 @@ export async function MemberDetailPage({
   if (!data) {
     return (
       <Main>
-        <MemberNotFoundState orgId={orgId} />
+        <MemberNotFoundState slug={slug} />
       </Main>
     )
   }
 
   return (
     <Main>
-      <MemberDetailView membership={data} orgId={orgId} />
+      <MemberDetailView membership={data} slug={slug} />
     </Main>
   )
 }

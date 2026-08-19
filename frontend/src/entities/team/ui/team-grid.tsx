@@ -3,10 +3,10 @@ import { TeamMemberCard } from '@/entities/team'
 
 interface TeamGridProps {
   memberships: Membership[]
-  orgId: string
+  slug: string
 }
 
-export const TeamGrid = ({ memberships, orgId }: TeamGridProps) => {
+export const TeamGrid = ({ memberships, slug }: TeamGridProps) => {
   if (!memberships || memberships.length === 0) {
     return (
       <div
@@ -29,7 +29,7 @@ export const TeamGrid = ({ memberships, orgId }: TeamGridProps) => {
         <TeamMemberCard
           key={membership.id}
           membership={membership}
-          orgId={orgId}
+          slug={slug}
         />
       ))}
     </div>

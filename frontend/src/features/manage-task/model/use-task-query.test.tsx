@@ -42,13 +42,13 @@ describe('useTaskQuery', () => {
     )
   }
 
-  it('successfully queries a single task by ID using getTaskAction', async () => {
+  it('successfully queries a single task by slug and taskId using getTaskAction', async () => {
     vi.mocked(getTaskAction).mockResolvedValue({
       success: true,
       data: mockTask,
     })
 
-    const { result } = renderHook(() => useTaskQuery('task-1'), {
+    const { result } = renderHook(() => useTaskQuery('org-1', 'task-1'), {
       wrapper: createWrapper(),
     })
 
@@ -56,16 +56,16 @@ describe('useTaskQuery', () => {
 
     expect(result.current.data).toEqual(mockTask)
     expect(getTaskAction).toHaveBeenCalledTimes(1)
-    expect(getTaskAction).toHaveBeenCalledWith({ id: 'task-1' })
+    expect(getTaskAction).toHaveBeenCalledWith({ slug: 'org-1', id: 'task-1' })
   })
 
   it('does not execute query if id is null or empty', () => {
-    const { result: nullId } = renderHook(() => useTaskQuery(null), {
+    const { result: nullId } = renderHook(() => useTaskQuery('org-1', null), {
       wrapper: createWrapper(),
     })
     expect(nullId.current.fetchStatus).toBe('idle')
 
-    const { result: emptyId } = renderHook(() => useTaskQuery(''), {
+    const { result: emptyId } = renderHook(() => useTaskQuery('org-1', ''), {
       wrapper: createWrapper(),
     })
     expect(emptyId.current.fetchStatus).toBe('idle')
@@ -79,7 +79,7 @@ describe('useTaskQuery', () => {
       error: 'Task not found',
     })
 
-    const { result } = renderHook(() => useTaskQuery('task-404'), {
+    const { result } = renderHook(() => useTaskQuery('org-1', 'task-404'), {
       wrapper: createWrapper(),
     })
 

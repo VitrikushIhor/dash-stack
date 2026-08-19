@@ -1,11 +1,12 @@
-import { fetchCalendarTasks } from '@/views/calendar/lib/fetch-calendar-tasks.server'
-import { CalendarYearClient } from './calendar-year-client'
+import { fetchCalendarTasks } from '../server'
+import { CalendarViewClient } from './calendar-view-client'
 
 interface Props {
+  slug: string
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export async function CalendarYearPage({ searchParams }: Props) {
-  const { tasks } = await fetchCalendarTasks('year', searchParams)
-  return <CalendarYearClient tasks={tasks} />
+export async function CalendarYearPage({ slug, searchParams }: Props) {
+  const { tasks } = await fetchCalendarTasks(slug, 'year', searchParams)
+  return <CalendarViewClient slug={slug} tasks={tasks} view='year' />
 }

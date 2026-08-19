@@ -5,26 +5,26 @@ import { type ActionState, ApiError, getErrorMessage } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import {
   type Organization,
-  OrganizationIdSchema,
+  OrganizationSlugSchema,
   type UpdateOrganizationDto,
   UpdateOrganizationDtoSchema,
 } from '@/entities/organization'
 import { organizationServerApi } from '@/entities/organization/server'
 
 export async function updateOrganizationAction(
-  orgId: string,
+  slug: string,
   dto: UpdateOrganizationDto
 ): Promise<ActionState<Organization>> {
   try {
-    const validOrgId = OrganizationIdSchema.parse(orgId)
+    const validSlug = OrganizationSlugSchema.parse(slug)
     const validDto = UpdateOrganizationDtoSchema.parse(dto)
 
     const res = await organizationServerApi.update({
-      orgId: validOrgId,
+      slug: validSlug,
       dto: validDto,
     })
     revalidateTag(SERVER_CACHE_TAGS.organizations)
-    revalidateTag(SERVER_CACHE_TAGS.orgDetail(orgId))
+    revalidateTag(SERVER_CACHE_TAGS.orgDetail(validSlug))
     return { success: true, data: res }
   } catch (error) {
     if (error instanceof ApiError) {

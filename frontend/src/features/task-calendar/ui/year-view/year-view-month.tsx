@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   format,
   getDaysInMonth,
@@ -9,6 +8,7 @@ import {
 } from 'date-fns'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
+import { useCalendarNavigation } from '../../lib/navigation'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
@@ -18,7 +18,7 @@ interface IProps {
 }
 
 export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
-  const router = useRouter()
+  const { navigateToMonth } = useCalendarNavigation()
 
   const monthName = format(month, 'MMMM')
 
@@ -36,7 +36,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
 
   const handleClick = () => {
     const firstDay = new Date(month.getFullYear(), month.getMonth(), 1)
-    router.push(`/calendar?date=${format(firstDay, 'yyyy-MM-dd')}`)
+    navigateToMonth(firstDay)
   }
 
   return (

@@ -8,10 +8,11 @@ import {
 } from '@/features/manage-label'
 
 interface LabelsTabContentProps {
+  slug: string
   labels: LabelDto[]
 }
 
-export function LabelsTabContent({ labels }: LabelsTabContentProps) {
+export function LabelsTabContent({ slug, labels }: LabelsTabContentProps) {
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -60,7 +61,7 @@ export function LabelsTabContent({ labels }: LabelsTabContentProps) {
         </CardContent>
       </Card>
 
-      <LabelModals labels={labels} />
+      <LabelModals slug={slug} labels={labels} />
     </div>
   )
 }

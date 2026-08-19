@@ -16,7 +16,7 @@ vi.mock('@/entities/organization/server', () => ({
 }))
 
 describe('deleteOrganizationAction', () => {
-  const validOrgId = 'cju1234567890123456789012'
+  const validSlug = 'acme-corp'
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -27,7 +27,7 @@ describe('deleteOrganizationAction', () => {
       message: 'Organization deleted',
     })
 
-    const result = await deleteOrganizationAction(validOrgId)
+    const result = await deleteOrganizationAction(validSlug)
 
     expect(result.success).toBe(true)
     if (result.success) {
@@ -35,11 +35,11 @@ describe('deleteOrganizationAction', () => {
     }
     expect(revalidateTag).toHaveBeenCalledWith(SERVER_CACHE_TAGS.organizations)
     expect(revalidateTag).toHaveBeenCalledWith(
-      SERVER_CACHE_TAGS.orgDetail(validOrgId)
+      SERVER_CACHE_TAGS.orgDetail(validSlug)
     )
   })
 
-  it('returns failure when given invalid empty orgId', async () => {
+  it('returns failure when given invalid empty slug', async () => {
     const result = await deleteOrganizationAction('')
 
     expect(result.success).toBe(false)
@@ -51,7 +51,7 @@ describe('deleteOrganizationAction', () => {
       new ApiError(404, 'Organization not found')
     )
 
-    const result = await deleteOrganizationAction(validOrgId)
+    const result = await deleteOrganizationAction(validSlug)
 
     expect(result.success).toBe(false)
     if (!result.success) {

@@ -6,6 +6,7 @@ export {
 } from './model/types'
 export {
   labelSchema,
+  LabelIdSchema,
   CreateLabelDtoSchema,
   UpdateLabelDtoSchema,
   type LabelDto,

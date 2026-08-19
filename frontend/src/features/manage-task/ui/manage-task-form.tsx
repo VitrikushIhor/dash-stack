@@ -14,6 +14,7 @@ import { createTaskAction, updateTaskAction } from '../server'
 import { TaskForm } from './task-form'
 
 interface ManageTaskFormProps {
+  slug: string
   mode: ManageTaskMode
   selectedTask: Task | null
   close: () => void
@@ -22,6 +23,7 @@ interface ManageTaskFormProps {
 }
 
 export function ManageTaskForm({
+  slug,
   mode,
   selectedTask,
   close,
@@ -50,11 +52,12 @@ export function ManageTaskForm({
     try {
       if (mode === ManageTaskMode.CREATE) {
         const createData = mapTaskFormToDto(values, ManageTaskMode.CREATE)
-        await executeCreate(createData)
+        await executeCreate({ slug, data: createData })
       } else {
         if (!selectedTask) return
         const updateData = mapTaskFormToDto(values, ManageTaskMode.EDIT)
         await executeUpdate({
+          slug,
           id: selectedTask.id,
           data: updateData,
         })

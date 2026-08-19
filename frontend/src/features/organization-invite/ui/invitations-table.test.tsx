@@ -45,12 +45,12 @@ describe('InvitationsTable', () => {
   })
 
   it('renders "No results." when the invitations list is empty', () => {
-    render(<InvitationsTable orgId='org-1' invitations={[]} />)
+    render(<InvitationsTable slug='org-1' invitations={[]} />)
     expect(screen.getByText('No results.')).toBeInTheDocument()
   })
 
   it('renders a list of invitations correctly', () => {
-    render(<InvitationsTable orgId='org-1' invitations={defaultInvitations} />)
+    render(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Check if emails are rendered
     expect(screen.getByText('test1@example.com')).toBeInTheDocument()
@@ -63,7 +63,7 @@ describe('InvitationsTable', () => {
 
   it('calls revokeInvite when the revoke button is clicked', async () => {
     const user = userEvent.setup()
-    render(<InvitationsTable orgId='org-1' invitations={defaultInvitations} />)
+    render(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Find all revoke buttons
     const revokeButtons = screen.getAllByRole('button', {
@@ -84,7 +84,7 @@ describe('InvitationsTable', () => {
     // For this test, we need `useRevokeInvite` to return `isPending: true` AFTER the button is clicked.
     // We can simulate this by re-rendering the component with updated mock values.
     const { rerender } = render(
-      <InvitationsTable orgId='org-1' invitations={defaultInvitations} />
+      <InvitationsTable slug='org-1' invitations={defaultInvitations} />
     )
 
     const revokeButtons = screen.getAllByRole('button', {
@@ -103,9 +103,7 @@ describe('InvitationsTable', () => {
     })
 
     // Rerender with the new mock value (simulating React's re-render on state change)
-    rerender(
-      <InvitationsTable orgId='org-1' invitations={defaultInvitations} />
-    )
+    rerender(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Find buttons again
     const updatedButtons = screen.getAllByRole('button', {
@@ -122,7 +120,7 @@ describe('InvitationsTable', () => {
   it('clears revokingId when isPending becomes false', async () => {
     const user = userEvent.setup()
     const { rerender } = render(
-      <InvitationsTable orgId='org-1' invitations={defaultInvitations} />
+      <InvitationsTable slug='org-1' invitations={defaultInvitations} />
     )
 
     // Click to start revoking
@@ -136,9 +134,7 @@ describe('InvitationsTable', () => {
       revokeInvite: mockRevokeInvite,
       isPending: true,
     })
-    rerender(
-      <InvitationsTable orgId='org-1' invitations={defaultInvitations} />
-    )
+    rerender(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Verify first button is disabled
     expect(
@@ -150,9 +146,7 @@ describe('InvitationsTable', () => {
       revokeInvite: mockRevokeInvite,
       isPending: false,
     })
-    rerender(
-      <InvitationsTable orgId='org-1' invitations={defaultInvitations} />
-    )
+    rerender(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Both buttons should be enabled again
     const finalButtons = screen.getAllByRole('button', {

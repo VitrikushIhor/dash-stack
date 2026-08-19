@@ -1,34 +1,35 @@
 'use client'
 
+import { ROUTES } from '@/shared/config'
 import { type UrlTabProps, UrlTabsNav } from '@/shared/ui/core/url-tabs-nav'
 
 interface OrganizationTabsNavProps {
-  orgId: string
+  slug: string
 }
 
-const getTabs = (orgId: string): UrlTabProps[] => [
-  {
-    value: null,
-    label: 'Overview',
-    href: `/organizations/${orgId}`,
-  },
-  {
-    value: 'members',
-    label: 'Members',
-    href: `/organizations/${orgId}/members`,
-  },
-  {
-    value: 'settings',
-    label: 'Settings',
-    href: `/organizations/${orgId}/settings`,
-  },
-  {
-    value: 'labels',
-    label: 'Labels',
-    href: `/organizations/${orgId}/labels`,
-  },
-]
+export function OrganizationTabsNav({ slug }: OrganizationTabsNavProps) {
+  const tabs: UrlTabProps[] = [
+    {
+      value: null,
+      label: 'Overview',
+      href: ROUTES.orgOverview(slug),
+    },
+    {
+      value: 'members',
+      label: 'Members',
+      href: ROUTES.orgMembers(slug),
+    },
+    {
+      value: 'settings',
+      label: 'Settings',
+      href: ROUTES.orgSettings(slug),
+    },
+    {
+      value: 'labels',
+      label: 'Labels',
+      href: ROUTES.orgLabels(slug),
+    },
+  ]
 
-export function OrganizationTabsNav({ orgId }: OrganizationTabsNavProps) {
-  return <UrlTabsNav tabs={getTabs(orgId)} ariaLabel='Organization sections' />
+  return <UrlTabsNav tabs={tabs} ariaLabel='Organization sections' />
 }

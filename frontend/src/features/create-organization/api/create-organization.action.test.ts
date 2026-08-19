@@ -1,5 +1,4 @@
 import { revalidateTag } from 'next/cache'
-import { cookies } from 'next/headers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
 import { organizationServerApi } from '@/entities/organization/server'
@@ -9,10 +8,6 @@ vi.mock('next/cache', () => ({
   revalidateTag: vi.fn(),
 }))
 
-vi.mock('next/headers', () => ({
-  cookies: vi.fn(),
-}))
-
 vi.mock('@/entities/organization/server', () => ({
   organizationServerApi: {
     create: vi.fn(),
@@ -20,16 +15,11 @@ vi.mock('@/entities/organization/server', () => ({
 }))
 
 describe('createOrganizationAction', () => {
-  const mockSetCookie = vi.fn()
-
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(cookies).mockResolvedValue({
-      set: mockSetCookie,
-    } as unknown as Awaited<ReturnType<typeof cookies>>)
   })
 
-  it('successfully creates an organization, sets active_org_id cookie and revalidates cache tag', async () => {
+  it('successfully creates an organization and revalidates cache tag', async () => {
     const mockOrg = {
       id: 'org-123',
       name: 'Acme Corp',
@@ -50,11 +40,6 @@ describe('createOrganizationAction', () => {
     if (result.success) {
       expect(result.data).toEqual(mockOrg)
     }
-    expect(mockSetCookie).toHaveBeenCalledWith(
-      'active_org_id',
-      'org-123',
-      expect.objectContaining({ httpOnly: false })
-    )
     expect(revalidateTag).toHaveBeenCalledWith('organizations')
   })
 

@@ -3,18 +3,19 @@
 import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
+import { createAction } from '@/shared/lib'
+import { LabelIdSchema } from '@/entities/label'
 import { labelServerApi } from '@/entities/label/server'
-import { createOrgAction } from '@/entities/organization/server'
+import { OrganizationSlugSchema } from '@/entities/organization'
 
-const DeleteLabelInputSchema = z.object({
-  id: z.string(),
-})
-
-export const deleteLabelAction = createOrgAction(
-  DeleteLabelInputSchema,
-  async ({ id }, { activeOrg }) => {
-    await labelServerApi.delete(activeOrg.id, id)
-    revalidateTag(SERVER_CACHE_TAGS.labels(activeOrg.id))
+export const deleteLabelAction = createAction(
+  z.object({
+    slug: OrganizationSlugSchema,
+    id: LabelIdSchema,
+  }),
+  async ({ slug, id }) => {
+    await labelServerApi.delete(slug, id)
+    revalidateTag(SERVER_CACHE_TAGS.labels(slug))
     return true
   }
 )

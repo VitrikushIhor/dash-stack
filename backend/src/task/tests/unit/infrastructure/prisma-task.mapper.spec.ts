@@ -15,12 +15,12 @@ const basePrismaTask = () => ({
   updatedAt: new Date('2024-01-01'),
   assignees: [] as Array<{
     id: string;
-    user?: {
+    user: {
       id: string;
       firstName: string;
-      email?: string | null;
-      avatar?: string | null;
-    } | null;
+      email: string;
+      avatar: string | null;
+    };
   }>,
   label: null as {
     id: string;

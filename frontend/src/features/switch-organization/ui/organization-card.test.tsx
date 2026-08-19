@@ -1,13 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { type OrganizationSummary } from '@/entities/organization'
-import { setActiveOrganizationAction } from '../api/set-active-organization.action'
 import { OrganizationCard } from './organization-card'
-
-vi.mock('../api/set-active-organization.action', () => ({
-  setActiveOrganizationAction: vi.fn(),
-}))
 
 describe('OrganizationCard', () => {
   const mockOrg: OrganizationSummary = {
@@ -22,10 +17,6 @@ describe('OrganizationCard', () => {
       events: 0,
     },
   }
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
 
   it('renders organization name, description, member count, and user role', () => {
     render(
@@ -44,16 +35,16 @@ describe('OrganizationCard', () => {
     expect(screen.getByText('1 member')).toBeInTheDocument()
   })
 
-  it('calls setActiveOrganizationAction and onSelect when clicked', async () => {
+  it('links to the organization overview route and triggers onSelect when clicked', async () => {
     const user = userEvent.setup()
     const onSelectMock = vi.fn()
 
     render(<OrganizationCard organization={mockOrg} onSelect={onSelectMock} />)
 
     const cardLink = screen.getByRole('link', { name: /cyberdyne systems/i })
-    await user.click(cardLink)
+    expect(cardLink).toHaveAttribute('href', '/organizations/cyberdyne')
 
-    expect(setActiveOrganizationAction).toHaveBeenCalledWith('org-555')
+    await user.click(cardLink)
     expect(onSelectMock).toHaveBeenCalledWith(mockOrg)
   })
 })

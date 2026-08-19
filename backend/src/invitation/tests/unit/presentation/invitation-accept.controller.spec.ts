@@ -1,11 +1,11 @@
 import { InvitationAcceptController } from '../../../presentation/controllers/invitation-accept.controller';
 import { AcceptInviteUseCase } from '../../../application/use-cases/accept-invite.use-case';
-import { User } from '@prisma/client';
+import { AuthUser } from '../../../../common/decorators/user.decorator';
 
-const mockUser = {
+const mockUser: AuthUser = {
   id: 'user-1',
   email: 'user@example.com',
-} as User;
+};
 
 describe('InvitationAcceptController', () => {
   let controller: InvitationAcceptController;
@@ -42,7 +42,7 @@ describe('InvitationAcceptController', () => {
     });
 
     it('passes user fields from decorator', async () => {
-      const otherUser = { id: 'user-99', email: 'other@test.com' } as User;
+      const otherUser: AuthUser = { id: 'user-99', email: 'other@test.com' };
       acceptInviteUseCase.execute.mockResolvedValue({});
 
       await controller.acceptInvite('token-abc', otherUser);

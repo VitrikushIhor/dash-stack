@@ -34,10 +34,13 @@ export const useCreateOrganizationForm = ({
 
   const onSubmit = async (values: CreateOrgFormValues) => {
     await createOrganization(values, {
-      onSuccess: () => {
+      onSuccess: (newOrg) => {
         form.reset()
         onSuccess?.()
-        router.replace(ROUTES.organizations)
+        const target = newOrg?.slug
+          ? ROUTES.orgTasks(newOrg.slug)
+          : ROUTES.organizations
+        router.replace(target)
       },
     })
   }

@@ -8,7 +8,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/shared/ui/core/sidebar'
-import { sidebarData } from './data/sidebar-data'
+import { useOrgSlug } from '@/entities/organization'
+import { getSidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 
 export function AppSidebar({
@@ -17,11 +18,15 @@ export function AppSidebar({
   teamSwitcher?: React.ReactNode
 }) {
   const { collapsible, variant } = useLayout()
+  const slug = useOrgSlug()
+
+  const currentSidebarData = getSidebarData(slug)
+
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>{teamSwitcher}</SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {currentSidebarData.navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>

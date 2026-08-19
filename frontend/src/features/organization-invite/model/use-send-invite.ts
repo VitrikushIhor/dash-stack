@@ -12,12 +12,12 @@ export function useSendInvite() {
   const router = useRouter()
 
   const sendInvite = (
-    orgId: string,
+    slug: string,
     dto: CreateInvitationDto,
     options?: { onSuccess?: () => void }
   ) => {
     startTransition(async () => {
-      const result = await sendInviteAction(orgId, dto)
+      const result = await sendInviteAction(slug, dto)
       if (!result.success) {
         handleServerError(
           result.validationMessages?.length

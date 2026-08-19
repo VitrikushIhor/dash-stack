@@ -1,6 +1,9 @@
 import 'server-only'
 import { getErrorMessage } from '@/shared/api'
-import { type Invitation, OrganizationIdSchema } from '@/entities/organization'
+import {
+  type Invitation,
+  OrganizationSlugSchema,
+} from '@/entities/organization'
 import { invitationServerApi } from '../invitation-api.server'
 
 type GetOrganizationInvitationsResponse = {
@@ -9,11 +12,11 @@ type GetOrganizationInvitationsResponse = {
 }
 
 export async function getOrganizationInvitations(
-  orgId: string
+  slug: string
 ): Promise<GetOrganizationInvitationsResponse> {
   try {
-    const validOrgId = OrganizationIdSchema.parse(orgId)
-    const data = await invitationServerApi.listPending(validOrgId)
+    const validSlug = OrganizationSlugSchema.parse(slug)
+    const data = await invitationServerApi.listPending(validSlug)
     return { data, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

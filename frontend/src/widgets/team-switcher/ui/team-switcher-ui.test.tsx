@@ -2,21 +2,18 @@ import { useRouter } from 'next/navigation'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ROUTES } from '@/shared/config'
 import { SidebarProvider } from '@/shared/ui/core/sidebar'
 import {
   OrgRole,
   type OrganizationSummary,
   type UserMembership,
 } from '@/entities/organization'
-import { setActiveOrganizationAction } from '@/features/switch-organization/server'
 import { TeamSwitcherUI } from './team-switcher-ui'
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
-}))
-
-vi.mock('@/features/switch-organization/server', () => ({
-  setActiveOrganizationAction: vi.fn(),
+  useParams: vi.fn(() => ({})),
 }))
 
 describe('TeamSwitcherUI', () => {
@@ -81,7 +78,7 @@ describe('TeamSwitcherUI', () => {
     expect(screen.getByText('Add organization')).toBeInTheDocument()
   })
 
-  it('switches organization when menu item is selected', async () => {
+  it('navigates to organization tasks when menu item is selected', async () => {
     const user = userEvent.setup()
     render(
       <SidebarProvider>
@@ -95,7 +92,6 @@ describe('TeamSwitcherUI', () => {
     const secondOrgItem = screen.getByText('Secondary Corp')
     await user.click(secondOrgItem)
 
-    expect(setActiveOrganizationAction).toHaveBeenCalledWith('org-2')
-    expect(mockPush).toHaveBeenCalledWith('/organizations/org-2')
+    expect(mockPush).toHaveBeenCalledWith(ROUTES.orgTasks('secondary-corp'))
   })
 })
