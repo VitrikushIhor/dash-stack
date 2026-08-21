@@ -16,7 +16,10 @@ COPY backend/package.json ./backend/
 COPY backend/prisma ./backend/prisma/
 
 # Install dependencies (workspace-aware)
-RUN pnpm install --frozen-lockfile --filter backend...
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter backend...
+
+# Generate Prisma Client
+RUN pnpm --filter backend run prisma:generate
 
 # Copy backend source code
 COPY backend/ ./backend/

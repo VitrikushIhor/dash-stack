@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY frontend/package.json ./frontend/
-RUN pnpm install --frozen-lockfile --filter frontend...
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter frontend...
 
 # Builder stage
 FROM base AS builder

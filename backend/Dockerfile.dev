@@ -10,7 +10,8 @@ RUN corepack enable
 COPY package.json ./
 COPY prisma ./prisma/
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm run prisma:generate
 
 # Copy source code explicitly to avoid leaking sensitive files
 COPY src ./src/
