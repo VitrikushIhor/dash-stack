@@ -27,24 +27,17 @@ export class OAuthExchangeUseCase {
     const userInfo = await this.auth0Client.getUserInfo(command.auth0Token);
     const [provider, providerAccountId] = this.parseAuth0Sub(userInfo.sub);
 
-    const existingAccount = await this.accountRepo.findByProvider(
-      provider,
-      providerAccountId,
-    );
+    const existingAccount = await this.accountRepo.findByProvider(provider, providerAccountId);
 
     if (existingAccount) {
-      this.logger.log(
-        `OAuth login: existing user ${existingAccount.user.email} via ${provider}`,
-      );
+      this.logger.log(`OAuth login: existing user ${existingAccount.user.email} via ${provider}`);
       return this.tokenGenerator.generateTokens(existingAccount.user.id);
     }
 
     let user = await this.userRepo.findByEmail(userInfo.email);
 
     if (user) {
-      this.logger.log(
-        `OAuth login: linking ${provider} to existing user ${userInfo.email}`,
-      );
+      this.logger.log(`OAuth login: linking ${provider} to existing user ${userInfo.email}`);
     } else {
       const firstName = userInfo.name?.split(' ')[0] || null;
       const lastName = userInfo.name?.split(' ').slice(1).join(' ') || null;
@@ -57,9 +50,7 @@ export class OAuthExchangeUseCase {
         emailVerified: new Date(),
       });
 
-      this.logger.log(
-        `OAuth login: created new user ${userInfo.email} via ${provider}`,
-      );
+      this.logger.log(`OAuth login: created new user ${userInfo.email} via ${provider}`);
     }
 
     await this.accountRepo.create({

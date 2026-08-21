@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { DataTableBulkActions } from '@/shared/ui'
+import { useAction } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
@@ -15,73 +15,82 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
-import { useOrgStore } from '@/entities/organization'
+import { DataTableBulkActions } from '@/shared/ui/data-table'
+import { STATUS_CONFIG, type Task, type TaskStatusEnum } from '@/entities/task'
 import {
-  type TaskStatusEnum,
-  type Task,
-  STATUS_CONFIG,
-  useBulkUpdateTasks,
-  useBulkDeleteTasks,
-} from '@/entities/task'
+  bulkDeleteTasksAction,
+  bulkUpdateTasksAction,
+} from '@/features/manage-task/server'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
 type TaskTableBulkActionsProps<TData> = {
+  slug: string
   table: Table<TData>
 }
 
 export function TaskTableBulkActions<TData>({
+  slug,
   table,
 }: TaskTableBulkActionsProps<TData>) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const { activeOrgId } = useOrgStore()
-  const { mutateAsync: bulkUpdate } = useBulkUpdateTasks(activeOrgId || '')
-  const { mutateAsync: bulkDelete } = useBulkDeleteTasks(activeOrgId || '')
+  const { execute: executeBulkUpdate, isPending: isUpdating } = useAction(
+    bulkUpdateTasksAction,
+    {
+      onSuccess: () => table.resetRowSelection(),
+    }
+  )
+
+  const { execute: executeBulkDelete, isPending: isDeleting } = useAction(
+    bulkDeleteTasksAction,
+    {
+      onSuccess: () => {
+        table.resetRowSelection()
+        setShowDeleteConfirm(false)
+      },
+    }
+  )
 
   const handleBulkStatusChange = async (status: string) => {
-    if (!activeOrgId) {
-      toast.error('No organization selected')
-      return
-    }
-
+    if (!slug) return
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
+    const toastId = toast.loading('Updating status...')
 
-    toast.promise(
-      bulkUpdate({
-        ids: selectedIds,
-        data: { status: status as TaskStatusEnum },
-      }),
-      {
-        loading: 'Updating status...',
-        success: () => {
-          table.resetRowSelection()
-          return `Status updated to "${status}" for ${selectedIds.length} task${selectedIds.length > 1 ? 's' : ''}.`
-        },
-        error: 'Failed to update tasks',
-      }
-    )
+    const result = await executeBulkUpdate({
+      slug,
+      ids: selectedIds,
+      data: { status: status as TaskStatusEnum },
+    })
+
+    if (result !== undefined) {
+      toast.success(
+        `Status updated to "${status}" for ${selectedIds.length} task${selectedIds.length > 1 ? 's' : ''}.`,
+        { id: toastId }
+      )
+    } else {
+      toast.dismiss(toastId)
+    }
   }
 
   const handleBulkDelete = async () => {
-    if (!activeOrgId) {
-      toast.error('No organization selected')
-      return
-    }
-
+    if (!slug) return
     const selectedIds = selectedRows.map((row) => (row.original as Task).id)
+    const toastId = toast.loading('Deleting tasks...')
 
-    toast.promise(bulkDelete(selectedIds), {
-      loading: 'Deleting tasks...',
-      success: () => {
-        table.resetRowSelection()
-        setShowDeleteConfirm(false)
-        return `Deleted ${selectedIds.length} ${
-          selectedIds.length > 1 ? 'tasks' : 'task'
-        }`
-      },
-      error: 'Failed to delete tasks',
+    const result = await executeBulkDelete({
+      slug,
+      ids: selectedIds,
     })
+
+    if (result !== undefined) {
+      toast.success(
+        `Deleted ${selectedIds.length} ${selectedIds.length > 1 ? 'tasks' : 'task'}`,
+        { id: toastId }
+      )
+    } else {
+      toast.dismiss(toastId)
+    }
   }
 
   return (
@@ -97,7 +106,7 @@ export function TaskTableBulkActions<TData>({
                   className='size-8'
                   aria-label='Update status'
                   title='Update status'
-                  disabled={!activeOrgId}
+                  disabled={isUpdating}
                 >
                   <CircleArrowUp />
                   <span className='sr-only'>Update status</span>
@@ -132,7 +141,7 @@ export function TaskTableBulkActions<TData>({
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
-              disabled={!activeOrgId}
+              disabled={isDeleting}
             >
               <Trash2 />
               <span className='sr-only'>Delete selected tasks</span>
@@ -146,9 +155,7 @@ export function TaskTableBulkActions<TData>({
 
       <TasksBulkDeleteDialog
         open={showDeleteConfirm}
-        onOpenChange={(open) => {
-          setShowDeleteConfirm(!open)
-        }}
+        onOpenChange={setShowDeleteConfirm}
         table={table}
         handleDelete={handleBulkDelete}
       />

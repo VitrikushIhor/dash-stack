@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Plus, ChevronDown, ChevronUp, EllipsisVertical } from 'lucide-react'
+import { ChevronDown, ChevronUp, EllipsisVertical, Plus } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,

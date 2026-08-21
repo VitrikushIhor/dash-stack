@@ -1,4 +1,4 @@
-import { useCallback, memo } from 'react'
+import { memo, useCallback } from 'react'
 import { EllipsisVertical } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import { Checkbox } from '@/shared/ui/core/checkbox'

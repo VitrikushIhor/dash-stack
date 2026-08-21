@@ -1,5 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import * as React from 'react'
-import { X, Image as ImageIcon } from 'lucide-react'
+import { Image as ImageIcon, X } from 'lucide-react'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE_2_MB } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from './core/button'

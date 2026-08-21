@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
 import { type Task } from '@/entities/task'
-import { useTaskModalStore } from '@/features/manage-task'
+import { useTaskSearchParams } from '@/features/manage-task'
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>
@@ -21,14 +21,14 @@ export function TaskTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const task = row.original as Task
-  const { openEdit, openDelete } = useTaskModalStore()
+  const [, setTaskParams] = useTaskSearchParams()
 
   const openEditDialog = () => {
-    openEdit(task)
+    setTaskParams({ 'update-task': task.id })
   }
 
   const openDeleteDialog = () => {
-    openDelete(task)
+    setTaskParams({ 'delete-task': task.id })
   }
 
   return (

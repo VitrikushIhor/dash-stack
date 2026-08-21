@@ -1,9 +1,9 @@
-import { api } from '@/shared/api'
+import { type HttpClient, type PaginatedResult, api } from '@/shared/api'
 import {
-  type Task,
   type CreateTaskDto,
-  type UpdateTaskDto,
+  type Task,
   type TaskStatusEnum,
+  type UpdateTaskDto,
 } from '../model/types'
 
 export interface TaskFilters {
@@ -15,48 +15,81 @@ export interface TaskFilters {
   dueDateTo?: string
   startDateFrom?: string
   startDateTo?: string
+  page?: number
+  perPage?: number
 }
 
-export const taskApi = {
-  findAll: (orgId: string, filters?: TaskFilters): Promise<Task[]> => {
-    const params: Record<string, string | undefined> = {
-      search: filters?.search,
-      dueDateFrom: filters?.dueDateFrom,
-      dueDateTo: filters?.dueDateTo,
-      startDateFrom: filters?.startDateFrom,
-      startDateTo: filters?.startDateTo,
-      status: filters?.status?.join(','),
-      assigneeIds: filters?.assigneeIds?.join(','),
-      labelNames: filters?.labelNames?.join(','),
-    }
+export function createTaskApi(client: HttpClient) {
+  return {
+    findAll: (
+      slug: string,
+      filters?: TaskFilters
+    ): Promise<PaginatedResult<Task>> => {
+      const params: Record<string, string | undefined> = {
+        search: filters?.search,
+        dueDateFrom: filters?.dueDateFrom,
+        dueDateTo: filters?.dueDateTo,
+        startDateFrom: filters?.startDateFrom,
+        startDateTo: filters?.startDateTo,
+        status: filters?.status?.join(','),
+        assigneeIds: filters?.assigneeIds?.join(','),
+        labelNames: filters?.labelNames?.join(','),
+        page: filters?.page?.toString(),
+        perPage: filters?.perPage?.toString(),
+      }
 
-    return api.get<Task[]>(`/organizations/${orgId}/tasks`, {
-      params,
-    })
-  },
+      return client.get<PaginatedResult<Task>>(`/organizations/${slug}/tasks`, {
+        params,
+      })
+    },
 
-  findById: (orgId: string, id: string): Promise<Task> =>
-    api.get<Task>(`/organizations/${orgId}/tasks/${id}`),
+    findAllUnpaginated: (
+      slug: string,
+      filters?: Omit<TaskFilters, 'page' | 'perPage'>
+    ): Promise<Task[]> => {
+      const params: Record<string, string | undefined> = {
+        search: filters?.search,
+        dueDateFrom: filters?.dueDateFrom,
+        dueDateTo: filters?.dueDateTo,
+        startDateFrom: filters?.startDateFrom,
+        startDateTo: filters?.startDateTo,
+        status: filters?.status?.join(','),
+        assigneeIds: filters?.assigneeIds?.join(','),
+        labelNames: filters?.labelNames?.join(','),
+      }
 
-  create: (orgId: string, data: CreateTaskDto): Promise<Task> =>
-    api.post<Task>(`/organizations/${orgId}/tasks`, data),
+      return client.get<Task[]>(`/organizations/${slug}/tasks/all`, {
+        params,
+      })
+    },
 
-  update: (orgId: string, id: string, data: UpdateTaskDto): Promise<Task> =>
-    api.patch<Task>(`/organizations/${orgId}/tasks/${id}`, data),
+    findById: (slug: string, id: string): Promise<Task> =>
+      client.get<Task>(`/organizations/${slug}/tasks/${id}`),
 
-  delete: (orgId: string, id: string): Promise<void> =>
-    api.delete<void>(`/organizations/${orgId}/tasks/${id}`),
+    create: (slug: string, data: CreateTaskDto): Promise<Task> =>
+      client.post<Task>(`/organizations/${slug}/tasks`, data),
 
-  bulkUpdate: (
-    orgId: string,
-    ids: string[],
-    data: Partial<Pick<UpdateTaskDto, 'status'>>
-  ): Promise<void> =>
-    api.patch<void>(`/organizations/${orgId}/tasks/bulk/update`, {
-      ids,
-      ...data,
-    }),
+    update: (slug: string, id: string, data: UpdateTaskDto): Promise<Task> =>
+      client.patch<Task>(`/organizations/${slug}/tasks/${id}`, data),
 
-  bulkDelete: (orgId: string, ids: string[]): Promise<void> =>
-    api.delete<void>(`/organizations/${orgId}/tasks/bulk`, { body: { ids } }),
+    delete: (slug: string, id: string): Promise<void> =>
+      client.delete<void>(`/organizations/${slug}/tasks/${id}`),
+
+    bulkUpdate: (
+      slug: string,
+      ids: string[],
+      data: Partial<Pick<UpdateTaskDto, 'status'>>
+    ): Promise<void> =>
+      client.patch<void>(`/organizations/${slug}/tasks/bulk/update`, {
+        ids,
+        ...data,
+      }),
+
+    bulkDelete: (slug: string, ids: string[]): Promise<void> =>
+      client.delete<void>(`/organizations/${slug}/tasks/bulk`, {
+        body: { ids },
+      }),
+  }
 }
+
+export const taskApi = createTaskApi(api)

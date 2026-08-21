@@ -20,11 +20,7 @@ describe('VerifyEmailUseCase', () => {
       generateTokens: jest.fn(),
     };
 
-    useCase = new VerifyEmailUseCase(
-      verificationTokenRepoMock,
-      userRepoMock,
-      tokenGeneratorMock,
-    );
+    useCase = new VerifyEmailUseCase(verificationTokenRepoMock, userRepoMock, tokenGeneratorMock);
   });
 
   it('should successfully verify email and generate tokens', async () => {
@@ -43,17 +39,13 @@ describe('VerifyEmailUseCase', () => {
       'test@example.com',
       expect.any(Date),
     );
-    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith(
-      'token-1',
-    );
+    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
     expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('user-1');
     expect(result).toEqual({ accessToken: 'acc' });
   });
 
   it('should throw BadRequestException if token not found', async () => {
     verificationTokenRepoMock.findByToken.mockResolvedValue(null);
-    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(BadRequestException);
   });
 });

@@ -15,7 +15,6 @@ export const TablePlaceholder = ({
   <div className={cn('flex w-[100px] items-center gap-2', className)}>
     <span
       className='text-muted-foreground flex items-center gap-2 text-sm'
-      tabIndex={0}
       aria-label={label}
       role='note'
     >

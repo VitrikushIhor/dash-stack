@@ -1,7 +1,8 @@
 import { TaskStatus } from '../../domain/enums/task-status.enum';
 import { TaskReadModel } from '../read-models/task.read-model';
+import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
-export interface ChecklistItemInput {
+interface ChecklistItemInput {
   text: string;
   completed?: boolean;
 }
@@ -9,11 +10,6 @@ export interface ChecklistItemInput {
 export interface ChecklistInput {
   name: string;
   items: ChecklistItemInput[];
-}
-
-export interface LabelInput {
-  name: string;
-  color?: string | null;
 }
 
 export interface CreateTaskData {
@@ -26,7 +22,7 @@ export interface CreateTaskData {
   startDate?: Date;
   dueDate?: Date;
   completedAt?: Date;
-  label?: LabelInput | null;
+  labelId?: string | null;
   checklists?: ChecklistInput[];
 }
 
@@ -39,11 +35,24 @@ export interface UpdateTaskData {
   startDate?: Date | null;
   dueDate?: Date | null;
   completedAt?: Date | null;
-  label?: LabelInput | null;
+  labelId?: string | null;
   checklists?: ChecklistInput[];
 }
 
 export interface FindAllTasksFilters {
+  search?: string;
+  status?: TaskStatus[];
+  assigneeIds?: string[];
+  labelNames?: string[];
+  dueDateFrom?: Date;
+  dueDateTo?: Date;
+  startDateFrom?: Date;
+  startDateTo?: Date;
+  page?: number;
+  perPage?: number;
+}
+
+export interface FindAllTasksUnpaginatedFilters {
   search?: string;
   status?: TaskStatus[];
   assigneeIds?: string[];
@@ -59,19 +68,19 @@ export interface TaskRepositoryPort {
   findAll(
     organizationId: string,
     filters: FindAllTasksFilters,
+  ): Promise<PaginatedResult<TaskReadModel>>;
+  findAllUnpaginated(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters,
   ): Promise<TaskReadModel[]>;
   findById(id: string, organizationId: string): Promise<TaskReadModel | null>;
-  update(
-    id: string,
-    organizationId: string,
-    data: UpdateTaskData,
-  ): Promise<TaskReadModel>;
+  update(id: string, organizationId: string, data: UpdateTaskData): Promise<TaskReadModel>;
   delete(id: string, organizationId: string): Promise<void>;
   deleteMany(organizationId: string, ids: string[]): Promise<{ count: number }>;
   updateMany(
     organizationId: string,
     ids: string[],
-    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'label' | 'checklists'>>,
+    data: Partial<Omit<UpdateTaskData, 'assigneeIds' | 'checklists'>>,
     additionalWhere?: Record<string, unknown>,
   ): Promise<{ count: number }>;
 }

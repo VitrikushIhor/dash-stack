@@ -1,6 +1,7 @@
 import { type SVGProps } from 'react'
+import { cn } from '@/shared/lib/utils'
 
-export function LogoIcon(props: SVGProps<SVGSVGElement>) {
+export function LogoIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       width='28'
@@ -8,16 +9,17 @@ export function LogoIcon(props: SVGProps<SVGSVGElement>) {
       viewBox='0 0 28 28'
       fill='none'
       aria-hidden='true'
+      className={cn('text-primary', className)}
       {...props}
     >
-      <rect x='2' y='14' width='5' height='12' rx='1' fill='#10b981' />
+      <rect x='2' y='14' width='5' height='12' rx='1' fill='currentColor' />
       <rect
         x='9'
         y='9'
         width='5'
         height='17'
         rx='1'
-        fill='#10b981'
+        fill='currentColor'
         opacity='0.8'
       />
       <rect
@@ -26,7 +28,7 @@ export function LogoIcon(props: SVGProps<SVGSVGElement>) {
         width='5'
         height='21'
         rx='1'
-        fill='#10b981'
+        fill='currentColor'
         opacity='0.6'
       />
       <rect
@@ -35,7 +37,7 @@ export function LogoIcon(props: SVGProps<SVGSVGElement>) {
         width='2'
         height='24'
         rx='1'
-        fill='#10b981'
+        fill='currentColor'
         opacity='0.3'
       />
     </svg>

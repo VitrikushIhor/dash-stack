@@ -1,7 +1,7 @@
 import { BadRequestException } from '../../common/exceptions/domain.exception';
 import { STORAGE_ERRORS } from './storage-errors';
 
-export class StorageException extends Error {
+class StorageException extends Error {
   constructor(
     message: string,
     public readonly cause?: Error,

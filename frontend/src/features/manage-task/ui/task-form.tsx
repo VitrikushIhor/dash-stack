@@ -1,10 +1,7 @@
+'use client'
+
 import { type UseFormReturn } from 'react-hook-form'
 import { type Membership } from '@/shared/model'
-import {
-  mockAvailableLabels,
-  FormFileUpload,
-  FormLabelSelector,
-} from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -26,7 +23,9 @@ import {
 } from '@/shared/ui/core/select'
 import { Separator } from '@/shared/ui/core/separator'
 import { Textarea } from '@/shared/ui/core/textarea'
-import { TaskStatusEnum, FormChecklist } from '@/entities/task'
+import { FormFileUpload } from '@/shared/ui/form-fields'
+import { FormLabelSelector, type Label } from '@/entities/label'
+import { FormChecklist, TaskStatusEnum } from '@/entities/task'
 import { FormMemberPicker } from '@/entities/team'
 import { type TaskFormValues } from '../model/create-task-schema'
 import { TaskDatePickerField } from './task-date-picker-field'
@@ -36,6 +35,7 @@ type TaskFormProps = {
   onCancel: () => void
   form: UseFormReturn<TaskFormValues>
   allMembers: Membership[]
+  availableLabels: Label[]
   onFileReject: (file: File, message: string) => void
   onUpload: (
     files: File[],
@@ -55,6 +55,7 @@ export function TaskForm({
   onFileReject,
   onUpload,
   allMembers,
+  availableLabels,
   submitText = 'Create',
 }: TaskFormProps) {
   return (
@@ -140,17 +141,7 @@ export function TaskForm({
 
         <Separator />
 
-        <FormLabelSelector
-          name='label'
-          availableLabels={mockAvailableLabels}
-          onCreateLabel={(name, color) => {
-            form.setValue('label', {
-              id: crypto.randomUUID(),
-              name,
-              color,
-            })
-          }}
-        />
+        <FormLabelSelector name='label' availableLabels={availableLabels} />
 
         <Separator />
 

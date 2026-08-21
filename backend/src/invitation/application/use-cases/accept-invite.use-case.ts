@@ -15,11 +15,6 @@ export class AcceptInviteUseCase {
 
     InvitationPolicy.assertCanAccept(invitation, command.userEmail);
 
-    return this.repository.accept(
-      invitation.id,
-      command.userId,
-      invitation.orgId,
-      invitation.role,
-    );
+    return this.repository.accept(invitation.id, command.userId, invitation.orgId, invitation.role);
   }
 }

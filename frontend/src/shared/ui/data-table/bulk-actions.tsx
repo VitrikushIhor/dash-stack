@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { X } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'

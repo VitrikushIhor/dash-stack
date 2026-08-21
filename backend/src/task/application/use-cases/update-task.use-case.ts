@@ -18,20 +18,10 @@ export class UpdateTaskUseCase {
     private readonly assigneeValidator: TaskAssigneeValidatorService,
   ) {}
 
-  async execute(
-    id: string,
-    organizationId: string,
-    command: UpdateTaskCommand,
-  ) {
-    const existingTask = await this.findTaskByIdUseCase.execute(
-      id,
-      organizationId,
-    );
+  async execute(id: string, organizationId: string, command: UpdateTaskCommand) {
+    const existingTask = await this.findTaskByIdUseCase.execute(id, organizationId);
 
-    await this.assigneeValidator.validateOrThrow(
-      organizationId,
-      command.assigneeIds,
-    );
+    await this.assigneeValidator.validateOrThrow(organizationId, command.assigneeIds);
 
     const startDate = TaskDates.normalizeOptional(command.startDate);
     const dueDate = TaskDates.normalizeOptional(command.dueDate);
@@ -43,9 +33,7 @@ export class UpdateTaskUseCase {
 
     const nextAttachments = command.attachments;
     if (nextAttachments !== undefined) {
-      const toDelete = existingTask.attachments.filter(
-        (key) => !nextAttachments.includes(key),
-      );
+      const toDelete = existingTask.attachments.filter((key) => !nextAttachments.includes(key));
 
       if (toDelete.length) {
         await this.taskFileStorage.deleteMany(toDelete);
@@ -64,7 +52,7 @@ export class UpdateTaskUseCase {
         previousStatus: existingTask.status,
         nextStatus: command.status,
       }),
-      label: command.label,
+      labelId: command.labelId,
       checklists: command.checklists,
     });
   }

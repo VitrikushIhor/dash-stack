@@ -1,10 +1,14 @@
-import { api } from '@/shared/api'
-import { type UserMembership } from '@/entities/organization'
+import { type HttpClient, api } from '@/shared/api'
+import { type UpdateUserDto } from '../model/schemas/user.schema'
 import { type User } from '../model/types'
 
-export const userApi = {
+export const createUserApi = (client: HttpClient) => ({
   getMe: (): Promise<User> => {
-    return api.get<User>('/me')
+    return client.get<User>('/me')
   },
-  getMyMemberships: () => api.get<UserMembership[]>('/me/memberships'),
-}
+  updateMe: (dto: UpdateUserDto): Promise<User> => {
+    return client.patch<User>('/me', dto)
+  },
+})
+
+export const userApi = createUserApi(api)

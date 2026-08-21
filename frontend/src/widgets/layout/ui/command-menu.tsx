@@ -1,7 +1,9 @@
+'use client'
+
 import React from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
-import { useSearch, useTheme } from '@/shared/lib/context'
+import { useSearch, useTheme } from '@/shared/lib/providers'
 import {
   CommandDialog,
   CommandEmpty,
@@ -12,12 +14,15 @@ import {
   CommandSeparator,
 } from '@/shared/ui/core/command'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { sidebarData } from './data/sidebar-data'
+import { useOrgSlug } from '@/entities/organization'
+import { getSidebarData } from './data/sidebar-data'
+import { type NavCollapsible, type NavLink } from './types'
 
 export function CommandMenu() {
-  const navigate = useNavigate()
   const { setTheme } = useTheme()
   const { open, setOpen } = useSearch()
+  const slug = useOrgSlug()
+  const currentSidebarData = getSidebarData(slug)
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -33,40 +38,23 @@ export function CommandMenu() {
       <CommandList>
         <ScrollArea type='hover' className='h-72 pe-1'>
           <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
+          {currentSidebarData.navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
-              {group.items.map((navItem, i) => {
-                if (navItem.url)
-                  return (
-                    <CommandItem
-                      key={`${navItem.url}-${i}`}
-                      value={navItem.title}
-                      onSelect={() => {
-                        runCommand(() => navigate({ to: navItem.url }))
-                      }}
-                    >
-                      <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
-                      </div>
-                      {navItem.title}
-                    </CommandItem>
-                  )
-
-                return navItem.items?.map((subItem, i: number) => (
-                  <CommandItem
-                    key={`${navItem.title}-${subItem.url}-${i}`}
-                    value={`${navItem.title}-${subItem.url}`}
-                    onSelect={() => {
-                      runCommand(() => navigate({ to: subItem.url }))
-                    }}
-                  >
-                    <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
-                    </div>
-                    {navItem.title} <ChevronRight /> {subItem.title}
-                  </CommandItem>
-                ))
-              })}
+              {group.items.map((navItem, i) =>
+                navItem.url ? (
+                  <CommandMenuNavItem
+                    key={`${navItem.url}-${i}`}
+                    item={navItem as NavLink}
+                    onSelect={runCommand}
+                  />
+                ) : (
+                  <CommandMenuSubItems
+                    key={`${navItem.title}-${i}`}
+                    item={navItem as NavCollapsible}
+                    onSelect={runCommand}
+                  />
+                )
+              )}
             </CommandGroup>
           ))}
           <CommandSeparator />
@@ -86,5 +74,56 @@ export function CommandMenu() {
         </ScrollArea>
       </CommandList>
     </CommandDialog>
+  )
+}
+
+function CommandMenuNavItem({
+  item,
+  onSelect,
+}: {
+  item: NavLink
+  onSelect: (command: () => unknown) => void
+}) {
+  const router = useRouter()
+  return (
+    <CommandItem
+      value={item.title}
+      onSelect={() => {
+        onSelect(() => router.push(item.url))
+      }}
+    >
+      <div className='flex size-4 items-center justify-center'>
+        <ArrowRight className='text-muted-foreground/80 size-2' />
+      </div>
+      {item.title}
+    </CommandItem>
+  )
+}
+
+function CommandMenuSubItems({
+  item,
+  onSelect,
+}: {
+  item: NavCollapsible
+  onSelect: (command: () => unknown) => void
+}) {
+  const router = useRouter()
+  return (
+    <>
+      {item.items.map((subItem, i) => (
+        <CommandItem
+          key={`${item.title}-${subItem.url}-${i}`}
+          value={`${item.title}-${subItem.url}`}
+          onSelect={() => {
+            onSelect(() => router.push(subItem.url))
+          }}
+        >
+          <div className='flex size-4 items-center justify-center'>
+            <ArrowRight className='text-muted-foreground/80 size-2' />
+          </div>
+          {item.title} <ChevronRight className='mx-1 size-3' /> {subItem.title}
+        </CommandItem>
+      ))}
+    </>
   )
 }

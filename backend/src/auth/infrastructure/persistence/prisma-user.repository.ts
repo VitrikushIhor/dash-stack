@@ -14,6 +14,9 @@ const userSummarySelect = {
   lastName: true,
   avatar: true,
   emailVerified: true,
+  dob: true,
+  bio: true,
+  urls: true,
 };
 
 @Injectable()
@@ -63,6 +66,33 @@ export class PrismaUserRepository implements UserRepositoryPort {
     return this.prisma.user.update({
       where: { email },
       data: { password: hashedPassword },
+      select: userSummarySelect,
+    });
+  }
+
+  async updateProfile(
+    userId: string,
+    data: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      dob?: Date;
+      bio?: string;
+      urls?: string[];
+      avatar?: string;
+    },
+  ): Promise<UserSummary> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dob: data.dob,
+        bio: data.bio,
+        urls: data.urls,
+        avatar: data.avatar,
+      },
       select: userSummarySelect,
     });
   }

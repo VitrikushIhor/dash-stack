@@ -1,52 +1,62 @@
-# Build stage
-FROM node:22-alpine AS builder
+# Base node image
+FROM node:22-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
+# Install dependencies stage
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy root workspace files for npm ci
-COPY package.json package-lock.json ./
-
-# Copy frontend package.json for workspace resolution
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY frontend/package.json ./frontend/
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter frontend...
 
-# Install dependencies (workspace-aware)
-RUN npm ci --workspace=frontend --include-workspace-root
-
-# Copy frontend source code
+# Builder stage
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY frontend/ ./frontend/
 
-# Build application
-RUN npm run build --workspace=frontend
+# Build-time args for NEXT_PUBLIC_* variables
+# These are baked into the Next.js client bundle at compile time
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_AUTH0_DOMAIN
+ARG NEXT_PUBLIC_AUTH0_CLIENT_ID
 
-# Production stage
-FROM nginx:alpine
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_AUTH0_DOMAIN=$NEXT_PUBLIC_AUTH0_DOMAIN
+ENV NEXT_PUBLIC_AUTH0_CLIENT_ID=$NEXT_PUBLIC_AUTH0_CLIENT_ID
 
-# Configure nginx for non-root operation
-RUN rm /etc/nginx/conf.d/default.conf && \
-    printf 'server {\n\
-    listen 8080;\n\
-    server_name localhost;\n\
-    root /usr/share/nginx/html;\n\
-    index index.html;\n\
-    location / {\n\
-        try_files $uri $uri/ /index.html;\n\
-    }\n\
-}\n' > /etc/nginx/conf.d/default.conf
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
-# Copy built files from builder
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+RUN pnpm --filter frontend run build
 
-# Use non-root user
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid
+# Runner stage (Next.js Standalone server)
+FROM base AS runner
+WORKDIR /app
 
-USER nginx
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Expose port
-EXPOSE 8080
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Copy static assets and standalone server output
+COPY --from=builder /app/frontend/public ./frontend/public
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/static ./frontend/.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+CMD ["node", "frontend/server.js"]

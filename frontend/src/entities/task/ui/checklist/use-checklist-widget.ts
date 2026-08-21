@@ -1,4 +1,6 @@
-import { useState, useCallback, useMemo } from 'react'
+'use client'
+
+import { useCallback, useMemo, useState } from 'react'
 import { type Checklist } from '@/entities/task'
 
 export function useChecklistWidget(

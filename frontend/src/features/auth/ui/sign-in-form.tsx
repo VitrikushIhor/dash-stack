@@ -1,9 +1,9 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { Loader2, LogIn } from 'lucide-react'
+import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib/utils'
-import { PasswordInput } from '@/shared/ui'
 import { Button } from '@/shared/ui/core/button'
 import {
   Form,
@@ -14,12 +14,8 @@ import {
   FormMessage,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
-import { useLogin } from '../model/mutations/use-login'
-import {
-  signInDefaultValues,
-  signInSchema,
-  type TSignInSchema,
-} from '../model/schema/sign-in.schema'
+import { PasswordInput } from '@/shared/ui/password-input'
+import { useSignInForm } from '../model/hooks/use-sign-in-form'
 import { OAuthButtons } from './oauth-buttons'
 
 interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -31,24 +27,12 @@ export function SignInForm({
   redirectTo,
   ...props
 }: SignInFormProps) {
-  const loginMutation = useLogin({ redirectTo })
-
-  const form = useForm<TSignInSchema>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: signInDefaultValues,
-  })
-
-  function onSubmit(data: TSignInSchema) {
-    loginMutation.mutate({
-      email: data.email,
-      password: data.password,
-    })
-  }
+  const { form, onSubmit, isPending } = useSignInForm({ redirectTo })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className={cn('grid gap-3', className)}
         {...props}
       >
@@ -65,6 +49,7 @@ export function SignInForm({
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='password'
@@ -76,34 +61,25 @@ export function SignInForm({
               </FormControl>
               <FormMessage />
               <Link
-                to='/forgot-password'
-                className='text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75'
+                href={ROUTES.forgotPassword}
+                className='text-muted-foreground absolute inset-e-0 -top-0.5 text-sm font-medium hover:opacity-75'
               >
                 Forgot password?
               </Link>
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={loginMutation.isPending}>
-          {loginMutation.isPending ? (
+
+        <Button className='mt-2' disabled={isPending}>
+          {isPending ? (
             <Loader2 className='animate-spin' />
           ) : (
-            <LogIn />
+            <LogIn className='h-4 w-4' />
           )}
           Sign in
         </Button>
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background text-muted-foreground px-2'>
-              Or continue with
-            </span>
-          </div>
-        </div>
 
-        <OAuthButtons disabled={loginMutation.isPending} />
+        <OAuthButtons disabled={isPending} />
       </form>
     </Form>
   )

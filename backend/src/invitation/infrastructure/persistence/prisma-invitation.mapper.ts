@@ -1,9 +1,11 @@
 import { PendingInvitationReadModel } from '../../application/read-models/pending-invitation.read-model';
+import { OrgRole as PrismaOrgRole } from '@prisma/client';
+import { PrismaOrgRoleMapper } from '../../../organization/infrastructure/persistence/mappers/org-role.mapper';
 
 interface PrismaInvitationPayload {
   id: string;
   email: string;
-  role: string;
+  role: PrismaOrgRole;
   orgId: string;
   invitedBy: string;
   token: string;
@@ -13,13 +15,11 @@ interface PrismaInvitationPayload {
 }
 
 export class PrismaInvitationMapper {
-  static toReadModel(
-    payload: PrismaInvitationPayload,
-  ): PendingInvitationReadModel {
+  static toReadModel(payload: PrismaInvitationPayload): PendingInvitationReadModel {
     return {
       id: payload.id,
       email: payload.email,
-      role: payload.role as PendingInvitationReadModel['role'],
+      role: PrismaOrgRoleMapper.toDomain(payload.role),
       orgId: payload.orgId,
       invitedBy: payload.invitedBy,
       token: payload.token,

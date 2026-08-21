@@ -15,9 +15,7 @@ describe('LogoutAllUseCase', () => {
   it('should delete all refresh tokens for a user', async () => {
     const result = await useCase.execute({ userId: 'user-1' });
 
-    expect(refreshTokenRepoMock.deleteAllByUserId).toHaveBeenCalledWith(
-      'user-1',
-    );
+    expect(refreshTokenRepoMock.deleteAllByUserId).toHaveBeenCalledWith('user-1');
     expect(result).toEqual({ message: AUTH_ERRORS.LOGOUT_ALL_SUCCESS });
   });
 });

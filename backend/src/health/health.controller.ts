@@ -11,11 +11,11 @@ import { PrismaService } from 'nestjs-prisma';
 @Controller('health')
 export class HealthController {
   constructor(
-    private health: HealthCheckService,
-    private http: HttpHealthIndicator,
-    private memory: MemoryHealthIndicator,
-    private prisma: PrismaHealthIndicator,
-    private prismaService: PrismaService,
+    private readonly health: HealthCheckService,
+    private readonly http: HttpHealthIndicator,
+    private readonly memory: MemoryHealthIndicator,
+    private readonly prisma: PrismaHealthIndicator,
+    private readonly prismaService: PrismaService,
   ) {}
 
   @Get()

@@ -12,33 +12,36 @@ describe('RefreshTokenUseCase', () => {
       deleteById: jest.fn(),
     };
     tokenGeneratorMock = {
-      generateAccessToken: jest.fn(),
+      generateTokens: jest.fn(),
     };
 
     useCase = new RefreshTokenUseCase(refreshTokenRepoMock, tokenGeneratorMock);
   });
 
-  it('should generate new access token for valid refresh token', async () => {
+  it('should generate new token pair and delete old refresh token (rotation)', async () => {
     refreshTokenRepoMock.findByToken.mockResolvedValue({
       id: 'token-1',
       userId: 'user-1',
       expiresAt: new Date(Date.now() + 10000),
     });
-    tokenGeneratorMock.generateAccessToken.mockReturnValue('new-acc-token');
+    tokenGeneratorMock.generateTokens.mockResolvedValue({
+      accessToken: 'new-acc-token',
+      refreshToken: 'new-ref-token',
+    });
 
     const result = await useCase.execute({ token: 'valid-ref' });
 
-    expect(tokenGeneratorMock.generateAccessToken).toHaveBeenCalledWith(
-      'user-1',
-    );
-    expect(result).toEqual({ accessToken: 'new-acc-token' });
+    expect(refreshTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
+    expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('user-1');
+    expect(result).toEqual({
+      accessToken: 'new-acc-token',
+      refreshToken: 'new-ref-token',
+    });
   });
 
   it('should throw UnauthorizedException for invalid token', async () => {
     refreshTokenRepoMock.findByToken.mockResolvedValue(null);
-    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(UnauthorizedException);
   });
 
   it('should delete token and throw if it is expired', async () => {
@@ -47,9 +50,7 @@ describe('RefreshTokenUseCase', () => {
       expiresAt: new Date(Date.now() - 10000), // past
     });
 
-    await expect(useCase.execute({ token: 'expired' })).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(useCase.execute({ token: 'expired' })).rejects.toThrow(UnauthorizedException);
     expect(refreshTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
   });
 });

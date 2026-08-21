@@ -12,11 +12,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../common/guards/membership-role.guard';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../organization/domain/enums/org-role.enum';
+import { TenantId } from '../../organization/presentation/decorators/tenant.decorator';
+import { RequireTenantRole } from '../../organization/presentation/decorators/require-tenant-role.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateTaskUseCase } from '../application/use-cases/create-task.use-case';
 import { UpdateTaskUseCase } from '../application/use-cases/update-task.use-case';
@@ -25,8 +23,10 @@ import { BulkUpdateTaskStatusUseCase } from '../application/use-cases/bulk-updat
 import { DeleteManyTasksUseCase } from '../application/use-cases/delete-many-tasks.use-case';
 import { FindTaskByIdUseCase } from '../application/use-cases/find-task-by-id.use-case';
 import { FindAllTasksUseCase } from '../application/use-cases/find-all-tasks.use-case';
+import { FindAllTasksUnpaginatedUseCase } from '../application/use-cases/find-all-tasks-unpaginated.use-case';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { FindAllTasksDto } from './dto/find-all-tasks.dto';
+import { FindAllTasksUnpaginatedDto } from './dto/find-all-tasks-unpaginated.dto';
 import { BulkDeleteTasksDto, BulkUpdateTasksDto } from './dto/bulk-action.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateTaskCommand } from '../application/commands/create-task.command';
@@ -34,8 +34,8 @@ import { UpdateTaskCommand } from '../application/commands/update-task.command';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
-@Controller('organizations/:orgId/tasks')
-@UseGuards(JwtAuthGuard, MembershipRoleGuard)
+@Controller('organizations/:slug/tasks')
+@UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(
     private readonly createTaskUseCase: CreateTaskUseCase,
@@ -45,12 +45,13 @@ export class TaskController {
     private readonly deleteManyTasksUseCase: DeleteManyTasksUseCase,
     private readonly findTaskByIdUseCase: FindTaskByIdUseCase,
     private readonly findAllTasksUseCase: FindAllTasksUseCase,
+    private readonly findAllTasksUnpaginatedUseCase: FindAllTasksUnpaginatedUseCase,
   ) {}
 
   @Post()
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Create a new task' })
-  create(@Param('orgId') orgId: string, @Body() dto: CreateTaskDto) {
+  create(@TenantId() orgId: string, @Body() dto: CreateTaskDto) {
     const command: CreateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -59,7 +60,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({
@@ -72,59 +73,49 @@ export class TaskController {
   }
 
   @Get()
-  @RequireOrgRole(OrgRole.GUEST)
-  @ApiOperation({ summary: 'List all tasks for an organization' })
-  findAll(@Param('orgId') orgId: string, @Query() dto: FindAllTasksDto) {
-    return this.findAllTasksUseCase.execute(orgId, {
-      search: dto.search,
-      status: dto.status,
-      assigneeIds: dto.assigneeIds,
-      labelNames: dto.labelNames,
-      dueDateFrom: dto.dueDateFrom,
-      dueDateTo: dto.dueDateTo,
-      startDateFrom: dto.startDateFrom,
-      startDateTo: dto.startDateTo,
-    });
+  @RequireTenantRole(OrgRole.GUEST)
+  @ApiOperation({ summary: 'List all tasks for an organization (paginated)' })
+  findAll(@TenantId() orgId: string, @Query() dto: FindAllTasksDto) {
+    return this.findAllTasksUseCase.execute(orgId, dto);
+  }
+
+  @Get('all')
+  @RequireTenantRole(OrgRole.GUEST)
+  @ApiOperation({
+    summary: 'List all tasks for an organization without pagination',
+  })
+  findAllUnpaginated(@TenantId() orgId: string, @Query() dto: FindAllTasksUnpaginatedDto) {
+    return this.findAllTasksUnpaginatedUseCase.execute(orgId, dto);
   }
 
   @Patch('bulk/update')
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Bulk update tasks' })
   @ApiBody({ type: BulkUpdateTasksDto })
-  async updateMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkUpdateTasksDto,
-  ) {
+  async updateMany(@TenantId() orgId: string, @Body() dto: BulkUpdateTasksDto) {
     return this.bulkUpdateTaskStatusUseCase.execute(orgId, dto.ids, dto.status);
   }
 
   @Delete('bulk')
-  @RequireOrgRole(OrgRole.ADMIN)
+  @RequireTenantRole(OrgRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Bulk delete tasks' })
   @ApiBody({ type: BulkDeleteTasksDto })
-  async deleteMany(
-    @Param('orgId') orgId: string,
-    @Body() dto: BulkDeleteTasksDto,
-  ) {
+  async deleteMany(@TenantId() orgId: string, @Body() dto: BulkDeleteTasksDto) {
     await this.deleteManyTasksUseCase.execute(orgId, dto.ids);
   }
 
   @Get(':id')
-  @RequireOrgRole(OrgRole.GUEST)
+  @RequireTenantRole(OrgRole.GUEST)
   @ApiOperation({ summary: 'Get task by ID' })
-  findById(@Param('orgId') orgId: string, @Param('id') id: string) {
+  findById(@TenantId() orgId: string, @Param('id') id: string) {
     return this.findTaskByIdUseCase.execute(id, orgId);
   }
 
   @Patch(':id')
-  @RequireOrgRole(OrgRole.MEMBER)
+  @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Update a task' })
-  update(
-    @Param('orgId') orgId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateTaskDto,
-  ) {
+  update(@TenantId() orgId: string, @Param('id') id: string, @Body() dto: UpdateTaskDto) {
     const command: UpdateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -133,7 +124,7 @@ export class TaskController {
       attachments: dto.attachments,
       startDate: dto.startDate,
       dueDate: dto.dueDate,
-      label: dto.label,
+      labelId: dto.labelId,
       checklists: dto.checklists?.map((cl) => ({
         name: cl.name,
         items: cl.items.map((item) => ({
@@ -146,10 +137,10 @@ export class TaskController {
   }
 
   @Delete(':id')
-  @RequireOrgRole(OrgRole.ADMIN)
+  @RequireTenantRole(OrgRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a task' })
-  async delete(@Param('orgId') orgId: string, @Param('id') id: string) {
+  async delete(@TenantId() orgId: string, @Param('id') id: string) {
     await this.deleteTaskUseCase.execute(id, orgId);
   }
 }

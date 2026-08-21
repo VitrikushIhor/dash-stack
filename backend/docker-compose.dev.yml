@@ -9,12 +9,12 @@ services:
     depends_on:
       - postgres
     volumes:
-      - .:/app                    # Mount source code for hot-reload
-      - /app/node_modules         # Exclude node_modules (use container's)
+      - .:/app # Mount source code for hot-reload
+      - /app/node_modules # Exclude node_modules (use container's)
     environment:
       - PORT=${PORT}
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${DB_PORT}/${POSTGRES_DB}?schema=${DB_SCHEMA}&sslmode=disable
-      - ENABLE_LOGS=true          # Enable logs in dev mode
+      - ENABLE_LOGS=true # Enable logs in dev mode
     env_file:
       - .env
 

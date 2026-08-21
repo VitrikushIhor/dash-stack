@@ -1,5 +1,8 @@
-import { Link } from '@tanstack/react-router'
+'use client'
+
+import Link from 'next/link'
 import { Mail } from 'lucide-react'
+import { ROUTES } from '@/shared/config'
 import { getInitials } from '@/shared/lib/utils'
 import {
   type Membership,
@@ -11,19 +14,20 @@ import { Card, CardContent } from '@/shared/ui/core/card'
 
 interface TeamMemberCardProps {
   membership: Membership
-  orgId: string
+  slug: string
 }
 
-export const TeamMemberCard = ({ membership, orgId }: TeamMemberCardProps) => {
+export const TeamMemberCard = ({ membership, slug }: TeamMemberCardProps) => {
   const { user, role, position } = membership
   const displayName = getMemberDisplayName(user)
   const displayRole = position ? formatPosition(position) : role
   const initials = getInitials(displayName)
 
+  const targetSlug = slug || membership.organization?.slug || ''
+
   return (
     <Link
-      to='/organizations/$orgId/members/$userId'
-      params={{ orgId: orgId || membership.orgId || '', userId: user.id }}
+      href={ROUTES.orgMemberDetail(targetSlug, user.id)}
       className='block no-underline'
     >
       <Card className='group relative overflow-hidden transition-all duration-300 hover:shadow-lg'>
@@ -41,8 +45,8 @@ export const TeamMemberCard = ({ membership, orgId }: TeamMemberCardProps) => {
             </AvatarFallback>
           </Avatar>
 
-          <div className='flex flex-col items-center gap-1 text-center'>
-            <h3 className='text-foreground text-xl font-semibold tracking-tight'>
+          <div className='flex flex-col items-center text-center'>
+            <h3 className='group-hover:text-primary text-lg font-bold tracking-tight transition-colors'>
               {displayName}
             </h3>
             <p className='text-muted-foreground text-sm font-medium'>
@@ -50,9 +54,11 @@ export const TeamMemberCard = ({ membership, orgId }: TeamMemberCardProps) => {
             </p>
           </div>
 
-          <div className='text-muted-foreground hover:text-accent-foreground flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors'>
-            <Mail className='h-4 w-4' />
-            <span className='max-w-[200px] truncate'>{user.email}</span>
+          <div className='bg-secondary/50 group-hover:bg-secondary flex w-full items-center justify-center gap-2 rounded-lg py-2 transition-colors'>
+            <Mail className='text-muted-foreground h-4 w-4' />
+            <span className='text-muted-foreground text-xs font-medium'>
+              {user.email}
+            </span>
           </div>
         </CardContent>
       </Card>

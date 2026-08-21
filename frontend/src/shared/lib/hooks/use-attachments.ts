@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { storageApi, attachServerData } from '@/shared/api'
-import { type FileUploadProps } from '@/shared/ui'
+import { attachServerData, storageApi } from '@/shared/api'
+import { type FileUploadProps } from '@/shared/ui/file-upload'
 
 /** Pseudo-progress simulation interval (ms) */
 const PROGRESS_TICK_MS = 200
@@ -42,8 +42,10 @@ export function useAttachments() {
   )
 
   const onFileReject = useCallback((file: File, message: string) => {
+    const fileName =
+      file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name
     toast.error(message, {
-      description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
+      description: `"${fileName}" has been rejected`,
     })
   }, [])
 

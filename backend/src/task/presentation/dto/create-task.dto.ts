@@ -43,18 +43,6 @@ export function IsDueDateAfterStartDate(validationOptions?: ValidationOptions) {
   };
 }
 
-export class CreateTaskLabelDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  color: string;
-}
-
 export class CreateChecklistItemDto {
   @ApiProperty()
   @IsString()
@@ -111,8 +99,7 @@ export class CreateTaskDto {
   @ApiPropertyOptional({
     type: String,
     format: 'date-time',
-    description:
-      'Optional task due date (ISO 8601). Must be >= startDate when both are provided.',
+    description: 'Optional task due date (ISO 8601). Must be >= startDate when both are provided.',
   })
   @IsOptional()
   @IsDateString()
@@ -131,11 +118,10 @@ export class CreateTaskDto {
   @IsString({ each: true })
   assigneeIds?: string[]; // These are Membership IDs
 
-  @ApiProperty({ type: CreateTaskLabelDto })
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => CreateTaskLabelDto)
-  label: CreateTaskLabelDto;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  labelId?: string;
 
   @ApiPropertyOptional({ type: [CreateChecklistDto] })
   @IsOptional()

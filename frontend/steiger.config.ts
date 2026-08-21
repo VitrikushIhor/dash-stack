@@ -4,40 +4,53 @@ import fsd from '@feature-sliced/steiger-plugin';
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    files: ['./src/shared/ui/core/**'],
+    files: ['./src/app/**'],
     rules: {
+      'fsd/insignificant-slice': 'off',
       'fsd/no-public-api-sidestep': 'off',
     },
   },
   {
-    files: [
-      './src/entities/team/**',
-      './src/entities/team',
-      './src/features/checklist/**',
-      './src/features/checklist',
-      './src/widgets/calendar-view/**',
-      './src/widgets/calendar-view',
-      './src/widgets/kanban-board/**',
-      './src/widgets/kanban-board',
-      './src/widgets/tasks-table/**',
-      './src/widgets/tasks-table',
-      './src/features/event-calendar/**',
-      './src/features/event-calendar',
-      './src/features/task/**',
-      './src/features/task',
-      './src/features/manage-task/**',
-      './src/features/manage-task'
-    ],
+    files: ['./src/widgets/**', './src/features/**', './src/entities/**'],
     rules: {
       'fsd/insignificant-slice': 'off',
     },
   },
   {
+    files: ['./src/shared/ui/core', './src/shared/ui/core/**'],
+    rules: {
+      'fsd/public-api': 'off',
+      'fsd/no-public-api-sidestep': 'off',
+    },
+  },
+  {
+    files: ['./src/shared/lib/test', './src/shared/lib/test/**'],
+    rules: {
+      'fsd/public-api': 'off',
+      'fsd/no-public-api-sidestep': 'off',
+    },
+  },
+
+  {
     files: [
-      './src/features/auth/ui/auth-layout.tsx'
+      './src/**/*.action.ts',
+      './src/**/*.action.test.ts',
+      './src/**/*.server.ts',
+      './src/**/*.server.tsx',
+      './src/**/*.test.ts',
+      './src/**/*.test.tsx',
+      './src/**/*.spec.ts',
+      './src/**/*.spec.tsx',
+      './src/widgets/**',
+      './src/views/**',
+      './src/features/**',
+      './src/entities/**',
     ],
     rules: {
-      'fsd/no-public-api-sidestep': 'off'
-    }
-  }
+      'fsd/no-public-api-sidestep': 'off',
+    },
+  },
 ]);
+
+
+

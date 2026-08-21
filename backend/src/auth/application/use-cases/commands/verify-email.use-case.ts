@@ -22,9 +22,7 @@ export class VerifyEmailUseCase {
   ) {}
 
   async execute(command: VerifyEmailCommand): Promise<AuthTokens> {
-    const verificationToken = await this.verificationTokenRepo.findByToken(
-      command.token,
-    );
+    const verificationToken = await this.verificationTokenRepo.findByToken(command.token);
 
     if (!verificationToken) {
       throw new BadRequestException(AUTH_ERRORS.INVALID_VERIFICATION_TOKEN);
@@ -39,10 +37,7 @@ export class VerifyEmailUseCase {
       AUTH_ERRORS.VERIFICATION_TOKEN_EXPIRED,
     );
 
-    const user = await this.userRepo.updateEmailVerified(
-      verificationToken.email,
-      new Date(),
-    );
+    const user = await this.userRepo.updateEmailVerified(verificationToken.email, new Date());
 
     await this.verificationTokenRepo.deleteById(verificationToken.id);
 

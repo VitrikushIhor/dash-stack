@@ -37,6 +37,7 @@ describe('UpdateTaskUseCase', () => {
     taskRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      findAllUnpaginated: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -79,10 +80,7 @@ describe('UpdateTaskUseCase', () => {
 
     expect(result.title).toBe('New Title');
     expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith('task-1', 'org-1');
-    expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith(
-      'org-1',
-      undefined,
-    );
+    expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith('org-1', undefined);
     expect(taskRepository.update).toHaveBeenCalledWith('task-1', 'org-1', {
       title: 'New Title',
       description: 'New Description',
@@ -92,7 +90,7 @@ describe('UpdateTaskUseCase', () => {
       startDate: undefined,
       dueDate: undefined,
       completedAt: undefined,
-      label: undefined,
+      labelId: undefined,
       checklists: undefined,
     });
   });
@@ -112,10 +110,7 @@ describe('UpdateTaskUseCase', () => {
 
     await useCase.execute('task-1', 'org-1', command);
 
-    expect(taskFileStorage.deleteMany).toHaveBeenCalledWith([
-      'file-2.pdf',
-      'file-3.jpg',
-    ]);
+    expect(taskFileStorage.deleteMany).toHaveBeenCalledWith(['file-2.pdf', 'file-3.jpg']);
     expect(taskRepository.update).toHaveBeenCalledWith(
       'task-1',
       'org-1',

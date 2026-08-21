@@ -1,5 +1,7 @@
+'use client'
+
 import { useFormContext } from 'react-hook-form'
-import { Plus, CheckCheck } from 'lucide-react'
+import { CheckCheck, Plus } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import {
   FormControl,

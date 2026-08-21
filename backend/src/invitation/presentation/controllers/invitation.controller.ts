@@ -1,26 +1,16 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../../common/guards/membership-role.guard';
-import { OrgRole, User } from '@prisma/client';
-import { UserEntity } from '../../../common/decorators/user.decorator';
+import { OrgRole } from '../../../organization/domain/enums/org-role.enum';
+import { UserEntity, AuthUser } from '../../../common/decorators/user.decorator';
+import { TenantId } from '../../../organization/presentation/decorators/tenant.decorator';
+import { RequireTenantRole } from '../../../organization/presentation/decorators/require-tenant-role.decorator';
 import { CreateInvitationDto } from '../dto/create-invitation.dto';
 import { SendInviteUseCase } from '../../application/use-cases/send-invite.use-case';
 import { ListPendingInvitationsUseCase } from '../../application/use-cases/list-pending-invitations.use-case';
 import { RevokeInviteUseCase } from '../../application/use-cases/revoke-invite.use-case';
 import { SendInviteCommand } from '../../application/commands/send-invite.command';
 
-@Controller('organizations/:orgId/invitations')
+@Controller('organizations/:slug/invitations')
 export class InvitationController {
   constructor(
     private readonly sendInviteUseCase: SendInviteUseCase,
@@ -29,11 +19,11 @@ export class InvitationController {
   ) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @RequireTenantRole(OrgRole.ADMIN)
   sendInvite(
-    @Param('orgId') orgId: string,
-    @UserEntity() user: User,
+    @TenantId() orgId: string,
+    @UserEntity() user: AuthUser,
     @Body() dto: CreateInvitationDto,
   ) {
     const command: SendInviteCommand = {
@@ -44,16 +34,16 @@ export class InvitationController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.ADMIN)
-  listPending(@Param('orgId') orgId: string) {
+  @UseGuards(JwtAuthGuard)
+  @RequireTenantRole(OrgRole.ADMIN)
+  listPending(@TenantId() orgId: string) {
     return this.listPendingUseCase.execute(orgId);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.ADMIN)
-  revokeInvite(@Param('orgId') orgId: string, @Param('id') id: string) {
+  @UseGuards(JwtAuthGuard)
+  @RequireTenantRole(OrgRole.ADMIN)
+  revokeInvite(@TenantId() orgId: string, @Param('id') id: string) {
     return this.revokeInviteUseCase.execute(id, orgId);
   }
 }

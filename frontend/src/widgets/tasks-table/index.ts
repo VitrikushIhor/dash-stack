@@ -1,3 +1,3 @@
-// Public API for tasks-table widget
-export { TasksTable } from './ui/tasks-table'
-export { useTasksTable } from './model/use-tasks-table'
+export { TasksTableView } from './ui/tasks-table-view'
+export { tasksColumns } from './ui/tasks-columns'
+export { useTasksTableState } from './model/use-tasks-table'

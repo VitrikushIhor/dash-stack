@@ -1,5 +1,5 @@
 import { PrismaInvitationRepository } from '../../../infrastructure/persistence/prisma-invitation.repository';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 
 const mockPrismaInvitation = (overrides?: Record<string, unknown>) => ({
   id: 'inv-1',
@@ -59,20 +59,14 @@ describe('PrismaInvitationRepository', () => {
       const membership = { id: 'mem-1' };
       prisma.membership.findFirst.mockResolvedValue(membership);
 
-      const result = await repository.findMembershipByEmailAndOrg(
-        'user@example.com',
-        'org-1',
-      );
+      const result = await repository.findMembershipByEmailAndOrg('user@example.com', 'org-1');
       expect(result).toBe(membership);
     });
 
     it('returns null when not found', async () => {
       prisma.membership.findFirst.mockResolvedValue(null);
 
-      const result = await repository.findMembershipByEmailAndOrg(
-        'user@example.com',
-        'org-1',
-      );
+      const result = await repository.findMembershipByEmailAndOrg('user@example.com', 'org-1');
       expect(result).toBeNull();
     });
   });
@@ -149,7 +143,7 @@ describe('PrismaInvitationRepository', () => {
         where: { token: 'token-abc' },
       });
       expect(result).not.toBeNull();
-      expect(result!.token).toBe('token-abc');
+      expect(result?.token).toBe('token-abc');
     });
 
     it('returns null when invitation not found', async () => {
@@ -170,7 +164,7 @@ describe('PrismaInvitationRepository', () => {
         where: { id: 'inv-1' },
       });
       expect(result).not.toBeNull();
-      expect(result!.id).toBe('inv-1');
+      expect(result?.id).toBe('inv-1');
     });
 
     it('returns null when invitation not found', async () => {
@@ -195,12 +189,7 @@ describe('PrismaInvitationRepository', () => {
       };
       prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
-      const result = await repository.accept(
-        'inv-1',
-        'user-1',
-        'org-1',
-        OrgRole.MEMBER,
-      );
+      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
 
       expect(tx.membership.findUnique).toHaveBeenCalledWith({
         where: { userId_orgId: { userId: 'user-1', orgId: 'org-1' } },
@@ -228,12 +217,7 @@ describe('PrismaInvitationRepository', () => {
       };
       prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
-      const result = await repository.accept(
-        'inv-1',
-        'user-1',
-        'org-1',
-        OrgRole.MEMBER,
-      );
+      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
 
       expect(tx.membership.create).not.toHaveBeenCalled();
       expect(tx.invitation.update).toHaveBeenCalled();

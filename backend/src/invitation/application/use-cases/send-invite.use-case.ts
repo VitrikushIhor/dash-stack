@@ -18,16 +18,10 @@ export class SendInviteUseCase {
   async execute(orgId: string, invitedBy: string, command: SendInviteCommand) {
     const email = new InvitationEmail(command.email);
 
-    const existingMember = await this.repository.findMembershipByEmailAndOrg(
-      email.value,
-      orgId,
-    );
+    const existingMember = await this.repository.findMembershipByEmailAndOrg(email.value, orgId);
     InvitationPolicy.assertNotAlreadyMember(existingMember);
 
-    const pendingInvite = await this.repository.findPendingByEmailAndOrg(
-      email.value,
-      orgId,
-    );
+    const pendingInvite = await this.repository.findPendingByEmailAndOrg(email.value, orgId);
     InvitationPolicy.assertNoPendingInvite(pendingInvite);
 
     const org = await this.repository.findOrgById(orgId);

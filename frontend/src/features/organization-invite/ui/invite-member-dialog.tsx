@@ -1,0 +1,104 @@
+'use client'
+
+import { OrgRole } from '@/shared/model'
+import { Button } from '@/shared/ui/core/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/core/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared/ui/core/form'
+import { Input } from '@/shared/ui/core/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/core/select'
+import { useInviteMemberForm } from '../model/use-invite-member-form'
+import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
+
+export const InviteMemberDialog = () => {
+  const { isOpen, slug, close } = useInviteMemberModalStore()
+
+  const { form, onSubmit, isPending } = useInviteMemberForm({
+    slug: slug ?? '',
+    onSuccess: () => {
+      close()
+    },
+  })
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+      <DialogContent className='sm:max-w-106.25'>
+        <DialogHeader>
+          <DialogTitle>Invite Member</DialogTitle>
+          <DialogDescription>
+            Send an invitation to join your organization.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='space-y-4 py-4'
+          >
+            <FormField
+              control={form.control}
+              name='email'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder='user@example.com' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='role'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select a role' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={OrgRole.ADMIN}>Admin</SelectItem>
+                      <SelectItem value={OrgRole.MEMBER}>Member</SelectItem>
+                      <SelectItem value={OrgRole.GUEST}>Guest</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type='submit' disabled={isPending}>
+                {isPending ? 'Sending...' : 'Send Invitation'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,28 +1,34 @@
-import { api } from '@/shared/api'
+import { type HttpClient, api } from '@/shared/api'
 import { type Membership } from '@/shared/model'
 import {
-  type Organization,
   type CreateOrganizationDto,
+  type Organization,
   type UpdateOrganizationDto,
+  type UserMembership,
 } from '../model/types/organization.types'
 
-export const organizationApi = {
-  getAll: () => api.get<Organization[]>('/organizations'),
+export const createOrganizationApi = (client: HttpClient) => ({
+  getAll: () => client.get<Organization[]>('/organizations'),
 
-  getById: (orgId: string) => api.get<Organization>(`/organizations/${orgId}`),
+  getMyMemberships: () => client.get<UserMembership[]>('/me/memberships'),
+
+  getBySlug: (slug: string) =>
+    client.get<Organization>(`/organizations/${slug}`),
 
   create: (dto: CreateOrganizationDto) =>
-    api.post<Organization>('/organizations', dto),
+    client.post<Organization>('/organizations', dto),
 
-  update: ({ orgId, dto }: { orgId: string; dto: UpdateOrganizationDto }) =>
-    api.patch<Organization>(`/organizations/${orgId}`, dto),
+  update: ({ slug, dto }: { slug: string; dto: UpdateOrganizationDto }) =>
+    client.patch<Organization>(`/organizations/${slug}`, dto),
 
-  delete: (orgId: string) =>
-    api.delete<{ message: string }>(`/organizations/${orgId}`),
+  delete: (slug: string) =>
+    client.delete<{ message: string }>(`/organizations/${slug}`),
 
-  getMembers: (orgId: string) =>
-    api.get<Membership[]>(`/organizations/${orgId}/members`),
+  getMembers: (slug: string) =>
+    client.get<Membership[]>(`/organizations/${slug}/members`),
 
-  getMember: ({ orgId, userId }: { orgId: string; userId: string }) =>
-    api.get<Membership>(`/organizations/${orgId}/members/${userId}`),
-}
+  getMember: ({ slug, userId }: { slug: string; userId: string }) =>
+    client.get<Membership>(`/organizations/${slug}/members/${userId}`),
+})
+
+export const organizationApi = createOrganizationApi(api)

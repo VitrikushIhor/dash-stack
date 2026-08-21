@@ -19,11 +19,7 @@ describe('ForgotPasswordUseCase', () => {
       sendPasswordResetEmail: jest.fn(),
     };
 
-    useCase = new ForgotPasswordUseCase(
-      userRepoMock,
-      verificationTokenRepoMock,
-      mailerMock,
-    );
+    useCase = new ForgotPasswordUseCase(userRepoMock, verificationTokenRepoMock, mailerMock);
   });
 
   it('should delete old tokens, create a new one, and send email if user exists', async () => {
@@ -31,9 +27,10 @@ describe('ForgotPasswordUseCase', () => {
 
     const result = await useCase.execute({ email: 'test@example.com' });
 
-    expect(
-      verificationTokenRepoMock.deleteManyByEmailAndType,
-    ).toHaveBeenCalledWith('test@example.com', AuthTokenType.PASSWORD_RESET);
+    expect(verificationTokenRepoMock.deleteManyByEmailAndType).toHaveBeenCalledWith(
+      'test@example.com',
+      AuthTokenType.PASSWORD_RESET,
+    );
     expect(verificationTokenRepoMock.create).toHaveBeenCalledWith(
       expect.objectContaining({
         email: 'test@example.com',

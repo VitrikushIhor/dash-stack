@@ -4,23 +4,17 @@ import { TaskStatus } from '../../../domain/enums/task-status.enum';
 describe('TaskStatusPolicy', () => {
   describe('resolveCompletedAtOnCreate()', () => {
     it('returns a Date when status is COMPLETED', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(
-        TaskStatus.COMPLETED,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(TaskStatus.COMPLETED);
       expect(result).toBeInstanceOf(Date);
     });
 
     it('returns undefined when status is PLANNED', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(
-        TaskStatus.PLANNED,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(TaskStatus.PLANNED);
       expect(result).toBeUndefined();
     });
 
     it('returns undefined when status is UPCOMING', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(
-        TaskStatus.UPCOMING,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnCreate(TaskStatus.UPCOMING);
       expect(result).toBeUndefined();
     });
   });
@@ -85,23 +79,17 @@ describe('TaskStatusPolicy', () => {
 
   describe('resolveCompletedAtOnBulkStatus()', () => {
     it('returns a Date when status is COMPLETED', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(
-        TaskStatus.COMPLETED,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(TaskStatus.COMPLETED);
       expect(result).toBeInstanceOf(Date);
     });
 
     it('returns null when status is PLANNED', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(
-        TaskStatus.PLANNED,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(TaskStatus.PLANNED);
       expect(result).toBeNull();
     });
 
     it('returns null when status is UPCOMING', () => {
-      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(
-        TaskStatus.UPCOMING,
-      );
+      const result = TaskStatusPolicy.resolveCompletedAtOnBulkStatus(TaskStatus.UPCOMING);
       expect(result).toBeNull();
     });
   });

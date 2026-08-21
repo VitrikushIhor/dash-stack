@@ -3,10 +3,10 @@ import { TeamMemberCard } from '@/entities/team'
 
 interface TeamGridProps {
   memberships: Membership[]
-  orgId: string
+  slug: string
 }
 
-export const TeamGrid = ({ memberships, orgId }: TeamGridProps) => {
+export const TeamGrid = ({ memberships, slug }: TeamGridProps) => {
   if (!memberships || memberships.length === 0) {
     return (
       <div
@@ -22,14 +22,13 @@ export const TeamGrid = ({ memberships, orgId }: TeamGridProps) => {
   return (
     <div
       className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-      tabIndex={0}
       aria-label='Team members grid'
     >
       {memberships.map((membership) => (
         <TeamMemberCard
           key={membership.id}
           membership={membership}
-          orgId={orgId}
+          slug={slug}
         />
       ))}
     </div>

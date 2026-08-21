@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { type FilterFn, type Row, type Column } from '@tanstack/react-table'
+import { type Column, type FilterFn, type Row } from '@tanstack/react-table'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
@@ -51,7 +51,7 @@ export function DataTableDateFilter<TData, TValue>({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const dateFilterFn: FilterFn<any> = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   row: Row<any>,

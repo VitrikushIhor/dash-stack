@@ -23,7 +23,7 @@ export class PrismaVerificationTokenRepository implements VerificationTokenRepos
       id: token.id,
       email: token.email,
       token: token.token,
-      type: token.type as unknown as AuthTokenType,
+      type: token.type as AuthTokenType,
       expires: token.expires,
     };
   }
@@ -35,9 +35,7 @@ export class PrismaVerificationTokenRepository implements VerificationTokenRepos
     return result ? this.mapToModel(result) : null;
   }
 
-  async create(
-    data: CreateVerificationTokenData,
-  ): Promise<VerificationTokenModel> {
+  async create(data: CreateVerificationTokenData): Promise<VerificationTokenModel> {
     const result = await this.prisma.verificationToken.create({
       data: {
         ...data,
@@ -54,10 +52,7 @@ export class PrismaVerificationTokenRepository implements VerificationTokenRepos
     return this.mapToModel(result);
   }
 
-  deleteManyByEmailAndType(
-    email: string,
-    type: AuthTokenType,
-  ): Promise<{ count: number }> {
+  deleteManyByEmailAndType(email: string, type: AuthTokenType): Promise<{ count: number }> {
     return this.prisma.verificationToken.deleteMany({
       where: { email, type: type as TokenType },
     });

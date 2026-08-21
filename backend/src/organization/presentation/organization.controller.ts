@@ -1,22 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
-import {
-  MembershipRoleGuard,
-  RequireOrgRole,
-} from '../../common/guards/membership-role.guard';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../domain/enums/org-role.enum';
 import { UserEntity } from '../../common/decorators/user.decorator';
+import { TenantId } from './decorators/tenant.decorator';
+import { RequireTenantRole } from './decorators/require-tenant-role.decorator';
 import { CreateOrganizationUseCase } from '../application/use-cases/create-organization.use-case';
 import { UpdateOrganizationUseCase } from '../application/use-cases/update-organization.use-case';
 import { DeleteOrganizationUseCase } from '../application/use-cases/delete-organization.use-case';
@@ -41,10 +30,7 @@ export class OrganizationController {
   ) {}
 
   @Post()
-  create(
-    @UserEntity() user: { id: string },
-    @Body() dto: CreateOrganizationDto,
-  ) {
+  create(@UserEntity() user: { id: string }, @Body() dto: CreateOrganizationDto) {
     const command: CreateOrganizationCommand = {
       name: dto.name,
       description: dto.description ?? null,
@@ -58,17 +44,15 @@ export class OrganizationController {
     return this.findOrganizationsByUserIdUseCase.execute(user.id);
   }
 
-  @Get(':orgId')
-  @UseGuards(MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.GUEST)
-  findById(@Param('orgId') orgId: string, @UserEntity() user: { id: string }) {
+  @Get(':slug')
+  @RequireTenantRole(OrgRole.GUEST)
+  findBySlug(@TenantId() orgId: string, @UserEntity() user: { id: string }) {
     return this.findOrganizationByIdUseCase.execute(orgId, user.id);
   }
 
-  @Patch(':orgId')
-  @UseGuards(MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.ADMIN)
-  update(@Param('orgId') orgId: string, @Body() dto: UpdateOrganizationDto) {
+  @Patch(':slug')
+  @RequireTenantRole(OrgRole.ADMIN)
+  update(@TenantId() orgId: string, @Body() dto: UpdateOrganizationDto) {
     const command: UpdateOrganizationCommand = {
       name: dto.name,
       description: dto.description,
@@ -77,24 +61,21 @@ export class OrganizationController {
     return this.updateOrganizationUseCase.execute(orgId, command);
   }
 
-  @Delete(':orgId')
-  @UseGuards(MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.OWNER)
-  async delete(@Param('orgId') orgId: string) {
+  @Delete(':slug')
+  @RequireTenantRole(OrgRole.OWNER)
+  async delete(@TenantId() orgId: string) {
     return await this.deleteOrganizationUseCase.execute(orgId);
   }
 
-  @Get(':orgId/members')
-  @UseGuards(MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.GUEST)
-  findMembers(@Param('orgId') orgId: string) {
+  @Get(':slug/members')
+  @RequireTenantRole(OrgRole.GUEST)
+  findMembers(@TenantId() orgId: string) {
     return this.findOrganizationMembersUseCase.execute(orgId);
   }
 
-  @Get(':orgId/members/:userId')
-  @UseGuards(MembershipRoleGuard)
-  @RequireOrgRole(OrgRole.GUEST)
-  findMember(@Param('orgId') orgId: string, @Param('userId') userId: string) {
+  @Get(':slug/members/:userId')
+  @RequireTenantRole(OrgRole.GUEST)
+  findMember(@TenantId() orgId: string, @Param('userId') userId: string) {
     return this.findOrganizationMemberUseCase.execute(orgId, userId);
   }
 }

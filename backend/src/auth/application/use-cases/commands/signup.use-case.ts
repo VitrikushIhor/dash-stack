@@ -33,9 +33,7 @@ export class SignupUseCase {
       throw new ConflictException(AUTH_ERRORS.USER_ALREADY_EXISTS);
     }
 
-    const hashedPassword = await this.passwordHasher.hashPassword(
-      command.password,
-    );
+    const hashedPassword = await this.passwordHasher.hashPassword(command.password);
 
     const user = await this.userRepo.create({
       email: email.value,

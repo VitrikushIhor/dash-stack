@@ -15,11 +15,7 @@ export class EmailInvitationMailerAdapter implements InvitationMailerPort {
     this.emailConfig = this.configService.get<EmailConfig>('email');
   }
 
-  async sendInviteEmail(
-    email: string,
-    token: string,
-    orgName: string,
-  ): Promise<void> {
+  async sendInviteEmail(email: string, token: string, orgName: string): Promise<void> {
     const acceptUrl = `${this.emailConfig.frontendUrl}/invite/accept?token=${token}`;
     const escapedOrgName = this.escapeHtml(orgName);
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { useFormContext } from 'react-hook-form'
 import { Upload, X } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
@@ -64,7 +66,7 @@ export function FormFileUpload({ name, label, ...props }: FormFileUploadProps) {
                 <FileUploadList>
                   {files.map((file, index) => (
                     <FileUploadItem
-                      key={index}
+                      key={`${file.name}-${index}`}
                       value={file}
                       className='flex-col'
                     >

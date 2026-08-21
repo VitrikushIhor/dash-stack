@@ -14,7 +14,7 @@ interface PrismaChecklist {
   items: PrismaChecklistItem[];
 }
 
-interface PrismaTaskWithRelations {
+export interface PrismaTaskWithRelations {
   id: string;
   organizationId: string;
   title: string;
@@ -28,30 +28,35 @@ interface PrismaTaskWithRelations {
   updatedAt: Date;
   assignees: Array<{
     id: string;
-    user?: {
+    user: {
       id: string;
       firstName: string;
-      email?: string | null;
-      avatar?: string | null;
+      email: string | null;
+      avatar: string | null;
     } | null;
   }>;
   label: {
     id: string;
     name: string;
     color: string;
-    taskId: string;
+    organizationId: string;
   } | null;
   checklists: PrismaChecklist[];
 }
 
 export class PrismaTaskMapper {
-  static toDomain(
-    prismaTask: PrismaTaskWithRelations | null,
-  ): TaskReadModel | null {
+  static toDomain(prismaTask: PrismaTaskWithRelations | null): TaskReadModel | null {
     if (!prismaTask) return null;
 
     return {
       ...prismaTask,
+      label: prismaTask.label
+        ? {
+            id: prismaTask.label.id,
+            name: prismaTask.label.name,
+            color: prismaTask.label.color ?? 'gray',
+          }
+        : null,
       checklists: prismaTask.checklists?.map((cl) => ({
         ...cl,
         items: cl.items?.map((item) => ({

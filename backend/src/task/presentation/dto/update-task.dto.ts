@@ -1,8 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsDueDateAfterStartDate } from './create-task.dto';
+import { CreateTaskDto, IsDueDateAfterStartDate } from './create-task.dto';
 import { IsDateString, IsOptional, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { CreateTaskDto } from './create-task.dto';
 
 /**
  * UpdateTaskDto extends PartialType(CreateTaskDto) so all create fields become
@@ -49,4 +48,14 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsDueDateAfterStartDate()
   @Transform(({ value }) => (value === null ? null : value))
   declare dueDate?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Set to null to clear the label',
+  })
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @Transform(({ value }) => (value === null ? null : value))
+  declare labelId?: string | null;
 }

@@ -15,18 +15,18 @@ const basePrismaTask = () => ({
   updatedAt: new Date('2024-01-01'),
   assignees: [] as Array<{
     id: string;
-    user?: {
+    user: {
       id: string;
       firstName: string;
-      email?: string | null;
-      avatar?: string | null;
-    } | null;
+      email: string;
+      avatar: string | null;
+    };
   }>,
   label: null as {
     id: string;
     name: string;
     color: string;
-    taskId: string;
+    organizationId: string;
   } | null,
   checklists: [] as Array<{
     id: string;
@@ -91,7 +91,7 @@ describe('PrismaTaskMapper', () => {
           id: 'label-1',
           name: 'Bug',
           color: '#ff0000',
-          taskId: 'task-1',
+          organizationId: 'org-1',
         },
       };
 

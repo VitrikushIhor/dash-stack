@@ -1,10 +1,11 @@
 import { PrismaInvitationMapper } from '../../../infrastructure/persistence/prisma-invitation.mapper';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
+import { OrgRole as PrismaOrgRole } from '@prisma/client';
 
 const basePrismaInvitation = () => ({
   id: 'inv-1',
   email: 'user@example.com',
-  role: 'MEMBER' as string,
+  role: PrismaOrgRole.MEMBER,
   orgId: 'org-1',
   invitedBy: 'admin-1',
   token: 'token-abc-123',
@@ -51,7 +52,7 @@ describe('PrismaInvitationMapper', () => {
     });
 
     it('casts role string to OrgRole enum', () => {
-      const payload = { ...basePrismaInvitation(), role: 'ADMIN' };
+      const payload = { ...basePrismaInvitation(), role: PrismaOrgRole.ADMIN };
       const result = PrismaInvitationMapper.toReadModel(payload);
 
       expect(result.role).toBe(OrgRole.ADMIN);

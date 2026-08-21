@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { OrganizationModule } from '../organization/organization.module';
 import { EmailModule } from '../email/email.module';
-import { EmailService } from '../email/email.service';
 import { InvitationController } from './presentation/controllers/invitation.controller';
 import { InvitationAcceptController } from './presentation/controllers/invitation-accept.controller';
 import { SendInviteUseCase } from './application/use-cases/send-invite.use-case';
@@ -11,7 +11,7 @@ import { PrismaInvitationRepository } from './infrastructure/persistence/prisma-
 import { EmailInvitationMailerAdapter } from './infrastructure/integrations/email-invitation-mailer.adapter';
 
 @Module({
-  imports: [EmailModule],
+  imports: [OrganizationModule, EmailModule],
   controllers: [InvitationController, InvitationAcceptController],
   providers: [
     SendInviteUseCase,

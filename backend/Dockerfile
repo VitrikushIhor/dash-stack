@@ -1,10 +1,13 @@
-FROM node:22-alpine AS builder
+FROM node:22-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-# Create app directory
+FROM base AS builder
 WORKDIR /app
 
 # Copy root workspace files for deterministic installs
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
 # Copy backend package.json for workspace resolution
 COPY backend/package.json ./backend/
@@ -13,38 +16,31 @@ COPY backend/package.json ./backend/
 COPY backend/prisma ./backend/prisma/
 
 # Install dependencies (workspace-aware)
-RUN npm ci --workspace=backend --include-workspace-root
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter backend...
+
+# Generate Prisma Client
+RUN pnpm --filter backend run prisma:generate
 
 # Copy backend source code
 COPY backend/ ./backend/
 
 # Build application
-RUN npm run build --workspace=backend
+RUN pnpm --filter backend run build
 
-FROM node:22-alpine AS runner
+# Deploy isolated backend workspace with production dependencies
+RUN pnpm --filter backend --prod deploy --legacy /app/pruned
 
-WORKDIR /app
+FROM base AS runner
+WORKDIR /app/backend
 
-# Copy root package and lockfile
-COPY --from=builder /app/package.json /app/package-lock.json ./
-
-# Copy root node_modules (which contains the generated Prisma client and all hoisted deps)
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy backend workspace package and files
-COPY --from=builder /app/backend/package.json ./backend/
-COPY --from=builder /app/backend/dist ./backend/dist
-COPY --from=builder /app/backend/prisma ./backend/prisma
-COPY --from=builder /app/backend/tsconfig.json ./backend/
-
-# Prune dev dependencies from the root workspace
-RUN npm prune --production
+# Copy production artifacts and isolated node_modules
+COPY --from=builder /app/backend/dist ./dist
+COPY --from=builder /app/backend/prisma ./prisma
+COPY --from=builder /app/pruned/node_modules ./node_modules
+COPY --from=builder /app/pruned/package.json ./package.json
 
 # Use non-root user
 USER node
 
-# We run from the backend workspace
-WORKDIR /app/backend
-
 EXPOSE 8000
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "node", "dist/main" ]

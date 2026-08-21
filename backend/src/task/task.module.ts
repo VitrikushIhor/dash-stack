@@ -8,10 +8,13 @@ import { BulkUpdateTaskStatusUseCase } from './application/use-cases/bulk-update
 import { DeleteManyTasksUseCase } from './application/use-cases/delete-many-tasks.use-case';
 import { FindTaskByIdUseCase } from './application/use-cases/find-task-by-id.use-case';
 import { FindAllTasksUseCase } from './application/use-cases/find-all-tasks.use-case';
+import { FindAllTasksUnpaginatedUseCase } from './application/use-cases/find-all-tasks-unpaginated.use-case';
 import { TaskController } from './presentation/task.controller';
 import { TaskAssigneeValidatorService } from './application/services/task-assignee-validator.service';
+import { OrganizationModule } from '../organization/organization.module';
 
 @Module({
+  imports: [OrganizationModule],
   controllers: [TaskController],
   providers: [
     CreateTaskUseCase,
@@ -21,6 +24,7 @@ import { TaskAssigneeValidatorService } from './application/services/task-assign
     DeleteManyTasksUseCase,
     FindTaskByIdUseCase,
     FindAllTasksUseCase,
+    FindAllTasksUnpaginatedUseCase,
     TaskAssigneeValidatorService,
     PrismaTaskRepository,
     {

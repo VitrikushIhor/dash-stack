@@ -1,30 +1,36 @@
-import { useLayout } from '@/shared/lib/context'
+'use client'
+
+import { useLayout } from '@/shared/lib/providers'
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from '@/shared/ui/core/sidebar'
-import { AppTitle } from './app-title'
-import { sidebarData } from './data/sidebar-data'
+import { useOrgSlug } from '@/entities/organization'
+import { getSidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 
-export function AppSidebar() {
+export function AppSidebar({
+  teamSwitcher,
+}: {
+  teamSwitcher?: React.ReactNode
+}) {
   const { collapsible, variant } = useLayout()
+  const slug = useOrgSlug()
+
+  const currentSidebarData = getSidebarData(slug)
+
   return (
-    <Sidebar
-      collapsible={collapsible}
-      variant={variant}
-      // className='border-accent border-r'
-    >
-      <SidebarHeader>
-        <AppTitle />
-      </SidebarHeader>
+    <Sidebar collapsible={collapsible} variant={variant}>
+      <SidebarHeader>{teamSwitcher}</SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {currentSidebarData.navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
+      <SidebarFooter></SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

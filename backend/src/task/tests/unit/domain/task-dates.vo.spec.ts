@@ -55,21 +55,17 @@ describe('TaskDates', () => {
     });
 
     it('throws InvalidTaskDatesException when startDate > dueDate', () => {
-      expect(() =>
-        TaskDates.validateRange(new Date('2024-12-31'), new Date('2024-01-01')),
-      ).toThrow(InvalidTaskDatesException);
+      expect(() => TaskDates.validateRange(new Date('2024-12-31'), new Date('2024-01-01'))).toThrow(
+        InvalidTaskDatesException,
+      );
     });
 
     it('does not throw when startDate is null', () => {
-      expect(() =>
-        TaskDates.validateRange(null, new Date('2024-12-31')),
-      ).not.toThrow();
+      expect(() => TaskDates.validateRange(null, new Date('2024-12-31'))).not.toThrow();
     });
 
     it('does not throw when dueDate is null', () => {
-      expect(() =>
-        TaskDates.validateRange(new Date('2024-01-01'), null),
-      ).not.toThrow();
+      expect(() => TaskDates.validateRange(new Date('2024-01-01'), null)).not.toThrow();
     });
 
     it('does not throw when both are null', () => {
@@ -97,9 +93,7 @@ describe('TaskDates', () => {
     });
 
     it('throws InvalidDateFormatException for invalid date string', () => {
-      expect(() => TaskDates.parseOptional('not-a-date')).toThrow(
-        InvalidDateFormatException,
-      );
+      expect(() => TaskDates.parseOptional('not-a-date')).toThrow(InvalidDateFormatException);
     });
   });
 
@@ -122,9 +116,7 @@ describe('TaskDates', () => {
     });
 
     it('throws InvalidDateFormatException for invalid string', () => {
-      expect(() => TaskDates.parseNullable('bad')).toThrow(
-        InvalidDateFormatException,
-      );
+      expect(() => TaskDates.parseNullable('bad')).toThrow(InvalidDateFormatException);
     });
   });
 });

@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsString,
-  IsNotEmpty,
-  ArrayMinSize,
-  IsEnum,
-} from 'class-validator';
+import { IsArray, IsString, IsNotEmpty, ArrayMinSize, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { TaskStatus } from '../../domain/enums/task-status.enum';
 

@@ -19,8 +19,5 @@ export interface VerificationTokenRepositoryPort {
   findByToken(token: string): Promise<VerificationTokenModel | null>;
   create(data: CreateVerificationTokenData): Promise<VerificationTokenModel>;
   deleteById(id: string): Promise<VerificationTokenModel>;
-  deleteManyByEmailAndType(
-    email: string,
-    type: AuthTokenType,
-  ): Promise<{ count: number }>;
+  deleteManyByEmailAndType(email: string, type: AuthTokenType): Promise<{ count: number }>;
 }

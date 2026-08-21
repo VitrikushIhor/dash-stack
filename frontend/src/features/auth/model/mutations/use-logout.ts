@@ -1,24 +1,33 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { clearTokens } from '@/shared/api'
-import { authApi } from '../../api/auth-api'
+import { ROUTES } from '@/shared/config'
+import { logoutAction } from '../../api/actions/logout.action'
 
 export function useLogout() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return useMutation({
-    mutationFn: authApi.logout,
+    mutationFn: async () => {
+      const res = await logoutAction()
+      if (!res.success) {
+        throw new Error(res.error)
+      }
+      return res.data
+    },
     onSuccess: () => {
       queryClient.clear()
       toast.success('Logged out successfully')
-      navigate({ to: '/sign-in', replace: true })
+      router.replace(ROUTES.signIn)
+      router.refresh()
     },
     onError: () => {
-      clearTokens()
       queryClient.clear()
-      navigate({ to: '/sign-in', replace: true })
+      router.replace(ROUTES.signIn)
+      router.refresh()
     },
   })
 }

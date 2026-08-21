@@ -16,6 +16,8 @@ describe('DeleteOrganizationUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
+      findMembershipBySlugAndUserId: jest.fn(),
     };
 
     useCase = new DeleteOrganizationUseCase(repository);
@@ -42,8 +44,6 @@ describe('DeleteOrganizationUseCase', () => {
     const prismaError = new Error('Record to delete does not exist');
     repository.delete.mockRejectedValue(prismaError);
 
-    await expect(useCase.execute('org-999')).rejects.toThrow(
-      'Record to delete does not exist',
-    );
+    await expect(useCase.execute('org-999')).rejects.toThrow('Record to delete does not exist');
   });
 });

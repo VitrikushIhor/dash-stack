@@ -1,8 +1,11 @@
+'use client'
+
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'
 import { useIsMobile } from '@/shared/lib'
+import { COOKIE_CONFIG } from '@/shared/lib/cookie-config'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import { Input } from '@/shared/ui/core/input'
@@ -22,8 +25,8 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state'
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+const SIDEBAR_COOKIE_NAME = COOKIE_CONFIG.SIDEBAR_STATE.name
+const SIDEBAR_COOKIE_MAX_AGE = COOKIE_CONFIG.SIDEBAR_STATE.maxAge
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
@@ -281,6 +284,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
 
   return (
     <button
+      type='button'
       data-sidebar='rail'
       data-slot='sidebar-rail'
       aria-label='Toggle Sidebar'

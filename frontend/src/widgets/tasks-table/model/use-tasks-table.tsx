@@ -1,143 +1,138 @@
-import { useState, useEffect, useMemo } from 'react'
-import { getRouteApi } from '@tanstack/react-router'
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
 import {
-  useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type OnChangeFn,
+  type PaginationState,
+  type RowSelectionState,
+  type SortingState,
+  type VisibilityState,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  type SortingState,
-  type VisibilityState,
-  type RowSelectionState,
+  useReactTable,
 } from '@tanstack/react-table'
-import { useTableUrlState } from '@/shared/lib'
+import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
+import { type Task } from '@/entities/task'
+import { useTasksTableSearchParams } from '@/features/task-filters'
 import {
-  dateFilterFn,
-  dateRangeFilterFn,
-  mockAvailableLabels,
-} from '@/shared/ui'
-import { useGetMembers } from '@/entities/organization'
-import { TaskStatusEnum, type Task, STATUS_CONFIG } from '@/entities/task'
-import { tasksColumns } from '../ui/tasks-columns'
+  mapColumnFiltersToSearchParams,
+  mapSearchParamsToColumnFilters,
+} from '../lib/filters'
 
-interface UseTasksTableProps {
-  orgId: string
+/* eslint-disable react-hooks/incompatible-library */
+
+interface UseTasksTableStateProps {
   data: Task[]
+  columns: ColumnDef<Task, unknown>[]
+  pageCount?: number
 }
-const route = getRouteApi('/_authenticated/task/')
 
-export function useTasksTable({ orgId, data }: UseTasksTableProps) {
-  // Local UI-only states
+const DEFAULT_PAGE_SIZE = 10
+
+export function useTasksTableState({
+  data,
+  columns,
+  pageCount = -1,
+}: UseTasksTableStateProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Synced with URL states
-  const {
-    globalFilter,
-    onGlobalFilterChange,
-    columnFilters,
-    onColumnFiltersChange,
-    pagination,
-    onPaginationChange,
-    ensurePageInRange,
-  } = useTableUrlState({
-    search: route.useSearch(),
-    navigate: route.useNavigate(),
-    pagination: { defaultPage: 1, defaultPageSize: 10 },
-    globalFilter: { enabled: true, key: 'filter' },
-    columnFilters: [
-      { columnId: 'status', searchKey: 'status', type: 'array' },
-      { columnId: 'label', searchKey: 'labels', type: 'array' },
-      { columnId: 'assignees', searchKey: 'members', type: 'array' },
-      {
-        columnId: 'dueDate',
-        searchKey: 'dueDate',
-        type: 'array',
-        serialize: (value: unknown) => {
-          if (!Array.isArray(value)) return undefined
-          const filtered = value.filter(Boolean)
-          return filtered.length > 0 ? filtered : undefined
-        },
-        deserialize: (value: unknown) => {
-          if (!Array.isArray(value)) return []
-          return value.filter((v) => typeof v === 'string' && v)
-        },
-      },
-    ],
-  })
+  const [searchParams, setSearchParams] = useTasksTableSearchParams()
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  const columnFilters: ColumnFiltersState = useMemo(
+    () => mapSearchParamsToColumnFilters(searchParams),
+    [searchParams]
+  )
+
+  const pagination: PaginationState = useMemo(
+    () => ({
+      pageIndex: Math.max(0, searchParams.page - 1),
+      pageSize: searchParams.perPage || DEFAULT_PAGE_SIZE,
+    }),
+    [searchParams.page, searchParams.perPage]
+  )
+
+  const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updater) => {
+    const next =
+      typeof updater === 'function' ? updater(columnFilters) : updater
+    const mapped = mapColumnFiltersToSearchParams(next)
+
+    setSearchParams({
+      page: 1,
+      status: mapped.status,
+      labels: mapped.labels,
+      members: mapped.members,
+      dueDate: mapped.dueDate,
+    })
+  }
+
+  const onGlobalFilterChange: OnChangeFn<string> = (updater) => {
+    const next =
+      typeof updater === 'function' ? updater(searchParams.filter) : updater
+    setSearchParams({
+      filter: next ? next.trim() : null,
+      page: 1,
+    })
+  }
+
+  const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
+    const next = typeof updater === 'function' ? updater(pagination) : updater
+    setSearchParams({
+      page: next.pageIndex + 1,
+      perPage: next.pageSize === DEFAULT_PAGE_SIZE ? null : next.pageSize,
+    })
+  }
+
   const table = useReactTable({
-    data: data || [],
-    columns: tasksColumns,
+    data,
+    columns,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
-      globalFilter,
+      globalFilter: searchParams.filter,
       pagination,
     },
-    enableRowSelection: true,
+    pageCount,
+    manualPagination: true,
+    manualFiltering: true,
+
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    manualFiltering: true,
-    globalFilterFn: (row, _columnId, filterValue) => {
-      const desc = String(row.getValue('description')).toLowerCase()
-      const title = String(row.getValue('title')).toLowerCase()
-      const searchValue = String(filterValue).toLowerCase()
 
-      return desc.includes(searchValue) || title.includes(searchValue)
-    },
-    filterFns: {
-      dateFilter: dateFilterFn,
-      dateRangeFilter: dateRangeFilterFn,
-    },
+    onColumnFiltersChange,
+    onGlobalFilterChange,
+    onPaginationChange,
+
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange,
-    onGlobalFilterChange,
-    onColumnFiltersChange,
+
+    filterFns: {
+      dateFilter: dateFilterFn,
+      dateRangeFilter: dateRangeFilterFn,
+    },
   })
 
-  const pageCount = table.getPageCount()
+  // Optionally ensure that page is bounded to pageCount
+  const actualPageCount = table.getPageCount()
   useEffect(() => {
-    ensurePageInRange(pageCount)
-  }, [pageCount, ensurePageInRange])
+    if (actualPageCount > 0 && searchParams.page > actualPageCount) {
+      setSearchParams({ page: Math.max(1, actualPageCount) })
+    }
+  }, [actualPageCount, searchParams.page, setSearchParams])
 
-  const { data: orgMembers = [] } = useGetMembers(orgId)
-
-  // Memoize filter options to avoid unnecessary recalculations
-  const filterOptions = useMemo(() => {
-    const statuses = Object.values(TaskStatusEnum).map((status) => ({
-      label: STATUS_CONFIG[status].label,
-      value: status,
-      icon: STATUS_CONFIG[status].icon,
-    }))
-
-    const labels = mockAvailableLabels.map((l) => ({
-      label: l.name.charAt(0).toUpperCase() + l.name.slice(1).toLowerCase(),
-      value: l.name,
-    }))
-
-    const members = orgMembers.map((member) => ({
-      label: member.user?.firstName || 'User',
-      value: member.id,
-    }))
-
-    return { statuses, labels, members }
-  }, [orgMembers])
-
-  return {
-    table,
-    filterOptions,
-  }
+  return table
 }

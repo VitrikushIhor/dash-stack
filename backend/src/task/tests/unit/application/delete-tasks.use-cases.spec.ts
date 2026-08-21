@@ -33,6 +33,7 @@ describe('Delete Tasks Use Cases', () => {
     taskRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      findAllUnpaginated: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -51,11 +52,7 @@ describe('Delete Tasks Use Cases', () => {
     let useCase: DeleteTaskUseCase;
 
     beforeEach(() => {
-      useCase = new DeleteTaskUseCase(
-        taskRepository,
-        taskFileStorage,
-        findTaskByIdUseCase,
-      );
+      useCase = new DeleteTaskUseCase(taskRepository, taskFileStorage, findTaskByIdUseCase);
     });
 
     it('should delete a task and its attachments if they exist', async () => {
@@ -66,15 +63,9 @@ describe('Delete Tasks Use Cases', () => {
 
       await useCase.execute('task-1', 'org-1');
 
-      expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith(
-        'task-1',
-        'org-1',
-      );
+      expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith('task-1', 'org-1');
       expect(taskRepository.delete).toHaveBeenCalledWith('task-1', 'org-1');
-      expect(taskFileStorage.deleteMany).toHaveBeenCalledWith([
-        'file-1.png',
-        'file-2.pdf',
-      ]);
+      expect(taskFileStorage.deleteMany).toHaveBeenCalledWith(['file-1.png', 'file-2.pdf']);
     });
 
     it('should delete a task but not call storage if there are no attachments', async () => {
@@ -84,10 +75,7 @@ describe('Delete Tasks Use Cases', () => {
 
       await useCase.execute('task-1', 'org-1');
 
-      expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith(
-        'task-1',
-        'org-1',
-      );
+      expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith('task-1', 'org-1');
       expect(taskRepository.delete).toHaveBeenCalledWith('task-1', 'org-1');
       expect(taskFileStorage.deleteMany).not.toHaveBeenCalled();
     });
@@ -106,10 +94,7 @@ describe('Delete Tasks Use Cases', () => {
       const result = await useCase.execute('org-1', ['task-1', 'task-2']);
 
       expect(result).toEqual({ count: 5 });
-      expect(taskRepository.deleteMany).toHaveBeenCalledWith('org-1', [
-        'task-1',
-        'task-2',
-      ]);
+      expect(taskRepository.deleteMany).toHaveBeenCalledWith('org-1', ['task-1', 'task-2']);
     });
   });
 });

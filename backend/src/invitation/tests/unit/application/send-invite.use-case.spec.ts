@@ -3,7 +3,7 @@ import { InvitationRepositoryPort } from '../../../application/ports/invitation.
 import { InvitationMailerPort } from '../../../application/ports/invitation-mailer.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
 import { SendInviteCommand } from '../../../application/commands/send-invite.command';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 import {
   AlreadyMemberException,
   InvitationAlreadySentException,
@@ -145,8 +145,7 @@ describe('SendInviteUseCase', () => {
     await useCase.execute('org-1', 'admin-1', command);
 
     const createCall = repository.create.mock.calls[0][0];
-    const daysDiff =
-      (createCall.expiresAt.getTime() - before.getTime()) / 86400000;
+    const daysDiff = (createCall.expiresAt.getTime() - before.getTime()) / 86400000;
     expect(daysDiff).toBeGreaterThanOrEqual(6.9);
     expect(daysDiff).toBeLessThanOrEqual(7.1);
   });

@@ -1,7 +1,7 @@
 import { ListPendingInvitationsUseCase } from '../../../application/use-cases/list-pending-invitations.use-case';
 import { InvitationRepositoryPort } from '../../../application/ports/invitation.repository.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 
 const mockInvitation = (
   overrides?: Partial<PendingInvitationReadModel>,

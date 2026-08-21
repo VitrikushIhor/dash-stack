@@ -21,15 +21,13 @@ describe('InvitationPolicy', () => {
     });
 
     it('does not throw when member is undefined', () => {
-      expect(() =>
-        InvitationPolicy.assertNotAlreadyMember(undefined),
-      ).not.toThrow();
+      expect(() => InvitationPolicy.assertNotAlreadyMember(undefined)).not.toThrow();
     });
 
     it('throws AlreadyMemberException when member exists', () => {
-      expect(() =>
-        InvitationPolicy.assertNotAlreadyMember({ id: 'membership-1' }),
-      ).toThrow(AlreadyMemberException);
+      expect(() => InvitationPolicy.assertNotAlreadyMember({ id: 'membership-1' })).toThrow(
+        AlreadyMemberException,
+      );
     });
   });
 
@@ -39,9 +37,9 @@ describe('InvitationPolicy', () => {
     });
 
     it('throws InvitationAlreadySentException when pending invite exists', () => {
-      expect(() =>
-        InvitationPolicy.assertNoPendingInvite({ id: 'invite-1' }),
-      ).toThrow(InvitationAlreadySentException);
+      expect(() => InvitationPolicy.assertNoPendingInvite({ id: 'invite-1' })).toThrow(
+        InvitationAlreadySentException,
+      );
     });
   });
 
@@ -59,15 +57,15 @@ describe('InvitationPolicy', () => {
     });
 
     it('throws InvitationNotFoundException when invitation is null', () => {
-      expect(() =>
-        InvitationPolicy.assertCanAccept(null, 'user@example.com'),
-      ).toThrow(InvitationNotFoundException);
+      expect(() => InvitationPolicy.assertCanAccept(null, 'user@example.com')).toThrow(
+        InvitationNotFoundException,
+      );
     });
 
     it('throws InvitationEmailMismatchException when emails differ', () => {
-      expect(() =>
-        InvitationPolicy.assertCanAccept(validInvitation, 'other@example.com'),
-      ).toThrow(InvitationEmailMismatchException);
+      expect(() => InvitationPolicy.assertCanAccept(validInvitation, 'other@example.com')).toThrow(
+        InvitationEmailMismatchException,
+      );
     });
 
     it('does not throw when emails differ only by case', () => {
@@ -78,9 +76,9 @@ describe('InvitationPolicy', () => {
 
     it('throws InvitationAlreadyAcceptedException when already accepted', () => {
       const accepted = { ...validInvitation, acceptedAt: new Date() };
-      expect(() =>
-        InvitationPolicy.assertCanAccept(accepted, 'user@example.com'),
-      ).toThrow(InvitationAlreadyAcceptedException);
+      expect(() => InvitationPolicy.assertCanAccept(accepted, 'user@example.com')).toThrow(
+        InvitationAlreadyAcceptedException,
+      );
     });
 
     it('throws InvitationExpiredException when expired', () => {
@@ -88,17 +86,15 @@ describe('InvitationPolicy', () => {
         ...validInvitation,
         expiresAt: new Date(Date.now() - 86400000), // -1 day
       };
-      expect(() =>
-        InvitationPolicy.assertCanAccept(expired, 'user@example.com'),
-      ).toThrow(InvitationExpiredException);
+      expect(() => InvitationPolicy.assertCanAccept(expired, 'user@example.com')).toThrow(
+        InvitationExpiredException,
+      );
     });
   });
 
   describe('assertBelongsToOrg()', () => {
     it('does not throw when invitation belongs to org', () => {
-      expect(() =>
-        InvitationPolicy.assertBelongsToOrg({ orgId: 'org-1' }, 'org-1'),
-      ).not.toThrow();
+      expect(() => InvitationPolicy.assertBelongsToOrg({ orgId: 'org-1' }, 'org-1')).not.toThrow();
     });
 
     it('throws InvitationNotInOrgException when invitation is null', () => {
@@ -108,29 +104,23 @@ describe('InvitationPolicy', () => {
     });
 
     it('throws InvitationNotInOrgException when orgId does not match', () => {
-      expect(() =>
-        InvitationPolicy.assertBelongsToOrg({ orgId: 'org-2' }, 'org-1'),
-      ).toThrow(InvitationNotInOrgException);
+      expect(() => InvitationPolicy.assertBelongsToOrg({ orgId: 'org-2' }, 'org-1')).toThrow(
+        InvitationNotInOrgException,
+      );
     });
   });
 
   describe('assertOrgExists()', () => {
     it('does not throw when org exists', () => {
-      expect(() =>
-        InvitationPolicy.assertOrgExists({ name: 'My Org' }),
-      ).not.toThrow();
+      expect(() => InvitationPolicy.assertOrgExists({ name: 'My Org' })).not.toThrow();
     });
 
     it('throws OrgNotFoundException when org is null', () => {
-      expect(() => InvitationPolicy.assertOrgExists(null)).toThrow(
-        OrgNotFoundException,
-      );
+      expect(() => InvitationPolicy.assertOrgExists(null)).toThrow(OrgNotFoundException);
     });
 
     it('throws OrgNotFoundException when org is undefined', () => {
-      expect(() => InvitationPolicy.assertOrgExists(undefined)).toThrow(
-        OrgNotFoundException,
-      );
+      expect(() => InvitationPolicy.assertOrgExists(undefined)).toThrow(OrgNotFoundException);
     });
   });
 });

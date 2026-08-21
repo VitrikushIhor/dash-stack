@@ -1,7 +1,9 @@
 import { OrganizationReadModel } from '../../application/read-models/organization.read-model';
+import { TenantContextReadModel } from '../../application/read-models/tenant-context.read-model';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { PrismaOrganizationMapper } from './prisma-organization.mapper';
+import { PrismaOrgRoleMapper } from './mappers/org-role.mapper';
 import {
   CreateOrganizationData,
   OrganizationRepositoryPort,
@@ -32,6 +34,16 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
             role: 'OWNER',
           },
         },
+        labels: {
+          create: [
+            { name: 'Internal', color: 'orange' },
+            { name: 'Marketing', color: 'lime' },
+            { name: 'Bug', color: 'red' },
+            { name: 'Feature', color: 'blue' },
+            { name: 'Documentation', color: 'purple' },
+            { name: 'Design', color: 'pink' },
+          ],
+        },
       },
       include: {
         _count: { select: this.countSelect },
@@ -49,13 +61,16 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
       },
     });
 
-    return rawOrgs.map((org) => PrismaOrganizationMapper.toReadModel(org));
+    return rawOrgs.map((org) => PrismaOrganizationMapper.toReadModel(org) as OrganizationReadModel);
   }
 
-  async findById(
-    id: string,
-    requesterId: string,
-  ): Promise<OrganizationReadModel | null> {
+  async countByUserId(userId: string): Promise<number> {
+    return this.prisma.membership.count({
+      where: { userId },
+    });
+  }
+
+  async findById(id: string, requesterId: string): Promise<OrganizationReadModel | null> {
     const rawOrg = await this.prisma.organization.findUnique({
       where: { id },
       include: {
@@ -81,7 +96,10 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
         },
       },
     });
-    return memberships;
+    return memberships.map((m) => ({
+      ...m,
+      role: PrismaOrgRoleMapper.toDomain(m.role),
+    }));
   }
 
   async update(
@@ -146,5 +164,26 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
       select: { id: true },
     });
     return !!existing;
+  }
+
+  async findMembershipBySlugAndUserId(
+    slug: string,
+    userId: string,
+  ): Promise<TenantContextReadModel | null> {
+    const membership = await this.prisma.membership.findFirst({
+      where: {
+        userId,
+        organization: { slug },
+      },
+      include: {
+        organization: true,
+      },
+    });
+
+    if (!membership) {
+      return null;
+    }
+
+    return PrismaOrganizationMapper.toTenantContext(membership);
   }
 }

@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  UserRepositoryPort,
-  UserSummary,
-} from '../../ports/outgoing/user.repository.port';
+import { UserRepositoryPort, UserSummary } from '../../ports/outgoing/user.repository.port';
 
 @Injectable()
 export class ValidateUserUseCase {

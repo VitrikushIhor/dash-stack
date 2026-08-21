@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
@@ -6,7 +6,7 @@ import { SecurityConfig } from '../../../common/configs/config.interface';
 import { TokenGeneratorPort } from '../../application/ports/outgoing/token-generator.port';
 import { RefreshTokenRepositoryPort } from '../../application/ports/outgoing/refresh-token.repository.port';
 import { AuthTokens } from '../../shared/types/token.type';
-import { Inject } from '@nestjs/common';
+
 import {
   DEFAULT_REFRESH_TOKEN_TTL,
   MS_IN_SECOND,
@@ -30,11 +30,7 @@ export class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
     ipAddress?: string,
   ): Promise<AuthTokens> {
     const accessToken = this.generateAccessToken(userId);
-    const refreshToken = await this.createRefreshToken(
-      userId,
-      userAgent,
-      ipAddress,
-    );
+    const refreshToken = await this.createRefreshToken(userId, userAgent, ipAddress);
 
     return { accessToken, refreshToken };
   }

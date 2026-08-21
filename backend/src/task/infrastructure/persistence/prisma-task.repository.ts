@@ -3,17 +3,20 @@ import { PrismaService } from 'nestjs-prisma';
 import {
   CreateTaskData,
   FindAllTasksFilters,
+  FindAllTasksUnpaginatedFilters,
   TaskRepositoryPort,
   UpdateTaskData,
 } from '../../application/ports/task.repository.port';
 import { TaskReadModel } from '../../application/read-models/task.read-model';
-import { PrismaTaskMapper } from './prisma-task.mapper';
+import { PrismaTaskMapper, PrismaTaskWithRelations } from './prisma-task.mapper';
+import { OrderDirection } from '../../../common/order/order-direction';
 import { MembershipRepositoryPort } from '../../application/ports/membership.repository.port';
+import { paginate } from '../../../common/pagination/paginate';
+import { PaginatedResult } from '../../../common/pagination/pagination.models';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class PrismaTaskRepository
-  implements TaskRepositoryPort, MembershipRepositoryPort
-{
+export class PrismaTaskRepository implements TaskRepositoryPort, MembershipRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   private readonly taskInclude = {
@@ -38,7 +41,7 @@ export class PrismaTaskRepository
   } as const;
 
   async create(data: CreateTaskData): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+    const { assigneeIds, checklists, ...rest } = data;
 
     const createdTask = await this.prisma.task.create({
       data: {
@@ -49,14 +52,7 @@ export class PrismaTaskRepository
               connect: assigneeIds.map((id) => ({ id })),
             }
           : undefined,
-        label: label
-          ? {
-              create: {
-                name: label.name,
-                color: label.color ?? null,
-              },
-            }
-          : undefined,
+
         checklists: checklists?.length
           ? {
               create: checklists.map((cl) => ({
@@ -80,64 +76,39 @@ export class PrismaTaskRepository
   async findAll(
     organizationId: string,
     filters: FindAllTasksFilters = {},
-  ): Promise<TaskReadModel[]> {
-    const {
-      search,
-      status,
-      assigneeIds,
-      labelNames,
-      dueDateFrom,
-      dueDateTo,
-      startDateFrom,
-      startDateTo,
-    } = filters;
+  ): Promise<PaginatedResult<TaskReadModel>> {
+    const { page, perPage } = filters;
 
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        organizationId,
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { description: { contains: search, mode: 'insensitive' } },
-                ],
-              }
-            : {},
-          status?.length ? { status: { in: status } } : {},
-          assigneeIds?.length
-            ? { assignees: { some: { id: { in: assigneeIds } } } }
-            : {},
-          labelNames?.length ? { label: { name: { in: labelNames } } } : {},
-          dueDateFrom || dueDateTo
-            ? {
-                dueDate: {
-                  gte: dueDateFrom,
-                  lte: dueDateTo,
-                },
-              }
-            : {},
-          startDateFrom || startDateTo
-            ? {
-                startDate: {
-                  gte: startDateFrom,
-                  lte: startDateTo,
-                },
-              }
-            : {},
-        ],
+    const paginated = await paginate<PrismaTaskWithRelations, Prisma.TaskFindManyArgs>(
+      this.prisma.task,
+      {
+        where: this.buildWhereClause(organizationId, filters),
+        include: this.taskInclude,
+        orderBy: [{ createdAt: OrderDirection.desc }, { updatedAt: OrderDirection.desc }],
       },
+      { page, perPage },
+    );
+
+    return {
+      ...paginated,
+      data: paginated.data.map((task) => PrismaTaskMapper.toDomain(task)),
+    };
+  }
+
+  async findAllUnpaginated(
+    organizationId: string,
+    filters: FindAllTasksUnpaginatedFilters = {},
+  ): Promise<TaskReadModel[]> {
+    const tasks = await this.prisma.task.findMany({
+      where: this.buildWhereClause(organizationId, filters),
       include: this.taskInclude,
-      orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
+      orderBy: [{ createdAt: OrderDirection.desc }, { updatedAt: OrderDirection.desc }],
     });
 
     return tasks.map((task) => PrismaTaskMapper.toDomain(task));
   }
 
-  async findById(
-    id: string,
-    organizationId: string,
-  ): Promise<TaskReadModel | null> {
+  async findById(id: string, organizationId: string): Promise<TaskReadModel | null> {
     const task = await this.prisma.task.findFirst({
       where: { id, organizationId },
       include: this.taskInclude,
@@ -146,20 +117,10 @@ export class PrismaTaskRepository
     return task ? PrismaTaskMapper.toDomain(task) : null;
   }
 
-  async update(
-    id: string,
-    organizationId: string,
-    data: UpdateTaskData,
-  ): Promise<TaskReadModel> {
-    const { assigneeIds, label, checklists, ...rest } = data;
+  async update(id: string, organizationId: string, data: UpdateTaskData): Promise<TaskReadModel> {
+    const { assigneeIds, checklists, ...rest } = data;
 
     const updatedTask = await this.prisma.$transaction(async (tx) => {
-      if (label !== undefined) {
-        await tx.taskLabel.deleteMany({
-          where: { taskId: id },
-        });
-      }
-
       if (checklists !== undefined) {
         await tx.checklist.deleteMany({
           where: { taskId: id },
@@ -175,17 +136,7 @@ export class PrismaTaskRepository
                 set: assigneeIds.map((membershipId) => ({ id: membershipId })),
               }
             : undefined,
-          label:
-            label === undefined
-              ? undefined
-              : label === null
-                ? undefined
-                : {
-                    create: {
-                      name: label.name,
-                      color: label.color ?? null,
-                    },
-                  },
+
           checklists:
             checklists === undefined
               ? undefined
@@ -230,10 +181,7 @@ export class PrismaTaskRepository
     });
   }
 
-  async deleteMany(
-    organizationId: string,
-    ids: string[],
-  ): Promise<{ count: number }> {
+  async deleteMany(organizationId: string, ids: string[]): Promise<{ count: number }> {
     return this.prisma.task.deleteMany({
       where: {
         id: { in: ids },
@@ -242,10 +190,7 @@ export class PrismaTaskRepository
     });
   }
 
-  async validateMemberships(
-    organizationId: string,
-    membershipIds: string[],
-  ): Promise<boolean> {
+  async validateMemberships(organizationId: string, membershipIds: string[]): Promise<boolean> {
     const uniqueIds = [...new Set(membershipIds)];
     const count = await this.prisma.membership.count({
       where: {
@@ -255,5 +200,58 @@ export class PrismaTaskRepository
     });
 
     return count === uniqueIds.length;
+  }
+
+  private buildWhereClause(organizationId: string, filters: FindAllTasksUnpaginatedFilters) {
+    const {
+      search,
+      status,
+      assigneeIds,
+      labelNames,
+      dueDateFrom,
+      dueDateTo,
+      startDateFrom,
+      startDateTo,
+    } = filters;
+
+    return {
+      organizationId,
+      AND: [
+        search
+          ? {
+              OR: [
+                {
+                  title: { contains: search, mode: 'insensitive' as const },
+                },
+                {
+                  description: {
+                    contains: search,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ],
+            }
+          : {},
+        status?.length ? { status: { in: status } } : {},
+        assigneeIds?.length ? { assignees: { some: { id: { in: assigneeIds } } } } : {},
+        labelNames?.length ? { label: { name: { in: labelNames } } } : {},
+        dueDateFrom || dueDateTo
+          ? {
+              dueDate: {
+                gte: dueDateFrom,
+                lte: dueDateTo,
+              },
+            }
+          : {},
+        startDateFrom || startDateTo
+          ? {
+              startDate: {
+                gte: startDateFrom,
+                lte: startDateTo,
+              },
+            }
+          : {},
+      ],
+    };
   }
 }

@@ -1,25 +1,18 @@
-import { useEffect } from 'react'
-import { Check, Moon, Sun } from 'lucide-react'
-import { useTheme } from '@/shared/lib/context'
-import { cn } from '@/shared/lib/utils'
+'use client'
+
+import { Moon, Sun } from 'lucide-react'
+import { isTheme, useTheme } from '@/shared/lib/providers'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
 
 export function ThemeSwitch() {
   const { theme, setTheme } = useTheme()
-
-  /* Update theme-color meta tag
-   * when theme is updated */
-  useEffect(() => {
-    const themeColor = theme === 'dark' ? '#020817' : '#fff'
-    const metaThemeColor = document.querySelector("meta[name='theme-color']")
-    if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor)
-  }, [theme])
 
   return (
     <DropdownMenu modal={false}>
@@ -31,27 +24,14 @@ export function ThemeSwitch() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light{' '}
-          <Check
-            size={14}
-            className={cn('ms-auto', theme !== 'light' && 'hidden')}
-          />
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-          <Check
-            size={14}
-            className={cn('ms-auto', theme !== 'dark' && 'hidden')}
-          />
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-          <Check
-            size={14}
-            className={cn('ms-auto', theme !== 'system' && 'hidden')}
-          />
-        </DropdownMenuItem>
+        <DropdownMenuRadioGroup
+          value={theme}
+          onValueChange={(val) => isTheme(val) && setTheme(val)}
+        >
+          <DropdownMenuRadioItem value='light'>Light</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value='dark'>Dark</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value='system'>System</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

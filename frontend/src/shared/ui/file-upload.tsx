@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import {
@@ -1428,8 +1429,6 @@ export {
   FileUploadItemProgress as ItemProgress,
   FileUploadItemDelete as ItemDelete,
   FileUploadClear as Clear,
-  //
-  // eslint-disable-next-line react-refresh/only-export-components
   useStore as useFileUpload,
   //
   type FileUploadRootProps as FileUploadProps,

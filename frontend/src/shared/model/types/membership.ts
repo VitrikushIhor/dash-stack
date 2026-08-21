@@ -15,11 +15,17 @@ export interface Membership {
   orgId: string
   role: OrgRole
   position?: TeamPosition
-  joinedAt: string
+  joinedAt?: string
+  createdAt?: string
   user: {
     id: string
     email: string
     firstName?: string
     avatar?: string
+  }
+  organization?: {
+    id: string
+    name: string
+    slug: string
   }
 }

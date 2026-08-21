@@ -1,0 +1,10 @@
+export interface PricingTier {
+  name: string
+  price: string
+  period?: string
+  description: string
+  features: string[]
+  cta: string
+  highlighted: boolean
+  badge?: string
+}

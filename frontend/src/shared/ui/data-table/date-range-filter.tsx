@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { format } from 'date-fns'
-import { type FilterFn, type Row, type Column } from '@tanstack/react-table'
+import { type Column, type FilterFn, type Row } from '@tanstack/react-table'
 import { CalendarIcon } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import { Calendar } from '@/shared/ui/core/calendar'
@@ -62,7 +62,6 @@ export function DataTableDateRangeFilter<TData, TValue>({
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const dateRangeFilterFn: FilterFn<any> = (
   row: Row<any>,
   columnId: string,

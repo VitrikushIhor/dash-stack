@@ -3,9 +3,7 @@ import { FindOrganizationsByUserIdUseCase } from '../../../application/use-cases
 import { OrganizationRepositoryPort } from '../../../application/ports/organization.port';
 import { OrganizationReadModel } from '../../../application/read-models/organization.read-model';
 
-const mockOrg = (
-  overrides: Partial<OrganizationReadModel> = {},
-): OrganizationReadModel => ({
+const mockOrg = (overrides: Partial<OrganizationReadModel> = {}): OrganizationReadModel => ({
   id: 'org-1',
   name: 'Acme Corp',
   slug: 'acme-corp',
@@ -31,6 +29,8 @@ describe('FindOrganizationByIdUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
+      findMembershipBySlugAndUserId: jest.fn(),
     };
 
     useCase = new FindOrganizationByIdUseCase(repository);
@@ -70,6 +70,8 @@ describe('FindOrganizationsByUserIdUseCase', () => {
       findOrganizationMembers: jest.fn(),
       findOrganizationMember: jest.fn(),
       existsBySlug: jest.fn(),
+      countByUserId: jest.fn(),
+      findMembershipBySlugAndUserId: jest.fn(),
     };
 
     useCase = new FindOrganizationsByUserIdUseCase(repository);

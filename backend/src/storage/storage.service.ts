@@ -1,10 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import sharp from 'sharp';
-import type {
-  IStorageProvider,
-  StorageUploadResult,
+import {
+  type IStorageProvider,
+  STORAGE_PROVIDER,
+  type StorageUploadResult,
 } from './interfaces/storage.interface';
-import { STORAGE_PROVIDER } from './interfaces/storage.interface';
+
 import { StorageValidationException } from './exceptions/storage.exception';
 import { STORAGE_ERRORS } from './exceptions/storage-errors';
 import {
@@ -26,10 +27,7 @@ export class StorageService {
     private readonly provider: IStorageProvider,
   ) {}
 
-  async uploadImage(
-    file: Express.Multer.File,
-    folder: string,
-  ): Promise<StorageUploadResult> {
+  async uploadImage(file: Express.Multer.File, folder: string): Promise<StorageUploadResult> {
     if (!ALLOWED_IMAGE_MIMES.includes(file.mimetype)) {
       throw new StorageValidationException(
         STORAGE_ERRORS.INVALID_IMAGE_TYPE(file.mimetype, ALLOWED_IMAGE_MIMES),
@@ -62,10 +60,7 @@ export class StorageService {
     });
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    folder: string,
-  ): Promise<StorageUploadResult> {
+  async uploadFile(file: Express.Multer.File, folder: string): Promise<StorageUploadResult> {
     if (!ALLOWED_FILE_MIMES.includes(file.mimetype)) {
       throw new StorageValidationException(
         STORAGE_ERRORS.INVALID_FILE_TYPE(file.mimetype, ALLOWED_FILE_MIMES),
@@ -73,9 +68,7 @@ export class StorageService {
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      throw new StorageValidationException(
-        STORAGE_ERRORS.FILE_TOO_LARGE(file.size, MAX_FILE_SIZE),
-      );
+      throw new StorageValidationException(STORAGE_ERRORS.FILE_TOO_LARGE(file.size, MAX_FILE_SIZE));
     }
 
     return this.provider.upload({

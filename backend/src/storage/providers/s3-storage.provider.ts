@@ -1,10 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
 import type {
@@ -12,10 +8,7 @@ import type {
   UploadFileDto,
   StorageUploadResult,
 } from '../interfaces/storage.interface';
-import {
-  StorageUploadException,
-  StorageDeleteException,
-} from '../exceptions/storage.exception';
+import { StorageUploadException, StorageDeleteException } from '../exceptions/storage.exception';
 
 @Injectable()
 export class S3StorageProvider implements IStorageProvider {
@@ -26,19 +19,13 @@ export class S3StorageProvider implements IStorageProvider {
 
   constructor(private readonly configService: ConfigService) {
     this.bucket = this.configService.getOrThrow<string>('storage.s3Bucket');
-    this.cloudfrontDomain = this.configService.getOrThrow<string>(
-      'storage.cloudfrontDomain',
-    );
+    this.cloudfrontDomain = this.configService.getOrThrow<string>('storage.cloudfrontDomain');
 
     this.s3Client = new S3Client({
       region: this.configService.get<string>('storage.s3Region', 'us-east-1'),
       credentials: {
-        accessKeyId: this.configService.getOrThrow<string>(
-          'storage.accessKeyId',
-        ),
-        secretAccessKey: this.configService.getOrThrow<string>(
-          'storage.secretAccessKey',
-        ),
+        accessKeyId: this.configService.getOrThrow<string>('storage.accessKeyId'),
+        secretAccessKey: this.configService.getOrThrow<string>('storage.secretAccessKey'),
       },
     });
 
@@ -66,9 +53,7 @@ export class S3StorageProvider implements IStorageProvider {
         }),
       );
 
-      this.logger.log(
-        `File uploaded to S3: ${key} (${dto.buffer.length} bytes)`,
-      );
+      this.logger.log(`File uploaded to S3: ${key} (${dto.buffer.length} bytes)`);
 
       return {
         key,
@@ -78,18 +63,13 @@ export class S3StorageProvider implements IStorageProvider {
       };
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.error(
-          `S3 upload failed for key "${key}": ${error.message}`,
-          error.stack,
-        );
+        this.logger.error(`S3 upload failed for key "${key}": ${error.message}`, error.stack);
         throw new StorageUploadException(error);
       }
       this.logger.error(`S3 upload failed for key "${key}" with unknown error`);
       throw new StorageUploadException(
         new Error(
-          typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
-            : String(error),
+          typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error),
         ),
       );
     }
@@ -107,18 +87,13 @@ export class S3StorageProvider implements IStorageProvider {
       this.logger.log(`File deleted from S3: ${key}`);
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.error(
-          `S3 delete failed for key "${key}": ${error.message}`,
-          error.stack,
-        );
+        this.logger.error(`S3 delete failed for key "${key}": ${error.message}`, error.stack);
         throw new StorageDeleteException(error);
       }
       this.logger.error(`S3 delete failed for key "${key}" with unknown error`);
       throw new StorageDeleteException(
         new Error(
-          typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
-            : String(error),
+          typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error),
         ),
       );
     }

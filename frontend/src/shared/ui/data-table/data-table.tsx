@@ -1,17 +1,17 @@
 import type * as React from 'react'
 import {
   type Column,
-  flexRender,
   type Table as TanstackTable,
+  flexRender,
 } from '@tanstack/react-table'
 import { cn } from '@/shared/lib/utils'
 import {
-  TableRow,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  TableRow,
 } from '@/shared/ui/core/table'
 import { DataTablePagination } from './pagination'
 
@@ -118,20 +118,22 @@ function getCommonPinningStyles<TData>({
     isPinned === 'left' && column.getIsLastColumn('left')
   const isFirstRightPinnedColumn =
     isPinned === 'right' && column.getIsFirstColumn('right')
+  let boxShadow: string | undefined = undefined
+  if (withBorder) {
+    if (isLastLeftPinnedColumn) {
+      boxShadow = '-4px 0 4px -4px var(--border) inset'
+    } else if (isFirstRightPinnedColumn) {
+      boxShadow = '4px 0 4px -4px var(--border) inset'
+    }
+  }
 
   return {
-    boxShadow: withBorder
-      ? isLastLeftPinnedColumn
-        ? '-4px 0 4px -4px var(--border) inset'
-        : isFirstRightPinnedColumn
-          ? '4px 0 4px -4px var(--border) inset'
-          : undefined
-      : undefined,
+    boxShadow,
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
     opacity: isPinned ? 0.97 : 1,
     position: isPinned ? 'sticky' : 'relative',
-    background: isPinned ? 'var(--background)' : 'var(--background)',
+    background: isPinned ? 'var(--background)' : undefined,
     width: column.getSize(),
     zIndex: isPinned ? 1 : undefined,
   }

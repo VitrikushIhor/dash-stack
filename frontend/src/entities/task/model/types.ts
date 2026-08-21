@@ -1,11 +1,13 @@
-import { type OrgRole } from '@/shared/model'
-import { type LabelColor } from '@/shared/ui'
+import { type LabelColor, type OrgRole } from '@/shared/model'
 
-export enum TaskStatusEnum {
-  PLANNED = 'PLANNED',
-  UPCOMING = 'UPCOMING',
-  COMPLETED = 'COMPLETED',
-}
+export const TaskStatusEnum = {
+  PLANNED: 'PLANNED',
+  UPCOMING: 'UPCOMING',
+  COMPLETED: 'COMPLETED',
+} as const
+
+export type TaskStatusEnum =
+  (typeof TaskStatusEnum)[keyof typeof TaskStatusEnum]
 
 export interface TaskAssignee {
   id: string // Membership ID
@@ -81,3 +83,11 @@ export interface UpdateTaskDto extends Partial<
   startDate?: string | null
   dueDate?: string | null
 }
+
+export const TaskViewMode = {
+  Kanban: 'kanban',
+  List: 'list',
+  Table: 'table',
+} as const
+
+export type TaskViewMode = (typeof TaskViewMode)[keyof typeof TaskViewMode]

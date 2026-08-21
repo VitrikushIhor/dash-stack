@@ -12,9 +12,6 @@ export interface AccountWithUserModel {
 }
 
 export interface AccountRepositoryPort {
-  findByProvider(
-    provider: string,
-    providerAccountId: string,
-  ): Promise<AccountWithUserModel | null>;
+  findByProvider(provider: string, providerAccountId: string): Promise<AccountWithUserModel | null>;
   create(data: CreateAccountData): Promise<unknown>;
 }

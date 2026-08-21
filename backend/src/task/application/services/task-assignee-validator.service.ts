@@ -9,10 +9,7 @@ export class TaskAssigneeValidatorService {
     private readonly membershipRepository: MembershipRepositoryPort,
   ) {}
 
-  async validateOrThrow(
-    organizationId: string,
-    assigneeIds?: string[],
-  ): Promise<void> {
+  async validateOrThrow(organizationId: string, assigneeIds?: string[]): Promise<void> {
     if (!assigneeIds?.length) return;
 
     const isValid = await this.membershipRepository.validateMemberships(

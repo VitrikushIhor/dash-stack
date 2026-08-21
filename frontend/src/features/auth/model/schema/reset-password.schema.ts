@@ -15,6 +15,7 @@ export const resetPasswordSchema = z
 
 export const resetPasswordDefaultValues = {
   password: '',
+  confirmPassword: '',
 }
 
 export type TResetPasswordSchema = z.infer<typeof resetPasswordSchema>

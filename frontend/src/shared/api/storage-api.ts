@@ -12,6 +12,12 @@ export interface FileWithServerData extends File {
   s3Url?: string
 }
 
+export function isFileWithServerData(
+  file: unknown
+): file is FileWithServerData {
+  return file instanceof File && ('s3Url' in file || 's3Key' in file)
+}
+
 /**
  * Attach server metadata to a File after a successful upload.
  * Mutates the original object so it stays referentially equal
@@ -46,4 +52,26 @@ export const storageApi = {
     formData.append('file', file)
     return api.post<UploadResponse>('/storage/file', formData)
   },
+}
+
+export async function resolveLogoUrl(
+  logoFile: File | null | undefined,
+  existingLogoUrl: string | undefined,
+  uploadImage: (file: File) => Promise<{ url: string }>
+): Promise<string | null> {
+  if (logoFile === null) {
+    return null
+  }
+
+  if (!logoFile) {
+    return existingLogoUrl || null
+  }
+
+  if (isFileWithServerData(logoFile)) {
+    const url = logoFile.s3Url || logoFile.s3Key
+    if (url) return url
+  }
+
+  const res = await uploadImage(logoFile)
+  return res.url
 }

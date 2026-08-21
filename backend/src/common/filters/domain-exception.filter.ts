@@ -1,15 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
-import {
-  DomainException,
-  DomainErrorCode,
-} from '../exceptions/domain.exception';
+import { DomainException, DomainErrorCode } from '../exceptions/domain.exception';
 
 const DOMAIN_ERROR_TO_HTTP: Record<DomainErrorCode, HttpStatus> = {
   [DomainErrorCode.NOT_FOUND]: HttpStatus.NOT_FOUND,
@@ -17,6 +8,7 @@ const DOMAIN_ERROR_TO_HTTP: Record<DomainErrorCode, HttpStatus> = {
   [DomainErrorCode.CONFLICT]: HttpStatus.CONFLICT,
   [DomainErrorCode.FORBIDDEN]: HttpStatus.FORBIDDEN,
   [DomainErrorCode.UNAUTHORIZED]: HttpStatus.UNAUTHORIZED,
+  [DomainErrorCode.INTERNAL_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
 };
 
 @Catch(DomainException)
@@ -27,12 +19,9 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status =
-      DOMAIN_ERROR_TO_HTTP[exception.code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = DOMAIN_ERROR_TO_HTTP[exception.code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
 
-    this.logger.error(
-      `Http Status: ${status} Error Message: ${exception.message}`,
-    );
+    this.logger.error(`Http Status: ${status} Error Message: ${exception.message}`);
 
     response.status(status).json({
       statusCode: status,

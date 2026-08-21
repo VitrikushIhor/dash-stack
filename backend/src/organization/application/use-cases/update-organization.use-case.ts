@@ -11,10 +11,7 @@ export class UpdateOrganizationUseCase {
     private readonly organizationRepository: OrganizationRepositoryPort,
   ) {}
 
-  async execute(
-    orgId: string,
-    command: UpdateOrganizationCommand,
-  ): Promise<OrganizationReadModel> {
+  async execute(orgId: string, command: UpdateOrganizationCommand): Promise<OrganizationReadModel> {
     const updatedOrg = await this.organizationRepository.update(orgId, {
       name: command.name,
       description: command.description,

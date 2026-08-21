@@ -4,9 +4,7 @@ import {
 } from '../exceptions/invalid-task-dates.exception';
 
 export class TaskDates {
-  static normalizeOptional(
-    value?: string | Date | null,
-  ): Date | null | undefined {
+  static normalizeOptional(value?: string | Date | null): Date | null | undefined {
     if (value === undefined) return undefined;
     if (value === null) return null;
     return value instanceof Date ? value : new Date(value);

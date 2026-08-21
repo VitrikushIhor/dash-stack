@@ -43,10 +43,7 @@ describe('OAuthExchangeUseCase', () => {
 
     const result = await useCase.execute({ auth0Token: 'token' });
 
-    expect(accountRepoMock.findByProvider).toHaveBeenCalledWith(
-      'google',
-      '123',
-    );
+    expect(accountRepoMock.findByProvider).toHaveBeenCalledWith('google', '123');
     expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('user-1');
     expect(userRepoMock.create).not.toHaveBeenCalled();
     expect(result).toEqual({ accessToken: 'acc' });

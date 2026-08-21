@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from './health/health.module';
 import { Pool } from 'pg';
@@ -16,6 +14,7 @@ import { InvitationModule } from './invitation/invitation.module';
 import { TaskModule } from './task/task.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './user/user.module';
+import { LabelModule } from './label/label.module';
 import config from './common/configs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
@@ -25,11 +24,16 @@ import { join } from 'node:path';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config],
-      envFilePath: ['.env', '../.env'],
+      envFilePath: '.env',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
+      serveStaticOptions: {
+        setHeaders: (res) => {
+          res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        },
+      },
     }),
     PrismaModule.forRootAsync({
       isGlobal: true,
@@ -44,9 +48,7 @@ import { join } from 'node:path';
             const schema = url.searchParams.get('schema');
             if (schema) {
               poolConfig.options = `-c search_path=${schema}`;
-              console.log(
-                `[AppModule] Configured Postgres search_path to: ${schema}`,
-              );
+              console.log(`[AppModule] Configured Postgres search_path to: ${schema}`);
             }
           }
         } catch (e) {
@@ -79,11 +81,7 @@ import { join } from 'node:path';
             customProps: () => ({
               context: 'HTTP',
             }),
-            redact: [
-              'req.headers.authorization',
-              'req.body.password',
-              'req.body.newPassword',
-            ],
+            redact: ['req.headers.authorization', 'req.body.password', 'req.body.newPassword'],
             transport: {
               target: 'pino-pretty',
               options: {
@@ -96,12 +94,12 @@ import { join } from 'node:path';
         };
       },
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     ttl: 60000,
+    //     limit: 10,
+    //   },
+    // ]),
 
     AuthModule,
     HealthModule,
@@ -111,14 +109,15 @@ import { join } from 'node:path';
     TaskModule,
     StorageModule,
     UserModule,
+    LabelModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class AppModule {}

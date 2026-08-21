@@ -43,9 +43,10 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
       useFactory: (configService: ConfigService) => {
         const securityConfig = configService.get<SecurityConfig>('security');
         return {
-          secret: configService.get<string>('JWT_ACCESS_SECRET'),
+          secret: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
           signOptions: {
-            expiresIn: securityConfig.expiresIn as any,
+            expiresIn: (securityConfig?.expiresIn ?? '2m') as
+              `${number}m` | `${number}s` | `${number}h` | `${number}d`,
           },
         };
       },
@@ -105,11 +106,6 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
     Auth0ClientAdapter,
     { provide: 'Auth0ClientPort', useExisting: Auth0ClientAdapter },
   ],
-  exports: [
-    JwtAuthGuard,
-    ValidateUserUseCase,
-    PrismaUserRepository,
-    'UserRepositoryPort',
-  ],
+  exports: [JwtAuthGuard, ValidateUserUseCase, PrismaUserRepository, 'UserRepositoryPort'],
 })
 export class AuthModule {}

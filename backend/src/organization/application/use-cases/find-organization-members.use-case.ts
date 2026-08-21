@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  OrganizationMember,
-  OrganizationRepositoryPort,
-} from '../ports/organization.port';
+import { OrganizationMember, OrganizationRepositoryPort } from '../ports/organization.port';
 
 @Injectable()
 export class FindOrganizationMembersUseCase {

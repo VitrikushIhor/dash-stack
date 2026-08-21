@@ -10,9 +10,7 @@ describe('OrganizationSlugService', () => {
       existsBySlug: jest.fn(),
     };
 
-    service = new OrganizationSlugService(
-      repository as unknown as OrganizationRepositoryPort,
-    );
+    service = new OrganizationSlugService(repository as unknown as OrganizationRepositoryPort);
   });
 
   describe('generateUnique()', () => {

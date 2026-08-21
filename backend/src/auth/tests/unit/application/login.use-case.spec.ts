@@ -22,11 +22,7 @@ describe('LoginUseCase', () => {
       generateTokens: jest.fn(),
     };
 
-    useCase = new LoginUseCase(
-      userRepoMock,
-      passwordHasherMock,
-      tokenGeneratorMock,
-    );
+    useCase = new LoginUseCase(userRepoMock, passwordHasherMock, tokenGeneratorMock);
   });
 
   it('should successfully log in a verified user', async () => {
@@ -47,9 +43,7 @@ describe('LoginUseCase', () => {
       password: 'password123',
     });
 
-    expect(userRepoMock.findByEmailWithPassword).toHaveBeenCalledWith(
-      'test@example.com',
-    );
+    expect(userRepoMock.findByEmailWithPassword).toHaveBeenCalledWith('test@example.com');
     expect(passwordHasherMock.validatePassword).toHaveBeenCalledWith(
       'password123',
       'hashed_password',
@@ -64,9 +58,9 @@ describe('LoginUseCase', () => {
   it('should throw UnauthorizedException if user not found', async () => {
     userRepoMock.findByEmailWithPassword.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute({ email: 'test@example.com', password: 'pwd' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(useCase.execute({ email: 'test@example.com', password: 'pwd' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should throw BadRequestException if user has no password (social login)', async () => {
@@ -75,9 +69,9 @@ describe('LoginUseCase', () => {
       password: null,
     });
 
-    await expect(
-      useCase.execute({ email: 'test@example.com', password: 'pwd' }),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute({ email: 'test@example.com', password: 'pwd' })).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw UnauthorizedException on wrong password', async () => {
@@ -87,9 +81,9 @@ describe('LoginUseCase', () => {
     });
     passwordHasherMock.validatePassword.mockResolvedValue(false);
 
-    await expect(
-      useCase.execute({ email: 'test@example.com', password: 'wrong' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(useCase.execute({ email: 'test@example.com', password: 'wrong' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should throw ForbiddenException if email not verified', async () => {
@@ -100,8 +94,8 @@ describe('LoginUseCase', () => {
     });
     passwordHasherMock.validatePassword.mockResolvedValue(true);
 
-    await expect(
-      useCase.execute({ email: 'test@example.com', password: 'pwd' }),
-    ).rejects.toThrow(ForbiddenException);
+    await expect(useCase.execute({ email: 'test@example.com', password: 'pwd' })).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 });

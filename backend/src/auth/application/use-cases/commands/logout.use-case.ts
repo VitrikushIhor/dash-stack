@@ -13,9 +13,7 @@ export class LogoutUseCase {
   ) {}
 
   async execute(command: LogoutCommand): Promise<{ message: string }> {
-    const deleted = await this.refreshTokenRepo.deleteByToken(
-      command.refreshToken,
-    );
+    const deleted = await this.refreshTokenRepo.deleteByToken(command.refreshToken);
 
     if (deleted.count === 0) {
       throw new BadRequestException(AUTH_ERRORS.INVALID_REFRESH_TOKEN);

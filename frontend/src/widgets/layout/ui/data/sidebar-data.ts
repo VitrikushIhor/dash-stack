@@ -1,49 +1,37 @@
 import {
-  LayoutDashboard,
-  Monitor,
-  Bell,
-  Palette,
+  Calendar,
+  ClipboardList,
   Settings,
-  Wrench,
-  UserCog,
   ShieldCheck,
   UsersRound,
-  ClipboardList,
-  Calendar,
 } from 'lucide-react'
+import { ROUTES } from '@/shared/config'
 import { type SidebarData } from '../types'
 
-export const sidebarData: SidebarData = {
-  user: {
-    name: 'user',
-    email: 'user@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-
+export const getSidebarData = (slug?: string): SidebarData => ({
   navGroups: [
     {
       title: 'General',
       items: [
         {
-          title: 'Dashboard',
-          url: '/dashboard',
-          icon: LayoutDashboard,
-        },
-        {
           title: 'Organizations',
-          url: '/organizations',
+          url: ROUTES.organizations,
           icon: UsersRound,
         },
-        {
-          title: 'Tasks',
-          url: '/task',
-          icon: ClipboardList,
-        },
-        {
-          title: 'Calendar',
-          url: '/calendar',
-          icon: Calendar,
-        },
+        ...(slug
+          ? [
+              {
+                title: 'Tasks',
+                url: ROUTES.orgTasks(slug),
+                icon: ClipboardList,
+              },
+              {
+                title: 'Calendar',
+                url: ROUTES.orgCalendar(slug),
+                icon: Calendar,
+              },
+            ]
+          : []),
       ],
     },
 
@@ -56,15 +44,15 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Sign In',
-              url: '/sign-in',
+              url: ROUTES.signIn,
             },
             {
               title: 'Sign Up',
-              url: '/sign-up',
+              url: ROUTES.signUp,
             },
             {
               title: 'Forgot Password',
-              url: '/forgot-password',
+              url: ROUTES.forgotPassword,
             },
             {
               title: 'OTP',
@@ -79,36 +67,12 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Settings',
+          url: ROUTES.settings,
           icon: Settings,
-          items: [
-            {
-              title: 'Profile',
-              url: '/settings',
-              icon: UserCog,
-            },
-            {
-              title: 'Account',
-              url: '/settings/account',
-              icon: Wrench,
-            },
-            {
-              title: 'Appearance',
-              url: '/settings/appearance',
-              icon: Palette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
-            },
-          ],
         },
       ],
     },
   ],
-}
+})
+
+export const sidebarData: SidebarData = getSidebarData()

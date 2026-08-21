@@ -24,9 +24,7 @@ export class ResetPasswordUseCase {
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<{ message: string }> {
-    const resetToken = await this.verificationTokenRepo.findByToken(
-      command.token,
-    );
+    const resetToken = await this.verificationTokenRepo.findByToken(command.token);
 
     if (!resetToken) {
       throw new BadRequestException(AUTH_ERRORS.INVALID_RESET_TOKEN);
@@ -36,14 +34,9 @@ export class ResetPasswordUseCase {
       throw new BadRequestException(AUTH_ERRORS.INVALID_TOKEN_TYPE);
     }
 
-    TokenExpiryPolicy.assertNotExpired(
-      resetToken.expires,
-      AUTH_ERRORS.RESET_TOKEN_EXPIRED,
-    );
+    TokenExpiryPolicy.assertNotExpired(resetToken.expires, AUTH_ERRORS.RESET_TOKEN_EXPIRED);
 
-    const hashedPassword = await this.passwordHasher.hashPassword(
-      command.newPassword,
-    );
+    const hashedPassword = await this.passwordHasher.hashPassword(command.newPassword);
 
     await this.userRepo.updatePassword(resetToken.email, hashedPassword);
     await this.verificationTokenRepo.deleteById(resetToken.id);

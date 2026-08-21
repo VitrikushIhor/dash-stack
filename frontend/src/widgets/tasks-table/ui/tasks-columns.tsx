@@ -2,23 +2,23 @@ import { format } from 'date-fns'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Calendar, ListTodo, Paperclip, Tag, Users } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import {
-  AvatarGroup,
-  DataTableColumnHeader,
-  dateRangeFilterFn,
-  TablePlaceholder,
-  LabelBadge,
-} from '@/shared/ui'
+import { AvatarGroup } from '@/shared/ui/avatar-group'
 import { Checkbox } from '@/shared/ui/core/checkbox'
 import {
-  type TaskStatusEnum,
+  DataTableColumnHeader,
+  TablePlaceholder,
+  dateRangeFilterFn,
+} from '@/shared/ui/data-table'
+import { LabelBadge } from '@/entities/label'
+import {
   type Task,
-  type TaskLabel,
   type TaskAssignee,
+  type TaskLabel,
+  TaskStatusBadge,
+  type TaskStatusEnum,
   calculateTaskProgress,
   isTaskOverdue as checkOverdue,
 } from '@/entities/task'
-import { TaskStatusBadge } from '@/features/task'
 import { TaskTableRowActions } from './task-table-row-actions'
 
 export const tasksColumns: ColumnDef<Task>[] = [

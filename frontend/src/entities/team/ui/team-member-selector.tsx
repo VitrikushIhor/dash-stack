@@ -1,4 +1,6 @@
-import { useState, useMemo, memo } from 'react'
+'use client'
+
+import { memo, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { getInitials, stringToColor } from '@/shared/lib/utils'

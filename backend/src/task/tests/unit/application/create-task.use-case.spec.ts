@@ -34,6 +34,7 @@ describe('CreateTaskUseCase', () => {
     taskRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      findAllUnpaginated: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -55,7 +56,7 @@ describe('CreateTaskUseCase', () => {
       dueDate: '2026-06-10T00:00:00.000Z',
       assigneeIds: ['user-1'],
       attachments: ['attachment-1'],
-      label: { name: 'Bug', color: '#ff0000' },
+      labelId: 'label-1',
       checklists: [
         {
           name: 'To Do',
@@ -78,9 +79,7 @@ describe('CreateTaskUseCase', () => {
     const result = await useCase.execute('org-1', command);
 
     expect(result).toBe(expectedTask);
-    expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith('org-1', [
-      'user-1',
-    ]);
+    expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith('org-1', ['user-1']);
     expect(taskRepository.create).toHaveBeenCalledWith({
       organizationId: 'org-1',
       title: 'New Task',
@@ -91,7 +90,7 @@ describe('CreateTaskUseCase', () => {
       startDate: new Date('2026-06-01T00:00:00.000Z'),
       dueDate: new Date('2026-06-10T00:00:00.000Z'),
       completedAt: undefined,
-      label: { name: 'Bug', color: '#ff0000' },
+      labelId: 'label-1',
       checklists: [
         {
           name: 'To Do',
@@ -123,7 +122,7 @@ describe('CreateTaskUseCase', () => {
       startDate: new Date('2026-06-01T00:00:00.000Z'),
       dueDate: new Date('2026-06-10T00:00:00.000Z'),
       completedAt: undefined,
-      label: null,
+      labelId: null,
       checklists: undefined,
     });
   });
@@ -156,9 +155,7 @@ describe('CreateTaskUseCase', () => {
       dueDate: '2026-06-01T00:00:00.000Z',
     };
 
-    await expect(useCase.execute('org-1', command)).rejects.toThrow(
-      InvalidTaskDatesException,
-    );
+    await expect(useCase.execute('org-1', command)).rejects.toThrow(InvalidTaskDatesException);
     expect(taskRepository.create).not.toHaveBeenCalled();
   });
 
@@ -170,13 +167,9 @@ describe('CreateTaskUseCase', () => {
       assigneeIds: ['invalid-user'],
     };
 
-    assigneeValidator.validateOrThrow.mockRejectedValue(
-      new InvalidAssigneesException(),
-    );
+    assigneeValidator.validateOrThrow.mockRejectedValue(new InvalidAssigneesException());
 
-    await expect(useCase.execute('org-1', command)).rejects.toThrow(
-      InvalidAssigneesException,
-    );
+    await expect(useCase.execute('org-1', command)).rejects.toThrow(InvalidAssigneesException);
     expect(taskRepository.create).not.toHaveBeenCalled();
   });
 });

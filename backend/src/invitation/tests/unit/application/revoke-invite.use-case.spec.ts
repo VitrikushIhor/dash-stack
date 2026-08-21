@@ -1,7 +1,7 @@
 import { RevokeInviteUseCase } from '../../../application/use-cases/revoke-invite.use-case';
 import { InvitationRepositoryPort } from '../../../application/ports/invitation.repository.port';
 import { PendingInvitationReadModel } from '../../../application/read-models/pending-invitation.read-model';
-import { OrgRole } from '@prisma/client';
+import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
 import { InvitationNotInOrgException } from '../../../domain/exceptions/invitation-not-found.exception';
 
 const mockInvitation = (
@@ -51,20 +51,14 @@ describe('RevokeInviteUseCase', () => {
   it('should throw InvitationNotInOrgException when invitation is null', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(
-      InvitationNotInOrgException,
-    );
+    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(InvitationNotInOrgException);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw InvitationNotInOrgException when orgId does not match', async () => {
-    repository.findById.mockResolvedValue(
-      mockInvitation({ orgId: 'org-other' }),
-    );
+    repository.findById.mockResolvedValue(mockInvitation({ orgId: 'org-other' }));
 
-    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(
-      InvitationNotInOrgException,
-    );
+    await expect(useCase.execute('inv-1', 'org-1')).rejects.toThrow(InvitationNotInOrgException);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 });

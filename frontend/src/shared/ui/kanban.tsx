@@ -1,42 +1,44 @@
+'use client'
+
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import {
   type Announcements,
   type CollisionDetection,
-  closestCenter,
-  closestCorners,
   DndContext,
   type DndContextProps,
   type DragCancelEvent,
   type DragEndEvent,
-  type DraggableAttributes,
-  type DraggableSyntheticListeners,
   type DragOverEvent,
   DragOverlay,
   type DragStartEvent,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
   type DropAnimation,
   type DroppableContainer,
-  defaultDropAnimationSideEffects,
-  getFirstCollision,
   KeyboardCode,
   type KeyboardCoordinateGetter,
   KeyboardSensor,
   MeasuringStrategy,
   MouseSensor,
-  pointerWithin,
-  rectIntersection,
   TouchSensor,
   type UniqueIdentifier,
+  closestCenter,
+  closestCorners,
+  defaultDropAnimationSideEffects,
+  getFirstCollision,
+  pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
 import {
   type AnimateLayoutChanges,
+  SortableContext,
+  type SortableContextProps,
   arrayMove,
   defaultAnimateLayoutChanges,
   horizontalListSortingStrategy,
-  SortableContext,
-  type SortableContextProps,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
@@ -1038,6 +1040,7 @@ function KanbanOverlay(props: KanbanOverlayProps) {
   const context = useKanbanContext(OVERLAY_NAME)
 
   const [mounted, setMounted] = React.useState(false)
+
   React.useLayoutEffect(() => setMounted(true), [])
 
   const container =
