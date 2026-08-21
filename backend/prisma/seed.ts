@@ -1,5 +1,6 @@
 import { PrismaClient, TaskStatus, OrgRole } from '@prisma/client';
 import { addDays, startOfDay } from 'date-fns';
+import { systemDecks } from './seeds/vocabulary-data';
 
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -11,7 +12,18 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    console.error(
+      'FATAL: Running destructive seed script with table truncation in production environment is strictly forbidden!',
+    );
+    process.exit(1);
+  }
+
   console.log('Cleaning up database...');
+  await prisma.deckLeaderboard.deleteMany();
+  await prisma.vocabProgress.deleteMany();
+  await prisma.flashcard.deleteMany();
+  await prisma.deck.deleteMany();
   await prisma.organizationLabel.deleteMany();
   await prisma.checklistItem.deleteMany();
   await prisma.checklist.deleteMany();
@@ -153,6 +165,49 @@ async function main() {
       },
     },
   });
+
+  // 5. Seed Vocabulary System Decks
+  console.log('Seeding vocabulary starter decks...');
+  for (const deckData of systemDecks) {
+    const deck = await prisma.deck.upsert({
+      where: { slug: deckData.slug },
+      update: {
+        title: deckData.title,
+        description: deckData.description,
+        language: deckData.language,
+        level: deckData.level,
+        tags: deckData.tags,
+        visibility: deckData.visibility,
+        status: deckData.status,
+        type: deckData.type,
+      },
+      create: {
+        ownerUserId: user1.id,
+        title: deckData.title,
+        slug: deckData.slug,
+        description: deckData.description,
+        language: deckData.language,
+        level: deckData.level,
+        tags: deckData.tags,
+        visibility: deckData.visibility,
+        status: deckData.status,
+        type: deckData.type,
+        flashcards: {
+          create: deckData.flashcards.map((card, index) => ({
+            term: card.term,
+            definition: card.definition,
+            example: card.example,
+            imageUrl: card.imageUrl,
+            position: index + 1,
+          })),
+        },
+      },
+    });
+
+    console.log(
+      `- Seeded deck: "${deck.title}" (${deck.slug}) with ${deckData.flashcards.length} cards`,
+    );
+  }
 
   console.log('Seeding completed successfully!');
 }
