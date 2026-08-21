@@ -11,8 +11,8 @@ export interface SendMailOptions {
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
-  private emailConfig: EmailConfig;
+  private readonly transporter: nodemailer.Transporter;
+  private readonly emailConfig: EmailConfig;
 
   constructor(private readonly configService: ConfigService) {
     this.emailConfig = this.configService.get<EmailConfig>('email');

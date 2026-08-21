@@ -40,13 +40,12 @@ export function DataTableColumnHeader<TData, TValue>({
       >
         {title}
         {column.getCanSort() &&
-          (column.getIsSorted() === 'desc' ? (
-            <ChevronDown />
-          ) : column.getIsSorted() === 'asc' ? (
-            <ChevronUp />
-          ) : (
-            <ChevronsUpDown />
-          ))}
+          (() => {
+            const sorted = column.getIsSorted()
+            if (sorted === 'desc') return <ChevronDown />
+            if (sorted === 'asc') return <ChevronUp />
+            return <ChevronsUpDown />
+          })()}
       </DropdownMenuTrigger>
       <DropdownMenuContent align='start' className='w-28'>
         {column.getCanSort() && (

@@ -66,7 +66,7 @@ export function FormFileUpload({ name, label, ...props }: FormFileUploadProps) {
                 <FileUploadList>
                   {files.map((file, index) => (
                     <FileUploadItem
-                      key={index}
+                      key={`${file.name}-${index}`}
                       value={file}
                       className='flex-col'
                     >
