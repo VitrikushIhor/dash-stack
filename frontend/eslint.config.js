@@ -25,6 +25,18 @@ export default defineConfig(
     ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: [
+            'steiger.config.ts',
+            'vitest.config.ts',
+            '*.js',
+            '*.mjs',
+            '*.cjs',
+          ],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
       ecmaVersion: 2022,
       globals: {
         ...globals.browser,
