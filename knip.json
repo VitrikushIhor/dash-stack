@@ -27,13 +27,34 @@
         "src/**/*.dto.ts",
         "test-db.ts"
       ],
-
       "project": ["src/**/*.ts"],
       "ignore": [
         "src/common/order/**",
         "src/auth/domain/constants/auth.constants.ts"
       ],
-      "ignoreDependencies": ["pino-pretty"]
+      "ignoreDependencies": [
+        "pino-pretty",
+        "passport",
+        "pino-http",
+        "reflect-metadata",
+        "rxjs",
+        "@nestjs/cli",
+        "@swc/cli",
+        "@swc/core",
+        "eslint",
+        "jest",
+        "prettier",
+        "prisma"
+      ],
+      "ignoreBinaries": [
+        "nest",
+        "tsc",
+        "prettier",
+        "eslint",
+        "prisma",
+        "jest",
+        "ts-node"
+      ]
     }
   }
 }
