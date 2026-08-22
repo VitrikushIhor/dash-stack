@@ -10,6 +10,20 @@ export type ActionState<T = void> =
   | { success: true; data: T }
   | { success: false; error: string; validationMessages?: string[] }
 
+export type QueryErrorCode =
+  'UNAUTHORIZED' | 'VALIDATION' | 'NOT_FOUND' | 'UNKNOWN'
+
+export type QueryResult<T> =
+  | { ok: true; data: T }
+  | {
+      ok: false
+      error: {
+        code: QueryErrorCode
+        message: string
+        details?: Record<string, string[] | undefined>
+      }
+    }
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 export interface RequestOptions<TBody = unknown> {

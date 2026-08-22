@@ -31,6 +31,15 @@ export const ROUTES = {
   orgLabels: (slug: string) => `/organizations/${slug}/labels`,
   orgSettings: (slug: string) => `/organizations/${slug}/settings`,
 
+  // Vocabulary / SRS
+  vocabDecks: '/vocab/decks',
+  vocabDeckNew: '/vocab/decks/new',
+  vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
+  vocabCatalog: '/vocab/catalog',
+  vocabDeckStudy: (id: string) => `/vocab/decks/${id}/study`,
+  vocabDeckLearn: (id: string) => `/vocab/decks/${id}/learn`,
+  vocabMatch: (id: string) => `/vocab/decks/${id}/match`,
+
   // Legal
   terms: '/terms',
   privacy: '/privacy',

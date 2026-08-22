@@ -242,7 +242,7 @@ async function forward(req: NextRequest, path: string[]) {
     }
   }
 
-  const data = await res.arrayBuffer()
+  const data = res.status === 204 ? null : await res.arrayBuffer()
   const response = new NextResponse(data, {
     status: res.status,
     headers: resHeaders,
