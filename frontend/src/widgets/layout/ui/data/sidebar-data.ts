@@ -1,6 +1,8 @@
 import {
   Calendar,
   ClipboardList,
+  Compass,
+  Library,
   Settings,
   ShieldCheck,
   UsersRound,
@@ -32,6 +34,22 @@ export const getSidebarData = (slug?: string): SidebarData => ({
               },
             ]
           : []),
+      ],
+    },
+
+    {
+      title: 'Vocabulary',
+      items: [
+        {
+          title: 'My Decks',
+          url: ROUTES.vocabDecks,
+          icon: Library,
+        },
+        {
+          title: 'Catalog',
+          url: ROUTES.vocabCatalog,
+          icon: Compass,
+        },
       ],
     },
 
