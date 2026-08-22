@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, CEFRLevel } from '@prisma/client';
 import { Deck } from '../../domain/entities/deck.entity';
 import {
   DeckRepositoryPort,
@@ -85,7 +85,7 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
   }
 
   async findMyDecks(filter: FindMyDecksFilter): Promise<Deck[]> {
-    const where: any = {
+    const where: Prisma.DeckWhereInput = {
       ownerUserId: filter.ownerUserId,
     };
 
@@ -122,7 +122,7 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
     }
 
     if (filter.level) {
-      where.level = filter.level as any;
+      where.level = filter.level as CEFRLevel;
     }
 
     if (filter.tags && filter.tags.length > 0) {
@@ -163,42 +163,47 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
   async forkDeck(sourceDeckId: string, forkedDeck: Deck): Promise<Deck> {
     const raw = PrismaDeckMapper.toPersistence(forkedDeck);
 
-    return this.prisma.$transaction(async (tx) => {
-      const createdDeck = await tx.deck.create({
-        data: {
-          ownerUserId: raw.ownerUserId,
-          title: raw.title,
-          slug: raw.slug,
-          description: raw.description,
-          language: raw.language,
-          level: raw.level,
-          tags: raw.tags,
-          visibility: raw.visibility,
-          status: raw.status,
-          type: raw.type,
-          forkedFromDeckId: raw.forkedFromDeckId,
-        },
-      });
-
-      // Pure SQL direct clone (zero V8 memory allocation & sub-millisecond execution)
-      await tx.$executeRaw`
-        INSERT INTO "flashcards" ("id", "deckId", "term", "definition", "example", "imageUrl", "position", "createdAt", "updatedAt")
-        SELECT gen_random_uuid()::text, ${createdDeck.id}, "term", "definition", "example", "imageUrl", "position", NOW(), NOW()
-        FROM "flashcards"
-        WHERE "deckId" = ${sourceDeckId}
-      `;
-
-      const result = await tx.deck.findUniqueOrThrow({
-        where: { id: createdDeck.id },
-        include: {
-          _count: {
-            select: { flashcards: true },
+    return this.prisma.$transaction(
+      async (tx) => {
+        const createdDeck = await tx.deck.create({
+          data: {
+            ownerUserId: raw.ownerUserId,
+            title: raw.title,
+            slug: raw.slug,
+            description: raw.description,
+            language: raw.language,
+            level: raw.level,
+            tags: raw.tags,
+            visibility: raw.visibility,
+            status: raw.status,
+            type: raw.type,
+            forkedFromDeckId: raw.forkedFromDeckId,
           },
-        },
-      });
+        });
 
-      return PrismaDeckMapper.toDomain(result);
-    });
+        // Pure SQL direct clone (zero V8 memory allocation & sub-millisecond execution)
+        await tx.$executeRaw`
+          INSERT INTO "flashcards" ("id", "deckId", "term", "definition", "example", "imageUrl", "position", "createdAt", "updatedAt")
+          SELECT gen_random_uuid()::text, ${createdDeck.id}, "term", "definition", "example", "imageUrl", "position", NOW(), NOW()
+          FROM "flashcards"
+          WHERE "deckId" = ${sourceDeckId}
+        `;
+
+        const result = await tx.deck.findUniqueOrThrow({
+          where: { id: createdDeck.id },
+          include: {
+            _count: {
+              select: { flashcards: true },
+            },
+          },
+        });
+
+        return PrismaDeckMapper.toDomain(result);
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      },
+    );
   }
 
   async delete(id: string): Promise<void> {

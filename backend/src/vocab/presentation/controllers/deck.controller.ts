@@ -10,7 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Req,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
@@ -107,11 +106,13 @@ export class DeckController {
     summary: 'Get deck details and cards by ID (respects visibility)',
   })
   @ApiResponse({ status: HttpStatus.OK, type: DeckResponseDto })
-  async getDeckById(@Param('id') id: string, @Req() req: any): Promise<DeckResponseDto> {
-    const userId = req.user?.id || null;
+  async getDeckById(
+    @Param('id') id: string,
+    @UserEntity() user: AuthUser | null,
+  ): Promise<DeckResponseDto> {
     const deck = await this.getDeckByIdUseCase.execute({
       deckId: id,
-      userId,
+      userId: user?.id ?? null,
     });
     return DeckPresentationMapper.toResponse(deck);
   }

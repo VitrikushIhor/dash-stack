@@ -4,6 +4,12 @@ import { DeckPublishInvalidException } from '../exceptions/vocab-domain.exceptio
 export class DeckLifecyclePolicy {
   static readonly MIN_CARDS_FOR_PUBLISH = 2;
 
+  private static readonly ALLOWED_TRANSITIONS: Record<DeckStatus, readonly DeckStatus[]> = {
+    [DeckStatus.DRAFT]: [DeckStatus.PUBLISHED, DeckStatus.ARCHIVED],
+    [DeckStatus.PUBLISHED]: [DeckStatus.DRAFT, DeckStatus.ARCHIVED],
+    [DeckStatus.ARCHIVED]: [DeckStatus.DRAFT],
+  };
+
   static validatePublishEligibility(cardCount: number): void {
     if (cardCount < this.MIN_CARDS_FOR_PUBLISH) {
       throw new DeckPublishInvalidException(cardCount);
@@ -11,15 +17,6 @@ export class DeckLifecyclePolicy {
   }
 
   static canTransition(from: DeckStatus, to: DeckStatus): boolean {
-    switch (from) {
-      case DeckStatus.DRAFT:
-        return to === DeckStatus.PUBLISHED || to === DeckStatus.ARCHIVED;
-      case DeckStatus.PUBLISHED:
-        return to === DeckStatus.DRAFT || to === DeckStatus.ARCHIVED;
-      case DeckStatus.ARCHIVED:
-        return to === DeckStatus.DRAFT;
-      default:
-        return false;
-    }
+    return this.ALLOWED_TRANSITIONS[from]?.includes(to) ?? false;
   }
 }

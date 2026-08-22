@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaDeckRepository } from './infrastructure/persistence/prisma-deck.repository';
 import { PrismaFlashcardRepository } from './infrastructure/persistence/prisma-flashcard.repository';
+import { PrismaVocabProgressRepository } from './infrastructure/persistence/prisma-vocab-progress.repository';
 import { UnsplashAdapter } from './infrastructure/integrations/unsplash.adapter';
 import { CreateDeckUseCase } from './application/use-cases/create-deck.use-case';
 import { GetMyDecksUseCase } from './application/use-cases/get-my-decks.use-case';
@@ -18,12 +19,24 @@ import { UpdateFlashcardUseCase } from './application/use-cases/update-flashcard
 import { DeleteFlashcardUseCase } from './application/use-cases/delete-flashcard.use-case';
 import { ReorderFlashcardsUseCase } from './application/use-cases/reorder-flashcards.use-case';
 import { SearchUnsplashPhotosUseCase } from './application/use-cases/search-unsplash-photos.use-case';
+import { GetDueReviewsUseCase } from './application/use-cases/get-due-reviews.use-case';
+import { GetStudyCardsUseCase } from './application/use-cases/get-study-cards.use-case';
+import { SubmitStudyProgressUseCase } from './application/use-cases/submit-study-progress.use-case';
+import { ToggleCardStarUseCase } from './application/use-cases/toggle-card-star.use-case';
 import { DeckController } from './presentation/controllers/deck.controller';
 import { FlashcardController } from './presentation/controllers/flashcard.controller';
 import { UnsplashController } from './presentation/controllers/unsplash.controller';
+import { VocabProgressController } from './presentation/controllers/vocab-progress.controller';
+import { DeckStudyController } from './presentation/controllers/deck-study.controller';
 
 @Module({
-  controllers: [DeckController, FlashcardController, UnsplashController],
+  controllers: [
+    DeckController,
+    FlashcardController,
+    UnsplashController,
+    VocabProgressController,
+    DeckStudyController,
+  ],
   providers: [
     // Use Cases - Decks
     CreateDeckUseCase,
@@ -47,6 +60,12 @@ import { UnsplashController } from './presentation/controllers/unsplash.controll
     // Use Cases - Unsplash
     SearchUnsplashPhotosUseCase,
 
+    // Use Cases - SRS & Study Progress
+    GetDueReviewsUseCase,
+    GetStudyCardsUseCase,
+    SubmitStudyProgressUseCase,
+    ToggleCardStarUseCase,
+
     // Repositories, Adapters & Ports
     PrismaDeckRepository,
     {
@@ -57,6 +76,11 @@ import { UnsplashController } from './presentation/controllers/unsplash.controll
     {
       provide: 'FlashcardRepositoryPort',
       useExisting: PrismaFlashcardRepository,
+    },
+    PrismaVocabProgressRepository,
+    {
+      provide: 'VocabProgressRepositoryPort',
+      useExisting: PrismaVocabProgressRepository,
     },
     UnsplashAdapter,
     {
@@ -69,8 +93,13 @@ import { UnsplashController } from './presentation/controllers/unsplash.controll
     CreateDeckUseCase,
     ForkDeckUseCase,
     SearchUnsplashPhotosUseCase,
+    GetDueReviewsUseCase,
+    GetStudyCardsUseCase,
+    SubmitStudyProgressUseCase,
+    ToggleCardStarUseCase,
     'DeckRepositoryPort',
     'FlashcardRepositoryPort',
+    'VocabProgressRepositoryPort',
     'UnsplashServicePort',
   ],
 })

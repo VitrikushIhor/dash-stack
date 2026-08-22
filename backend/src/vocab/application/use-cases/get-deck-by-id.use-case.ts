@@ -18,11 +18,7 @@ export class GetDeckByIdUseCase {
   async execute(query: GetDeckByIdQuery): Promise<Deck> {
     const deck = await this.deckRepository.findById(query.deckId);
 
-    if (!deck) {
-      throw new DeckNotFoundException(query.deckId);
-    }
-
-    if (!deck.isAccessibleBy(query.userId)) {
+    if (!deck || !deck.isAccessibleBy(query.userId)) {
       throw new DeckNotFoundException(query.deckId);
     }
 

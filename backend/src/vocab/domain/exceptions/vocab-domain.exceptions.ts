@@ -40,3 +40,21 @@ export class InvalidFlashcardDataException extends BadRequestException {
     super(message);
   }
 }
+
+export class VocabProgressNotFoundException extends NotFoundException {
+  constructor(identifier: string) {
+    super(VOCAB_ERRORS.VOCAB_PROGRESS_NOT_FOUND(identifier));
+  }
+}
+
+export class FlashcardNotInDeckException extends BadRequestException {
+  constructor(cardId: string, deckId: string) {
+    super(VOCAB_ERRORS.FLASHCARD_NOT_IN_DECK(cardId, deckId));
+  }
+}
+
+export class InvalidVocabProgressDataException extends BadRequestException {
+  constructor(reason: string) {
+    super(VOCAB_ERRORS.INVALID_PROGRESS_DATA(reason));
+  }
+}

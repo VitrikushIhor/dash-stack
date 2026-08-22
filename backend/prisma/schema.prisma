@@ -277,6 +277,7 @@ model VocabProgress {
   flashcard      Flashcard           @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
 
   @@unique([userId, deckId, flashcardId])
+  @@index([userId, deckId, nextReviewAt])
   @@index([userId, nextReviewAt])
   @@index([deckId])
   @@map("vocab_progress")

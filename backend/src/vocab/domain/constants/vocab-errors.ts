@@ -15,4 +15,16 @@ export const VOCAB_ERRORS = {
   FLASHCARD_DEFINITION_TOO_LONG: 'Flashcard definition cannot exceed 1000 characters',
   FLASHCARD_EXAMPLE_TOO_LONG: 'Flashcard example cannot exceed 500 characters',
   FLASHCARD_POSITION_NEGATIVE: 'Flashcard position must be non-negative',
+  VOCAB_PROGRESS_NOT_FOUND: (id: string) => `Vocab progress not found: ${id}`,
+  VOCAB_PROGRESS_USER_REQUIRED: 'User ID is required',
+  VOCAB_PROGRESS_DECK_REQUIRED: 'Deck ID is required',
+  VOCAB_PROGRESS_FLASHCARD_REQUIRED: 'Flashcard ID is required',
+  VOCAB_PROGRESS_INVALID_BOX: 'Box number must be between 1 and 5',
+  VOCAB_PROGRESS_NEGATIVE_STREAK: 'Correct streak cannot be negative',
+  VOCAB_PROGRESS_NEGATIVE_CORRECT_COUNT: 'Correct count cannot be negative',
+  VOCAB_PROGRESS_NEGATIVE_INCORRECT_COUNT: 'Incorrect count cannot be negative',
+  FLASHCARD_NOT_IN_DECK: (cardId: string, deckId: string) =>
+    `Flashcard ${cardId} does not belong to deck ${deckId}`,
+  EMPTY_PROGRESS_SUBMISSION: 'Progress results array cannot be empty',
+  INVALID_PROGRESS_DATA: (reason: string) => `Invalid vocab progress data: ${reason}`,
 } as const;
