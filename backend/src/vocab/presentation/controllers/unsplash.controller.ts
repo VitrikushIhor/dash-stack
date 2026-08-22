@@ -6,7 +6,7 @@ import { SearchUnsplashPhotosUseCase } from '../../application/use-cases/search-
 import { UnsplashSearchQueryDto } from '../dtos/unsplash-search.dto';
 
 @ApiTags('Vocabulary - Unsplash')
-@Controller('vocab/unsplash')
+@Controller('v1/vocab/unsplash')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UnsplashController {
