@@ -47,15 +47,20 @@ export function CatalogGrid({
             key={deck.id}
             deck={deck}
             href={ROUTES.vocabDeckStudy(deck.id)}
-            footerActionsSlot={
+          >
+            <DeckCard.Header>
+              <DeckCard.Badges />
+            </DeckCard.Header>
+            <DeckCard.Content />
+            <DeckCard.Footer>
               <Button asChild size='sm' className='h-8 gap-1.5 shadow-sm'>
                 <Link href={ROUTES.vocabDeckStudy(deck.id)}>
                   <BookOpen className='h-3.5 w-3.5' />
                   <span>Study</span>
                 </Link>
               </Button>
-            }
-          />
+            </DeckCard.Footer>
+          </DeckCard>
         ))}
       </div>
       {children}

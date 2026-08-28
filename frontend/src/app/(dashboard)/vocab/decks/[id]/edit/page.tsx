@@ -23,9 +23,12 @@ export default async function DeckEditPage({ params }: Props) {
 
   const deck = deckRes.data
 
-  if (!deck.flashcards) {
-    deck.flashcards = []
-  }
-
-  return <DeckEditorView initialDeck={deck} />
+  return (
+    <DeckEditorView
+      initialDeck={{
+        ...deck,
+        flashcards: deck.flashcards ?? [],
+      }}
+    />
+  )
 }

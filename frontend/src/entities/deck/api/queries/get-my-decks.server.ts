@@ -3,7 +3,7 @@ import { z } from 'zod'
 import 'server-only'
 import { createServerQuery } from '@/shared/lib/server'
 import { DeckStatusEnum } from '../../model/types'
-import { deckServerApi } from '../../server/deck-api.server'
+import { deckServerApi } from '../deck-api.server'
 
 const GetMyDecksSchema = z
   .enum([

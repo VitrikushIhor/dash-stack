@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowRight, Loader2, RotateCcw, Trophy } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
+import { formatTime } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 
 interface StudySummaryProps {
-  deckId: string
+  deckId?: string
   results?: { flashcardId: string; isCorrect: boolean }[]
   onRetryIncorrect?: () => void
   onRestart?: () => void
@@ -17,13 +18,7 @@ interface StudySummaryProps {
   isSubmitting?: boolean
 }
 
-function formatDuration(ms: number) {
-  const totalSeconds = (ms / 1000).toFixed(1)
-  return `${totalSeconds}s`
-}
-
 export function StudySummary({
-  deckId,
   results = [],
   onRetryIncorrect,
   onRestart,
@@ -61,7 +56,7 @@ export function StudySummary({
               Completion Time
             </div>
             <div className='text-primary font-mono text-4xl font-extrabold'>
-              {formatDuration(matchDurationMs)}
+              {formatTime(matchDurationMs)}s
             </div>
           </div>
         ) : (

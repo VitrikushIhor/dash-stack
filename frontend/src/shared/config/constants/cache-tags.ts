@@ -8,4 +8,6 @@ export const SERVER_CACHE_TAGS = {
   labels: (slug: string) => `labels-${slug}`,
   decks: 'decks',
   deckDetail: (id: string) => `deck-${id}`,
+  dueReviews: 'due-reviews',
+  studySession: (deckId: string) => `study-session-${deckId}`,
 } as const

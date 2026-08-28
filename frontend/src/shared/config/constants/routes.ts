@@ -23,7 +23,7 @@ export const ROUTES = {
   orgTasksList: (slug: string) => `/organizations/${slug}/tasks/list`,
   orgTasksTable: (slug: string) => `/organizations/${slug}/tasks/table`,
   orgCalendar: (slug: string) => `/organizations/${slug}/calendar`,
-  orgCalendarView: (slug: string, view: string) =>
+  orgCalendarView: (slug: string, view: 'day' | 'week' | 'month') =>
     `/organizations/${slug}/calendar/${view}`,
   orgMembers: (slug: string) => `/organizations/${slug}/members`,
   orgMemberDetail: (slug: string, userId: string) =>
@@ -36,7 +36,7 @@ export const ROUTES = {
   vocabDeckNew: '/vocab/decks/new',
   vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
   vocabCatalog: '/vocab/catalog',
-  vocabDeckStudy: (id: string) => `/vocab/decks/${id}/study`,
+  vocabDeckStudy: (id: string) => `/vocab/decks/${id}/flashcards`,
   vocabDeckLearn: (id: string) => `/vocab/decks/${id}/learn`,
   vocabMatch: (id: string) => `/vocab/decks/${id}/match`,
 

@@ -1,15 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-
-const isInputActive = () => {
-  const activeEl = document.activeElement as HTMLElement | null
-  return (
-    activeEl?.tagName === 'INPUT' ||
-    activeEl?.tagName === 'TEXTAREA' ||
-    activeEl?.isContentEditable
-  )
-}
+import { isInputActive } from '../../lib/is-input-active'
 
 const isFlipKey = (e: KeyboardEvent) => e.code === 'Space'
 const isFailKey = (e: KeyboardEvent) => e.key === '1'

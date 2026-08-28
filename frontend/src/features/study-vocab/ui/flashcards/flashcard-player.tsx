@@ -4,10 +4,10 @@ import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/shared/ui/core/button'
 import { type StudyCard } from '@/entities/vocab'
-import { StudyEmptyState } from '../shared/study-empty-state'
-import { StudySavingState } from '../shared/study-saving-state'
 import { useFlashcardShortcuts } from '../../model/flashcards/use-flashcard-shortcuts'
 import { useFlashcards } from '../../model/flashcards/use-flashcards'
+import { StudyEmptyState } from '../shared/study-empty-state'
+import { StudySavingState } from '../shared/study-saving-state'
 import { StudySessionView } from '../shared/study-session-view'
 import { FlashcardItem } from './flashcard-item'
 
@@ -16,10 +16,7 @@ interface FlashcardPlayerProps {
   onComplete: (results: { flashcardId: string; isCorrect: boolean }[]) => void
 }
 
-export function FlashcardPlayer({
-  cards,
-  onComplete,
-}: FlashcardPlayerProps) {
+export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
   const {
     currentCard,
     isFlipped,

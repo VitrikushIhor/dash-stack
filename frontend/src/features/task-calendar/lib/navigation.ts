@@ -17,7 +17,7 @@ export function getCalendarViewUrl(
   if (view === 'month') {
     return `${ROUTES.orgCalendar(slug)}${dateQuery}`
   }
-  return `${ROUTES.orgCalendarView(slug, view)}${dateQuery}`
+  return `${ROUTES.orgCalendarView(slug, view as 'day' | 'week' | 'month')}${dateQuery}`
 }
 
 export function useCalendarNavigation() {

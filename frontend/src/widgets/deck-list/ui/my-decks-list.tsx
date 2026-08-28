@@ -1,11 +1,18 @@
+import React from 'react'
 import Link from 'next/link'
 import { BookOpen, Layers } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/core/dropdown-menu'
 import { EmptyState } from '@/shared/ui/feedback/empty-state'
-import { type Deck, DeckCard } from '@/entities/deck'
-import { DeckStatusBadge } from '@/entities/deck/ui/deck-status-badge'
+import { type Deck, DeckCard, DeckStatusBadge } from '@/entities/deck'
 import { CreateDeckDialog, MyDeckCardActions } from '@/features/manage-deck'
+import { DeckDueBadge, DueReviewsProvider } from '@/features/study-vocab'
 import type { FilterTab } from '../model/use-my-decks-filter'
 
 interface MyDecksListProps {
@@ -49,24 +56,50 @@ export function MyDecksList({
   }
 
   return (
-    <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
-      {decks.map((deck) => (
-        <DeckCard
-          key={deck.id}
-          deck={deck}
-          href={ROUTES.vocabDeckEdit(deck.id)}
-          statusBadgeSlot={<DeckStatusBadge status={deck.status} />}
-          footerActionsSlot={
-            <Button asChild size='sm' className='h-8 gap-1.5 shadow-sm'>
-              <Link href={ROUTES.vocabDeckStudy(deck.id)}>
-                <BookOpen className='h-3.5 w-3.5' />
-                <span>Study</span>
-              </Link>
-            </Button>
-          }
-          dropdownActionsSlot={<MyDeckCardActions deck={deck} />}
-        />
-      ))}
-    </div>
+    <DueReviewsProvider>
+      <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+        {decks.map((deck) => (
+          <DeckCard
+            key={deck.id}
+            deck={deck}
+            href={ROUTES.vocabDeckEdit(deck.id)}
+          >
+            <DeckCard.Header>
+              <DeckCard.Badges>
+                <DeckStatusBadge status={deck.status} />
+                <DeckDueBadge deckId={deck.id} />
+              </DeckCard.Badges>
+              <DeckCard.Actions>
+                <MyDeckCardActions deck={deck} />
+              </DeckCard.Actions>
+            </DeckCard.Header>
+            <DeckCard.Content />
+            <DeckCard.Footer>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size='sm' className='h-8 gap-1.5 shadow-sm'>
+                    <BookOpen className='h-3.5 w-3.5' />
+                    <span>Study</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem asChild>
+                    <Link href={ROUTES.vocabDeckStudy(deck.id)}>
+                      Flashcards
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={ROUTES.vocabDeckLearn(deck.id)}>Learn</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={ROUTES.vocabMatch(deck.id)}>Match</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </DeckCard.Footer>
+          </DeckCard>
+        ))}
+      </div>
+    </DueReviewsProvider>
   )
 }

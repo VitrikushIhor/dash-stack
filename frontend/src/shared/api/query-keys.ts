@@ -5,4 +5,5 @@ export const QUERY_KEYS = {
   DECKS: 'decks',
   FLASHCARDS: 'flashcards',
   UNSPLASH: 'unsplash',
+  VOCAB: 'vocab',
 } as const
