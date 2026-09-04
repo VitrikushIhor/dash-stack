@@ -160,19 +160,6 @@ export class Deck {
     return this.props.ownerUserId === userId;
   }
 
-  isAccessibleBy(userId?: string | null): boolean {
-    if (
-      this.props.visibility === DeckVisibility.PUBLIC ||
-      this.props.visibility === DeckVisibility.UNLISTED
-    ) {
-      return true;
-    }
-    if (!userId) {
-      return false;
-    }
-    return this.isOwnedBy(userId);
-  }
-
   updateMetadata(data: {
     title?: string;
     description?: string | null;

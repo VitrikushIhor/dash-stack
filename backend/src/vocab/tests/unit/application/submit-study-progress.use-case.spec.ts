@@ -5,11 +5,17 @@ import { VocabProgressRepositoryPort } from '../../../application/ports/vocab-pr
 import { Deck } from '../../../domain/entities/deck.entity';
 import { Flashcard } from '../../../domain/entities/flashcard.entity';
 import { VocabProgress } from '../../../domain/entities/vocab-progress.entity';
-import { DeckVisibility, VocabProgressStatus } from '../../../domain/enums/vocab.enums';
+import {
+  DeckStatus,
+  DeckType,
+  DeckVisibility,
+  VocabProgressStatus,
+} from '../../../domain/enums/vocab.enums';
 import {
   DeckNotFoundException,
   FlashcardNotInDeckException,
   InvalidVocabProgressDataException,
+  DeckAccessForbiddenException,
 } from '../../../domain/exceptions/vocab-domain.exceptions';
 
 describe('SubmitStudyProgressUseCase', () => {
@@ -86,8 +92,8 @@ describe('SubmitStudyProgressUseCase', () => {
       level: null,
       tags: [],
       visibility: DeckVisibility.PUBLIC,
-      status: 'PUBLISHED' as any,
-      type: 'USER_GENERATED' as any,
+      status: DeckStatus.PUBLISHED,
+      type: DeckType.USER_GENERATED,
       forkedFromDeckId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -131,8 +137,8 @@ describe('SubmitStudyProgressUseCase', () => {
       level: null,
       tags: [],
       visibility: DeckVisibility.PUBLIC,
-      status: 'PUBLISHED' as any,
-      type: 'USER_GENERATED' as any,
+      status: DeckStatus.PUBLISHED,
+      type: DeckType.USER_GENERATED,
       forkedFromDeckId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -211,5 +217,25 @@ describe('SubmitStudyProgressUseCase', () => {
     expect(resCard2!.correctStreak).toBe(0);
     expect(resCard2!.incorrectCount).toBe(1);
     expect(resCard2!.status).toBe(VocabProgressStatus.FORGOTTEN);
+  });
+
+  it('should reject progress submission for an archived public deck by a non-owner', async () => {
+    mockDeckRepo.findById.mockResolvedValue(
+      Deck.create({
+        id: 'deck-1',
+        ownerUserId: 'owner-user',
+        title: 'Archived deck',
+        visibility: DeckVisibility.PUBLIC,
+        status: DeckStatus.ARCHIVED,
+      }),
+    );
+
+    await expect(
+      useCase.execute({
+        userId: 'user-2',
+        deckId: 'deck-1',
+        results: [{ flashcardId: 'card-1', isCorrect: true }],
+      }),
+    ).rejects.toThrow(DeckAccessForbiddenException);
   });
 });

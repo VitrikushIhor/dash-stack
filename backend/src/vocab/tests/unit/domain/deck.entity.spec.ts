@@ -98,28 +98,11 @@ describe('Deck Entity', () => {
     });
   });
 
-  describe('Access and Ownership Checks', () => {
+  describe('Ownership Checks', () => {
     it('should correctly identify owner', () => {
       const deck = Deck.create(defaultProps);
       expect(deck.isOwnedBy('user-1')).toBe(true);
       expect(deck.isOwnedBy('user-2')).toBe(false);
-    });
-
-    it('should allow public access for PUBLIC or UNLISTED decks', () => {
-      const publicDeck = Deck.create({ ...defaultProps, visibility: DeckVisibility.PUBLIC });
-      expect(publicDeck.isAccessibleBy(null)).toBe(true);
-      expect(publicDeck.isAccessibleBy('anonymous')).toBe(true);
-
-      const unlistedDeck = Deck.create({ ...defaultProps, visibility: DeckVisibility.UNLISTED });
-      expect(unlistedDeck.isAccessibleBy(null)).toBe(true);
-      expect(unlistedDeck.isAccessibleBy('user-2')).toBe(true);
-    });
-
-    it('should restrict PRIVATE deck access strictly to the owner', () => {
-      const privateDeck = Deck.create({ ...defaultProps, visibility: DeckVisibility.PRIVATE });
-      expect(privateDeck.isAccessibleBy('user-1')).toBe(true);
-      expect(privateDeck.isAccessibleBy('user-2')).toBe(false);
-      expect(privateDeck.isAccessibleBy(null)).toBe(false);
     });
   });
 

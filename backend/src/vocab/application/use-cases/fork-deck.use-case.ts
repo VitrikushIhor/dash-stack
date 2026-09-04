@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import { Deck } from '../../domain/entities/deck.entity';
 import { DeckSlug } from '../../domain/value-objects/deck-slug.vo';
 import { DeckNotFoundException } from '../../domain/exceptions/vocab-domain.exceptions';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
 export interface ForkDeckCommand {
@@ -20,7 +21,10 @@ export class ForkDeckUseCase {
   async execute(command: ForkDeckCommand): Promise<Deck> {
     const sourceDeck = await this.deckRepository.findById(command.deckId);
 
-    if (!sourceDeck || !sourceDeck.isAccessibleBy(command.targetUserId)) {
+    if (
+      !sourceDeck ||
+      !DeckAccessPolicy.canAccess(sourceDeck, DeckAccessAction.FORK, command.targetUserId)
+    ) {
       throw new DeckNotFoundException(command.deckId);
     }
 

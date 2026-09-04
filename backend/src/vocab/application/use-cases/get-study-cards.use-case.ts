@@ -6,8 +6,9 @@ import { StudyCardReadModel } from '../read-models/study-card.read-model';
 import {
   DeckNotFoundException,
   DeckAccessForbiddenException,
+  PersonalizedStudyFilterAuthRequiredException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
-import { DeckVisibility } from '../../domain/enums/vocab.enums';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
 @Injectable()
 export class GetStudyCardsUseCase {
@@ -26,9 +27,12 @@ export class GetStudyCardsUseCase {
       throw new DeckNotFoundException(deckId);
     }
 
-    // Access check: PRIVATE decks can only be studied by their owner
-    if (deck.visibility === DeckVisibility.PRIVATE && (!userId || deck.ownerUserId !== userId)) {
+    if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.STUDY, userId)) {
       throw new DeckAccessForbiddenException();
+    }
+
+    if (!userId && (onlyStarred || onlyDue)) {
+      throw new PersonalizedStudyFilterAuthRequiredException();
     }
 
     return this.vocabProgressRepository.getStudyCards(userId, deckId, {

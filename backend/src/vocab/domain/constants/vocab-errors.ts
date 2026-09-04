@@ -27,4 +27,5 @@ export const VOCAB_ERRORS = {
     `Flashcard ${cardId} does not belong to deck ${deckId}`,
   EMPTY_PROGRESS_SUBMISSION: 'Progress results array cannot be empty',
   INVALID_PROGRESS_DATA: (reason: string) => `Invalid vocab progress data: ${reason}`,
+  PERSONALIZED_STUDY_FILTER_AUTH_REQUIRED: 'Personalized study filters require authentication',
 } as const;

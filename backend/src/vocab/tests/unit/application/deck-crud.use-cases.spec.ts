@@ -96,6 +96,7 @@ describe('Deck Use Cases', () => {
         ownerUserId: 'user-1',
         title: 'Public Deck',
         visibility: DeckVisibility.PUBLIC,
+        status: DeckStatus.PUBLISHED,
       });
       mockDeckRepository.findById.mockResolvedValueOnce(deck);
 

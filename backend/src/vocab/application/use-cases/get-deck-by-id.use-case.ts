@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Deck } from '../../domain/entities/deck.entity';
 import { DeckNotFoundException } from '../../domain/exceptions/vocab-domain.exceptions';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
 export interface GetDeckByIdQuery {
@@ -18,7 +19,7 @@ export class GetDeckByIdUseCase {
   async execute(query: GetDeckByIdQuery): Promise<Deck> {
     const deck = await this.deckRepository.findById(query.deckId);
 
-    if (!deck || !deck.isAccessibleBy(query.userId)) {
+    if (!deck || !DeckAccessPolicy.canAccess(deck, DeckAccessAction.VIEW, query.userId)) {
       throw new DeckNotFoundException(query.deckId);
     }
 

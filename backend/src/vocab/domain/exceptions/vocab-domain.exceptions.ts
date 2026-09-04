@@ -58,3 +58,9 @@ export class InvalidVocabProgressDataException extends BadRequestException {
     super(VOCAB_ERRORS.INVALID_PROGRESS_DATA(reason));
   }
 }
+
+export class PersonalizedStudyFilterAuthRequiredException extends BadRequestException {
+  constructor() {
+    super(VOCAB_ERRORS.PERSONALIZED_STUDY_FILTER_AUTH_REQUIRED);
+  }
+}

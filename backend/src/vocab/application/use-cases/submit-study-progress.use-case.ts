@@ -6,7 +6,7 @@ import {
   FlashcardNotInDeckException,
   InvalidVocabProgressDataException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
-import { DeckVisibility } from '../../domain/enums/vocab.enums';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
 import { VocabProgressRepositoryPort } from '../ports/vocab-progress-repository.port';
@@ -36,7 +36,7 @@ export class SubmitStudyProgressUseCase {
       throw new DeckNotFoundException(deckId);
     }
 
-    if (deck.visibility === DeckVisibility.PRIVATE && deck.ownerUserId !== userId) {
+    if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.SUBMIT_PROGRESS, userId)) {
       throw new DeckAccessForbiddenException();
     }
 

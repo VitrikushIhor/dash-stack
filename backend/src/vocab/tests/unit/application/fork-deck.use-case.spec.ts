@@ -112,4 +112,20 @@ describe('ForkDeckUseCase', () => {
       }),
     ).rejects.toThrow(DeckNotFoundException);
   });
+
+  it('should not fork a public draft deck as a non-owner', async () => {
+    mockDeckRepository.findById.mockResolvedValue(
+      Deck.create({
+        id: 'draft-deck-1',
+        ownerUserId: 'owner-1',
+        title: 'Unpublished deck',
+        visibility: DeckVisibility.PUBLIC,
+        status: DeckStatus.DRAFT,
+      }),
+    );
+
+    await expect(
+      useCase.execute({ deckId: 'draft-deck-1', targetUserId: 'user-2' }),
+    ).rejects.toThrow(DeckNotFoundException);
+  });
 });

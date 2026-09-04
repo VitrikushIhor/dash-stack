@@ -2,7 +2,12 @@ import { GetStudyCardsUseCase } from '../../../application/use-cases/get-study-c
 import { DeckRepositoryPort } from '../../../application/ports/deck-repository.port';
 import { VocabProgressRepositoryPort } from '../../../application/ports/vocab-progress-repository.port';
 import { Deck } from '../../../domain/entities/deck.entity';
-import { DeckVisibility, VocabProgressStatus } from '../../../domain/enums/vocab.enums';
+import {
+  DeckStatus,
+  DeckType,
+  DeckVisibility,
+  VocabProgressStatus,
+} from '../../../domain/enums/vocab.enums';
 import {
   DeckNotFoundException,
   DeckAccessForbiddenException,
@@ -58,8 +63,8 @@ describe('GetStudyCardsUseCase', () => {
       level: null,
       tags: [],
       visibility: DeckVisibility.PRIVATE,
-      status: 'DRAFT' as any,
-      type: 'USER_GENERATED' as any,
+      status: DeckStatus.DRAFT,
+      type: DeckType.USER_GENERATED,
       forkedFromDeckId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -83,8 +88,8 @@ describe('GetStudyCardsUseCase', () => {
       level: null,
       tags: [],
       visibility: DeckVisibility.PUBLIC,
-      status: 'PUBLISHED' as any,
-      type: 'USER_GENERATED' as any,
+      status: DeckStatus.PUBLISHED,
+      type: DeckType.USER_GENERATED,
       forkedFromDeckId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -127,5 +132,53 @@ describe('GetStudyCardsUseCase', () => {
       onlyDue: false,
     });
     expect(result).toEqual(expectedCards);
+  });
+
+  it('should reject a guest studying a public draft deck', async () => {
+    mockDeckRepo.findById.mockResolvedValue(
+      Deck.create({
+        id: 'deck-1',
+        ownerUserId: 'owner-user',
+        title: 'Unpublished deck',
+        visibility: DeckVisibility.PUBLIC,
+        status: DeckStatus.DRAFT,
+      }),
+    );
+
+    await expect(useCase.execute({ userId: null, deckId: 'deck-1' })).rejects.toThrow(
+      DeckAccessForbiddenException,
+    );
+  });
+
+  it('should reject a guest personalized due filter', async () => {
+    mockDeckRepo.findById.mockResolvedValue(
+      Deck.create({
+        id: 'deck-1',
+        ownerUserId: 'owner-user',
+        title: 'Published deck',
+        visibility: DeckVisibility.PUBLIC,
+        status: DeckStatus.PUBLISHED,
+      }),
+    );
+
+    await expect(
+      useCase.execute({ userId: null, deckId: 'deck-1', onlyDue: true }),
+    ).rejects.toThrow('Personalized study filters require authentication');
+  });
+
+  it('does not reveal a private deck through a guest personalized filter', async () => {
+    mockDeckRepo.findById.mockResolvedValue(
+      Deck.create({
+        id: 'deck-1',
+        ownerUserId: 'owner-user',
+        title: 'Private deck',
+        visibility: DeckVisibility.PRIVATE,
+        status: DeckStatus.PUBLISHED,
+      }),
+    );
+
+    await expect(
+      useCase.execute({ userId: null, deckId: 'deck-1', onlyDue: true }),
+    ).rejects.toThrow(DeckAccessForbiddenException);
   });
 });
