@@ -5,7 +5,7 @@ import { vocabCatalogSearchParamsCache } from '@/features/vocab-filters/server'
 import { CatalogView } from '@/views/vocab'
 
 export const metadata: Metadata = {
-  title: 'Public Deck Catalog | Dash English',
+  title: 'Public Deck Catalog',
   description: 'Explore community and official CEFR English vocabulary decks.',
 }
 
@@ -19,13 +19,9 @@ export default async function CatalogPage({ searchParams }: Props) {
     level: rawLevel,
     page,
   } = await vocabCatalogSearchParamsCache.parse(searchParams)
-
-  const q = rawQ ?? undefined
-  const level = rawLevel ?? undefined
-
   const result = await getPublicDecksQuery({
-    q,
-    level,
+    q: rawQ ?? undefined,
+    level: rawLevel ?? undefined,
     page,
     perPage: 12,
   })
@@ -35,6 +31,11 @@ export default async function CatalogPage({ searchParams }: Props) {
   }
 
   return (
-    <CatalogView initialData={result.data} q={q} level={level} page={page} />
+    <CatalogView
+      initialData={result.data}
+      q={rawQ ?? undefined}
+      level={rawLevel ?? undefined}
+      page={page}
+    />
   )
 }

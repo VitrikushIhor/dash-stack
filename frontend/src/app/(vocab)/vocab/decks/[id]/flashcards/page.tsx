@@ -2,23 +2,22 @@ import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
 import { getDeckQuery } from '@/entities/deck/server'
 import { getStudyCardsQuery } from '@/entities/vocab/server'
-import { MatchView } from '@/views/vocab'
+import { FlashcardsView } from '@/views/vocab'
 
 export const metadata: Metadata = {
-  title: 'Match Game | Dash English Vocabulary',
-  description: 'Test your vocabulary recall speed with a matching challenge.',
+  title: 'Flashcards',
+  description: 'Study vocabulary flashcards with spaced repetition.',
 }
 
-export default async function MatchPage({
+export default async function FlashcardsPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-
   const [deckResult, cardsResult] = await Promise.all([
     getDeckQuery(id),
-    getStudyCardsQuery({ deckId: id, mode: 'match' }),
+    getStudyCardsQuery({ deckId: id, mode: 'flashcards' }),
   ])
 
   if (!deckResult.ok) {
@@ -29,5 +28,7 @@ export default async function MatchPage({
     return <PageErrorHandler error={cardsResult.error} withContainer={false} />
   }
 
-  return <MatchView deck={deckResult.data} initialCards={cardsResult.data} />
+  return (
+    <FlashcardsView deck={deckResult.data} initialCards={cardsResult.data} />
+  )
 }

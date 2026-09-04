@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { logger } from '@/shared/lib'
 import { ErrorFallback } from '@/shared/ui/error-state'
 
 export default function VocabError({
@@ -11,9 +12,7 @@ export default function VocabError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service if needed
-    // eslint-disable-next-line no-console
-    console.error('[Vocab Error Boundary]', error)
+    logger.error('[Vocab Error Boundary]', error)
   }, [error])
 
   return (
