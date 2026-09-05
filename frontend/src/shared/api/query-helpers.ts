@@ -19,6 +19,9 @@ export function handleQueryError(
         error: { code: 'UNAUTHORIZED', message: error.message },
       }
     }
+    if (error.isForbidden) {
+      return { ok: false, error: { code: 'FORBIDDEN', message: error.message } }
+    }
     if (error.isNotFound) {
       return { ok: false, error: { code: 'NOT_FOUND', message: error.message } }
     }

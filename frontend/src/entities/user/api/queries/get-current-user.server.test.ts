@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ApiError } from '@/shared/api'
 import { userServerApi } from '../user-api.server'
 import { getCurrentUser } from './get-current-user.server'
 
@@ -27,6 +28,7 @@ describe('getCurrentUser', () => {
     expect(result).toEqual({
       data: mockUser,
       error: null,
+      statusCode: null,
     })
     expect(userServerApi.getMe).toHaveBeenCalledTimes(1)
   })
@@ -39,6 +41,19 @@ describe('getCurrentUser', () => {
     expect(result).toEqual({
       data: null,
       error: 'Unauthorized',
+      statusCode: null,
+    })
+  })
+
+  it('preserves an API error status for server-side callers', async () => {
+    vi.mocked(userServerApi.getMe).mockRejectedValue(
+      new ApiError(401, 'Unauthorized')
+    )
+
+    await expect(getCurrentUser()).resolves.toEqual({
+      data: null,
+      error: 'Unauthorized',
+      statusCode: 401,
     })
   })
 })

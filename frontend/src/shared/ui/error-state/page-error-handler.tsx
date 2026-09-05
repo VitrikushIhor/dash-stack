@@ -1,7 +1,6 @@
 import React from 'react'
-import { notFound, redirect } from 'next/navigation'
+import { forbidden, notFound, unauthorized } from 'next/navigation'
 import { type QueryErrorCode } from '@/shared/api'
-import { ROUTES } from '@/shared/config'
 import { cn } from '@/shared/lib'
 import { ErrorFallback } from './error-fallback'
 
@@ -20,7 +19,11 @@ export function PageErrorHandler({
   withContainer = true,
 }: PageErrorHandlerProps) {
   if (error.code === 'UNAUTHORIZED') {
-    redirect(ROUTES.signIn)
+    unauthorized()
+  }
+
+  if (error.code === 'FORBIDDEN') {
+    forbidden()
   }
 
   if (error.code === 'NOT_FOUND') {

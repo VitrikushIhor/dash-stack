@@ -11,7 +11,7 @@ export type ActionState<T = void> =
   | { success: false; error: string; validationMessages?: string[] }
 
 export type QueryErrorCode =
-  'UNAUTHORIZED' | 'VALIDATION' | 'NOT_FOUND' | 'UNKNOWN'
+  'UNAUTHORIZED' | 'FORBIDDEN' | 'VALIDATION' | 'NOT_FOUND' | 'UNKNOWN'
 
 export type QueryResult<T> =
   | { ok: true; data: T }
