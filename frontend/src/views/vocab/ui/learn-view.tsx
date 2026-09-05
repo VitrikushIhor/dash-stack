@@ -1,18 +1,16 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { type Deck } from '@/entities/deck'
 import { type StudyCard } from '@/entities/vocab'
 import {
   LearnModeSelect,
   type LearnQuestionType,
-  type StudyAnswerResult,
   StudySessionContainer,
   StudySessionSkeleton,
   StudySummary,
   useStudySession,
-  useSubmitProgress,
 } from '@/features/study-vocab'
 
 const LearnPlayer = dynamic(
@@ -30,15 +28,6 @@ interface LearnViewProps {
 
 export function LearnView({ deck, initialCards }: LearnViewProps) {
   const [mode, setMode] = useState<LearnQuestionType | null>(null)
-  const { submitProgress, isSubmitting } = useSubmitProgress()
-
-  const handleSubmit = useCallback(
-    (results: StudyAnswerResult[]) => {
-      submitProgress(deck.id, results)
-    },
-    [deck.id, submitProgress]
-  )
-
   const {
     cards,
     results,
@@ -46,15 +35,16 @@ export function LearnView({ deck, initialCards }: LearnViewProps) {
     completeSession,
     retryIncorrect,
     restart,
+    isSubmitting,
   } = useStudySession({
+    deckId: deck.id,
     initialCards,
-    onComplete: handleSubmit,
   })
 
   if (results) {
     return (
       <StudySummary
-        deckId={deck.id}
+        kind='cards'
         results={results}
         onRetryIncorrect={retryIncorrect}
         onRestart={restart}

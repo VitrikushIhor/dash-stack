@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { useAction } from '@/shared/lib'
+import { useCurrentUser } from '@/entities/user'
 import { toggleStarAction } from '../../server'
 
 export function useStarCard(
@@ -9,6 +10,7 @@ export function useStarCard(
   cardId: string,
   initialIsStarred: boolean
 ) {
+  const { data: user } = useCurrentUser()
   const [isStarred, setIsStarred] = useState(initialIsStarred)
   const [prevCardId, setPrevCardId] = useState(cardId)
   const [prevInitialStarred, setPrevInitialStarred] = useState(initialIsStarred)
@@ -25,6 +27,8 @@ export function useStarCard(
       e?.preventDefault()
       e?.stopPropagation()
 
+      if (user === null) return
+
       let nextValue = false
       setIsStarred((prev) => {
         nextValue = !prev
@@ -36,7 +40,7 @@ export function useStarCard(
         setIsStarred((curr) => (curr === nextValue ? !nextValue : curr))
       }
     },
-    [deckId, cardId, execute]
+    [deckId, cardId, execute, user]
   )
 
   return { isStarred, toggleStar }

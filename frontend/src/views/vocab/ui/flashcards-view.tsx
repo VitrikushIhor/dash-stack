@@ -1,15 +1,12 @@
 'use client'
 
-import { useCallback } from 'react'
 import { type Deck } from '@/entities/deck'
 import { type StudyCard } from '@/entities/vocab'
 import {
   FlashcardPlayer,
-  type StudyAnswerResult,
   StudySessionContainer,
   StudySummary,
   useStudySession,
-  useSubmitProgress,
 } from '@/features/study-vocab'
 
 interface FlashcardsViewProps {
@@ -18,15 +15,6 @@ interface FlashcardsViewProps {
 }
 
 export function FlashcardsView({ deck, initialCards }: FlashcardsViewProps) {
-  const { submitProgress, isSubmitting } = useSubmitProgress()
-
-  const handleSubmit = useCallback(
-    (results: StudyAnswerResult[]) => {
-      submitProgress(deck.id, results)
-    },
-    [deck.id, submitProgress]
-  )
-
   const {
     cards,
     results,
@@ -34,15 +22,16 @@ export function FlashcardsView({ deck, initialCards }: FlashcardsViewProps) {
     completeSession,
     retryIncorrect,
     restart,
+    isSubmitting,
   } = useStudySession({
+    deckId: deck.id,
     initialCards,
-    onComplete: handleSubmit,
   })
 
   if (results) {
     return (
       <StudySummary
-        deckId={deck.id}
+        kind='cards'
         results={results}
         onRetryIncorrect={retryIncorrect}
         onRestart={restart}

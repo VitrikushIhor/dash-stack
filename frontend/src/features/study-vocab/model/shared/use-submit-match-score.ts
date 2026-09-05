@@ -1,6 +1,7 @@
 'use client'
 
 import { useAction } from '@/shared/lib'
+import { useCurrentUser } from '@/entities/user'
 import { submitMatchScoreAction } from '../../server'
 
 interface UseSubmitMatchScoreProps {
@@ -9,6 +10,7 @@ interface UseSubmitMatchScoreProps {
 }
 
 export function useSubmitMatchScore(props?: UseSubmitMatchScoreProps) {
+  const { data: user } = useCurrentUser()
   const { execute, isPending } = useAction(submitMatchScoreAction, {
     onSuccess: () => {
       props?.onSuccess?.()
@@ -19,7 +21,9 @@ export function useSubmitMatchScore(props?: UseSubmitMatchScoreProps) {
   })
 
   const submitMatchScore = (deckId: string, durationMs: number) => {
-    execute({ deckId, durationMs })
+    if (user === null) return
+
+    return execute({ deckId, durationMs })
   }
 
   return {

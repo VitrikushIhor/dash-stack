@@ -3,26 +3,30 @@
 import { useCallback, useState } from 'react'
 import { type StudyCard } from '@/entities/vocab'
 import { type StudyAnswerResult } from './types'
+import { useSubmitProgress } from './use-submit-progress'
 
 interface UseStudySessionOptions {
+  deckId: string
   initialCards: StudyCard[]
-  onComplete: (results: StudyAnswerResult[]) => void
 }
 
 export function useStudySession({
+  deckId,
   initialCards,
-  onComplete,
 }: UseStudySessionOptions) {
   const [cards, setCards] = useState<StudyCard[]>(initialCards)
   const [results, setResults] = useState<StudyAnswerResult[] | null>(null)
   const [sessionVersion, setSessionVersion] = useState(0)
 
+  const { submitProgress, isSubmitting } = useSubmitProgress()
+
   const completeSession = useCallback(
     (sessionResults: StudyAnswerResult[]) => {
+      if (isSubmitting) return
       setResults(sessionResults)
-      onComplete(sessionResults)
+      submitProgress(deckId, sessionResults)
     },
-    [onComplete]
+    [deckId, submitProgress, isSubmitting]
   )
 
   const restart = useCallback(() => {
@@ -54,5 +58,6 @@ export function useStudySession({
     completeSession,
     restart,
     retryIncorrect,
+    isSubmitting,
   }
 }

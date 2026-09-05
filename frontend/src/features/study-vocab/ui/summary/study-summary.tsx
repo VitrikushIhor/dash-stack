@@ -7,26 +7,47 @@ import { ArrowRight, Loader2, RotateCcw, Trophy } from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { formatTime } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
+import { GuestStudySaveProgressCta } from './guest-study-save-progress-cta'
 
-interface StudySummaryProps {
-  deckId?: string
-  results?: { flashcardId: string; isCorrect: boolean }[]
-  onRetryIncorrect?: () => void
+interface BaseSummaryProps {
   onRestart?: () => void
-  isMatchGame?: boolean
-  matchDurationMs?: number
   isSubmitting?: boolean
+  deckId?: string
 }
 
-export function StudySummary({
-  results = [],
-  onRetryIncorrect,
-  onRestart,
-  isMatchGame = false,
-  matchDurationMs = 0,
-  isSubmitting = false,
-}: StudySummaryProps) {
+interface CardsSummaryProps extends BaseSummaryProps {
+  kind?: 'cards'
+  results: { flashcardId: string; isCorrect: boolean }[]
+  onRetryIncorrect?: () => void
+  isMatchGame?: false
+  matchDurationMs?: never
+}
+
+interface MatchSummaryProps extends BaseSummaryProps {
+  kind: 'match'
+  matchDurationMs: number
+  isMatchGame?: true
+  results?: never
+  onRetryIncorrect?: never
+}
+
+export type StudySummaryProps = CardsSummaryProps | MatchSummaryProps
+
+export function StudySummary(props: StudySummaryProps) {
+  const { onRestart, isSubmitting = false } = props
   const router = useRouter()
+
+  const isMatch = props.kind === 'match' || Boolean(props.isMatchGame)
+  const matchDurationMs =
+    isMatch &&
+    'matchDurationMs' in props &&
+    typeof props.matchDurationMs === 'number'
+      ? props.matchDurationMs
+      : 0
+  const results =
+    !isMatch && 'results' in props && props.results ? props.results : []
+  const onRetryIncorrect =
+    !isMatch && 'onRetryIncorrect' in props ? props.onRetryIncorrect : undefined
 
   const total = results.length
   const correctCount = results.filter((r) => r.isCorrect).length
@@ -50,7 +71,7 @@ export function StudySummary({
           Great job! Keep reviewing regularly to build long-term memory.
         </p>
 
-        {isMatchGame ? (
+        {isMatch ? (
           <div className='bg-muted/50 mb-8 w-full rounded-xl p-6'>
             <div className='text-muted-foreground mb-1 text-sm font-medium'>
               Completion Time
@@ -79,6 +100,8 @@ export function StudySummary({
             </div>
           </div>
         )}
+
+        <GuestStudySaveProgressCta />
 
         <div className='flex w-full flex-col gap-3 sm:flex-row'>
           {hasIncorrect && onRetryIncorrect && (

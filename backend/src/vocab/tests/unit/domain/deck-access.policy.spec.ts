@@ -2,11 +2,32 @@ import { Deck } from '../../../domain/entities/deck.entity';
 import { DeckStatus, DeckType, DeckVisibility } from '../../../domain/enums/vocab.enums';
 import { DeckAccessAction, DeckAccessPolicy } from '../../../domain/policies/deck-access.policy';
 
+const ownerUserId = 'owner-1';
+const nonOwnerUserId = 'user-2';
+const allActions: DeckAccessAction[] = [
+  DeckAccessAction.VIEW,
+  DeckAccessAction.STUDY,
+  DeckAccessAction.EDIT,
+  DeckAccessAction.FORK,
+  DeckAccessAction.STAR,
+  DeckAccessAction.EXPORT,
+  DeckAccessAction.SUBMIT_PROGRESS,
+  DeckAccessAction.SUBMIT_MATCH_SCORE,
+];
+const guestSharedActions: DeckAccessAction[] = [DeckAccessAction.VIEW, DeckAccessAction.STUDY];
+const authenticatedSharedActions: DeckAccessAction[] = [
+  ...guestSharedActions,
+  DeckAccessAction.FORK,
+  DeckAccessAction.STAR,
+  DeckAccessAction.SUBMIT_PROGRESS,
+  DeckAccessAction.SUBMIT_MATCH_SCORE,
+];
+
 describe('DeckAccessPolicy', () => {
   const createDeck = (visibility: DeckVisibility, status: DeckStatus): Deck =>
     Deck.create({
       id: 'deck-1',
-      ownerUserId: 'owner-1',
+      ownerUserId,
       title: 'Vocabulary deck',
       language: 'en',
       tags: [],
@@ -15,27 +36,54 @@ describe('DeckAccessPolicy', () => {
       type: DeckType.USER_GENERATED,
     });
 
-  it('denies a guest from viewing a public draft deck', () => {
-    const deck = createDeck(DeckVisibility.PUBLIC, DeckStatus.DRAFT);
+  const expectActions = (deck: Deck, userId: string | null, allowedActions: DeckAccessAction[]) => {
+    for (const action of allActions) {
+      expect(DeckAccessPolicy.canAccess(deck, action, userId)).toBe(
+        allowedActions.includes(action),
+      );
+    }
+  };
 
-    expect(DeckAccessPolicy.canAccess(deck, DeckAccessAction.VIEW, null)).toBe(false);
-  });
+  describe.each([DeckVisibility.PUBLIC, DeckVisibility.UNLISTED])(
+    'for a published %s deck',
+    (visibility) => {
+      const deck = createDeck(visibility, DeckStatus.PUBLISHED);
 
-  it('denies an authenticated non-owner from studying an unlisted archived deck', () => {
-    const deck = createDeck(DeckVisibility.UNLISTED, DeckStatus.ARCHIVED);
+      it('allows every action for the owner', () => {
+        expectActions(deck, ownerUserId, allActions);
+      });
 
-    expect(DeckAccessPolicy.canAccess(deck, DeckAccessAction.STUDY, 'user-2')).toBe(false);
-  });
+      it('allows read-only study for a guest', () => {
+        expectActions(deck, null, guestSharedActions);
+      });
 
-  it('allows an owner to view a private draft deck', () => {
-    const deck = createDeck(DeckVisibility.PRIVATE, DeckStatus.DRAFT);
+      it('allows personalized actions for an authenticated non-owner', () => {
+        expectActions(deck, nonOwnerUserId, authenticatedSharedActions);
+      });
+    },
+  );
 
-    expect(DeckAccessPolicy.canAccess(deck, DeckAccessAction.VIEW, 'owner-1')).toBe(true);
-  });
+  describe.each([
+    [DeckVisibility.PRIVATE, DeckStatus.PUBLISHED],
+    [DeckVisibility.PRIVATE, DeckStatus.DRAFT],
+    [DeckVisibility.PRIVATE, DeckStatus.ARCHIVED],
+    [DeckVisibility.PUBLIC, DeckStatus.DRAFT],
+    [DeckVisibility.PUBLIC, DeckStatus.ARCHIVED],
+    [DeckVisibility.UNLISTED, DeckStatus.DRAFT],
+    [DeckVisibility.UNLISTED, DeckStatus.ARCHIVED],
+  ])('for a %s %s deck', (visibility, status) => {
+    const deck = createDeck(visibility, status);
 
-  it('allows a guest to view a published public deck', () => {
-    const deck = createDeck(DeckVisibility.PUBLIC, DeckStatus.PUBLISHED);
+    it('allows every action for the owner', () => {
+      expectActions(deck, ownerUserId, allActions);
+    });
 
-    expect(DeckAccessPolicy.canAccess(deck, DeckAccessAction.VIEW, null)).toBe(true);
+    it('denies every action for a guest', () => {
+      expectActions(deck, null, []);
+    });
+
+    it('denies every action for an authenticated non-owner', () => {
+      expectActions(deck, nonOwnerUserId, []);
+    });
   });
 });

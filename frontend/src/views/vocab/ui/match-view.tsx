@@ -45,8 +45,7 @@ export function MatchView({ deck, initialCards }: MatchViewProps) {
   if (durationMs !== null) {
     return (
       <StudySummary
-        deckId={deck.id}
-        isMatchGame={true}
+        kind='match'
         matchDurationMs={durationMs}
         onRestart={handleRestart}
         isSubmitting={isSubmitting}

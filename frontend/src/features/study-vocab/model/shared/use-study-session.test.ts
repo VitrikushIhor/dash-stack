@@ -1,7 +1,12 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type StudyCard, VocabProgressStatus } from '@/entities/vocab'
 import { useStudySession } from './use-study-session'
+import { useSubmitProgress } from './use-submit-progress'
+
+vi.mock('./use-submit-progress', () => ({
+  useSubmitProgress: vi.fn(),
+}))
 
 const mockCards: StudyCard[] = [
   {
@@ -47,12 +52,20 @@ const mockCards: StudyCard[] = [
 ]
 
 describe('useStudySession', () => {
+  const submitProgressMock = vi.fn()
+
+  beforeEach(() => {
+    vi.mocked(useSubmitProgress).mockReturnValue({
+      submitProgress: submitProgressMock,
+      isSubmitting: false,
+    } as unknown as ReturnType<typeof useSubmitProgress>)
+  })
+
   it('handles completeSession, restart, and retryIncorrect flows', () => {
-    const onComplete = vi.fn()
     const { result } = renderHook(() =>
       useStudySession({
+        deckId: 'd1',
         initialCards: mockCards,
-        onComplete,
       })
     )
 
@@ -70,7 +83,7 @@ describe('useStudySession', () => {
     })
 
     expect(result.current.results).toEqual(sessionResults)
-    expect(onComplete).toHaveBeenCalledWith(sessionResults)
+    expect(submitProgressMock).toHaveBeenCalledWith('d1', sessionResults)
 
     act(() => {
       result.current.retryIncorrect()
