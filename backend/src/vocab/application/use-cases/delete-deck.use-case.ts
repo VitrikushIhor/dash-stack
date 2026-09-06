@@ -4,6 +4,7 @@ import {
   DeckNotFoundException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
 export interface DeleteDeckCommand {
   deckId: string;
@@ -24,7 +25,7 @@ export class DeleteDeckUseCase {
       throw new DeckNotFoundException(command.deckId);
     }
 
-    if (!deck.isOwnedBy(command.userId)) {
+    if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.EDIT, command.userId)) {
       throw new DeckAccessForbiddenException();
     }
 

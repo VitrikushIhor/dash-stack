@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
+import { DeckStatus, DeckVisibility, Prisma } from '@prisma/client';
 import { VocabProgress } from '../../domain/entities/vocab-progress.entity';
 import { VocabProgressRepositoryPort } from '../../application/ports/vocab-progress-repository.port';
 import { DueReviewsReadModel } from '../../application/read-models/due-reviews.read-model';
@@ -113,6 +113,15 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
 
   public async getDueReviews(userId: string, deckId?: string): Promise<DueReviewsReadModel> {
     const now = new Date();
+    const accessibleDeckWhere: Prisma.DeckWhereInput = {
+      OR: [
+        { ownerUserId: userId },
+        {
+          status: DeckStatus.PUBLISHED,
+          visibility: { in: [DeckVisibility.PUBLIC, DeckVisibility.UNLISTED] },
+        },
+      ],
+    };
 
     // Fast path: if filtered by a single deck, do a single targeted count
     if (deckId) {
@@ -122,10 +131,11 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
             userId,
             deckId,
             nextReviewAt: { lte: now },
+            deck: accessibleDeckWhere,
           },
         }),
-        this.prisma.deck.findUnique({
-          where: { id: deckId },
+        this.prisma.deck.findFirst({
+          where: { id: deckId, ...accessibleDeckWhere },
           select: { id: true, title: true },
         }),
       ]);
@@ -150,6 +160,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
       where: {
         userId,
         nextReviewAt: { lte: now },
+        deck: accessibleDeckWhere,
       },
       _count: {
         _all: true,
@@ -167,7 +178,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
 
     const deckIds = groupedCounts.map((g) => g.deckId);
     const decks = await this.prisma.deck.findMany({
-      where: { id: { in: deckIds } },
+      where: { id: { in: deckIds }, ...accessibleDeckWhere },
       select: { id: true, title: true },
     });
 

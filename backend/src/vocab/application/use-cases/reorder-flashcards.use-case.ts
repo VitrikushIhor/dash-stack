@@ -5,6 +5,7 @@ import {
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
+import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
 export interface ReorderFlashcardsCommand {
   deckId: string;
@@ -28,7 +29,7 @@ export class ReorderFlashcardsUseCase {
       throw new DeckNotFoundException(command.deckId);
     }
 
-    if (!deck.isOwnedBy(command.userId)) {
+    if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.EDIT, command.userId)) {
       throw new DeckAccessForbiddenException();
     }
 

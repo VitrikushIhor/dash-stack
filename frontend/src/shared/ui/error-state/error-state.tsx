@@ -20,7 +20,7 @@ export function ErrorState({
     <div className={cn('h-svh w-full', className)}>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2 p-4'>
         <h1 className='text-[7rem] leading-tight font-bold'>{statusCode}</h1>
-        <span className='text-xl font-medium'>{title}</span>
+        <h2 className='text-xl font-medium'>{title}</h2>
         <p className='text-muted-foreground max-w-md text-center'>
           {description}
         </p>
