@@ -74,6 +74,15 @@ export const UpdateDeckPayloadSchema = z.object({
   data: CreateDeckSchema.partial(),
 })
 
+export const SaveDeckEditorPayloadSchema = z.object({
+  id: DeckIdSchema,
+  data: z.object({
+    metadata: CreateDeckSchema.partial(),
+    cards: z.array(FlashcardSchema.extend({ id: z.string().optional() })),
+    deletedCardIds: z.array(z.string()),
+  }),
+})
+
 export const CreateFlashcardPayloadSchema = z.object({
   deckId: z.string(),
   data: FlashcardSchema,

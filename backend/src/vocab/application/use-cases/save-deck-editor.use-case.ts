@@ -11,6 +11,7 @@ import {
   DeckEditorRepositoryPort,
 } from '../ports/deck-editor-repository.port';
 import { Deck } from '../../domain/entities/deck.entity';
+import { Flashcard } from '../../domain/entities/flashcard.entity';
 
 export interface SaveDeckEditorCommand {
   deckId: string;
@@ -35,6 +36,17 @@ export class SaveDeckEditorUseCase {
     }
 
     deck.updateMetadata(command.metadata);
+    command.cards.forEach((card, position) => {
+      Flashcard.create({
+        id: card.id,
+        deckId: command.deckId,
+        term: card.term,
+        definition: card.definition,
+        example: card.example,
+        imageUrl: card.imageUrl,
+        position,
+      });
+    });
 
     return this.editorRepository.save({
       deck,

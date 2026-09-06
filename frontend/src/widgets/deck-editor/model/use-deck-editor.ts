@@ -3,8 +3,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { type Deck, type Flashcard } from '@/entities/deck'
 import { useDeckActions } from '@/features/manage-deck'
-import { updateDeckAction } from '@/features/manage-deck/server'
-import { batchSaveFlashcardsAction } from '@/features/manage-flashcard/server'
+import { saveDeckEditorAction } from '@/features/manage-deck/server'
 import { useDeckMetadata } from './use-deck-metadata'
 import { useFlashcards } from './use-flashcards'
 import { useImagePicker } from './use-image-picker'
@@ -33,42 +32,28 @@ export function useDeckEditor(
 
     startTransition(async () => {
       try {
-        const deckRes = await updateDeckAction({
+        const deckRes = await saveDeckEditorAction({
           id: deckId,
           data: {
-            title: metadata.title.trim(),
-            description: metadata.description.trim(),
-            level: metadata.level,
-            visibility: metadata.visibility,
+            metadata: {
+              title: metadata.title.trim(),
+              description: metadata.description.trim(),
+              level: metadata.level,
+              visibility: metadata.visibility,
+            },
+            cards: flashcards.cards.map((card) => ({
+              id: card.id.startsWith('temp-') ? undefined : card.id,
+              term: card.term?.trim() ?? '',
+              definition: card.definition?.trim() ?? '',
+              example: card.example?.trim() || undefined,
+              imageUrl: card.imageUrl || undefined,
+            })),
+            deletedCardIds: flashcards.deletedCardIds,
           },
         })
 
         if (!deckRes.success) {
           throw new Error(deckRes.error)
-        }
-
-        const validCards = flashcards.cards
-          .filter((c) => c.term?.trim() || c.definition?.trim())
-          .map((c, i) => ({
-            id: c.id,
-            term: c.term?.trim() || '',
-            definition: c.definition?.trim() || '',
-            example: c.example?.trim() || undefined,
-            imageUrl: c.imageUrl || undefined,
-            position: i,
-            isNew: c.id.startsWith('temp-'),
-          }))
-
-        if (validCards.length > 0 || flashcards.deletedCardIds.length > 0) {
-          const cardsRes = await batchSaveFlashcardsAction({
-            deckId,
-            cards: validCards,
-            deletedCardIds: flashcards.deletedCardIds,
-          })
-
-          if (!cardsRes.success) {
-            throw new Error(cardsRes.error)
-          }
         }
 
         router.refresh()

@@ -1,5 +1,6 @@
 export { createDeckAction } from './api/create-deck.action'
 export { updateDeckAction } from './api/update-deck.action'
+export { saveDeckEditorAction } from './api/save-deck-editor.action'
 export { deleteDeckAction } from './api/delete-deck.action'
 export { publishDeckAction } from './api/publish-deck.action'
 export { unpublishDeckAction } from './api/unpublish-deck.action'

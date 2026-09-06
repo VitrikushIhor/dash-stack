@@ -79,6 +79,18 @@ export type UpdateDeckDto = {
   visibility?: DeckVisibilityEnum
 }
 
+export type SaveDeckEditorDto = {
+  metadata: UpdateDeckDto
+  cards: Array<{
+    id?: string
+    term: string
+    definition: string
+    example?: string | null
+    imageUrl?: string | null
+  }>
+  deletedCardIds: string[]
+}
+
 export type CreateFlashcardDto = {
   term: string
   definition: string

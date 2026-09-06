@@ -5,6 +5,7 @@ import { Deck } from '../../../domain/entities/deck.entity';
 import {
   DeckAccessForbiddenException,
   DeckNotFoundException,
+  InvalidFlashcardDataException,
 } from '../../../domain/exceptions/vocab-domain.exceptions';
 
 describe('SaveDeckEditorUseCase', () => {
@@ -73,6 +74,19 @@ describe('SaveDeckEditorUseCase', () => {
         deletedCardIds: [],
       }),
     ).rejects.toThrow(DeckNotFoundException);
+    expect(editorRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid card before the editor transaction', async () => {
+    await expect(
+      useCase.execute({
+        deckId: 'deck-1',
+        userId: 'owner-1',
+        metadata: {},
+        cards: [{ term: '', definition: 'Definition' }],
+        deletedCardIds: [],
+      }),
+    ).rejects.toThrow(InvalidFlashcardDataException);
     expect(editorRepository.save).not.toHaveBeenCalled();
   });
 });
