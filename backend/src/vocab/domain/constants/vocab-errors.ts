@@ -17,6 +17,8 @@ export const VOCAB_ERRORS = {
   FLASHCARD_DEFINITION_TOO_LONG: 'Flashcard definition cannot exceed 1000 characters',
   FLASHCARD_EXAMPLE_TOO_LONG: 'Flashcard example cannot exceed 500 characters',
   FLASHCARD_POSITION_NEGATIVE: 'Flashcard position must be non-negative',
+  FLASHCARD_ORDER_MUST_BE_EXACT_PERMUTATION:
+    'Flashcard order must contain every card in the deck exactly once',
   VOCAB_PROGRESS_NOT_FOUND: (id: string) => `Vocab progress not found: ${id}`,
   VOCAB_PROGRESS_USER_REQUIRED: 'User ID is required',
   VOCAB_PROGRESS_DECK_REQUIRED: 'Deck ID is required',

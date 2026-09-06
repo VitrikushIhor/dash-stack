@@ -121,17 +121,15 @@ export class PrismaFlashcardRepository implements FlashcardRepositoryPort {
         orderedCardIds.map((cardId, index) =>
           tx.flashcard.updateMany({
             where: { id: cardId, deckId },
-            data: { position: index + 1 },
+            data: { position: index },
           }),
         ),
       );
 
-      await tx.deck
-        .update({
-          where: { id: deckId },
-          data: { updatedAt: new Date() },
-        })
-        .catch(() => undefined);
+      await tx.deck.update({
+        where: { id: deckId },
+        data: { updatedAt: new Date() },
+      });
     });
   }
 

@@ -68,4 +68,40 @@ describe('PrismaFlashcardRepository', () => {
       data: { updatedAt: expect.any(Date) },
     });
   });
+
+  it('persists a reorder as zero-based contiguous positions in one transaction', async () => {
+    const transaction = {
+      flashcard: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+      deck: {
+        update: jest.fn().mockResolvedValue({ id: 'deck-1' }),
+      },
+    };
+    const prisma = {
+      $transaction: jest
+        .fn()
+        .mockImplementation(
+          async (callback: (tx: typeof transaction) => Promise<void>): Promise<void> =>
+            callback(transaction),
+        ),
+    };
+    const repository = new PrismaFlashcardRepository(prisma as unknown as PrismaService);
+
+    await repository.updatePositions('deck-1', ['card-3', 'card-1', 'card-2']);
+
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(transaction.flashcard.updateMany).toHaveBeenNthCalledWith(1, {
+      where: { id: 'card-3', deckId: 'deck-1' },
+      data: { position: 0 },
+    });
+    expect(transaction.flashcard.updateMany).toHaveBeenNthCalledWith(2, {
+      where: { id: 'card-1', deckId: 'deck-1' },
+      data: { position: 1 },
+    });
+    expect(transaction.flashcard.updateMany).toHaveBeenNthCalledWith(3, {
+      where: { id: 'card-2', deckId: 'deck-1' },
+      data: { position: 2 },
+    });
+  });
 });

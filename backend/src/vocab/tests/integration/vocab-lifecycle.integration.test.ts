@@ -9,9 +9,13 @@ import { PrismaService } from 'nestjs-prisma';
 import { ArchiveDeckUseCase } from '../../application/use-cases/archive-deck.use-case';
 import { DeleteFlashcardUseCase } from '../../application/use-cases/delete-flashcard.use-case';
 import { PublishDeckUseCase } from '../../application/use-cases/publish-deck.use-case';
+import { ReorderFlashcardsUseCase } from '../../application/use-cases/reorder-flashcards.use-case';
 import { RestoreDeckUseCase } from '../../application/use-cases/restore-deck.use-case';
 import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
-import { DeckLifecycleInvalidTransitionException } from '../../domain/exceptions/vocab-domain.exceptions';
+import {
+  DeckLifecycleInvalidTransitionException,
+  InvalidFlashcardDataException,
+} from '../../domain/exceptions/vocab-domain.exceptions';
 import { PrismaDeckRepository } from '../../infrastructure/persistence/prisma-deck.repository';
 import { PrismaFlashcardRepository } from '../../infrastructure/persistence/prisma-flashcard.repository';
 
@@ -128,6 +132,39 @@ describe('Vocabulary lifecycle integration', () => {
     const remainingCards = await prisma.flashcard.count({ where: { deckId: deck.id } });
     expect(persistedDeck.status).toBe(DeckStatus.DRAFT);
     expect(remainingCards).toBe(1);
+  });
+
+  it('persists only an exact, zero-based reorder permutation', async () => {
+    const deck = await createDeck(3);
+    const reorderFlashcards = new ReorderFlashcardsUseCase(deckRepository, flashcardRepository);
+    const orderedCardIds = [deck.flashcards[2].id, deck.flashcards[0].id, deck.flashcards[1].id];
+
+    await reorderFlashcards.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      orderedCardIds,
+    });
+
+    const persistedOrder = await prisma.flashcard.findMany({
+      where: { deckId: deck.id },
+      orderBy: { position: 'asc' },
+    });
+    expect(persistedOrder.map((card) => card.id)).toEqual(orderedCardIds);
+    expect(persistedOrder.map((card) => card.position)).toEqual([0, 1, 2]);
+
+    await expect(
+      reorderFlashcards.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        orderedCardIds: [orderedCardIds[0], orderedCardIds[0], orderedCardIds[1]],
+      }),
+    ).rejects.toThrow(InvalidFlashcardDataException);
+
+    const unchangedOrder = await prisma.flashcard.findMany({
+      where: { deckId: deck.id },
+      orderBy: { position: 'asc' },
+    });
+    expect(unchangedOrder.map((card) => card.id)).toEqual(orderedCardIds);
   });
 });
 

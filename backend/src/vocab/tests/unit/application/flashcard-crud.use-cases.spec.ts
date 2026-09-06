@@ -9,6 +9,7 @@ import { Flashcard } from '../../../domain/entities/flashcard.entity';
 import {
   DeckAccessForbiddenException,
   FlashcardNotFoundException,
+  InvalidFlashcardDataException,
 } from '../../../domain/exceptions/vocab-domain.exceptions';
 
 describe('Flashcard Use Cases', () => {
@@ -195,7 +196,19 @@ describe('Flashcard Use Cases', () => {
   });
 
   describe('ReorderFlashcardsUseCase', () => {
-    it('should reorder cards in deck', async () => {
+    const existingCards = ['card-1', 'card-2', 'card-3'].map((id, position) =>
+      Flashcard.create({
+        id,
+        deckId: 'deck-1',
+        term: `Term ${position}`,
+        definition: `Definition ${position}`,
+        position,
+      }),
+    );
+
+    it('should reorder an exact permutation of the deck cards', async () => {
+      mockFlashcardRepository.findByDeckId.mockResolvedValueOnce(existingCards);
+
       await reorderFlashcardsUseCase.execute({
         deckId: 'deck-1',
         userId: 'user-1',
@@ -207,6 +220,36 @@ describe('Flashcard Use Cases', () => {
         'card-1',
         'card-2',
       ]);
+    });
+
+    it.each([
+      ['duplicates', ['card-1', 'card-1', 'card-2']],
+      ['missing cards', ['card-1', 'card-2']],
+      ['a foreign card', ['card-1', 'card-2', 'card-other']],
+    ])('rejects an order containing %s before persistence', async (_, orderedCardIds) => {
+      mockFlashcardRepository.findByDeckId.mockResolvedValueOnce(existingCards);
+
+      await expect(
+        reorderFlashcardsUseCase.execute({
+          deckId: 'deck-1',
+          userId: 'user-1',
+          orderedCardIds,
+        }),
+      ).rejects.toThrow(InvalidFlashcardDataException);
+
+      expect(mockFlashcardRepository.updatePositions).not.toHaveBeenCalled();
+    });
+
+    it('accepts an empty order for an empty deck', async () => {
+      mockFlashcardRepository.findByDeckId.mockResolvedValueOnce([]);
+
+      await reorderFlashcardsUseCase.execute({
+        deckId: 'deck-1',
+        userId: 'user-1',
+        orderedCardIds: [],
+      });
+
+      expect(mockFlashcardRepository.updatePositions).toHaveBeenCalledWith('deck-1', []);
     });
   });
 });
