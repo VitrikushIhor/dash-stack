@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Flashcard } from '../../domain/entities/flashcard.entity';
-import { FlashcardRepositoryPort } from '../../application/ports/flashcard-repository.port';
+import {
+  DeleteFlashcardWithLifecycleCommand,
+  FlashcardRepositoryPort,
+} from '../../application/ports/flashcard-repository.port';
 import { PrismaFlashcardMapper } from './mappers/prisma-flashcard.mapper';
 import { OrderDirection } from '../../../common/order/order-direction';
+import { DeckStatus } from '../../domain/enums/vocab.enums';
 
 @Injectable()
 export class PrismaFlashcardRepository implements FlashcardRepositoryPort {
@@ -142,5 +146,42 @@ export class PrismaFlashcardRepository implements FlashcardRepositoryPort {
         data: { updatedAt: new Date() },
       })
       .catch(() => undefined);
+  }
+
+  async deleteAndDemotePublishedDeckIfBelowMinimum(
+    command: DeleteFlashcardWithLifecycleCommand,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        SELECT 1 FROM "decks" WHERE "id" = ${command.deckId} FOR UPDATE
+      `;
+
+      await tx.flashcard.delete({
+        where: { id: command.cardId },
+      });
+
+      const remainingCardCount = await tx.flashcard.count({
+        where: { deckId: command.deckId },
+      });
+
+      if (remainingCardCount < command.minimumCardCount) {
+        await tx.deck.updateMany({
+          where: {
+            id: command.deckId,
+            status: DeckStatus.PUBLISHED,
+          },
+          data: {
+            status: DeckStatus.DRAFT,
+            updatedAt: new Date(),
+          },
+        });
+        return;
+      }
+
+      await tx.deck.update({
+        where: { id: command.deckId },
+        data: { updatedAt: new Date() },
+      });
+    });
   }
 }

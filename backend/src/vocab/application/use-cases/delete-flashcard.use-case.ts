@@ -4,7 +4,6 @@ import {
   DeckNotFoundException,
   FlashcardNotFoundException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
-import { DeckStatus } from '../../domain/enums/vocab.enums';
 import { DeckLifecyclePolicy } from '../../domain/policies/deck-lifecycle.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
@@ -42,15 +41,10 @@ export class DeleteFlashcardUseCase {
       throw new FlashcardNotFoundException(command.cardId);
     }
 
-    await this.flashcardRepository.delete(command.cardId);
-
-    // Invariant check: if a published deck falls below minimum required cards, demote to DRAFT
-    if (deck.status === DeckStatus.PUBLISHED) {
-      const remainingCount = await this.deckRepository.countFlashcardsByDeckId(command.deckId);
-      if (remainingCount < DeckLifecyclePolicy.MIN_CARDS_FOR_PUBLISH) {
-        deck.unpublish();
-        await this.deckRepository.save(deck);
-      }
-    }
+    await this.flashcardRepository.deleteAndDemotePublishedDeckIfBelowMinimum({
+      cardId: command.cardId,
+      deckId: command.deckId,
+      minimumCardCount: DeckLifecyclePolicy.MIN_CARDS_FOR_PUBLISH,
+    });
   }
 }

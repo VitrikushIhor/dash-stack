@@ -44,6 +44,7 @@ describe('SubmitStudyProgressUseCase', () => {
       getMaxPositionByDeckId: jest.fn(),
       updatePositions: jest.fn(),
       delete: jest.fn(),
+      deleteAndDemotePublishedDeckIfBelowMinimum: jest.fn(),
     };
 
     mockVocabProgressRepo = {

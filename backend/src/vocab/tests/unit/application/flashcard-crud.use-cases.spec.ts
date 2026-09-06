@@ -6,7 +6,6 @@ import { DeckRepositoryPort } from '../../../application/ports/deck-repository.p
 import { FlashcardRepositoryPort } from '../../../application/ports/flashcard-repository.port';
 import { Deck } from '../../../domain/entities/deck.entity';
 import { Flashcard } from '../../../domain/entities/flashcard.entity';
-import { DeckStatus } from '../../../domain/enums/vocab.enums';
 import {
   DeckAccessForbiddenException,
   FlashcardNotFoundException,
@@ -46,6 +45,7 @@ describe('Flashcard Use Cases', () => {
       getMaxPositionByDeckId: jest.fn().mockResolvedValue(0),
       updatePositions: jest.fn(),
       delete: jest.fn(),
+      deleteAndDemotePublishedDeckIfBelowMinimum: jest.fn(),
     };
 
     createFlashcardUseCase = new CreateFlashcardUseCase(
@@ -156,37 +156,41 @@ describe('Flashcard Use Cases', () => {
         userId: 'user-1',
       });
 
-      expect(mockFlashcardRepository.delete).toHaveBeenCalledWith('card-1');
+      expect(
+        mockFlashcardRepository.deleteAndDemotePublishedDeckIfBelowMinimum,
+      ).toHaveBeenCalledWith({
+        cardId: 'card-1',
+        deckId: 'deck-1',
+        minimumCardCount: 2,
+      });
     });
 
-    it('should demote PUBLISHED deck to DRAFT when card count falls below 2 after deletion', async () => {
-      const publishedDeck = Deck.create({
-        id: 'deck-published',
-        ownerUserId: 'user-1',
-        title: 'Published Deck',
-        status: DeckStatus.PUBLISHED,
-      });
-      mockDeckRepository.findById.mockResolvedValueOnce(publishedDeck);
-
+    it('should delegate published-deck demotion to the atomic persistence operation', async () => {
       const card = Flashcard.create({
         id: 'card-1',
-        deckId: 'deck-published',
+        deckId: 'deck-1',
         term: 'Term',
         definition: 'Def',
         position: 1,
       });
       mockFlashcardRepository.findById.mockResolvedValueOnce(card);
-      mockDeckRepository.countFlashcardsByDeckId.mockResolvedValueOnce(1); // Only 1 card left
 
       await deleteFlashcardUseCase.execute({
-        deckId: 'deck-published',
+        deckId: 'deck-1',
         cardId: 'card-1',
         userId: 'user-1',
       });
 
-      expect(mockFlashcardRepository.delete).toHaveBeenCalledWith('card-1');
-      expect(publishedDeck.status).toBe(DeckStatus.DRAFT);
-      expect(mockDeckRepository.save).toHaveBeenCalledWith(publishedDeck);
+      expect(
+        mockFlashcardRepository.deleteAndDemotePublishedDeckIfBelowMinimum,
+      ).toHaveBeenCalledWith({
+        cardId: 'card-1',
+        deckId: 'deck-1',
+        minimumCardCount: 2,
+      });
+      expect(mockFlashcardRepository.delete).not.toHaveBeenCalled();
+      expect(mockDeckRepository.countFlashcardsByDeckId).not.toHaveBeenCalled();
+      expect(mockDeckRepository.save).not.toHaveBeenCalled();
     });
   });
 
