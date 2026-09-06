@@ -19,6 +19,8 @@ export const VOCAB_ERRORS = {
   FLASHCARD_POSITION_NEGATIVE: 'Flashcard position must be non-negative',
   FLASHCARD_ORDER_MUST_BE_EXACT_PERMUTATION:
     'Flashcard order must contain every card in the deck exactly once',
+  FLASHCARD_EDITOR_INVALID_SNAPSHOT:
+    'Deck editor changes must account for every existing flashcard exactly once',
   VOCAB_PROGRESS_NOT_FOUND: (id: string) => `Vocab progress not found: ${id}`,
   VOCAB_PROGRESS_USER_REQUIRED: 'User ID is required',
   VOCAB_PROGRESS_DECK_REQUIRED: 'Deck ID is required',

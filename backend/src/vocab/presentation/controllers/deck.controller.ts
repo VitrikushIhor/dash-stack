@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Body,
@@ -20,6 +21,7 @@ import { CreateDeckUseCase } from '../../application/use-cases/create-deck.use-c
 import { GetMyDecksUseCase } from '../../application/use-cases/get-my-decks.use-case';
 import { GetDeckByIdUseCase } from '../../application/use-cases/get-deck-by-id.use-case';
 import { UpdateDeckUseCase } from '../../application/use-cases/update-deck.use-case';
+import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
 import { DeleteDeckUseCase } from '../../application/use-cases/delete-deck.use-case';
 import { PublishDeckUseCase } from '../../application/use-cases/publish-deck.use-case';
 import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
@@ -29,6 +31,7 @@ import { ForkDeckUseCase } from '../../application/use-cases/fork-deck.use-case'
 import { SearchPublicDecksUseCase } from '../../application/use-cases/search-public-decks.use-case';
 import { CreateDeckDto } from '../dtos/create-deck.dto';
 import { UpdateDeckDto } from '../dtos/update-deck.dto';
+import { SaveDeckEditorDto } from '../dtos/save-deck-editor.dto';
 import { MyDecksQueryDto, PublicDecksQueryDto } from '../dtos/deck-query.dto';
 import { DeckPresentationMapper } from '../mappers/deck-presentation.mapper';
 import { DeckResponseDto } from '../dtos/deck-response.dto';
@@ -41,6 +44,7 @@ export class DeckController {
     private readonly getMyDecksUseCase: GetMyDecksUseCase,
     private readonly getDeckByIdUseCase: GetDeckByIdUseCase,
     private readonly updateDeckUseCase: UpdateDeckUseCase,
+    private readonly saveDeckEditorUseCase: SaveDeckEditorUseCase,
     private readonly deleteDeckUseCase: DeleteDeckUseCase,
     private readonly publishDeckUseCase: PublishDeckUseCase,
     private readonly unpublishDeckUseCase: UnpublishDeckUseCase,
@@ -113,6 +117,26 @@ export class DeckController {
     const deck = await this.getDeckByIdUseCase.execute({
       deckId: id,
       userId: user?.id ?? null,
+    });
+    return DeckPresentationMapper.toResponse(deck);
+  }
+
+  @Put(':id/editor')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atomically save deck metadata and flashcard editor state' })
+  @ApiResponse({ status: HttpStatus.OK, type: DeckResponseDto })
+  async saveEditor(
+    @Param('id') id: string,
+    @UserEntity() user: AuthUser,
+    @Body() dto: SaveDeckEditorDto,
+  ): Promise<DeckResponseDto> {
+    const deck = await this.saveDeckEditorUseCase.execute({
+      deckId: id,
+      userId: user.id,
+      metadata: dto.metadata,
+      cards: dto.cards,
+      deletedCardIds: dto.deletedCardIds ?? [],
     });
     return DeckPresentationMapper.toResponse(deck);
   }

@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PrismaDeckRepository } from './infrastructure/persistence/prisma-deck.repository';
 import { PrismaFlashcardRepository } from './infrastructure/persistence/prisma-flashcard.repository';
+import { PrismaDeckEditorRepository } from './infrastructure/persistence/prisma-deck-editor.repository';
 import { PrismaVocabProgressRepository } from './infrastructure/persistence/prisma-vocab-progress.repository';
 import { UnsplashAdapter } from './infrastructure/integrations/unsplash.adapter';
 import { CreateDeckUseCase } from './application/use-cases/create-deck.use-case';
 import { GetMyDecksUseCase } from './application/use-cases/get-my-decks.use-case';
 import { GetDeckByIdUseCase } from './application/use-cases/get-deck-by-id.use-case';
 import { UpdateDeckUseCase } from './application/use-cases/update-deck.use-case';
+import { SaveDeckEditorUseCase } from './application/use-cases/save-deck-editor.use-case';
 import { DeleteDeckUseCase } from './application/use-cases/delete-deck.use-case';
 import { PublishDeckUseCase } from './application/use-cases/publish-deck.use-case';
 import { UnpublishDeckUseCase } from './application/use-cases/unpublish-deck.use-case';
@@ -43,6 +45,7 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     GetMyDecksUseCase,
     GetDeckByIdUseCase,
     UpdateDeckUseCase,
+    SaveDeckEditorUseCase,
     DeleteDeckUseCase,
     PublishDeckUseCase,
     UnpublishDeckUseCase,
@@ -76,6 +79,11 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     {
       provide: 'FlashcardRepositoryPort',
       useExisting: PrismaFlashcardRepository,
+    },
+    PrismaDeckEditorRepository,
+    {
+      provide: 'DeckEditorRepositoryPort',
+      useExisting: PrismaDeckEditorRepository,
     },
     PrismaVocabProgressRepository,
     {
