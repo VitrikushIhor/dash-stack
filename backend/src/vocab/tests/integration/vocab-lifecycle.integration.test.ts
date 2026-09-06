@@ -11,12 +11,14 @@ import { DeleteFlashcardUseCase } from '../../application/use-cases/delete-flash
 import { PublishDeckUseCase } from '../../application/use-cases/publish-deck.use-case';
 import { ReorderFlashcardsUseCase } from '../../application/use-cases/reorder-flashcards.use-case';
 import { RestoreDeckUseCase } from '../../application/use-cases/restore-deck.use-case';
+import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
 import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
 import {
   DeckLifecycleInvalidTransitionException,
   InvalidFlashcardDataException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { PrismaDeckRepository } from '../../infrastructure/persistence/prisma-deck.repository';
+import { PrismaDeckEditorRepository } from '../../infrastructure/persistence/prisma-deck-editor.repository';
 import { PrismaFlashcardRepository } from '../../infrastructure/persistence/prisma-flashcard.repository';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
@@ -32,6 +34,7 @@ describe('Vocabulary lifecycle integration', () => {
   let prisma: PrismaClient;
   let deckRepository: PrismaDeckRepository;
   let flashcardRepository: PrismaFlashcardRepository;
+  let deckEditorRepository: PrismaDeckEditorRepository;
   let ownerUserId: string;
 
   const createDeck = async (cardCount: number) => {
@@ -58,6 +61,7 @@ describe('Vocabulary lifecycle integration', () => {
     const prismaService = prisma as unknown as PrismaService;
     deckRepository = new PrismaDeckRepository(prismaService);
     flashcardRepository = new PrismaFlashcardRepository(prismaService);
+    deckEditorRepository = new PrismaDeckEditorRepository(prismaService);
   });
 
   beforeEach(async () => {
@@ -165,6 +169,73 @@ describe('Vocabulary lifecycle integration', () => {
       orderBy: { position: 'asc' },
     });
     expect(unchangedOrder.map((card) => card.id)).toEqual(orderedCardIds);
+  });
+
+  it('atomically saves metadata and the complete flashcard editor snapshot', async () => {
+    const deck = await createDeck(3);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      metadata: { title: 'Updated atomically', description: 'Saved with cards' },
+      cards: [
+        {
+          id: deck.flashcards[1].id,
+          term: 'Updated term',
+          definition: 'Updated definition',
+        },
+        {
+          id: deck.flashcards[0].id,
+          term: deck.flashcards[0].term,
+          definition: deck.flashcards[0].definition,
+        },
+        { term: 'New term', definition: 'New definition' },
+      ],
+      deletedCardIds: [deck.flashcards[2].id],
+    });
+
+    const saved = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(saved.title).toBe('Updated atomically');
+    expect(saved.description).toBe('Saved with cards');
+    expect(saved.flashcards.map((card) => card.position)).toEqual([0, 1, 2]);
+    expect(saved.flashcards.map((card) => card.term)).toEqual([
+      'Updated term',
+      deck.flashcards[0].term,
+      'New term',
+    ]);
+    expect(saved.flashcards.some((card) => card.id === deck.flashcards[2].id)).toBe(false);
+  });
+
+  it('does not persist editor metadata when the card snapshot is invalid', async () => {
+    const deck = await createDeck(2);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await expect(
+      saveEditor.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        metadata: { title: 'Must not persist' },
+        cards: [
+          {
+            id: deck.flashcards[0].id,
+            term: deck.flashcards[0].term,
+            definition: deck.flashcards[0].definition,
+          },
+        ],
+        deletedCardIds: [],
+      }),
+    ).rejects.toThrow(InvalidFlashcardDataException);
+
+    const unchanged = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: true },
+    });
+    expect(unchanged.title).toBe(deck.title);
+    expect(unchanged.flashcards).toHaveLength(2);
   });
 });
 
