@@ -1,9 +1,11 @@
 import { Deck } from '../../../domain/entities/deck.entity';
 import { CEFRLevel, DeckStatus, DeckType, DeckVisibility } from '../../../domain/enums/vocab.enums';
 import {
+  DeckLifecycleInvalidTransitionException,
   DeckPublishInvalidException,
   InvalidDeckDataException,
 } from '../../../domain/exceptions/vocab-domain.exceptions';
+import { DomainErrorCode } from '../../../../common/exceptions/domain.exception';
 
 describe('Deck Entity', () => {
   const defaultProps = {
@@ -90,12 +92,68 @@ describe('Deck Entity', () => {
 
     it('should archive and restore a deck', () => {
       const deck = Deck.create(defaultProps);
+      deck.publish(2);
       deck.archive();
       expect(deck.status).toBe(DeckStatus.ARCHIVED);
 
       deck.restore();
       expect(deck.status).toBe(DeckStatus.DRAFT);
     });
+
+    it.each([
+      {
+        action: 'publish',
+        initialStatus: DeckStatus.PUBLISHED,
+        transition: (deck: Deck) => deck.publish(2),
+      },
+      {
+        action: 'unpublish',
+        initialStatus: DeckStatus.DRAFT,
+        transition: (deck: Deck) => deck.unpublish(),
+      },
+      {
+        action: 'unpublish',
+        initialStatus: DeckStatus.ARCHIVED,
+        transition: (deck: Deck) => deck.unpublish(),
+      },
+      {
+        action: 'archive',
+        initialStatus: DeckStatus.DRAFT,
+        transition: (deck: Deck) => deck.archive(),
+      },
+      {
+        action: 'archive',
+        initialStatus: DeckStatus.ARCHIVED,
+        transition: (deck: Deck) => deck.archive(),
+      },
+      {
+        action: 'restore',
+        initialStatus: DeckStatus.PUBLISHED,
+        transition: (deck: Deck) => deck.restore(),
+      },
+      {
+        action: 'restore',
+        initialStatus: DeckStatus.DRAFT,
+        transition: (deck: Deck) => deck.restore(),
+      },
+    ])(
+      'should reject invalid $action transition from $initialStatus',
+      ({ initialStatus, transition }) => {
+        const deck = Deck.create({ ...defaultProps, status: initialStatus });
+
+        expect(() => transition(deck)).toThrow(DeckLifecycleInvalidTransitionException);
+        expect(deck.status).toBe(initialStatus);
+
+        try {
+          transition(deck);
+        } catch (error) {
+          expect(error).toBeInstanceOf(DeckLifecycleInvalidTransitionException);
+          expect((error as DeckLifecycleInvalidTransitionException).code).toBe(
+            DomainErrorCode.CONFLICT,
+          );
+        }
+      },
+    );
   });
 
   describe('Ownership Checks', () => {

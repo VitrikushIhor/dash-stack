@@ -14,6 +14,15 @@ export const DeckStatus = {
 
 export type DeckStatus = (typeof DeckStatus)[keyof typeof DeckStatus];
 
+export const DeckLifecycleAction = {
+  PUBLISH: 'PUBLISH',
+  UNPUBLISH: 'UNPUBLISH',
+  ARCHIVE: 'ARCHIVE',
+  RESTORE: 'RESTORE',
+} as const;
+
+export type DeckLifecycleAction = (typeof DeckLifecycleAction)[keyof typeof DeckLifecycleAction];
+
 export const DeckType = {
   USER_GENERATED: 'USER_GENERATED',
   SYSTEM: 'SYSTEM',

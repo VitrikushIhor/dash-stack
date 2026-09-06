@@ -1,4 +1,10 @@
-import { CEFRLevel, DeckStatus, DeckType, DeckVisibility } from '../enums/vocab.enums';
+import {
+  CEFRLevel,
+  DeckLifecycleAction,
+  DeckStatus,
+  DeckType,
+  DeckVisibility,
+} from '../enums/vocab.enums';
 import { InvalidDeckDataException } from '../exceptions/vocab-domain.exceptions';
 import { DeckLifecyclePolicy } from '../policies/deck-lifecycle.policy';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
@@ -179,22 +185,26 @@ export class Deck {
   }
 
   publish(currentCardCount: number): void {
+    DeckLifecyclePolicy.assertCanPerform(DeckLifecycleAction.PUBLISH, this.props.status);
     DeckLifecyclePolicy.validatePublishEligibility(currentCardCount);
     this.props.status = DeckStatus.PUBLISHED;
     this.props.updatedAt = new Date();
   }
 
   unpublish(): void {
+    DeckLifecyclePolicy.assertCanPerform(DeckLifecycleAction.UNPUBLISH, this.props.status);
     this.props.status = DeckStatus.DRAFT;
     this.props.updatedAt = new Date();
   }
 
   archive(): void {
+    DeckLifecyclePolicy.assertCanPerform(DeckLifecycleAction.ARCHIVE, this.props.status);
     this.props.status = DeckStatus.ARCHIVED;
     this.props.updatedAt = new Date();
   }
 
   restore(): void {
+    DeckLifecyclePolicy.assertCanPerform(DeckLifecycleAction.RESTORE, this.props.status);
     this.props.status = DeckStatus.DRAFT;
     this.props.updatedAt = new Date();
   }

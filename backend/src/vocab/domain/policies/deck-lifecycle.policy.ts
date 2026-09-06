@@ -1,13 +1,23 @@
-import { DeckStatus } from '../enums/vocab.enums';
-import { DeckPublishInvalidException } from '../exceptions/vocab-domain.exceptions';
+import { DeckLifecycleAction, DeckStatus } from '../enums/vocab.enums';
+import {
+  DeckLifecycleInvalidTransitionException,
+  DeckPublishInvalidException,
+} from '../exceptions/vocab-domain.exceptions';
 
 export class DeckLifecyclePolicy {
   static readonly MIN_CARDS_FOR_PUBLISH = 2;
 
-  private static readonly ALLOWED_TRANSITIONS: Record<DeckStatus, readonly DeckStatus[]> = {
-    [DeckStatus.DRAFT]: [DeckStatus.PUBLISHED, DeckStatus.ARCHIVED],
-    [DeckStatus.PUBLISHED]: [DeckStatus.DRAFT, DeckStatus.ARCHIVED],
-    [DeckStatus.ARCHIVED]: [DeckStatus.DRAFT],
+  private static readonly ALLOWED_ACTIONS: Record<DeckStatus, readonly DeckLifecycleAction[]> = {
+    [DeckStatus.DRAFT]: [DeckLifecycleAction.PUBLISH],
+    [DeckStatus.PUBLISHED]: [DeckLifecycleAction.UNPUBLISH, DeckLifecycleAction.ARCHIVE],
+    [DeckStatus.ARCHIVED]: [DeckLifecycleAction.RESTORE],
+  };
+
+  private static readonly ACTION_TARGET_STATUS: Record<DeckLifecycleAction, DeckStatus> = {
+    [DeckLifecycleAction.PUBLISH]: DeckStatus.PUBLISHED,
+    [DeckLifecycleAction.UNPUBLISH]: DeckStatus.DRAFT,
+    [DeckLifecycleAction.ARCHIVE]: DeckStatus.ARCHIVED,
+    [DeckLifecycleAction.RESTORE]: DeckStatus.DRAFT,
   };
 
   static validatePublishEligibility(cardCount: number): void {
@@ -16,7 +26,12 @@ export class DeckLifecyclePolicy {
     }
   }
 
-  static canTransition(from: DeckStatus, to: DeckStatus): boolean {
-    return this.ALLOWED_TRANSITIONS[from]?.includes(to) ?? false;
+  static assertCanPerform(action: DeckLifecycleAction, currentStatus: DeckStatus): void {
+    if (!this.ALLOWED_ACTIONS[currentStatus].includes(action)) {
+      throw new DeckLifecycleInvalidTransitionException(
+        currentStatus,
+        this.ACTION_TARGET_STATUS[action],
+      );
+    }
   }
 }

@@ -2,6 +2,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  ConflictException,
 } from '../../../common/exceptions/domain.exception';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
 
@@ -20,6 +21,12 @@ export class DeckAccessForbiddenException extends ForbiddenException {
 export class DeckPublishInvalidException extends BadRequestException {
   constructor(cardCount: number) {
     super(VOCAB_ERRORS.DECK_PUBLISH_MIN_CARDS(cardCount));
+  }
+}
+
+export class DeckLifecycleInvalidTransitionException extends ConflictException {
+  constructor(from: string, to: string) {
+    super(VOCAB_ERRORS.DECK_LIFECYCLE_INVALID_TRANSITION(from, to));
   }
 }
 

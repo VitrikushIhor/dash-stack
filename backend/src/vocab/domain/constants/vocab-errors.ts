@@ -3,6 +3,8 @@ export const VOCAB_ERRORS = {
   DECK_FORBIDDEN: 'You do not have permission to access or modify this deck',
   DECK_PUBLISH_MIN_CARDS: (cardCount: number) =>
     `Cannot publish deck. A minimum of 2 flashcards is required to publish, but this deck has ${cardCount}.`,
+  DECK_LIFECYCLE_INVALID_TRANSITION: (from: string, to: string) =>
+    `Deck lifecycle transition from ${from} to ${to} is not allowed`,
   DECK_TITLE_REQUIRED: 'Deck title is required and cannot be empty',
   DECK_TITLE_TOO_LONG: 'Deck title cannot exceed 100 characters',
   DECK_OWNER_REQUIRED: 'Deck must belong to an owner',
