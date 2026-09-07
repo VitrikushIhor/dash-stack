@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   BadRequestException,
   ConflictException,
+  InternalErrorException,
 } from '../../../common/exceptions/domain.exception';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
 
@@ -69,5 +70,11 @@ export class InvalidVocabProgressDataException extends BadRequestException {
 export class PersonalizedStudyFilterAuthRequiredException extends BadRequestException {
   constructor() {
     super(VOCAB_ERRORS.PERSONALIZED_STUDY_FILTER_AUTH_REQUIRED);
+  }
+}
+
+export class DeckEditorFlashcardsMissingException extends InternalErrorException {
+  constructor() {
+    super(VOCAB_ERRORS.DECK_EDITOR_FLASHCARDS_REQUIRED);
   }
 }

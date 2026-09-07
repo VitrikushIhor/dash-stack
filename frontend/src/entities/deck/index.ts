@@ -1,5 +1,6 @@
 export type {
   Deck,
+  DeckEditorSaveResponse,
   Flashcard,
   CreateDeckDto,
   UpdateDeckDto,
@@ -20,6 +21,7 @@ export {
 export {
   CreateDeckSchema,
   FlashcardSchema,
+  DeckEditorSaveResponseSchema,
   type CreateDeckFormValues,
   type FlashcardFormValues,
   DeckIdSchema,

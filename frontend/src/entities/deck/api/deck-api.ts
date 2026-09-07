@@ -3,6 +3,7 @@ import { SERVER_CACHE_TAGS } from '@/shared/config/constants/cache-tags'
 import {
   type CreateDeckDto,
   type Deck,
+  type DeckEditorSaveResponse,
   type DeckStatusEnum,
   type SaveDeckEditorDto,
   type UpdateDeckDto,
@@ -53,8 +54,11 @@ export function createDeckApi(client: HttpClient) {
     update: (id: string, data: UpdateDeckDto): Promise<Deck> =>
       client.patch<Deck>(`/v1/vocab/decks/${id}`, data),
 
-    saveEditor: (id: string, data: SaveDeckEditorDto): Promise<Deck> =>
-      client.put<Deck>(`/v1/vocab/decks/${id}/editor`, data),
+    saveEditor: (
+      id: string,
+      data: SaveDeckEditorDto
+    ): Promise<DeckEditorSaveResponse> =>
+      client.put<DeckEditorSaveResponse>(`/v1/vocab/decks/${id}/editor`, data),
 
     delete: (id: string): Promise<void> =>
       client.delete<void>(`/v1/vocab/decks/${id}`),

@@ -13,7 +13,7 @@ vi.mock('sonner', () => ({
 
 describe('useFlashcards', () => {
   it('should initialize with default empty cards if initialCards is empty', () => {
-    const { result } = renderHook(() => useFlashcards('deck-1', []))
+    const { result } = renderHook(() => useFlashcards([]))
 
     expect(result.current.cards).toHaveLength(2)
     expect(result.current.cards[0].id).toBe('temp-init-1')
@@ -34,14 +34,14 @@ describe('useFlashcards', () => {
       },
     ]
 
-    const { result } = renderHook(() => useFlashcards('deck-1', initialCards))
+    const { result } = renderHook(() => useFlashcards(initialCards))
 
     expect(result.current.cards).toHaveLength(1)
     expect(result.current.cards[0].term).toBe('eloquent')
   })
 
   it('should add a new card with temporary ID', () => {
-    const { result } = renderHook(() => useFlashcards('deck-1', []))
+    const { result } = renderHook(() => useFlashcards([]))
 
     act(() => {
       result.current.handleAddCard()
@@ -52,7 +52,7 @@ describe('useFlashcards', () => {
   })
 
   it('should update a card field', () => {
-    const { result } = renderHook(() => useFlashcards('deck-1', []))
+    const { result } = renderHook(() => useFlashcards([]))
 
     act(() => {
       result.current.handleCardChange('temp-init-1', 'term', 'resilience')
@@ -62,7 +62,7 @@ describe('useFlashcards', () => {
   })
 
   it('should remove a temporary card without adding to deletedCardIds', () => {
-    const { result } = renderHook(() => useFlashcards('deck-1', []))
+    const { result } = renderHook(() => useFlashcards([]))
 
     act(() => {
       result.current.handleCardDelete('temp-init-1')
@@ -85,7 +85,7 @@ describe('useFlashcards', () => {
       },
     ]
 
-    const { result } = renderHook(() => useFlashcards('deck-1', initialCards))
+    const { result } = renderHook(() => useFlashcards(initialCards))
 
     act(() => {
       result.current.handleCardDelete('persisted-card-1')

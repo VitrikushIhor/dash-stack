@@ -1,5 +1,7 @@
 import { Deck } from '../../domain/entities/deck.entity';
+import { DeckEditorFlashcardsMissingException } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckResponseDto } from '../dtos/deck-response.dto';
+import { DeckEditorResponseDto } from '../dtos/deck-editor-response.dto';
 import { FlashcardPresentationMapper } from './flashcard-presentation.mapper';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
@@ -25,6 +27,14 @@ export class DeckPresentationMapper {
       createdAt: deck.createdAt.toISOString(),
       updatedAt: deck.updatedAt.toISOString(),
     };
+  }
+
+  static toEditorResponse(deck: Deck): DeckEditorResponseDto {
+    const response = this.toResponse(deck);
+    if (!response.flashcards) {
+      throw new DeckEditorFlashcardsMissingException();
+    }
+    return { ...response, flashcards: response.flashcards };
   }
 
   static toResponseList(decks: Deck[]): DeckResponseDto[] {

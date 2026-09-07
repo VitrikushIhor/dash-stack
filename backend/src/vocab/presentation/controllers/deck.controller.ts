@@ -35,6 +35,7 @@ import { SaveDeckEditorDto } from '../dtos/save-deck-editor.dto';
 import { MyDecksQueryDto, PublicDecksQueryDto } from '../dtos/deck-query.dto';
 import { DeckPresentationMapper } from '../mappers/deck-presentation.mapper';
 import { DeckResponseDto } from '../dtos/deck-response.dto';
+import { DeckEditorResponseDto } from '../dtos/deck-editor-response.dto';
 
 @ApiTags('Vocabulary - Decks')
 @Controller('v1/vocab/decks')
@@ -125,12 +126,12 @@ export class DeckController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Atomically save deck metadata and flashcard editor state' })
-  @ApiResponse({ status: HttpStatus.OK, type: DeckResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: DeckEditorResponseDto })
   async saveEditor(
     @Param('id') id: string,
     @UserEntity() user: AuthUser,
     @Body() dto: SaveDeckEditorDto,
-  ): Promise<DeckResponseDto> {
+  ): Promise<DeckEditorResponseDto> {
     const deck = await this.saveDeckEditorUseCase.execute({
       deckId: id,
       userId: user.id,
@@ -138,7 +139,7 @@ export class DeckController {
       cards: dto.cards,
       deletedCardIds: dto.deletedCardIds ?? [],
     });
-    return DeckPresentationMapper.toResponse(deck);
+    return DeckPresentationMapper.toEditorResponse(deck);
   }
 
   @Patch(':id')

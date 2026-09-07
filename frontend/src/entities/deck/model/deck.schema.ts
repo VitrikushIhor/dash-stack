@@ -47,6 +47,20 @@ export const FlashcardSchema = z.object({
   imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 })
 
+export const DeckEditorSaveResponseSchema = z.object({
+  flashcards: z.array(
+    z.object({
+      id: z.string(),
+      deckId: z.string(),
+      term: z.string(),
+      definition: z.string(),
+      position: z.number(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+    })
+  ),
+})
+
 export type FlashcardFormValues = z.infer<typeof FlashcardSchema>
 
 export const PublicDeckFiltersSchema = z

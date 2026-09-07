@@ -26,11 +26,17 @@ export function DeckEditorForm({ initialDeck }: DeckEditorFormProps) {
   return (
     <div className='space-y-8 pb-20'>
       <DeckEditorHeader state={editorState} />
-      <DeckMetadataForm state={editorState.metadata} />
-      <DeckFlashcardsSection
-        state={editorState.flashcards}
-        imagePickerState={editorState.imagePicker}
-      />
+      <fieldset
+        disabled={editorState.isSaving}
+        inert={editorState.isSaving}
+        className='space-y-8'
+      >
+        <DeckMetadataForm state={editorState.metadata} />
+        <DeckFlashcardsSection
+          state={editorState.flashcards}
+          imagePickerState={editorState.imagePicker}
+        />
+      </fieldset>
       <UnsplashPickerDialog
         open={editorState.imagePicker.isImagePickerOpen}
         onOpenChange={editorState.imagePicker.setIsImagePickerOpen}

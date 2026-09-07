@@ -61,6 +61,10 @@ export type Deck = {
   updatedAt: string
 }
 
+export type DeckEditorSaveResponse = Deck & {
+  flashcards: Flashcard[]
+}
+
 export type CreateDeckDto = {
   title: string
   description?: string

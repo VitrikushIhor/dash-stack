@@ -34,4 +34,5 @@ export const VOCAB_ERRORS = {
   EMPTY_PROGRESS_SUBMISSION: 'Progress results array cannot be empty',
   INVALID_PROGRESS_DATA: (reason: string) => `Invalid vocab progress data: ${reason}`,
   PERSONALIZED_STUDY_FILTER_AUTH_REQUIRED: 'Personalized study filters require authentication',
+  DECK_EDITOR_FLASHCARDS_REQUIRED: 'Editor save response requires flashcards',
 } as const;

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { type Flashcard } from '@/entities/deck'
 
-export function useFlashcards(_deckId: string, initialCards: Flashcard[] = []) {
+export function useFlashcards(initialCards: Flashcard[] = []) {
   const [cards, setCards] = useState<(Partial<Flashcard> & { id: string })[]>(
     () =>
       initialCards.length > 0
@@ -49,6 +49,7 @@ export function useFlashcards(_deckId: string, initialCards: Flashcard[] = []) {
     cards,
     setCards,
     deletedCardIds,
+    setDeletedCardIds,
     handleAddCard,
     handleCardChange,
     handleCardDelete,
