@@ -12,6 +12,8 @@ interface PublicDeckCatalogProps {
   initialData: PaginatedResult<Deck>
   currentQuery?: string
   currentLevel?: string
+  currentLanguage?: string
+  currentTags?: string[]
   currentPage?: number
 }
 
@@ -19,6 +21,8 @@ export function PublicDeckCatalog({
   initialData,
   currentQuery = '',
   currentLevel,
+  currentLanguage,
+  currentTags,
   currentPage = 1,
 }: PublicDeckCatalogProps) {
   const [, setParams] = useVocabSearchParams()
@@ -36,7 +40,7 @@ export function PublicDeckCatalog({
 
   const handleResetFilters = () => {
     startTransition(() => {
-      setParams({ q: null, level: null, page: 1 })
+      setParams({ q: null, level: null, language: null, tags: [], page: 1 })
     })
   }
 
@@ -53,6 +57,8 @@ export function PublicDeckCatalog({
           decks={decks}
           currentQuery={currentQuery}
           currentLevel={currentLevel}
+          currentLanguage={currentLanguage}
+          currentTags={currentTags}
           onResetFilters={handleResetFilters}
         >
           <CatalogPagination

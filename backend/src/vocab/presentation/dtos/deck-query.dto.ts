@@ -30,6 +30,13 @@ export class PublicDecksQueryDto extends PaginationDto {
   level?: string;
 
   @ApiPropertyOptional({
+    description: 'Filter by deck language code',
+  })
+  @IsString()
+  @IsOptional()
+  language?: string;
+
+  @ApiPropertyOptional({
     description: 'Comma-separated tags to filter by',
   })
   @IsString()

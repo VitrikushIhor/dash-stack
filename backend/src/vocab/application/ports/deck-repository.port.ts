@@ -11,6 +11,7 @@ export interface FindMyDecksFilter {
 export interface SearchPublicDecksFilter extends PaginateOptions {
   query?: string;
   level?: string;
+  language?: string;
   tags?: string[];
   limit?: number;
 }

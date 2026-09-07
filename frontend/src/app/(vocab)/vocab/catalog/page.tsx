@@ -17,11 +17,15 @@ export default async function CatalogPage({ searchParams }: Props) {
   const {
     q: rawQ,
     level: rawLevel,
+    language: rawLanguage,
+    tags,
     page,
   } = await vocabCatalogSearchParamsCache.parse(searchParams)
   const result = await getPublicDecksQuery({
     q: rawQ ?? undefined,
     level: rawLevel ?? undefined,
+    language: rawLanguage ?? undefined,
+    tags,
     page,
     perPage: 12,
   })
@@ -35,6 +39,8 @@ export default async function CatalogPage({ searchParams }: Props) {
       initialData={result.data}
       q={rawQ ?? undefined}
       level={rawLevel ?? undefined}
+      language={rawLanguage ?? undefined}
+      tags={tags}
       page={page}
     />
   )

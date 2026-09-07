@@ -98,6 +98,7 @@ export class DeckController {
     const paginated = await this.searchPublicDecksUseCase.execute({
       query: query.q,
       level: query.level,
+      language: query.language,
       tags,
       page: query.page,
       perPage: query.perPage ?? query.limit,

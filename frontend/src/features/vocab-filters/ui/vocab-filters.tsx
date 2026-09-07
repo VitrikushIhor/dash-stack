@@ -2,8 +2,9 @@
 
 import React, { useTransition } from 'react'
 import { Card } from '@/shared/ui/core/card'
+import { Input } from '@/shared/ui/core/input'
 import { SearchInput } from '@/shared/ui/search-input'
-import { CEFRLevelEnum } from '@/entities/deck'
+import { CEFRLevelEnum, normalizeDeckTag } from '@/entities/deck'
 import { useVocabSearchParams } from '../model/use-search-params'
 
 const CEFR_LEVELS = ['ALL', ...Object.values(CEFRLevelEnum)]
@@ -13,6 +14,7 @@ export function VocabFilters() {
   const [isPending, startTransition] = useTransition()
 
   const currentLevel = params.level || 'ALL'
+  const [tagInput, setTagInput] = React.useState('')
 
   const handleSearchChange = (value: string) => {
     startTransition(() => {
@@ -23,6 +25,31 @@ export function VocabFilters() {
   const handleLevelChange = (lvl: string) => {
     startTransition(() => {
       setParams({ level: lvl === 'ALL' ? null : lvl, page: 1 })
+    })
+  }
+
+  const handleLanguageChange = (value: string) => {
+    startTransition(() => {
+      setParams({ language: value || null, page: 1 }, { throttleMs: 300 })
+    })
+  }
+
+  const handleTagKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter' && event.key !== ',') return
+
+    event.preventDefault()
+    const tag = normalizeDeckTag(tagInput)
+    if (tag && !params.tags.includes(tag)) {
+      startTransition(() => {
+        setParams({ tags: [...params.tags, tag], page: 1 })
+      })
+    }
+    setTagInput('')
+  }
+
+  const handleRemoveTag = (tag: string) => {
+    startTransition(() => {
+      setParams({ tags: params.tags.filter((item) => item !== tag), page: 1 })
     })
   }
 
@@ -50,6 +77,36 @@ export function VocabFilters() {
             }`}
           >
             {lvl === 'ALL' ? 'All Levels' : lvl}
+          </button>
+        ))}
+      </div>
+
+      <Input
+        aria-label='Language'
+        value={params.language ?? ''}
+        onChange={(event) => handleLanguageChange(event.target.value)}
+        placeholder='Language, e.g. en'
+        className='sm:w-36'
+      />
+
+      <div className='flex min-w-48 flex-1 flex-wrap items-center gap-1.5'>
+        <Input
+          aria-label='Tags'
+          value={tagInput}
+          onChange={(event) => setTagInput(event.target.value)}
+          onKeyDown={handleTagKeyDown}
+          placeholder='Add tag and press Enter'
+          className='min-w-44 flex-1'
+        />
+        {params.tags.map((tag) => (
+          <button
+            key={tag}
+            type='button'
+            onClick={() => handleRemoveTag(tag)}
+            className='bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-xs font-medium'
+            aria-label={`Remove tag ${tag}`}
+          >
+            #{tag} ×
           </button>
         ))}
       </div>

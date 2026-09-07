@@ -125,6 +125,10 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
       where.level = filter.level as CEFRLevel;
     }
 
+    if (filter.language && filter.language.trim().length > 0) {
+      where.language = filter.language.trim().toLowerCase();
+    }
+
     if (filter.tags && filter.tags.length > 0) {
       where.tags = {
         hasSome: filter.tags.map((t) => t.toLowerCase()),

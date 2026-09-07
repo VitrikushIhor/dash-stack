@@ -9,6 +9,8 @@ interface CatalogGridProps {
   decks: Deck[]
   currentQuery?: string
   currentLevel?: string
+  currentLanguage?: string
+  currentTags?: string[]
   onResetFilters: () => void
   children?: React.ReactNode
 }
@@ -17,10 +19,13 @@ export function CatalogGrid({
   decks,
   currentQuery = '',
   currentLevel,
+  currentLanguage,
+  currentTags = [],
   onResetFilters,
   children,
 }: CatalogGridProps) {
-  const isShowReset = currentQuery || currentLevel
+  const isShowReset =
+    currentQuery || currentLevel || currentLanguage || currentTags.length > 0
 
   if (decks.length === 0) {
     return (

@@ -67,6 +67,7 @@ export const PublicDeckFiltersSchema = z
   .object({
     q: z.string().optional(),
     level: z.string().optional(),
+    language: z.string().optional(),
     tags: z.array(z.string()).optional(),
     page: z.number().optional(),
     perPage: z.number().optional(),

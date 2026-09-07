@@ -12,6 +12,7 @@ import {
 export interface PublicDeckFilters {
   q?: string
   level?: string
+  language?: string
   tags?: string[]
   page?: number
   perPage?: number
@@ -33,6 +34,7 @@ export function createDeckApi(client: HttpClient) {
       const params: Record<string, string | undefined> = {
         q: filters?.q,
         level: filters?.level,
+        language: filters?.language,
         tags: filters?.tags?.join(','),
         page: filters?.page?.toString(),
         perPage: filters?.perPage?.toString(),
