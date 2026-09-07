@@ -14,16 +14,19 @@ export function useImagePicker(
   >(null)
   const [isImagePickerOpen, setIsImagePickerOpen] = React.useState(false)
 
-  const handleOpenImagePicker = (cardId: string) => {
+  const handleOpenImagePicker = React.useCallback((cardId: string) => {
     setActiveCardIdForImage(cardId)
     setIsImagePickerOpen(true)
-  }
+  }, [])
 
-  const handleSelectImage = (imageUrl: string) => {
-    if (activeCardIdForImage) {
-      handleCardChange(activeCardIdForImage, 'imageUrl', imageUrl)
-    }
-  }
+  const handleSelectImage = React.useCallback(
+    (imageUrl: string) => {
+      if (activeCardIdForImage) {
+        handleCardChange(activeCardIdForImage, 'imageUrl', imageUrl)
+      }
+    },
+    [activeCardIdForImage, handleCardChange]
+  )
 
   const activeCardTerm = React.useMemo(() => {
     if (!activeCardIdForImage) return ''

@@ -120,4 +120,30 @@ describe('useDeckEditor save', () => {
 
     expect(saveDeckEditorAction).not.toHaveBeenCalled()
   })
+
+  it('saves the deck language and tags with editor metadata', async () => {
+    const initialDeck: Deck = {
+      ...deck,
+      language: 'uk',
+      tags: ['verbs', 'daily-use'],
+    }
+    vi.mocked(saveDeckEditorAction).mockResolvedValueOnce({
+      success: true,
+      data: { ...initialDeck, flashcards: [] },
+    })
+    const { result } = renderHook(() => useDeckEditor(initialDeck))
+
+    await act(async () => result.current.handleSaveChanges())
+
+    expect(saveDeckEditorAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          metadata: expect.objectContaining({
+            language: 'uk',
+            tags: ['verbs', 'daily-use'],
+          }),
+        }),
+      })
+    )
+  })
 })

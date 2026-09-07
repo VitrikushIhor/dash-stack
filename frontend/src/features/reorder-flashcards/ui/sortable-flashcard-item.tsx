@@ -8,16 +8,20 @@ import { type Flashcard, FlashcardRow } from '@/entities/deck'
 interface SortableFlashcardItemProps {
   card: Partial<Flashcard> & { id: string }
   index: number
-  onChange: (field: keyof Flashcard, value: string | null) => void
-  onDelete: () => void
-  onOpenImagePicker: () => void
+  onCardChange: (
+    cardId: string,
+    field: keyof Flashcard,
+    value: string | null
+  ) => void
+  onCardDelete: (cardId: string) => void
+  onOpenImagePicker: (cardId: string) => void
 }
 
-export function SortableFlashcardItem({
+export const SortableFlashcardItem = React.memo(function SortableFlashcardItem({
   card,
   index,
-  onChange,
-  onDelete,
+  onCardChange,
+  onCardDelete,
   onOpenImagePicker,
 }: SortableFlashcardItemProps) {
   const {
@@ -42,10 +46,10 @@ export function SortableFlashcardItem({
         card={card}
         index={index}
         dragHandleProps={{ ...attributes, ...listeners }}
-        onChange={onChange}
-        onDelete={onDelete}
-        onOpenImagePicker={onOpenImagePicker}
+        onChange={(field, value) => onCardChange(card.id, field, value)}
+        onDelete={() => onCardDelete(card.id)}
+        onOpenImagePicker={() => onOpenImagePicker(card.id)}
       />
     </div>
   )
-}
+})

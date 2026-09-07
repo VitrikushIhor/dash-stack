@@ -10,6 +10,8 @@ const initial: DeckEditorDraftState = {
   metadata: {
     title: 'Original',
     description: '',
+    language: 'en',
+    tags: [],
     level: 'B1',
     visibility: 'PRIVATE',
   },

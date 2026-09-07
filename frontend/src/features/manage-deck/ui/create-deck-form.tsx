@@ -22,7 +22,11 @@ import {
   SelectValue,
 } from '@/shared/ui/core/select'
 import { Textarea } from '@/shared/ui/core/textarea'
-import { CEFRLevelEnum, DeckVisibilityEnum } from '@/entities/deck'
+import {
+  CEFRLevelEnum,
+  DeckVisibilityEnum,
+  normalizeDeckTag,
+} from '@/entities/deck'
 import { useCreateDeckForm } from '../model/use-create-deck-form'
 
 export function CreateDeckForm() {
@@ -36,7 +40,7 @@ export function CreateDeckForm() {
   ) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
-      const trimmed = tagInput.trim().toLowerCase().replace(/^#/, '')
+      const trimmed = normalizeDeckTag(tagInput)
       if (trimmed && !currentTags.includes(trimmed)) {
         onChange([...currentTags, trimmed])
         setTagInput('')

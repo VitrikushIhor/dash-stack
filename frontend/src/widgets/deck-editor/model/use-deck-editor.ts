@@ -32,13 +32,22 @@ export function useDeckEditor(
   const [isSaving, startTransition] = useTransition()
   const savingRef = useRef(false)
   const { setIsImagePickerOpen } = imagePicker
-  const { setTitle, setDescription, setLevel, setVisibility } = metadata
+  const {
+    setTitle,
+    setDescription,
+    setLanguage,
+    setTags,
+    setLevel,
+    setVisibility,
+  } = metadata
   const { setCards, setDeletedCardIds } = flashcards
 
   const applyState = useCallback(
     (state: DeckEditorDraftState) => {
       setTitle(state.metadata.title)
       setDescription(state.metadata.description)
+      setLanguage(state.metadata.language)
+      setTags(state.metadata.tags)
       setLevel(state.metadata.level)
       setVisibility(state.metadata.visibility)
       setCards(state.cards)
@@ -47,6 +56,8 @@ export function useDeckEditor(
     [
       setTitle,
       setDescription,
+      setLanguage,
+      setTags,
       setLevel,
       setVisibility,
       setCards,
@@ -74,6 +85,8 @@ export function useDeckEditor(
       metadata: {
         title: metadata.title,
         description: metadata.description,
+        language: metadata.language,
+        tags: metadata.tags,
         level: metadata.level,
         visibility: metadata.visibility,
       },
@@ -83,6 +96,8 @@ export function useDeckEditor(
     [
       metadata.title,
       metadata.description,
+      metadata.language,
+      metadata.tags,
       metadata.level,
       metadata.visibility,
       flashcards.cards,
@@ -104,6 +119,8 @@ export function useDeckEditor(
       metadata: {
         title: metadata.title.trim(),
         description: metadata.description.trim(),
+        language: metadata.language.trim(),
+        tags: metadata.tags,
         level: metadata.level,
         visibility: metadata.visibility,
       },
@@ -119,6 +136,8 @@ export function useDeckEditor(
     [
       metadata.title,
       metadata.description,
+      metadata.language,
+      metadata.tags,
       metadata.level,
       metadata.visibility,
       flashcards.cards,
@@ -156,6 +175,8 @@ export function useDeckEditor(
           metadata: {
             title: saved.title,
             description: saved.description ?? '',
+            language: saved.language,
+            tags: saved.tags,
             level: saved.level ?? savePayload.metadata.level,
             visibility: saved.visibility,
           },

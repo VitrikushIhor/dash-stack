@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { type Flashcard } from '@/entities/deck'
 
@@ -15,35 +15,36 @@ export function useFlashcards(initialCards: Flashcard[] = []) {
 
   const [deletedCardIds, setDeletedCardIds] = useState<string[]>([])
 
-  const handleAddCard = () => {
-    const newCard: Partial<Flashcard> & { id: string } = {
-      id: `temp-${Date.now()}`,
-      term: '',
-      definition: '',
-      position: cards.length,
-    }
-    setCards((prev) => [...prev, newCard])
-  }
+  const handleAddCard = useCallback(() => {
+    setCards((prev) => [
+      ...prev,
+      {
+        id: `temp-${Date.now()}`,
+        term: '',
+        definition: '',
+        position: prev.length,
+      },
+    ])
+  }, [])
 
-  const handleCardChange = (
-    cardId: string,
-    field: keyof Flashcard,
-    value: string | null
-  ) => {
-    setCards((prev) =>
-      prev.map((card) =>
-        card.id === cardId ? { ...card, [field]: value } : card
+  const handleCardChange = useCallback(
+    (cardId: string, field: keyof Flashcard, value: string | null) => {
+      setCards((prev) =>
+        prev.map((card) =>
+          card.id === cardId ? { ...card, [field]: value } : card
+        )
       )
-    )
-  }
+    },
+    []
+  )
 
-  const handleCardDelete = (cardId: string) => {
+  const handleCardDelete = useCallback((cardId: string) => {
     if (!cardId.startsWith('temp-')) {
       setDeletedCardIds((prev) => [...prev, cardId])
     }
     setCards((prev) => prev.filter((card) => card.id !== cardId))
     toast.info('Card removed (will be permanently deleted on save)')
-  }
+  }, [])
 
   return {
     cards,

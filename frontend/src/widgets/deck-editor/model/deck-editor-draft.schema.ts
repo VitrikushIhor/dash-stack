@@ -5,6 +5,8 @@ export const draftStateSchema = z.object({
   metadata: z.object({
     title: z.string(),
     description: z.string(),
+    language: z.string().default('en'),
+    tags: z.array(z.string()).default([]),
     level: z.enum(CEFRLevelEnum),
     visibility: z.enum(DeckVisibilityEnum),
   }),

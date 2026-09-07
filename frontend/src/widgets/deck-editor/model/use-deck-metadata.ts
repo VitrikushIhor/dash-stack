@@ -16,6 +16,8 @@ export function useDeckMetadata(initialDeck: Deck) {
   const [visibility, setVisibility] = React.useState<DeckVisibilityEnum>(
     initialDeck.visibility
   )
+  const [language, setLanguage] = React.useState(initialDeck.language)
+  const [tags, setTags] = React.useState(initialDeck.tags)
 
   return {
     title,
@@ -26,5 +28,9 @@ export function useDeckMetadata(initialDeck: Deck) {
     setLevel,
     visibility,
     setVisibility,
+    language,
+    setLanguage,
+    tags,
+    setTags,
   }
 }
