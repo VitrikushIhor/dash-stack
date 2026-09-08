@@ -4,6 +4,97 @@ import { VocabProgressStatus } from '../../../domain/enums/vocab.enums';
 describe('LeitnerSrsEngine', () => {
   const baseDate = new Date('2026-08-21T12:00:00.000Z');
 
+  describe('approved transition matrix', () => {
+    it.each([
+      [1, true, 2, VocabProgressStatus.LEARNING, '2026-08-24T12:00:00.000Z'],
+      [2, true, 3, VocabProgressStatus.KNOWN, '2026-08-28T12:00:00.000Z'],
+      [3, true, 4, VocabProgressStatus.KNOWN, '2026-09-04T12:00:00.000Z'],
+      [4, true, 5, VocabProgressStatus.MASTERED, '2026-09-20T12:00:00.000Z'],
+      [5, true, 5, VocabProgressStatus.MASTERED, '2026-09-20T12:00:00.000Z'],
+      [1, false, 1, VocabProgressStatus.LEARNING, '2026-08-22T12:00:00.000Z'],
+      [2, false, 1, VocabProgressStatus.LEARNING, '2026-08-22T12:00:00.000Z'],
+      [3, false, 1, VocabProgressStatus.FORGOTTEN, '2026-08-22T12:00:00.000Z'],
+      [4, false, 1, VocabProgressStatus.FORGOTTEN, '2026-08-22T12:00:00.000Z'],
+      [5, false, 1, VocabProgressStatus.FORGOTTEN, '2026-08-22T12:00:00.000Z'],
+    ] as const)(
+      'should_schedule_approved_state_when_box_is_%i_and_isCorrect_is_%s',
+      (currentBox, isCorrect, nextBox, status, nextReviewAt) => {
+        const input = {
+          currentBox,
+          isCorrect,
+          currentStreak: 4,
+          correctCount: 11,
+          incorrectCount: 3,
+          now: new Date(baseDate),
+        };
+
+        const result = LeitnerSrsEngine.calculateNextReview(input);
+
+        expect(result).toEqual({
+          nextBox,
+          status,
+          nextReviewAt: new Date(nextReviewAt),
+          lastReviewedAt: baseDate,
+          correctStreak: isCorrect ? 5 : 0,
+          correctCount: isCorrect ? 12 : 11,
+          incorrectCount: isCorrect ? 3 : 4,
+        });
+      },
+    );
+  });
+
+  describe('box boundaries', () => {
+    it.each([
+      [1, false, VocabProgressStatus.LEARNING, '2026-08-23T12:00:00.000Z'],
+      [5, true, VocabProgressStatus.MASTERED, '2026-10-20T12:00:00.000Z'],
+    ] as const)(
+      'should_remain_at_boundary_when_box_is_%i_and_isCorrect_is_%s_repeatedly',
+      (currentBox, isCorrect, status, nextReviewAt) => {
+        const first = LeitnerSrsEngine.calculateNextReview({
+          currentBox,
+          isCorrect,
+          now: new Date(baseDate),
+        });
+
+        const second = LeitnerSrsEngine.calculateNextReview({
+          currentBox: first.nextBox,
+          isCorrect,
+          currentStreak: first.correctStreak,
+          correctCount: first.correctCount,
+          incorrectCount: first.incorrectCount,
+          now: first.nextReviewAt,
+        });
+
+        expect(second).toEqual({
+          nextBox: currentBox,
+          status,
+          nextReviewAt: new Date(nextReviewAt),
+          lastReviewedAt: first.nextReviewAt,
+          correctStreak: isCorrect ? 2 : 0,
+          correctCount: isCorrect ? 2 : 0,
+          incorrectCount: isCorrect ? 0 : 2,
+        });
+      },
+    );
+  });
+
+  it('should_return_identical_results_without_mutation_when_input_and_clock_are_fixed', () => {
+    const input = Object.freeze({
+      currentBox: 3,
+      isCorrect: true,
+      currentStreak: 2,
+      correctCount: 7,
+      incorrectCount: 1,
+      now: new Date(baseDate),
+    });
+
+    const first = LeitnerSrsEngine.calculateNextReview(input);
+    const second = LeitnerSrsEngine.calculateNextReview(input);
+
+    expect(second).toEqual(first);
+    expect(input.now).toEqual(baseDate);
+  });
+
   describe('calculateNextReview - Correct Answers', () => {
     it('promotes from Box 1 to Box 2 with 3-day interval', () => {
       const result = LeitnerSrsEngine.calculateNextReview({

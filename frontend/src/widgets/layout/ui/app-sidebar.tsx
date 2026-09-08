@@ -9,6 +9,7 @@ import {
   SidebarRail,
 } from '@/shared/ui/core/sidebar'
 import { useOrgSlug } from '@/entities/organization'
+import { GlobalDueCount } from '@/features/study-vocab'
 import { getSidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 
@@ -20,7 +21,7 @@ export function AppSidebar({
   const { collapsible, variant } = useLayout()
   const slug = useOrgSlug()
 
-  const currentSidebarData = getSidebarData(slug)
+  const currentSidebarData = getSidebarData(slug, <GlobalDueCount />)
 
   return (
     <Sidebar collapsible={collapsible} variant={variant}>

@@ -41,3 +41,5 @@ export type {
   FlashcardResult,
   LearnResult,
 } from './model/shared/types'
+export { StudyFilters } from './ui/filters/study-filters'
+export { GlobalDueCount, ReviewQueue } from './ui/due-badge/review-queue'

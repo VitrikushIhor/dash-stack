@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -23,6 +23,9 @@ export class SubmitProgressItemDto {
     description: 'Whether the answer provided by the user was correct',
     example: true,
   })
+  @Transform(({ obj }: { obj: unknown }) =>
+    typeof obj === 'object' && obj !== null && 'isCorrect' in obj ? obj.isCorrect : undefined,
+  )
   @IsBoolean()
   isCorrect: boolean;
 }

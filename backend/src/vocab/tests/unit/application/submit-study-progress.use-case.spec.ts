@@ -57,11 +57,14 @@ describe('SubmitStudyProgressUseCase', () => {
       upsertBatch: jest.fn(),
     };
 
-    useCase = new SubmitStudyProgressUseCase(
-      mockDeckRepo,
-      mockFlashcardRepo,
-      mockVocabProgressRepo,
-    );
+    useCase = new SubmitStudyProgressUseCase({
+      run: (work) =>
+        work({
+          deckRepository: mockDeckRepo,
+          flashcardRepository: mockFlashcardRepo,
+          vocabProgressRepository: mockVocabProgressRepo,
+        }),
+    });
   });
 
   it('should throw InvalidVocabProgressDataException when results is empty', async () => {
@@ -69,6 +72,37 @@ describe('SubmitStudyProgressUseCase', () => {
       useCase.execute({ userId: 'user-1', deckId: 'deck-1', results: [] }),
     ).rejects.toThrow(InvalidVocabProgressDataException);
   });
+
+  it.each([true, false])(
+    'should_reject_duplicate_card_ids_when_answers_match_or_conflict_%s',
+    async (isCorrect) => {
+      mockDeckRepo.findById.mockResolvedValue(
+        Deck.create({ id: 'deck-1', ownerUserId: 'user-1', title: 'Deck' }),
+      );
+      mockFlashcardRepo.findByDeckId.mockResolvedValue([
+        Flashcard.create({
+          id: 'card-1',
+          deckId: 'deck-1',
+          term: 'Term',
+          definition: 'Definition',
+          position: 0,
+        }),
+      ]);
+      mockVocabProgressRepo.findByUserAndCardIds.mockResolvedValue([]);
+      mockVocabProgressRepo.upsertBatch.mockImplementation(async (entities) => entities);
+      await expect(
+        useCase.execute({
+          userId: 'user-1',
+          deckId: 'deck-1',
+          results: [
+            { flashcardId: 'card-1', isCorrect: true },
+            { flashcardId: 'card-1', isCorrect },
+          ],
+        }),
+      ).rejects.toThrow(InvalidVocabProgressDataException);
+      expect(mockVocabProgressRepo.upsertBatch).not.toHaveBeenCalled();
+    },
+  );
 
   it('should throw DeckNotFoundException when deck is missing', async () => {
     mockDeckRepo.findById.mockResolvedValue(null);

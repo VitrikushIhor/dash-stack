@@ -59,7 +59,14 @@ describe('ToggleCardStarUseCase', () => {
       upsertBatch: jest.fn(),
     };
 
-    useCase = new ToggleCardStarUseCase(mockFlashcardRepo, mockDeckRepo, mockVocabProgressRepo);
+    useCase = new ToggleCardStarUseCase({
+      run: (work) =>
+        work({
+          deckRepository: mockDeckRepo,
+          flashcardRepository: mockFlashcardRepo,
+          vocabProgressRepository: mockVocabProgressRepo,
+        }),
+    });
   });
 
   it('should throw FlashcardNotFoundException if card does not exist', async () => {

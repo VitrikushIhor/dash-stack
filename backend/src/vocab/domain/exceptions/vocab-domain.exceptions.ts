@@ -78,3 +78,9 @@ export class DeckEditorFlashcardsMissingException extends InternalErrorException
     super(VOCAB_ERRORS.DECK_EDITOR_FLASHCARDS_REQUIRED);
   }
 }
+
+export class VocabProgressConflictException extends ConflictException {
+  constructor() {
+    super('Progress changed concurrently. Please submit the review again.');
+  }
+}

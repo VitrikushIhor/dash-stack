@@ -44,7 +44,7 @@ export class VocabProgress {
       correctCount: 0,
       incorrectCount: 0,
       lastReviewedAt: null,
-      nextReviewAt: now,
+      nextReviewAt: null,
       createdAt: now,
       updatedAt: now,
     });

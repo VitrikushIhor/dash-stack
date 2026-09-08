@@ -1,3 +1,4 @@
+import { PrismaStudyProgressTransaction } from './infrastructure/persistence/prisma-study-progress-transaction';
 import { Module } from '@nestjs/common';
 import { PrismaDeckRepository } from './infrastructure/persistence/prisma-deck.repository';
 import { PrismaFlashcardRepository } from './infrastructure/persistence/prisma-flashcard.repository';
@@ -69,6 +70,8 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     SubmitStudyProgressUseCase,
     ToggleCardStarUseCase,
 
+    PrismaStudyProgressTransaction,
+    { provide: 'StudyProgressTransactionPort', useExisting: PrismaStudyProgressTransaction },
     // Repositories, Adapters & Ports
     PrismaDeckRepository,
     {

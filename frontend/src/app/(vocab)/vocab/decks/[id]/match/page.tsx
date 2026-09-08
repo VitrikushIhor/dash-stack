@@ -1,31 +1,52 @@
 import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
-import { getDeckQuery } from '@/entities/deck/server'
-import { getStudyCardsQuery } from '@/entities/vocab/server'
+import { MIN_MATCH_CARDS, StudyEmptyState } from '@/features/study-vocab'
 import { MatchView } from '@/views/vocab'
+import {
+  type StudyRouteProps,
+  getStudyRouteData,
+  getStudySessionKey,
+} from '@/views/vocab/server'
 
 export const metadata: Metadata = {
   title: 'Match Game',
   description: 'Test your vocabulary recall speed with a matching challenge.',
 }
 
-export default async function MatchPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const [deckResult, cardsResult] = await Promise.all([
-    getDeckQuery(id),
-    getStudyCardsQuery({ deckId: id, mode: 'match' }),
-  ])
+export default async function MatchPage(props: StudyRouteProps) {
+  const route = await getStudyRouteData({ ...props, mode: 'match' })
 
-  if (!deckResult.ok) {
-    return <PageErrorHandler error={deckResult.error} withContainer={false} />
-  }
-  if (!cardsResult.ok) {
-    return <PageErrorHandler error={cardsResult.error} withContainer={false} />
+  if (!route.deck.ok) {
+    return <PageErrorHandler error={route.deck.error} withContainer={false} />
   }
 
-  return <MatchView deck={deckResult.data} initialCards={cardsResult.data} />
+  if (!route.cards.ok) {
+    return <PageErrorHandler error={route.cards.error} withContainer={false} />
+  }
+
+  if (route.cards.data.length === 0) {
+    return (
+      <StudyEmptyState
+        title='No cards match these filters'
+        description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
+      />
+    )
+  }
+
+  if (route.cards.data.length < MIN_MATCH_CARDS) {
+    return (
+      <StudyEmptyState
+        title='Not enough cards for Match'
+        description='Match needs at least six cards. Change the filters or use Flashcards to review this selection.'
+      />
+    )
+  }
+
+  return (
+    <MatchView
+      key={getStudySessionKey(route.deck.data.id, route.mode, route.filters)}
+      deck={route.deck.data}
+      initialCards={route.cards.data}
+    />
+  )
 }

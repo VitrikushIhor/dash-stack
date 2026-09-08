@@ -7,21 +7,15 @@ import {
   InvalidVocabProgressDataException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
-import { DeckRepositoryPort } from '../ports/deck-repository.port';
-import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
-import { VocabProgressRepositoryPort } from '../ports/vocab-progress-repository.port';
+import { StudyProgressTransactionPort } from '../ports/study-progress-transaction.port';
 import { SubmitStudyProgressCommand } from '../commands/submit-study-progress.command';
 import { VocabProgressReadModel } from '../read-models/vocab-progress.read-model';
 
 @Injectable()
 export class SubmitStudyProgressUseCase {
   constructor(
-    @Inject('DeckRepositoryPort')
-    private readonly deckRepository: DeckRepositoryPort,
-    @Inject('FlashcardRepositoryPort')
-    private readonly flashcardRepository: FlashcardRepositoryPort,
-    @Inject('VocabProgressRepositoryPort')
-    private readonly vocabProgressRepository: VocabProgressRepositoryPort,
+    @Inject('StudyProgressTransactionPort')
+    private readonly transaction: StudyProgressTransactionPort,
   ) {}
 
   public async execute(command: SubmitStudyProgressCommand): Promise<VocabProgressReadModel[]> {
@@ -31,71 +25,79 @@ export class SubmitStudyProgressUseCase {
       throw new InvalidVocabProgressDataException('Results array cannot be empty');
     }
 
-    const deck = await this.deckRepository.findById(deckId);
-    if (!deck) {
-      throw new DeckNotFoundException(deckId);
+    if (new Set(results.map((result) => result.flashcardId)).size !== results.length) {
+      throw new InvalidVocabProgressDataException('Results must contain unique flashcardId values');
     }
 
-    if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.SUBMIT_PROGRESS, userId)) {
-      throw new DeckAccessForbiddenException();
-    }
+    return this.transaction.run(
+      async ({ deckRepository, flashcardRepository, vocabProgressRepository }) => {
+        const deck = await deckRepository.findById(deckId);
+        if (!deck) {
+          throw new DeckNotFoundException(deckId);
+        }
 
-    const deckCards = await this.flashcardRepository.findByDeckId(deckId);
-    const validCardIdSet = new Set(deckCards.map((c) => c.id));
+        if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.SUBMIT_PROGRESS, userId)) {
+          throw new DeckAccessForbiddenException();
+        }
 
-    for (const result of results) {
-      if (!validCardIdSet.has(result.flashcardId)) {
-        throw new FlashcardNotInDeckException(result.flashcardId, deckId);
-      }
-    }
+        const deckCards = await flashcardRepository.findByDeckId(deckId);
+        const validCardIdSet = new Set(deckCards.map((c) => c.id));
 
-    const cardIds = results.map((r) => r.flashcardId);
-    const existingProgressList = await this.vocabProgressRepository.findByUserAndCardIds(
-      userId,
-      deckId,
-      cardIds,
+        for (const result of results) {
+          if (!validCardIdSet.has(result.flashcardId)) {
+            throw new FlashcardNotInDeckException(result.flashcardId, deckId);
+          }
+        }
+
+        const cardIds = results.map((r) => r.flashcardId);
+        const existingProgressList = await vocabProgressRepository.findByUserAndCardIds(
+          userId,
+          deckId,
+          cardIds,
+        );
+
+        const progressMap = new Map<string, VocabProgress>();
+        for (const p of existingProgressList) {
+          progressMap.set(p.flashcardId, p);
+        }
+
+        const now = new Date();
+        const updatedEntities: VocabProgress[] = [];
+
+        for (const result of results) {
+          let progress = progressMap.get(result.flashcardId);
+
+          if (!progress) {
+            progress = VocabProgress.createNew(userId, deckId, result.flashcardId, now);
+            progressMap.set(result.flashcardId, progress);
+          }
+
+          progress.recordReview(result.isCorrect, now);
+          updatedEntities.push(progress);
+        }
+
+        const savedEntities = await vocabProgressRepository.upsertBatch(updatedEntities);
+
+        return savedEntities.map((e) => {
+          const snap = e.toSnapshot();
+          return {
+            id: snap.id,
+            userId: snap.userId,
+            deckId: snap.deckId,
+            flashcardId: snap.flashcardId,
+            status: snap.status,
+            box: snap.box,
+            isStarred: snap.isStarred,
+            correctStreak: snap.correctStreak,
+            correctCount: snap.correctCount,
+            incorrectCount: snap.incorrectCount,
+            lastReviewedAt: snap.lastReviewedAt,
+            nextReviewAt: snap.nextReviewAt,
+            createdAt: snap.createdAt,
+            updatedAt: snap.updatedAt,
+          };
+        });
+      },
     );
-
-    const progressMap = new Map<string, VocabProgress>();
-    for (const p of existingProgressList) {
-      progressMap.set(p.flashcardId, p);
-    }
-
-    const now = new Date();
-    const updatedEntities: VocabProgress[] = [];
-
-    for (const result of results) {
-      let progress = progressMap.get(result.flashcardId);
-
-      if (!progress) {
-        progress = VocabProgress.createNew(userId, deckId, result.flashcardId, now);
-        progressMap.set(result.flashcardId, progress);
-      }
-
-      progress.recordReview(result.isCorrect, now);
-      updatedEntities.push(progress);
-    }
-
-    const savedEntities = await this.vocabProgressRepository.upsertBatch(updatedEntities);
-
-    return savedEntities.map((e) => {
-      const snap = e.toSnapshot();
-      return {
-        id: snap.id,
-        userId: snap.userId,
-        deckId: snap.deckId,
-        flashcardId: snap.flashcardId,
-        status: snap.status,
-        box: snap.box,
-        isStarred: snap.isStarred,
-        correctStreak: snap.correctStreak,
-        correctCount: snap.correctCount,
-        incorrectCount: snap.incorrectCount,
-        lastReviewedAt: snap.lastReviewedAt,
-        nextReviewAt: snap.nextReviewAt,
-        createdAt: snap.createdAt,
-        updatedAt: snap.updatedAt,
-      };
-    });
   }
 }

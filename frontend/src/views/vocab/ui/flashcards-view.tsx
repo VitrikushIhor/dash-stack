@@ -4,6 +4,7 @@ import { type Deck } from '@/entities/deck'
 import { type StudyCard } from '@/entities/vocab'
 import {
   FlashcardPlayer,
+  StudyEmptyState,
   StudySessionContainer,
   StudySummary,
   useStudySession,
@@ -36,6 +37,15 @@ export function FlashcardsView({ deck, initialCards }: FlashcardsViewProps) {
         onRetryIncorrect={retryIncorrect}
         onRestart={restart}
         isSubmitting={isSubmitting}
+      />
+    )
+  }
+
+  if (cards.length === 0) {
+    return (
+      <StudyEmptyState
+        title='No cards match these filters'
+        description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
       />
     )
   }

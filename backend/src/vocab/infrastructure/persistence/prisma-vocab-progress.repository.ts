@@ -1,3 +1,4 @@
+import { upsertVocabProgressBatch } from './upsert-vocab-progress-batch';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { DeckStatus, DeckVisibility, Prisma } from '@prisma/client';
@@ -13,8 +14,6 @@ type FlashcardWithProgress = Prisma.FlashcardGetPayload<{
 
 @Injectable()
 export class PrismaVocabProgressRepository implements VocabProgressRepositoryPort {
-  private static readonly BULK_CHUNK_SIZE = 100;
-
   constructor(private readonly prisma: PrismaService) {}
 
   public async findByUserAndCard(
@@ -73,22 +72,15 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
 
     const where: Prisma.FlashcardWhereInput = {
       deckId,
-      ...(options?.onlyStarred && userId
+      ...(userId && (options?.onlyStarred || options?.onlyDue)
         ? {
             progress: {
               some: {
                 userId,
-                isStarred: true,
+                ...(options.onlyStarred ? { isStarred: true } : {}),
+                ...(options.onlyDue ? { nextReviewAt: { lte: now } } : {}),
               },
             },
-          }
-        : {}),
-      ...(options?.onlyDue && userId
-        ? {
-            OR: [
-              { progress: { none: { userId } } },
-              { progress: { some: { userId, nextReviewAt: { lte: now } } } },
-            ],
           }
         : {}),
     };
@@ -100,7 +92,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
           ? {
               where: { userId },
             }
-          : true,
+          : { where: { userId: { in: [] } } },
       },
       orderBy: { position: 'asc' },
     });
@@ -205,49 +197,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
   }
 
   public async upsertBatch(progressList: VocabProgress[]): Promise<VocabProgress[]> {
-    if (progressList.length === 0) {
-      return [];
-    }
-
-    const rawList = progressList.map(PrismaVocabProgressMapper.toPersistence);
-    const now = new Date();
-
-    // High-performance multi-row Postgres bulk upsert with chunking
-    for (let i = 0; i < rawList.length; i += PrismaVocabProgressRepository.BULK_CHUNK_SIZE) {
-      const chunk = rawList.slice(i, i + PrismaVocabProgressRepository.BULK_CHUNK_SIZE);
-
-      const values = Prisma.join(
-        chunk.map(
-          (r) =>
-            Prisma.sql`(${r.id || Prisma.sql`gen_random_uuid()::text`}, ${r.userId}, ${r.deckId}, ${r.flashcardId}, ${r.status}::"VocabProgressStatus", ${r.box}, ${r.isStarred}, ${r.correctStreak}, ${r.correctCount}, ${r.incorrectCount}, ${r.lastReviewedAt}, ${r.nextReviewAt}, ${now}, ${now})`,
-        ),
-      );
-
-      await this.prisma.$executeRaw`
-        INSERT INTO "vocab_progress" (
-          "id", "userId", "deckId", "flashcardId", "status", "box", "isStarred",
-          "correctStreak", "correctCount", "incorrectCount", "lastReviewedAt", "nextReviewAt", "createdAt", "updatedAt"
-        )
-        VALUES ${values}
-        ON CONFLICT ("userId", "deckId", "flashcardId")
-        DO UPDATE SET
-          "status" = EXCLUDED."status",
-          "box" = EXCLUDED."box",
-          "isStarred" = EXCLUDED."isStarred",
-          "correctStreak" = EXCLUDED."correctStreak",
-          "correctCount" = EXCLUDED."correctCount",
-          "incorrectCount" = EXCLUDED."incorrectCount",
-          "lastReviewedAt" = EXCLUDED."lastReviewedAt",
-          "nextReviewAt" = EXCLUDED."nextReviewAt",
-          "updatedAt" = EXCLUDED."updatedAt";
-      `;
-    }
-
-    return this.findByUserAndCardIds(
-      rawList[0].userId,
-      rawList[0].deckId,
-      rawList.map((r) => r.flashcardId),
-    );
+    return this.prisma.$transaction((tx) => upsertVocabProgressBatch(tx, progressList));
   }
 
   private buildUpsertArgs(

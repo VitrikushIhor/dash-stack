@@ -21,7 +21,7 @@ describe('VocabProgress Entity', () => {
       expect(progress.correctCount).toBe(0);
       expect(progress.incorrectCount).toBe(0);
       expect(progress.lastReviewedAt).toBeNull();
-      expect(progress.nextReviewAt).toEqual(fixedDate);
+      expect(progress.nextReviewAt).toBeNull();
       expect(progress.createdAt).toEqual(fixedDate);
       expect(progress.updatedAt).toEqual(fixedDate);
     });
@@ -145,7 +145,7 @@ describe('VocabProgress Entity', () => {
         correctCount: 4,
         incorrectCount: 0,
         lastReviewedAt: fixedDate,
-        nextReviewAt: fixedDate,
+        nextReviewAt: null,
         createdAt: fixedDate,
         updatedAt: fixedDate,
       });
@@ -205,7 +205,7 @@ describe('VocabProgress Entity', () => {
         correctCount: 0,
         incorrectCount: 0,
         lastReviewedAt: null,
-        nextReviewAt: fixedDate,
+        nextReviewAt: null,
         createdAt: fixedDate,
         updatedAt: fixedDate,
       });
