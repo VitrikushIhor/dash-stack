@@ -3,11 +3,13 @@ import { GetStudyCardsUseCase } from '../../../application/use-cases/get-study-c
 import { SubmitStudyProgressUseCase } from '../../../application/use-cases/submit-study-progress.use-case';
 import { AuthUser } from '../../../../common/decorators/user.decorator';
 import { VocabProgressStatus } from '../../../domain/enums/vocab.enums';
+import { BrowseDeckCardsUseCase } from '../../../application/use-cases/browse-deck-cards.use-case';
 
 describe('DeckStudyController', () => {
   let controller: DeckStudyController;
   let mockGetStudyCardsUseCase: jest.Mocked<GetStudyCardsUseCase>;
   let mockSubmitStudyProgressUseCase: jest.Mocked<SubmitStudyProgressUseCase>;
+  let mockBrowseDeckCardsUseCase: jest.Mocked<BrowseDeckCardsUseCase>;
 
   const mockUser: AuthUser = {
     id: 'user-1',
@@ -23,7 +25,15 @@ describe('DeckStudyController', () => {
       execute: jest.fn(),
     } as unknown as jest.Mocked<SubmitStudyProgressUseCase>;
 
-    controller = new DeckStudyController(mockGetStudyCardsUseCase, mockSubmitStudyProgressUseCase);
+    mockBrowseDeckCardsUseCase = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<BrowseDeckCardsUseCase>;
+
+    controller = new DeckStudyController(
+      mockGetStudyCardsUseCase,
+      mockSubmitStudyProgressUseCase,
+      mockBrowseDeckCardsUseCase,
+    );
   });
 
   it('should call GetStudyCardsUseCase and return mapped response list', async () => {

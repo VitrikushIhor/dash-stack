@@ -14,12 +14,14 @@ import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../guards/optional-jwt-auth.guard';
 import { UserEntity, AuthUser } from '../../../common/decorators/user.decorator';
 import { GetStudyCardsUseCase } from '../../application/use-cases/get-study-cards.use-case';
+import { BrowseDeckCardsUseCase } from '../../application/use-cases/browse-deck-cards.use-case';
 import { SubmitStudyProgressUseCase } from '../../application/use-cases/submit-study-progress.use-case';
 import { StudySessionQueryDto } from '../dtos/study-session-query.dto';
 import { StudyCardResponseDto } from '../dtos/study-session-response.dto';
 import { SubmitProgressDto } from '../dtos/submit-progress.dto';
 import { VocabProgressResponseDto } from '../dtos/vocab-progress-response.dto';
 import { VocabProgressPresentationMapper } from '../mappers/vocab-progress-presentation.mapper';
+import { BrowseDeckCardsQueryDto } from '../dtos/browse-deck-cards.dto';
 
 @ApiTags('Vocabulary - Study & Practice')
 @Controller('v1/vocab/decks')
@@ -27,7 +29,30 @@ export class DeckStudyController {
   constructor(
     private readonly getStudyCardsUseCase: GetStudyCardsUseCase,
     private readonly submitStudyProgressUseCase: SubmitStudyProgressUseCase,
+    private readonly browseDeckCardsUseCase: BrowseDeckCardsUseCase,
   ) {}
+
+  @Get(':id/cards/browse')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiOperation({ summary: 'Browse and search deck cards with pagination' })
+  public async browseDeckCards(
+    @Param('id') deckId: string,
+    @Query() query: BrowseDeckCardsQueryDto,
+    @UserEntity() user: AuthUser | null,
+  ) {
+    const result = await this.browseDeckCardsUseCase.execute({
+      deckId,
+      userId: user?.id ?? null,
+      search: query.q,
+      page: query.page,
+      perPage: query.perPage,
+    });
+
+    return {
+      ...result,
+      data: VocabProgressPresentationMapper.toStudyCardResponseList(result.data),
+    };
+  }
 
   @Get(':id/study')
   @UseGuards(OptionalJwtAuthGuard)

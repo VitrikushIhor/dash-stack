@@ -54,6 +54,7 @@ describe('ToggleCardStarUseCase', () => {
       findByUserAndDeck: jest.fn(),
       findByUserAndCardIds: jest.fn(),
       getStudyCards: jest.fn(),
+      browseDeckCards: jest.fn(),
       getDueReviews: jest.fn(),
       save: jest.fn(),
       upsertBatch: jest.fn(),

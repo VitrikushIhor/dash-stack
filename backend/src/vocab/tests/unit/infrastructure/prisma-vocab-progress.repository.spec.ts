@@ -78,4 +78,49 @@ describe('PrismaVocabProgressRepository', () => {
       },
     });
   });
+
+  it('searches deck cards with stable pagination and server-derived counters', async () => {
+    const prismaMock = {
+      flashcard: {
+        count: jest.fn().mockResolvedValueOnce(1).mockResolvedValueOnce(100),
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+      vocabProgress: {
+        count: jest.fn().mockResolvedValueOnce(8).mockResolvedValueOnce(5).mockResolvedValueOnce(2),
+      },
+    };
+    const repository = new PrismaVocabProgressRepository(prismaMock as unknown as PrismaService);
+
+    const result = await repository.browseDeckCards(userId, 'deck-1', {
+      search: 'Deploy',
+      page: 2,
+      perPage: 25,
+    });
+
+    expect(prismaMock.flashcard.findMany).toHaveBeenCalledWith({
+      where: {
+        deckId: 'deck-1',
+        OR: [
+          { term: { contains: 'Deploy', mode: 'insensitive' } },
+          { definition: { contains: 'Deploy', mode: 'insensitive' } },
+        ],
+      },
+      include: { progress: { where: { userId } } },
+      orderBy: [{ position: 'asc' }, { id: 'asc' }],
+      skip: 25,
+      take: 25,
+    });
+    expect(result).toEqual({
+      data: [],
+      meta: {
+        total: 1,
+        lastPage: 1,
+        currentPage: 2,
+        perPage: 25,
+        prev: 1,
+        next: null,
+      },
+      summary: { total: 100, due: 8, starred: 5, dueAndStarred: 2 },
+    });
+  });
 });

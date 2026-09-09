@@ -6,7 +6,10 @@ import { VocabProgress } from '../../domain/entities/vocab-progress.entity';
 import { VocabProgressRepositoryPort } from '../../application/ports/vocab-progress-repository.port';
 import { DueReviewsReadModel } from '../../application/read-models/due-reviews.read-model';
 import { StudyCardReadModel } from '../../application/read-models/study-card.read-model';
+import { BrowsedDeckCardsReadModel } from '../../application/read-models/browsed-deck-cards.read-model';
 import { PrismaVocabProgressMapper } from './mappers/prisma-vocab-progress.mapper';
+import { paginate } from '../../../common/pagination/paginate';
+import { OrderDirection } from '../../../common/order/order-direction';
 
 type FlashcardWithProgress = Prisma.FlashcardGetPayload<{
   include: { progress: true };
@@ -101,6 +104,60 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
       const rawProgress = card.progress?.[0] ?? null;
       return PrismaVocabProgressMapper.toStudyCardReadModel(card, rawProgress);
     });
+  }
+
+  public async browseDeckCards(
+    userId: string | null,
+    deckId: string,
+    options: { search?: string; page: number; perPage: number },
+  ): Promise<BrowsedDeckCardsReadModel> {
+    const search = options.search?.trim();
+    const where: Prisma.FlashcardWhereInput = {
+      deckId,
+      ...(search
+        ? {
+            OR: [
+              { term: { contains: search, mode: 'insensitive' } },
+              { definition: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
+    const progressWhere = userId ? { userId } : { userId: { in: [] as string[] } };
+    const now = new Date();
+
+    const [page, allCards, due, starred, dueAndStarred] = await Promise.all([
+      paginate<FlashcardWithProgress, Prisma.FlashcardFindManyArgs>(
+        this.prisma.flashcard,
+        {
+          where,
+          include: { progress: { where: progressWhere } },
+          orderBy: [{ position: OrderDirection.asc }, { id: OrderDirection.asc }],
+        },
+        options,
+      ),
+      this.prisma.flashcard.count({ where: { deckId } }),
+      userId
+        ? this.prisma.vocabProgress.count({
+            where: { userId, deckId, nextReviewAt: { lte: now } },
+          })
+        : Promise.resolve(0),
+      userId
+        ? this.prisma.vocabProgress.count({ where: { userId, deckId, isStarred: true } })
+        : Promise.resolve(0),
+      userId
+        ? this.prisma.vocabProgress.count({
+            where: { userId, deckId, isStarred: true, nextReviewAt: { lte: now } },
+          })
+        : Promise.resolve(0),
+    ]);
+    return {
+      data: page.data.map((card) =>
+        PrismaVocabProgressMapper.toStudyCardReadModel(card, card.progress[0] ?? null),
+      ),
+      meta: page.meta,
+      summary: { total: allCards, due, starred, dueAndStarred },
+    };
   }
 
   public async getDueReviews(userId: string, deckId?: string): Promise<DueReviewsReadModel> {

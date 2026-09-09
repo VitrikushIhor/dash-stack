@@ -24,6 +24,7 @@ import { ReorderFlashcardsUseCase } from './application/use-cases/reorder-flashc
 import { SearchUnsplashPhotosUseCase } from './application/use-cases/search-unsplash-photos.use-case';
 import { GetDueReviewsUseCase } from './application/use-cases/get-due-reviews.use-case';
 import { GetStudyCardsUseCase } from './application/use-cases/get-study-cards.use-case';
+import { BrowseDeckCardsUseCase } from './application/use-cases/browse-deck-cards.use-case';
 import { SubmitStudyProgressUseCase } from './application/use-cases/submit-study-progress.use-case';
 import { ToggleCardStarUseCase } from './application/use-cases/toggle-card-star.use-case';
 import { DeckController } from './presentation/controllers/deck.controller';
@@ -67,6 +68,7 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     // Use Cases - SRS & Study Progress
     GetDueReviewsUseCase,
     GetStudyCardsUseCase,
+    BrowseDeckCardsUseCase,
     SubmitStudyProgressUseCase,
     ToggleCardStarUseCase,
 
