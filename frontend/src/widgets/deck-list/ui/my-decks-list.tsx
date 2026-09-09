@@ -3,12 +3,6 @@ import Link from 'next/link'
 import { BookOpen, Layers } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/core/dropdown-menu'
 import { EmptyState } from '@/shared/ui/feedback/empty-state'
 import { type Deck, DeckCard, DeckStatusBadge } from '@/entities/deck'
 import { CreateDeckDialog, MyDeckCardActions } from '@/features/manage-deck'
@@ -59,11 +53,7 @@ export function MyDecksList({
     <DueReviewsProvider>
       <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
         {decks.map((deck) => (
-          <DeckCard
-            key={deck.id}
-            deck={deck}
-            href={ROUTES.vocabDeckEdit(deck.id)}
-          >
+          <DeckCard key={deck.id} deck={deck} href={ROUTES.vocabDeck(deck.id)}>
             <DeckCard.Header>
               <DeckCard.Badges>
                 <DeckStatusBadge status={deck.status} />
@@ -75,27 +65,12 @@ export function MyDecksList({
             </DeckCard.Header>
             <DeckCard.Content />
             <DeckCard.Footer>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size='sm' className='h-8 gap-1.5 shadow-sm'>
-                    <BookOpen className='h-3.5 w-3.5' />
-                    <span>Study</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                  <DropdownMenuItem asChild>
-                    <Link href={ROUTES.vocabDeckStudy(deck.id)}>
-                      Flashcards
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={ROUTES.vocabDeckLearn(deck.id)}>Learn</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={ROUTES.vocabMatch(deck.id)}>Match</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button asChild size='sm' className='h-8 gap-1.5 shadow-sm'>
+                <Link href={ROUTES.vocabDeck(deck.id)}>
+                  <BookOpen className='h-3.5 w-3.5' />
+                  <span>Open deck</span>
+                </Link>
+              </Button>
             </DeckCard.Footer>
           </DeckCard>
         ))}

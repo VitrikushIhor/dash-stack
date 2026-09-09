@@ -45,6 +45,7 @@ export function createHttpClient(config: HttpClientConfig) {
       skipAuth,
       cache,
       next,
+      signal,
     } = options
 
     const isFormData = body instanceof FormData
@@ -73,6 +74,7 @@ export function createHttpClient(config: HttpClientConfig) {
         body: requestBody,
         cache,
         next,
+        signal,
       }
     )
 

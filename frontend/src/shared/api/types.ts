@@ -34,4 +34,5 @@ export interface RequestOptions<TBody = unknown> {
   skipAuth?: boolean
   cache?: RequestCache
   next?: NextFetchRequestConfig
+  signal?: AbortSignal
 }

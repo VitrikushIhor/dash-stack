@@ -42,4 +42,5 @@ export type {
   LearnResult,
 } from './model/shared/types'
 export { StudyFilters } from './ui/filters/study-filters'
+export { useStudySearchParams } from './model/filters/use-search-params'
 export { GlobalDueCount, ReviewQueue } from './ui/due-badge/review-queue'

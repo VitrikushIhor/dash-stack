@@ -50,9 +50,9 @@ export function DeckEditorHeader({ state }: DeckEditorHeaderProps) {
           size='sm'
           className='gap-1.5 shadow-sm'
         >
-          <Link href={ROUTES.vocabDeckStudy(deck.id)}>
+          <Link href={ROUTES.vocabDeck(deck.id)}>
             <BookOpen className='text-primary h-3.5 w-3.5' />
-            <span>Study Deck</span>
+            <span>View Deck</span>
           </Link>
         </Button>
 

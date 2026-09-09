@@ -1,6 +1,7 @@
 import { type HttpClient, api } from '@/shared/api'
 import { SERVER_CACHE_TAGS } from '@/shared/config/constants/cache-tags'
 import {
+  type DeckCardsPage,
   type DueReviewsResponse,
   type MatchLeaderboardEntry,
   type StudyCard,
@@ -13,6 +14,20 @@ import {
 
 export function createVocabApi(client: HttpClient) {
   return {
+    browseDeckCards: (
+      deckId: string,
+      query: { search?: string; page: number; perPage: number },
+      signal?: AbortSignal
+    ): Promise<DeckCardsPage> =>
+      client.get<DeckCardsPage>(`/v1/vocab/decks/${deckId}/cards/browse`, {
+        params: {
+          q: query.search || undefined,
+          page: query.page,
+          perPage: query.perPage,
+        },
+        signal,
+      }),
+
     getStudySession: (
       deckId: string,
       query?: Omit<StudySessionQuery, 'deckId'>

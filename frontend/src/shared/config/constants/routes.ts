@@ -34,6 +34,7 @@ export const ROUTES = {
   // Vocabulary / SRS
   vocabDecks: '/vocab/decks',
   vocabDeckNew: '/vocab/decks/new',
+  vocabDeck: (id: string) => `/vocab/decks/${id}`,
   vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
   vocabCatalog: '/vocab/catalog',
   vocabDeckStudy: (id: string) => `/vocab/decks/${id}/flashcards`,

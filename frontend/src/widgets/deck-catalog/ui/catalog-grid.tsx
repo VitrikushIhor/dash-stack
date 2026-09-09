@@ -48,20 +48,16 @@ export function CatalogGrid({
     <>
       <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
         {decks.map((deck) => (
-          <DeckCard
-            key={deck.id}
-            deck={deck}
-            href={ROUTES.vocabDeckStudy(deck.id)}
-          >
+          <DeckCard key={deck.id} deck={deck} href={ROUTES.vocabDeck(deck.id)}>
             <DeckCard.Header>
               <DeckCard.Badges />
             </DeckCard.Header>
             <DeckCard.Content />
             <DeckCard.Footer>
               <Button asChild size='sm' className='h-8 gap-1.5 shadow-sm'>
-                <Link href={ROUTES.vocabDeckStudy(deck.id)}>
+                <Link href={ROUTES.vocabDeck(deck.id)}>
                   <BookOpen className='h-3.5 w-3.5' />
-                  <span>Study</span>
+                  <span>Open deck</span>
                 </Link>
               </Button>
             </DeckCard.Footer>

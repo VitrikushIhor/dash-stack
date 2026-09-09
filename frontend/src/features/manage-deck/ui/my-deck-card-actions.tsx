@@ -36,11 +36,11 @@ export function MyDeckCardActions({ deck }: MyDeckCardActionsProps) {
     <>
       <DropdownMenuItem asChild>
         <Link
-          href={ROUTES.vocabDeckStudy(deck.id)}
+          href={ROUTES.vocabDeck(deck.id)}
           className='flex items-center gap-2'
         >
           <BookOpen className='text-primary h-4 w-4' />
-          <span>Study Cards</span>
+          <span>Open Deck</span>
         </Link>
       </DropdownMenuItem>
 

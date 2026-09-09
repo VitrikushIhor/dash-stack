@@ -39,6 +39,26 @@ export type StudyCard = {
   progress: StudyCardProgress
 }
 
+export type DeckCardSelectionSummary = {
+  total: number
+  due: number
+  starred: number
+  dueAndStarred: number
+}
+
+export type DeckCardsPage = {
+  data: StudyCard[]
+  meta: {
+    total: number
+    lastPage: number
+    currentPage: number
+    perPage: number
+    prev: number | null
+    next: number | null
+  }
+  summary: DeckCardSelectionSummary
+}
+
 export type SubmitProgressItem = {
   flashcardId: string
   isCorrect: boolean
