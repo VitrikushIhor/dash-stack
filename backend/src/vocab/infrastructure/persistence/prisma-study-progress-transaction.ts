@@ -10,6 +10,7 @@ import {
 import { PrismaDeckMapper } from './mappers/prisma-deck.mapper';
 import { PrismaFlashcardMapper } from './mappers/prisma-flashcard.mapper';
 import { PrismaVocabProgressMapper } from './mappers/prisma-vocab-progress.mapper';
+import { isPrismaWriteConflict } from './prisma-write-conflict';
 import { upsertVocabProgressBatch } from './upsert-vocab-progress-batch';
 
 @Injectable()
@@ -65,26 +66,10 @@ export class PrismaStudyProgressTransaction implements StudyProgressTransactionP
           },
         );
       } catch (error: unknown) {
-        if (!this.isWriteConflict(error)) throw error;
+        if (!isPrismaWriteConflict(error)) throw error;
         if (attempt >= 3) throw new VocabProgressConflictException();
         await setTimeout(25 * 2 ** attempt);
       }
     }
-  }
-  private isWriteConflict(error: unknown): boolean {
-    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
-    if (error.code === 'P2034' || error.code === 'P2002') return true;
-    if (error.code !== 'P2010') return false;
-    if (error.meta?.code === '40001' || error.meta?.code === '40P01') return true;
-    const adapterError = error.meta?.driverAdapterError;
-    if (typeof adapterError !== 'object' || adapterError === null || !('cause' in adapterError))
-      return false;
-    const cause = adapterError.cause;
-    return (
-      typeof cause === 'object' &&
-      cause !== null &&
-      'originalCode' in cause &&
-      (cause.originalCode === '40001' || cause.originalCode === '40P01')
-    );
   }
 }

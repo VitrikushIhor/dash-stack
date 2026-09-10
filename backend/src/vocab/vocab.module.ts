@@ -1,5 +1,12 @@
 import { PrismaStudyProgressTransaction } from './infrastructure/persistence/prisma-study-progress-transaction';
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { MatchController } from './presentation/controllers/match.controller';
+import { PrismaMatchTransaction } from './infrastructure/persistence/prisma-match-transaction';
+import { CreateMatchSessionUseCase } from './application/use-cases/create-match-session.use-case';
+import { CompleteMatchSessionUseCase } from './application/use-cases/complete-match-session.use-case';
+import { GetMatchLeaderboardUseCase } from './application/use-cases/get-match-leaderboard.use-case';
+import { RecordMatchPairUseCase } from './application/use-cases/record-match-pair.use-case';
 import { PrismaDeckRepository } from './infrastructure/persistence/prisma-deck.repository';
 import { PrismaFlashcardRepository } from './infrastructure/persistence/prisma-flashcard.repository';
 import { PrismaDeckEditorRepository } from './infrastructure/persistence/prisma-deck-editor.repository';
@@ -34,7 +41,9 @@ import { VocabProgressController } from './presentation/controllers/vocab-progre
 import { DeckStudyController } from './presentation/controllers/deck-study.controller';
 
 @Module({
+  imports: [ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }])],
   controllers: [
+    MatchController,
     DeckController,
     FlashcardController,
     UnsplashController,
@@ -42,6 +51,13 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     DeckStudyController,
   ],
   providers: [
+    CreateMatchSessionUseCase,
+    CompleteMatchSessionUseCase,
+    GetMatchLeaderboardUseCase,
+    RecordMatchPairUseCase,
+    PrismaMatchTransaction,
+    { provide: 'MatchTransactionPort', useExisting: PrismaMatchTransaction },
+    { provide: 'MatchClockPort', useValue: { now: () => new Date() } },
     // Use Cases - Decks
     CreateDeckUseCase,
     GetMyDecksUseCase,

@@ -25,6 +25,7 @@ model User {
   decks         Deck[]         @relation("UserDecks")
   vocabProgress VocabProgress[] @relation("UserVocabProgress")
   deckLeaderboardEntries DeckLeaderboard[] @relation("UserDeckLeaderboard")
+  matchSessions          MatchSession[]
 }
 
 model Account {
@@ -230,6 +231,7 @@ model Deck {
   flashcards       Flashcard[]
   vocabProgress    VocabProgress[]
   leaderboard      DeckLeaderboard[]
+  matchSessions     MatchSession[]
   forkedFrom       Deck?             @relation("DeckForks", fields: [forkedFromDeckId], references: [id], onDelete: SetNull)
   forks            Deck[]            @relation("DeckForks")
 
@@ -250,7 +252,8 @@ model Flashcard {
   updatedAt   DateTime        @updatedAt
 
   deck        Deck            @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  progress    VocabProgress[]
+  progress      VocabProgress[]
+  matchSessions MatchSessionCard[]
 
   @@index([deckId, position])
   @@map("flashcards")
@@ -283,6 +286,39 @@ model VocabProgress {
   @@map("vocab_progress")
 }
 
+model MatchSession {
+  id          String    @id @default(cuid())
+  deckId      String
+  userId      String
+  startedAt   DateTime
+  expiresAt   DateTime
+  completedAt DateTime?
+
+  deck  Deck               @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  user  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards MatchSessionCard[]
+
+  @@index([deckId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("match_sessions")
+}
+
+model MatchSessionCard {
+  sessionId   String
+  flashcardId String
+  position    Int
+  matchedAt   DateTime?
+
+  session   MatchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  flashcard Flashcard    @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, flashcardId])
+  @@unique([sessionId, position])
+  @@index([flashcardId])
+  @@map("match_session_cards")
+}
+
 model DeckLeaderboard {
   id         String   @id @default(cuid())
   deckId     String
@@ -294,7 +330,9 @@ model DeckLeaderboard {
   deck       Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
   user       User     @relation("UserDeckLeaderboard", fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([deckId, durationMs])
+  @@unique([deckId, userId])
+  @@index([userId])
+  @@index([deckId, durationMs, createdAt, id])
   @@map("deck_leaderboards")
 }
 
