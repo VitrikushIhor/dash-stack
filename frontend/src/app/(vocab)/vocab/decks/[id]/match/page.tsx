@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
 import { MIN_MATCH_CARDS, StudyEmptyState } from '@/features/study-vocab'
-import { MatchView } from '@/views/vocab'
+import { VocabMatch } from '@/widgets/vocab-match'
 import {
   type StudyRouteProps,
   getStudyRouteData,
@@ -43,10 +43,10 @@ export default async function MatchPage(props: StudyRouteProps) {
   }
 
   return (
-    <MatchView
+    <VocabMatch
       key={getStudySessionKey(route.deck.data.id, route.mode, route.filters)}
       deck={route.deck.data}
-      initialCards={route.cards.data}
+      filters={route.filters}
     />
   )
 }

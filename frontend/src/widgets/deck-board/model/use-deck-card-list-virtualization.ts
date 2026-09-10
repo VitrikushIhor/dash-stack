@@ -38,6 +38,7 @@ export function useDeckCardListVirtualization({
     [cards]
   )
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: cards.length,
     enabled: shouldVirtualize,

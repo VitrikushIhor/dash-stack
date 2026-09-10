@@ -1,5 +1,5 @@
 import { shuffle } from '@/shared/lib/utils'
-import { type StudyCard } from '@/entities/vocab'
+import { type MatchCard } from '@/entities/vocab'
 import {
   MAX_MATCH_CARDS,
   MIN_MATCH_CARDS,
@@ -63,13 +63,17 @@ export type GameAction =
   | { type: typeof MATCH_ACTIONS.CLEAR_WRONG_MATCH }
   | { type: typeof MATCH_ACTIONS.FINISH_GAME; payload: { duration: number } }
 
-export function createInitialTiles(cards: StudyCard[]): MatchTile[] {
+export function createInitialTiles(cards: MatchCard[]): MatchTile[] {
   if (cards.length < MIN_MATCH_CARDS) {
     throw new Error(`Match game requires at least ${MIN_MATCH_CARDS} cards`)
   }
-  const sessionCards = shuffle([...cards]).slice(0, MAX_MATCH_CARDS)
+  if (cards.length > MAX_MATCH_CARDS) {
+    throw new Error(
+      `Match game supports at most ${MAX_MATCH_CARDS} server-selected cards`
+    )
+  }
   const tiles: MatchTile[] = []
-  sessionCards.forEach((card) => {
+  cards.forEach((card) => {
     tiles.push({
       id: `term-${card.id}`,
       cardId: card.id,
@@ -96,7 +100,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case MATCH_ACTIONS.SELECT_TILE: {
       if (state.wrongMatchIds.length > 0) return state
-      if (state.selectedTileIds.includes(action.payload)) return state
+      if (state.selectedTileIds.includes(action.payload)) {
+        return {
+          ...state,
+          selectedTileIds: state.selectedTileIds.filter(
+            (tileId) => tileId !== action.payload
+          ),
+        }
+      }
       if (state.selectedTileIds.length >= 2) return state
 
       const clickedTile = state.tiles.find((t) => t.id === action.payload)

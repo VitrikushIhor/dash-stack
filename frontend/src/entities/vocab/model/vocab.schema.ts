@@ -33,9 +33,23 @@ export const DueReviewsQuerySchema = z
 
 export const MatchLeaderboardQuerySchema = z.object({
   deckId: z.string().min(1, 'Deck ID is required'),
+  page: z.number().int().positive().optional(),
+  perPage: z.number().int().positive().max(100).optional(),
 })
 
-export const SubmitMatchScorePayloadSchema = z.object({
+export const CreateMatchSessionPayloadSchema = z.object({
   deckId: z.string().min(1),
-  durationMs: z.number().int().min(2000),
+  onlyDue: z.boolean().optional(),
+  onlyStarred: z.boolean().optional(),
+})
+
+export const CompleteMatchSessionPayloadSchema = z.object({
+  deckId: z.string().min(1),
+  sessionId: z.string().min(1),
+})
+
+export const RecordMatchPairPayloadSchema = z.object({
+  deckId: z.string().min(1),
+  sessionId: z.string().min(1),
+  cardId: z.string().min(1),
 })

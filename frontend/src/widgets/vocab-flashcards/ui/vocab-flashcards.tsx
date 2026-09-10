@@ -1,34 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
 import { type Deck } from '@/entities/deck'
 import { type StudyCard } from '@/entities/vocab'
 import {
-  LearnModeSelect,
-  type LearnQuestionType,
+  FlashcardPlayer,
   StudyEmptyState,
   StudySessionContainer,
-  StudySessionSkeleton,
   StudySummary,
   useStudySession,
 } from '@/features/study-vocab'
 
-const LearnPlayer = dynamic(
-  () => import('@/features/study-vocab').then((mod) => mod.LearnPlayer),
-  {
-    ssr: false,
-    loading: () => <StudySessionSkeleton />,
-  }
-)
-
-interface LearnViewProps {
+interface VocabFlashcardsProps {
   deck: Deck
   initialCards: StudyCard[]
 }
 
-export function LearnView({ deck, initialCards }: LearnViewProps) {
-  const [mode, setMode] = useState<LearnQuestionType | null>(null)
+export function VocabFlashcards({ deck, initialCards }: VocabFlashcardsProps) {
   const {
     cards,
     results,
@@ -63,24 +50,11 @@ export function LearnView({ deck, initialCards }: LearnViewProps) {
     )
   }
 
-  if (!mode) {
-    return (
-      <StudySessionContainer>
-        <LearnModeSelect
-          deck={deck}
-          cardsCount={cards.length}
-          onSelectMode={setMode}
-        />
-      </StudySessionContainer>
-    )
-  }
-
   return (
     <StudySessionContainer>
-      <LearnPlayer
-        key={`${sessionVersion}-${mode}`}
+      <FlashcardPlayer
+        key={sessionVersion}
         cards={cards}
-        mode={mode}
         onComplete={completeSession}
       />
     </StudySessionContainer>

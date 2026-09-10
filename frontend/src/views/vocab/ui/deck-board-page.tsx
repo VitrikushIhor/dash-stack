@@ -1,7 +1,7 @@
 import 'server-only'
 import { PageErrorHandler } from '@/shared/ui/error-state'
+import { DeckBoard } from '@/widgets/deck-board'
 import { getDeckBoardData } from '../model/get-deck-board-data'
-import { DeckBoardView } from './deck-board-view'
 
 type DeckBoardPageProps = {
   params: Promise<{ id: string }>
@@ -20,7 +20,7 @@ export async function DeckBoardPage({ params }: DeckBoardPageProps) {
 
   const user = result.currentUser.data ?? null
   return (
-    <DeckBoardView
+    <DeckBoard
       deck={result.deck.data}
       initialCardsPage={result.cards.data}
       isAuthenticated={user != null}

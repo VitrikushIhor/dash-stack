@@ -90,12 +90,15 @@ export function useDeckBoardViewModel({
     },
     [invalidateDeckCards, toggleStar]
   )
+
   const handleLoadMore = useCallback(() => {
     void fetchNextDeckPage()
   }, [fetchNextDeckPage])
+
   const handleRetrySearch = useCallback(() => {
     void retrySearch()
   }, [retrySearch])
+
   const handleRetryNextPage = useCallback(() => {
     void retryNextPage()
   }, [retryNextPage])

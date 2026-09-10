@@ -8,6 +8,7 @@ export const getMatchLeaderboardQuery = cache(
   createServerQuery(
     'getMatchLeaderboardQuery',
     MatchLeaderboardQuerySchema,
-    ({ deckId }) => vocabServerApi.getLeaderboard(deckId)
+    ({ deckId, page, perPage }) =>
+      vocabServerApi.getLeaderboard(deckId, { page, perPage })
   )
 )

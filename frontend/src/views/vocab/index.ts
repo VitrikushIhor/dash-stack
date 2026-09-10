@@ -1,8 +1,2 @@
 export { MyDecksView } from './ui/my-decks-view'
 export { DeckEditorView } from './ui/deck-editor-view'
-export { CatalogView } from './ui/catalog-view'
-export { FlashcardsView } from './ui/flashcards-view'
-export { LearnView } from './ui/learn-view'
-export { MatchView } from './ui/match-view'
-export { DeckBoardView } from './ui/deck-board-view'
-export { DeckBoardSkeleton } from './ui/deck-board-skeleton'

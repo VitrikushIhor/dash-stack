@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useReducer, useRef } from 'react'
-import { type StudyCard } from '@/entities/vocab'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { type MatchCard } from '@/entities/vocab'
 import {
   MATCH_DELAY_MS,
   MATCH_WIN_DELAY_MS,
@@ -16,8 +16,9 @@ import {
 } from './match-game-reducer'
 
 export function useMatch(
-  cards: StudyCard[],
-  onComplete: (durationMs: number) => void
+  cards: MatchCard[],
+  onComplete: () => void,
+  onPairMatched: (cardId: string) => Promise<boolean>
 ) {
   const [state, dispatch] = useReducer(
     gameReducer,
@@ -31,6 +32,8 @@ export function useMatch(
       penaltyTime: 0,
     })
   )
+  const [pairError, setPairError] = useState(false)
+  const [pairRetry, setPairRetry] = useState(0)
 
   const onCompleteRef = useRef(onComplete)
 
@@ -38,7 +41,6 @@ export function useMatch(
     onCompleteRef.current = onComplete
   }, [onComplete])
 
-  // Handle wrong match timer or successful match timer when 2 tiles are selected
   useEffect(() => {
     if (state.type !== GAME_STATUS.PLAYING) return
 
@@ -55,11 +57,21 @@ export function useMatch(
     ) {
       const [id1, id2] = state.selectedTileIds
       const timer = setTimeout(() => {
-        dispatch({ type: MATCH_ACTIONS.MATCH_SUCCESS, payload: { id1, id2 } })
+        const cardId = state.tiles.find((tile) => tile.id === id1)?.cardId
+        if (cardId)
+          void onPairMatched(cardId).then((saved) => {
+            if (saved) {
+              setPairError(false)
+              dispatch({
+                type: MATCH_ACTIONS.MATCH_SUCCESS,
+                payload: { id1, id2 },
+              })
+            } else setPairError(true)
+          })
       }, MATCH_DELAY_MS)
       return () => clearTimeout(timer)
     }
-  }, [state])
+  }, [onPairMatched, pairRetry, state])
 
   // Handle win completion
   useEffect(() => {
@@ -70,18 +82,29 @@ export function useMatch(
           type: MATCH_ACTIONS.FINISH_GAME,
           payload: { duration: finalDuration },
         })
-        onCompleteRef.current(finalDuration)
+        onCompleteRef.current()
       }, MATCH_WIN_DELAY_MS)
       return () => clearTimeout(timer)
     }
   }, [state])
 
-  const handleTileClick = useCallback((tileId: string) => {
-    dispatch({ type: MATCH_ACTIONS.SELECT_TILE, payload: tileId })
-  }, [])
+  const handleTileClick = useCallback(
+    (tileId: string) => {
+      if (
+        state.type === GAME_STATUS.PLAYING &&
+        state.selectedTileIds.includes(tileId)
+      ) {
+        setPairError(false)
+      }
+      dispatch({ type: MATCH_ACTIONS.SELECT_TILE, payload: tileId })
+    },
+    [state]
+  )
 
   return {
     gameState: state,
     handleTileClick,
+    pairError,
+    retryPair: () => setPairRetry((value) => value + 1),
   }
 }

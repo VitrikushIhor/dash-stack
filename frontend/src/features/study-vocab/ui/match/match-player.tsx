@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { type StudyCard } from '@/entities/vocab'
+import { WidgetErrorState } from '@/shared/ui/feedback'
+import { type MatchCard } from '@/entities/vocab'
 import { GAME_STATUS } from '../../model/match/match-game-reducer'
 import { useMatch } from '../../model/match/use-match'
 import { StudyEmptyState } from '../shared/study-empty-state'
@@ -11,12 +12,21 @@ import { MatchTileButton } from './match-tile-button'
 import { MatchTimer } from './match-timer'
 
 interface MatchPlayerProps {
-  cards: StudyCard[]
-  onComplete: (durationMs: number) => void
+  cards: MatchCard[]
+  onComplete: () => void
+  onPairMatched: (cardId: string) => Promise<boolean>
 }
 
-export function MatchPlayer({ cards, onComplete }: MatchPlayerProps) {
-  const { gameState, handleTileClick } = useMatch(cards, onComplete)
+export function MatchPlayer({
+  cards,
+  onComplete,
+  onPairMatched,
+}: MatchPlayerProps) {
+  const { gameState, handleTileClick, pairError, retryPair } = useMatch(
+    cards,
+    onComplete,
+    onPairMatched
+  )
 
   if (cards.length < 6) {
     return (
@@ -63,6 +73,14 @@ export function MatchPlayer({ cards, onComplete }: MatchPlayerProps) {
           </motion.div>
         )}
       </AnimatePresence>
+      {pairError && (
+        <WidgetErrorState
+          className='mt-4'
+          title='Match pair could not be saved'
+          description='Try saving this pair again.'
+          onRetry={retryPair}
+        />
+      )}
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '@/shared/ui/core/alert'
 import { Button } from '@/shared/ui/core/button'
 import { Checkbox } from '@/shared/ui/core/checkbox'
 import { MIN_MATCH_CARDS } from '@/features/study-vocab'
-import { getStudySessionHref } from '../../lib/get-study-session-href'
+import { getStudySessionHref } from '@/widgets/deck-board/lib/get-study-session-href'
 
 type StudyFilterValues = {
   onlyDue: boolean

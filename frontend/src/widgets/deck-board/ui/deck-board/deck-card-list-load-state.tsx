@@ -1,4 +1,4 @@
-import { Button } from '@/shared/ui/core/button'
+import { WidgetErrorState } from '@/shared/ui/feedback'
 import { DeckCardListSkeleton } from './deck-card-list-skeleton'
 
 type DeckCardListLoadStateProps = {
@@ -18,11 +18,11 @@ export function DeckCardListLoadState({
   if (!isError) return null
 
   return (
-    <div className='py-3 text-center' role='alert'>
-      <p className='text-destructive text-sm'>Could not load more cards.</p>
-      <Button variant='outline' size='sm' className='mt-2' onClick={onRetry}>
-        Retry loading
-      </Button>
-    </div>
+    <WidgetErrorState
+      className='mt-3'
+      title='Could not load more cards'
+      description='Try loading more cards again.'
+      onRetry={onRetry}
+    />
   )
 }

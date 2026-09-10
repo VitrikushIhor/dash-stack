@@ -121,9 +121,34 @@ export type MatchLeaderboardEntry = {
   durationMs: number
   cardCount: number
   createdAt: string
+  user: {
+    id: string
+    firstName: string | null
+    lastName: string | null
+    avatar: string | null
+  }
 }
 
-export type SubmitMatchScorePayload = {
+export type MatchCard = Pick<StudyCard, 'id' | 'deckId' | 'term' | 'definition'>
+
+export type MatchSession = {
+  id: string
   deckId: string
+  startedAt: string
+  expiresAt: string
+  cards: MatchCard[]
+}
+
+export type MatchCompletion = {
+  sessionId: string
   durationMs: number
+  cardCount: number
+  completedAt: string
+  bestResult: MatchLeaderboardEntry
+}
+
+export type MatchLeaderboard = {
+  data: MatchLeaderboardEntry[]
+  meta: import('@/shared/api').PaginationMeta
+  currentUserBest: MatchLeaderboardEntry | null
 }

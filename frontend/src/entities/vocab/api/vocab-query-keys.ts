@@ -9,4 +9,6 @@ export const vocabKeys = {
     [...vocabKeys.all, 'deck-cards', deckId] as const,
   deckCards: (deckId: string, search: string) =>
     [...vocabKeys.deckCardsForDeck(deckId), search] as const,
+  leaderboard: (deckId: string, page = 1, perPage = 10) =>
+    [...vocabKeys.all, 'leaderboard', deckId, page, perPage] as const,
 }

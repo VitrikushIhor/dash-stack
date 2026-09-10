@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
 import { getPublicDecksQuery } from '@/entities/deck/server'
 import { vocabCatalogSearchParamsCache } from '@/features/vocab-filters/server'
-import { CatalogView } from '@/views/vocab'
+import { PublicDeckCatalog } from '@/widgets/deck-catalog'
 
 export const metadata: Metadata = {
   title: 'Public Deck Catalog',
@@ -35,13 +35,15 @@ export default async function CatalogPage({ searchParams }: Props) {
   }
 
   return (
-    <CatalogView
-      initialData={result.data}
-      q={rawQ ?? undefined}
-      level={rawLevel ?? undefined}
-      language={rawLanguage ?? undefined}
-      tags={tags}
-      page={page}
-    />
+    <main className='container mx-auto max-w-7xl px-4 py-6 sm:px-6'>
+      <PublicDeckCatalog
+        initialData={result.data}
+        currentQuery={rawQ ?? undefined}
+        currentLevel={rawLevel ?? undefined}
+        currentLanguage={rawLanguage ?? undefined}
+        currentTags={tags}
+        currentPage={page}
+      />
+    </main>
   )
 }

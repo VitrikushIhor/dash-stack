@@ -8,19 +8,19 @@ import { DeckCardList } from './deck-board/deck-card-list'
 import { DeckCardPreview } from './deck-board/deck-card-preview'
 import { DeckPracticePanel } from './deck-board/deck-practice-panel'
 
-type DeckBoardViewProps = {
+type DeckBoardProps = {
   deck: Deck
   initialCardsPage: DeckCardsPage
   isAuthenticated: boolean
   isOwner: boolean
 }
 
-export function DeckBoardView({
+export function DeckBoard({
   deck,
   initialCardsPage,
   isAuthenticated,
   isOwner,
-}: DeckBoardViewProps) {
+}: DeckBoardProps) {
   const viewModel = useDeckBoardViewModel({
     deckId: deck.id,
     initialCardsPage,

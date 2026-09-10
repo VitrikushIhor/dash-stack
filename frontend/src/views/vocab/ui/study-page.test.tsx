@@ -8,9 +8,9 @@ import { getDeckQuery } from '@/entities/deck/server'
 import { userKeys } from '@/entities/user'
 import { getCurrentUser } from '@/entities/user/server'
 import { getStudyCardsQuery } from '@/entities/vocab/server'
+import { VocabFlashcards } from '@/widgets/vocab-flashcards'
+import { getStudyRouteData } from '@/views/vocab/server'
 import FlashcardsPage from '@/app/(vocab)/vocab/decks/[id]/flashcards/page'
-import { getStudyRouteData } from '../model/get-study-route-data'
-import { FlashcardsView } from './flashcards-view'
 
 vi.mock('server-only', () => ({}))
 vi.mock('next/navigation', async (importOriginal) => ({
@@ -150,7 +150,7 @@ describe('study route composition', () => {
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     )
     const view = render(
-      wrap(<FlashcardsView deck={deck} initialCards={cards} />)
+      wrap(<VocabFlashcards deck={deck} initialCards={cards} />)
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Flashcard' }))
@@ -159,7 +159,7 @@ describe('study route composition', () => {
       await screen.findByRole('heading', { name: 'Session Complete!' })
     ).toBeInTheDocument()
 
-    view.rerender(wrap(<FlashcardsView deck={deck} initialCards={[]} />))
+    view.rerender(wrap(<VocabFlashcards deck={deck} initialCards={[]} />))
     expect(
       screen.getByRole('heading', { name: 'Session Complete!' })
     ).toBeInTheDocument()

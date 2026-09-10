@@ -203,9 +203,9 @@ describe('DeckCardList', () => {
 
     expect(screen.getByText('Term 0')).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'Could not load more cards.'
+      'Could not load more cards'
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Retry loading' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
     expect(retry).toHaveBeenCalledOnce()
   })
 

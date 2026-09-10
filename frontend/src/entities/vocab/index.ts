@@ -12,7 +12,10 @@ export type {
   StudySessionQuery,
   VocabProgressResponse,
   MatchLeaderboardEntry,
-  SubmitMatchScorePayload,
+  MatchSession,
+  MatchCard,
+  MatchCompletion,
+  MatchLeaderboard,
 } from './model/types'
 
 export { VocabProgressStatus, StudyMode } from './model/types'
@@ -24,10 +27,13 @@ export {
   ToggleStarPayloadSchema,
   DueReviewsQuerySchema,
   MatchLeaderboardQuerySchema,
-  SubmitMatchScorePayloadSchema,
+  CreateMatchSessionPayloadSchema,
+  CompleteMatchSessionPayloadSchema,
+  RecordMatchPairPayloadSchema,
 } from './model/vocab.schema'
 
 export { createVocabApi, vocabApi } from './api/vocab-api'
 export { vocabKeys } from './api/vocab-query-keys'
 export { useDueReviews } from './model/use-due-reviews'
 export { useDeckCards } from './model/use-deck-cards'
+export { useMatchLeaderboard } from './model/use-match-leaderboard'

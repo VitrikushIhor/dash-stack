@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
-import { LearnView } from '@/views/vocab'
+import { VocabLearn } from '@/widgets/vocab-learn'
 import {
   type StudyRouteProps,
   getStudyRouteData,
@@ -25,7 +25,7 @@ export default async function LearnPage(props: StudyRouteProps) {
   }
 
   return (
-    <LearnView
+    <VocabLearn
       key={getStudySessionKey(route.deck.data.id, route.mode, route.filters)}
       deck={route.deck.data}
       initialCards={route.cards.data}

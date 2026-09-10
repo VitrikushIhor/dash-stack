@@ -44,8 +44,8 @@ describe('match-game-reducer', () => {
       ).toThrow(`Match game requires at least ${MIN_MATCH_CARDS} cards`)
     })
 
-    it('creates matching pairs of term and definition tiles capped at MAX_MATCH_CARDS', () => {
-      const tiles = createInitialTiles(mockCards)
+    it('creates matching pairs from the server-selected cards', () => {
+      const tiles = createInitialTiles(mockCards.slice(0, MAX_MATCH_CARDS))
       expect(tiles).toHaveLength(MAX_MATCH_CARDS * 2)
 
       const termTiles = tiles.filter((t) => t.type === TILE_TYPES.TERM)
@@ -55,6 +55,12 @@ describe('match-game-reducer', () => {
       expect(defTiles).toHaveLength(MAX_MATCH_CARDS)
 
       expect(tiles.every((t) => !t.isMatched)).toBe(true)
+    })
+
+    it('rejects more cards than a server session may contain', () => {
+      expect(() => createInitialTiles(mockCards)).toThrow(
+        `Match game supports at most ${MAX_MATCH_CARDS} server-selected cards`
+      )
     })
   })
 
@@ -133,14 +139,18 @@ describe('match-game-reducer', () => {
       expect(nextState.wrongMatchIds).toEqual(['term-1', 'def-2'])
     })
 
-    it('ignores SELECT_TILE on already selected tile or when wrongMatchIds is active', () => {
+    it('deselects the first tile when it is selected again', () => {
       const state1 = createPlayingState({ selectedTileIds: ['term-1'] })
-      const sameTileState = gameReducer(state1, {
+      const nextState = gameReducer(state1, {
         type: MATCH_ACTIONS.SELECT_TILE,
         payload: 'term-1',
-      })
-      expect(sameTileState).toBe(state1)
+      }) as GamePlaying
 
+      expect(nextState.selectedTileIds).toEqual([])
+      expect(nextState.wrongMatchIds).toEqual([])
+    })
+
+    it('ignores SELECT_TILE while a wrong match is visible', () => {
       const state2 = createPlayingState({ wrongMatchIds: ['term-1', 'def-2'] })
       const blockedState = gameReducer(state2, {
         type: MATCH_ACTIONS.SELECT_TILE,

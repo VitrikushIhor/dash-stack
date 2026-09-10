@@ -3,10 +3,11 @@ import { SERVER_CACHE_TAGS } from '@/shared/config/constants/cache-tags'
 import {
   type DeckCardsPage,
   type DueReviewsResponse,
-  type MatchLeaderboardEntry,
+  type MatchCompletion,
+  type MatchLeaderboard,
+  type MatchSession,
   type StudyCard,
   type StudySessionQuery,
-  type SubmitMatchScorePayload,
   type SubmitProgressPayload,
   type ToggleStarResponse,
   type VocabProgressResponse,
@@ -73,18 +74,38 @@ export function createVocabApi(client: HttpClient) {
         isStarred: dto.isStarred,
       }),
 
-    getLeaderboard: (deckId: string): Promise<MatchLeaderboardEntry[]> =>
-      client.get<MatchLeaderboardEntry[]>(
-        `/v1/vocab/decks/${deckId}/leaderboard`
+    getLeaderboard: (
+      deckId: string,
+      query: { page?: number; perPage?: number } = {}
+    ): Promise<MatchLeaderboard> =>
+      client.get<MatchLeaderboard>(`/v1/vocab/decks/${deckId}/leaderboard`, {
+        params: query,
+      }),
+
+    createMatchSession: (
+      deckId: string,
+      filters: { onlyDue?: boolean; onlyStarred?: boolean }
+    ): Promise<MatchSession> =>
+      client.post<MatchSession>(
+        `/v1/vocab/decks/${deckId}/match/sessions`,
+        filters
       ),
 
-    submitMatchScore: (
+    completeMatchSession: (
       deckId: string,
-      dto: Omit<SubmitMatchScorePayload, 'deckId'>
-    ): Promise<MatchLeaderboardEntry> =>
-      client.post<MatchLeaderboardEntry>(
-        `/v1/vocab/decks/${deckId}/leaderboard`,
-        dto
+      sessionId: string
+    ): Promise<MatchCompletion> =>
+      client.post<MatchCompletion>(
+        `/v1/vocab/decks/${deckId}/match/sessions/${sessionId}/complete`
+      ),
+    recordMatchPair: (
+      deckId: string,
+      sessionId: string,
+      cardId: string
+    ): Promise<void> =>
+      client.post<void>(
+        `/v1/vocab/decks/${deckId}/match/sessions/${sessionId}/pairs`,
+        { cardId }
       ),
   }
 }

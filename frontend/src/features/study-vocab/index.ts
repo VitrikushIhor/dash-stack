@@ -4,6 +4,7 @@ export { LearnPlayer } from './ui/learn/learn-player'
 export { LearnModeSelect } from './ui/learn/learn-mode-select'
 export { MatchTileButton } from './ui/match/match-tile-button'
 export { MatchPlayer } from './ui/match/match-player'
+export { MatchLeaderboard } from './ui/match/match-leaderboard'
 export { StudySessionView } from './ui/shared/study-session-view'
 export { StudySessionSkeleton } from './ui/shared/study-session-skeleton'
 export { StudySummary } from './ui/summary/study-summary'
@@ -31,7 +32,10 @@ export { useMatch } from './model/match/use-match'
 export { type MatchTile } from './model/match/match-game-reducer'
 export { useStarCard } from './model/shared/use-star-card'
 export { useSubmitProgress } from './model/shared/use-submit-progress'
-export { useSubmitMatchScore } from './model/shared/use-submit-match-score'
+export {
+  MatchSessionStatus,
+  useMatchSession,
+} from './model/match/use-match-session'
 export { useStudySession } from './model/shared/use-study-session'
 export { isInputActive } from './lib/is-input-active'
 export { isTermMatch } from './lib/is-term-match'
@@ -42,5 +46,6 @@ export type {
   LearnResult,
 } from './model/shared/types'
 export { StudyFilters } from './ui/filters/study-filters'
+export { GuestStudySaveProgressCta } from './ui/summary/guest-study-save-progress-cta'
 export { useStudySearchParams } from './model/filters/use-search-params'
 export { GlobalDueCount, ReviewQueue } from './ui/due-badge/review-queue'

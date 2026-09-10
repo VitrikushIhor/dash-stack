@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { type Deck } from '@/entities/deck'
 import { userKeys } from '@/entities/user'
 import { type StudyCard, vocabApi } from '@/entities/vocab'
-import { DeckBoardView } from './deck-board-view'
+import { DeckBoard } from './deck-board'
 
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -57,7 +57,7 @@ function card(
   }
 }
 
-describe('DeckBoardView', () => {
+describe('DeckBoard', () => {
   afterEach(() => vi.restoreAllMocks())
   it('should_select_due_cards_before_launching_flashcards', async () => {
     const client = new QueryClient()
@@ -69,7 +69,7 @@ describe('DeckBoardView', () => {
     render(
       <QueryClientProvider client={client}>
         <NuqsTestingAdapter searchParams='?onlyDue=true'>
-          <DeckBoardView
+          <DeckBoard
             deck={deck}
             initialCardsPage={{
               data: [
@@ -117,7 +117,7 @@ describe('DeckBoardView', () => {
     render(
       <QueryClientProvider client={client}>
         <NuqsTestingAdapter searchParams='?onlyDue=true&onlyStarred=true'>
-          <DeckBoardView
+          <DeckBoard
             deck={deck}
             initialCardsPage={{
               data: [card('1', null), card('2', null), card('3', null)],
@@ -163,7 +163,7 @@ describe('DeckBoardView', () => {
     render(
       <QueryClientProvider client={client}>
         <NuqsTestingAdapter>
-          <DeckBoardView
+          <DeckBoard
             deck={{ ...deck, cardCount: 2 }}
             initialCardsPage={{
               data: [card('1', null)],

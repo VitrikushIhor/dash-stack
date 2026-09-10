@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { PageErrorHandler } from '@/shared/ui/error-state'
-import { FlashcardsView } from '@/views/vocab'
+import { VocabFlashcards } from '@/widgets/vocab-flashcards'
 import {
   type StudyRouteProps,
   getStudyRouteData,
@@ -24,7 +24,7 @@ export default async function FlashcardsPage(props: StudyRouteProps) {
   }
 
   return (
-    <FlashcardsView
+    <VocabFlashcards
       key={getStudySessionKey(route.deck.data.id, route.mode, route.filters)}
       deck={route.deck.data}
       initialCards={route.cards.data}
