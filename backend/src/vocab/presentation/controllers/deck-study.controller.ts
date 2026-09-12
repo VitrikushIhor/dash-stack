@@ -101,6 +101,7 @@ export class DeckStudyController {
       userId: user.id,
       deckId,
       results: dto.results,
+      attemptId: dto.attemptId,
     });
 
     return VocabProgressPresentationMapper.toVocabProgressResponseList(results);

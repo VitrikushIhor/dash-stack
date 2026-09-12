@@ -23,6 +23,15 @@ export class PrismaStudyProgressTransaction implements StudyProgressTransactionP
         return await this.prisma.$transaction(
           async (tx) =>
             work({
+              studyAttemptRepository: {
+                find: (userId, attemptId) =>
+                  tx.vocabStudyAttempt.findUnique({
+                    where: { userId_attemptId: { userId, attemptId } },
+                  }),
+                save: async (receipt) => {
+                  await tx.vocabStudyAttempt.create({ data: receipt });
+                },
+              },
               deckRepository: {
                 findById: async (id) => {
                   const deck = await tx.deck.findUnique({ where: { id } });

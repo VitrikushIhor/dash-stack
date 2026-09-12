@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -8,6 +8,9 @@ import {
   IsNotEmpty,
   IsString,
   ValidateNested,
+  ValidateIf,
+  Matches,
+  MaxLength,
 } from 'class-validator';
 
 export class SubmitProgressItemDto {
@@ -31,6 +34,13 @@ export class SubmitProgressItemDto {
 }
 
 export class SubmitProgressDto {
+  @ApiPropertyOptional({ description: 'Stable ID for one Learn attempt. Retries reuse this ID.' })
+  @ValidateIf((_object, value: unknown) => value !== undefined)
+  @IsString()
+  @MaxLength(100)
+  @Matches(/^[a-zA-Z0-9:_-]+$/)
+  attemptId?: string;
+
   @ApiProperty({
     description: 'Array of study review results for cards in the deck',
     type: [SubmitProgressItemDto],

@@ -26,6 +26,7 @@ model User {
   vocabProgress VocabProgress[] @relation("UserVocabProgress")
   deckLeaderboardEntries DeckLeaderboard[] @relation("UserDeckLeaderboard")
   matchSessions          MatchSession[]
+  vocabStudyAttempts     VocabStudyAttempt[]
 }
 
 model Account {
@@ -232,6 +233,7 @@ model Deck {
   vocabProgress    VocabProgress[]
   leaderboard      DeckLeaderboard[]
   matchSessions     MatchSession[]
+  studyAttempts    VocabStudyAttempt[]
   forkedFrom       Deck?             @relation("DeckForks", fields: [forkedFromDeckId], references: [id], onDelete: SetNull)
   forks            Deck[]            @relation("DeckForks")
 
@@ -254,6 +256,7 @@ model Flashcard {
   deck        Deck            @relation(fields: [deckId], references: [id], onDelete: Cascade)
   progress      VocabProgress[]
   matchSessions MatchSessionCard[]
+  studyAttempts VocabStudyAttempt[]
 
   @@index([deckId, position])
   @@map("flashcards")
@@ -284,6 +287,24 @@ model VocabProgress {
   @@index([userId, nextReviewAt])
   @@index([deckId])
   @@map("vocab_progress")
+}
+
+model VocabStudyAttempt {
+  userId      String
+  attemptId   String   @db.VarChar(100)
+  deckId      String
+  flashcardId String
+  isCorrect   Boolean
+  processedAt DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck      Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@id([userId, attemptId])
+  @@index([deckId])
+  @@index([flashcardId])
+  @@map("vocab_study_attempts")
 }
 
 model MatchSession {

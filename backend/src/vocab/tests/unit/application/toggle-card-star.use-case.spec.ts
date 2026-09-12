@@ -63,6 +63,7 @@ describe('ToggleCardStarUseCase', () => {
     useCase = new ToggleCardStarUseCase({
       run: (work) =>
         work({
+          studyAttemptRepository: { find: jest.fn(), save: jest.fn() },
           deckRepository: mockDeckRepo,
           flashcardRepository: mockFlashcardRepo,
           vocabProgressRepository: mockVocabProgressRepo,

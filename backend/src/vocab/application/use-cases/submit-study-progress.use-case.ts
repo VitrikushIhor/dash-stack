@@ -1,10 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { VOCAB_ERRORS } from '../../domain/constants/vocab-errors';
 import { VocabProgress } from '../../domain/entities/vocab-progress.entity';
 import {
   DeckNotFoundException,
   DeckAccessForbiddenException,
   FlashcardNotInDeckException,
   InvalidVocabProgressDataException,
+  StudyAttemptConflictException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { StudyProgressTransactionPort } from '../ports/study-progress-transaction.port';
@@ -19,18 +21,27 @@ export class SubmitStudyProgressUseCase {
   ) {}
 
   public async execute(command: SubmitStudyProgressCommand): Promise<VocabProgressReadModel[]> {
-    const { userId, deckId, results } = command;
+    const { userId, deckId, results, attemptId } = command;
 
     if (!results || results.length === 0) {
-      throw new InvalidVocabProgressDataException('Results array cannot be empty');
+      throw new InvalidVocabProgressDataException(VOCAB_ERRORS.PROGRESS_RESULTS_REQUIRED);
     }
 
     if (new Set(results.map((result) => result.flashcardId)).size !== results.length) {
-      throw new InvalidVocabProgressDataException('Results must contain unique flashcardId values');
+      throw new InvalidVocabProgressDataException(VOCAB_ERRORS.PROGRESS_RESULTS_UNIQUE_FLASHCARDS);
+    }
+
+    if (attemptId !== undefined && results.length !== 1) {
+      throw new InvalidVocabProgressDataException(VOCAB_ERRORS.STUDY_ATTEMPT_SINGLE_ANSWER);
     }
 
     return this.transaction.run(
-      async ({ deckRepository, flashcardRepository, vocabProgressRepository }) => {
+      async ({
+        deckRepository,
+        flashcardRepository,
+        vocabProgressRepository,
+        studyAttemptRepository,
+      }) => {
         const deck = await deckRepository.findById(deckId);
         if (!deck) {
           throw new DeckNotFoundException(deckId);
@@ -47,6 +58,16 @@ export class SubmitStudyProgressUseCase {
           if (!validCardIdSet.has(result.flashcardId)) {
             throw new FlashcardNotInDeckException(result.flashcardId, deckId);
           }
+        }
+
+        const receipt = attemptId ? await studyAttemptRepository.find(userId, attemptId) : null;
+        if (
+          receipt &&
+          (receipt.deckId !== deckId ||
+            receipt.flashcardId !== results[0].flashcardId ||
+            receipt.isCorrect !== results[0].isCorrect)
+        ) {
+          throw new StudyAttemptConflictException();
         }
 
         const cardIds = results.map((r) => r.flashcardId);
@@ -72,11 +93,16 @@ export class SubmitStudyProgressUseCase {
             progressMap.set(result.flashcardId, progress);
           }
 
-          progress.recordReview(result.isCorrect, now);
+          if (!receipt) progress.recordReview(result.isCorrect, now);
           updatedEntities.push(progress);
         }
 
-        const savedEntities = await vocabProgressRepository.upsertBatch(updatedEntities);
+        const savedEntities = receipt
+          ? existingProgressList
+          : await vocabProgressRepository.upsertBatch(updatedEntities);
+        if (attemptId && !receipt) {
+          await studyAttemptRepository.save({ userId, deckId, attemptId, ...results[0] });
+        }
 
         return savedEntities.map((e) => {
           const snap = e.toSnapshot();

@@ -16,6 +16,7 @@ import { SubmitStudyProgressUseCase } from '../../application/use-cases/submit-s
 import { PrismaStudyProgressTransaction } from '../../infrastructure/persistence/prisma-study-progress-transaction';
 import { PrismaVocabProgressRepository } from '../../infrastructure/persistence/prisma-vocab-progress.repository';
 import { VocabProgress } from '../../domain/entities/vocab-progress.entity';
+import { VOCAB_ERRORS } from '../../domain/constants/vocab-errors';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
@@ -77,6 +78,62 @@ describe('Vocabulary progress integration', () => {
     for (const row of rows) {
       expect(row).toMatchObject({ box: 4, correctCount: 3, correctStreak: 3, incorrectCount: 0 });
     }
+  });
+
+  it('should_record_one_review_when_the_same_learn_attempt_is_retried_concurrently', async () => {
+    const deck = await createDeck();
+    const command = {
+      userId,
+      deckId: deck.id,
+      attemptId: randomUUID(),
+      results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
+    };
+
+    await Promise.all([submit.execute(command), submit.execute(command), submit.execute(command)]);
+    await submit.execute(command);
+
+    const progress = await prisma.vocabProgress.findFirstOrThrow({
+      where: { userId, deckId: deck.id },
+    });
+    expect(progress).toMatchObject({ box: 2, correctCount: 1, correctStreak: 1 });
+  });
+
+  it('should_record_each_distinct_learn_attempt_when_the_card_is_repeated', async () => {
+    const deck = await createDeck();
+    const command = {
+      userId,
+      deckId: deck.id,
+      attemptId: randomUUID(),
+      results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
+    };
+    await submit.execute(command);
+    await submit.execute({ ...command, attemptId: randomUUID() });
+
+    const progress = await prisma.vocabProgress.findFirstOrThrow({
+      where: { userId, deckId: deck.id },
+    });
+    expect(progress).toMatchObject({ box: 3, correctCount: 2, correctStreak: 2 });
+  });
+
+  it('should_reject_reused_attempt_id_when_the_answer_changes', async () => {
+    const deck = await createDeck();
+    const command = {
+      userId,
+      deckId: deck.id,
+      attemptId: randomUUID(),
+      results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
+    };
+    await submit.execute(command);
+
+    await expect(
+      submit.execute({
+        ...command,
+        results: [{ flashcardId: deck.flashcards[0].id, isCorrect: false }],
+      }),
+    ).rejects.toThrow(VOCAB_ERRORS.STUDY_ATTEMPT_CONFLICT);
+    expect(
+      await prisma.vocabProgress.findFirstOrThrow({ where: { userId, deckId: deck.id } }),
+    ).toMatchObject({ box: 2, correctCount: 1, incorrectCount: 0 });
   });
 
   it('should_roll_back_all_chunks_when_a_later_write_fails', async () => {

@@ -32,6 +32,11 @@ export const VOCAB_ERRORS = {
   FLASHCARD_NOT_IN_DECK: (cardId: string, deckId: string) =>
     `Flashcard ${cardId} does not belong to deck ${deckId}`,
   EMPTY_PROGRESS_SUBMISSION: 'Progress results array cannot be empty',
+  PROGRESS_RESULTS_REQUIRED: 'Results array cannot be empty',
+  PROGRESS_RESULTS_UNIQUE_FLASHCARDS: 'Results must contain unique flashcardId values',
+  STUDY_ATTEMPT_SINGLE_ANSWER: 'An attempt must contain exactly one answer',
+  PROGRESS_WRITE_CONFLICT: 'Progress changed concurrently. Please submit the review again.',
+  STUDY_ATTEMPT_CONFLICT: 'Attempt ID was already used for a different answer',
   INVALID_PROGRESS_DATA: (reason: string) => `Invalid vocab progress data: ${reason}`,
   PERSONALIZED_STUDY_FILTER_AUTH_REQUIRED: 'Personalized study filters require authentication',
   DECK_EDITOR_FLASHCARDS_REQUIRED: 'Editor save response requires flashcards',

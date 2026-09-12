@@ -61,6 +61,7 @@ describe('SubmitStudyProgressUseCase', () => {
     useCase = new SubmitStudyProgressUseCase({
       run: (work) =>
         work({
+          studyAttemptRepository: { find: jest.fn(), save: jest.fn() },
           deckRepository: mockDeckRepo,
           flashcardRepository: mockFlashcardRepo,
           vocabProgressRepository: mockVocabProgressRepo,

@@ -1,8 +1,10 @@
 import { DeckRepositoryPort } from './deck-repository.port';
 import { FlashcardRepositoryPort } from './flashcard-repository.port';
 import { VocabProgressRepositoryPort } from './vocab-progress-repository.port';
+import { StudyAttemptRepositoryPort } from './study-attempt-repository.port';
 
 export interface StudyProgressTransactionContext {
+  studyAttemptRepository: StudyAttemptRepositoryPort;
   deckRepository: Pick<DeckRepositoryPort, 'findById'>;
   flashcardRepository: Pick<FlashcardRepositoryPort, 'findByDeckId' | 'findById'>;
   vocabProgressRepository: Pick<

@@ -6,5 +6,6 @@ export interface StudyResultItem {
 export interface SubmitStudyProgressCommand {
   userId: string;
   deckId: string;
+  attemptId?: string;
   results: StudyResultItem[];
 }
