@@ -1,5 +1,31 @@
 import { describe, expect, it } from 'vitest'
-import { RecordMatchPairPayloadSchema } from './vocab.schema'
+import {
+  RecordMatchPairPayloadSchema,
+  SubmitProgressPayloadSchema,
+} from './vocab.schema'
+
+describe('Learn progress payload', () => {
+  it('should_preserve_attempt_id_when_one_answer_is_submitted', () => {
+    const payload = {
+      deckId: 'deck',
+      attemptId: 'session:1',
+      results: [{ flashcardId: 'card', isCorrect: true }],
+    }
+    expect(SubmitProgressPayloadSchema.parse(payload)).toEqual(payload)
+  })
+  it('should_reject_multiple_answers_when_an_attempt_id_is_supplied', () => {
+    expect(
+      SubmitProgressPayloadSchema.safeParse({
+        deckId: 'deck',
+        attemptId: 'session:1',
+        results: [
+          { flashcardId: 'card', isCorrect: true },
+          { flashcardId: 'other', isCorrect: false },
+        ],
+      }).success
+    ).toBe(false)
+  })
+})
 
 describe('RecordMatchPairPayloadSchema', () => {
   it('accepts the trusted Match pair identity', () => {

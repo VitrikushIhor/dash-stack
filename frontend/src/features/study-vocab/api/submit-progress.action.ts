@@ -8,8 +8,11 @@ import { vocabServerApi } from '@/entities/vocab/server'
 
 export const submitProgressAction = createAction(
   SubmitProgressPayloadSchema,
-  async ({ deckId, results }) => {
-    const res = await vocabServerApi.submitProgress(deckId, { results })
+  async ({ deckId, results, attemptId }) => {
+    const res = await vocabServerApi.submitProgress(deckId, {
+      results,
+      attemptId,
+    })
     revalidateTag(SERVER_CACHE_TAGS.dueReviews)
     revalidateTag(SERVER_CACHE_TAGS.studySession(deckId))
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(deckId))

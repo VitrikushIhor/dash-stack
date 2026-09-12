@@ -22,6 +22,7 @@ export { VocabProgressStatus, StudyMode } from './model/types'
 
 export {
   StudySessionQuerySchema,
+  StudyCardSchema,
   SubmitProgressItemSchema,
   SubmitProgressPayloadSchema,
   ToggleStarPayloadSchema,

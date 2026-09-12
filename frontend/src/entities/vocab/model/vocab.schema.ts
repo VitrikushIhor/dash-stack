@@ -2,6 +2,27 @@ import { z } from 'zod'
 
 export const StudyModeSchema = z.enum(['flashcards', 'learn', 'test', 'match'])
 
+export const StudyCardSchema = z.object({
+  id: z.string().min(1),
+  deckId: z.string().min(1),
+  term: z.string().min(1).max(255),
+  definition: z.string().min(1).max(1000),
+  example: z.string().max(500).nullable(),
+  imageUrl: z.string().nullable(),
+  position: z.number().int().nonnegative(),
+  progress: z.object({
+    id: z.string().nullable(),
+    status: z.enum(['NEW', 'LEARNING', 'KNOWN', 'MASTERED', 'FORGOTTEN']),
+    box: z.number().int().min(1).max(5),
+    isStarred: z.boolean(),
+    correctStreak: z.number().int().nonnegative(),
+    correctCount: z.number().int().nonnegative(),
+    incorrectCount: z.number().int().nonnegative(),
+    lastReviewedAt: z.string().nullable(),
+    nextReviewAt: z.string().nullable(),
+  }),
+})
+
 export const StudySessionQuerySchema = z.object({
   deckId: z.string().min(1),
   mode: StudyModeSchema.optional().default('flashcards'),
@@ -14,10 +35,21 @@ export const SubmitProgressItemSchema = z.object({
   isCorrect: z.boolean(),
 })
 
-export const SubmitProgressPayloadSchema = z.object({
-  deckId: z.string().min(1),
-  results: z.array(SubmitProgressItemSchema).min(1),
-})
+export const SubmitProgressPayloadSchema = z
+  .object({
+    deckId: z.string().min(1),
+    attemptId: z
+      .string()
+      .min(1)
+      .max(100)
+      .regex(/^[a-zA-Z0-9:_-]+$/)
+      .optional(),
+    results: z.array(SubmitProgressItemSchema).min(1),
+  })
+  .refine((payload) => !payload.attemptId || payload.results.length === 1, {
+    message: 'An attempt must contain exactly one answer',
+    path: ['results'],
+  })
 
 export const ToggleStarPayloadSchema = z.object({
   deckId: z.string().min(1),

@@ -1,6 +1,7 @@
 export { FlashcardPlayer } from './ui/flashcards/flashcard-player'
 export { FlashcardItem } from './ui/flashcards/flashcard-item'
 export { LearnPlayer } from './ui/learn/learn-player'
+export { AdaptiveLearnPlayer } from './ui/learn/adaptive/player'
 export { LearnModeSelect } from './ui/learn/learn-mode-select'
 export { MatchTileButton } from './ui/match/match-tile-button'
 export { MatchPlayer } from './ui/match/match-player'
@@ -21,7 +22,7 @@ export {
 
 export { useFlashcards } from './model/flashcards/use-flashcards'
 export { useCardProgression } from './model/shared/use-card-progression'
-export { useMultipleChoiceShortcuts } from './model/learn/use-multiple-choice-shortcuts'
+export { useMultipleChoiceShortcuts } from './model/learn/interaction/use-multiple-choice-shortcuts'
 export {
   type LearnQuestionType,
   QUESTION_TYPES,

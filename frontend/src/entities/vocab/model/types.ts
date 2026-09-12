@@ -66,6 +66,7 @@ export type SubmitProgressItem = {
 
 export type SubmitProgressPayload = {
   deckId: string
+  attemptId?: string
   results: SubmitProgressItem[]
 }
 

@@ -29,6 +29,11 @@ export default async function LearnPage(props: StudyRouteProps) {
       key={getStudySessionKey(route.deck.data.id, route.mode, route.filters)}
       deck={route.deck.data}
       initialCards={route.cards.data}
+      sessionKey={getStudySessionKey(
+        route.deck.data.id,
+        route.mode,
+        route.filters
+      )}
     />
   )
 }

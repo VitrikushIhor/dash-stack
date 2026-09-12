@@ -1,19 +1,14 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { isInputActive } from '../../lib/is-input-active'
-
-interface UseMultipleChoiceShortcutsOptions {
-  optionsCount: number
-  isDisabled: boolean
-  onSelectIndex: (index: number) => void
-}
+import { isInputActive } from '../../../lib/is-input-active'
+import { type MultipleChoiceShortcutsOptions } from '../session/adaptive-session.contract'
 
 export function useMultipleChoiceShortcuts({
   optionsCount,
   isDisabled,
   onSelectIndex,
-}: UseMultipleChoiceShortcutsOptions) {
+}: MultipleChoiceShortcutsOptions) {
   const onSelectIndexRef = useRef(onSelectIndex)
   const isDisabledRef = useRef(isDisabled)
   const optionsCountRef = useRef(optionsCount)

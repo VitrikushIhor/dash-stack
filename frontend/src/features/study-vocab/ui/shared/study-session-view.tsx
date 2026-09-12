@@ -9,11 +9,18 @@ function Root({ children }: { children: ReactNode }) {
 }
 
 function Progress({ progress }: { progress: number }) {
+  const value = Math.round(Math.min(100, Math.max(0, progress)) * 100) / 100
+
   return (
     <div className='bg-secondary mb-8 h-2 w-full overflow-hidden rounded-full'>
       <div
         className='bg-primary h-full transition-all duration-300 ease-out'
-        style={{ width: `${progress}%` }}
+        role='progressbar'
+        aria-label='Session progress'
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={value}
+        style={{ width: `${value}%` }}
       />
     </div>
   )

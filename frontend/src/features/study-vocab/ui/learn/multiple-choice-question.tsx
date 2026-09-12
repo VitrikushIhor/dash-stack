@@ -8,7 +8,7 @@ import { cn, shuffle } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import { type StudyCard } from '@/entities/vocab'
 import { getOptionStyles } from '../../lib/get-option-styles'
-import { useMultipleChoiceShortcuts } from '../../model/learn/use-multiple-choice-shortcuts'
+import { useMultipleChoiceShortcuts } from '../../model/learn/interaction/use-multiple-choice-shortcuts'
 import { ANSWER_FEEDBACK_DELAY_MS } from '../../model/shared/constants'
 import { CardStarButton } from '../star-button/card-star-button'
 

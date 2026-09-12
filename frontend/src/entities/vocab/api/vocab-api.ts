@@ -50,7 +50,7 @@ export function createVocabApi(client: HttpClient) {
 
     submitProgress: (
       deckId: string,
-      dto: { results: SubmitProgressPayload['results'] }
+      dto: Omit<SubmitProgressPayload, 'deckId'>
     ): Promise<VocabProgressResponse[]> =>
       client.post<VocabProgressResponse[]>(
         `/v1/vocab/decks/${deckId}/progress`,
