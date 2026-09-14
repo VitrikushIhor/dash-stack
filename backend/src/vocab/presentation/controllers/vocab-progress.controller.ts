@@ -7,7 +7,9 @@ import {
   UseGuards,
   HttpStatus,
   HttpCode,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
 import { UserEntity, AuthUser } from '../../../common/decorators/user.decorator';
@@ -50,7 +52,20 @@ export class VocabProgressController {
   }
 
   @Post('cards/:cardId/star')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({
+    default: {
+      limit: 30,
+      ttl: 60000,
+      getTracker: (request: Record<string, unknown>) => {
+        const user = request.user;
+        if (!user || typeof user !== 'object' || !('id' in user) || typeof user.id !== 'string') {
+          throw new UnauthorizedException();
+        }
+        return user.id;
+      },
+    },
+  })
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
