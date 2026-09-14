@@ -1,26 +1,46 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Volume2 } from 'lucide-react'
-import { useSpeech } from '@/shared/lib/hooks/use-speech'
 import { Button } from '@/shared/ui/core/button'
 import { type StudyCard } from '@/entities/vocab'
-import { CardStarButton } from '../star-button/card-star-button'
+import { StarButton } from '../star-button/star-button'
 
 interface FlashcardItemProps {
   card: StudyCard
   isFlipped: boolean
   onFlip: () => void
+  isStarred: boolean
+  onToggleStar: () => void
+  onReplay: () => void
+  isStarPending?: boolean
+  isStarDisabled?: boolean
 }
 
-export function FlashcardItem({ card, isFlipped, onFlip }: FlashcardItemProps) {
-  const { speak } = useSpeech({ lang: 'en-US' })
+export const FlashcardItem = ({
+  card,
+  isFlipped,
+  onFlip,
+  isStarred,
+  onToggleStar,
+  onReplay,
+  isStarPending = false,
+  isStarDisabled = false,
+}: FlashcardItemProps) => {
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
+  const shouldReduceMotion = useReducedMotion()
+  const hasImageError = failedImageUrl === card.imageUrl
 
   const playAudio = (e: React.MouseEvent) => {
     e.stopPropagation()
-    speak(card.term)
+    onReplay()
+  }
+  const handleToggleStar = (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    onToggleStar()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -36,6 +56,7 @@ export function FlashcardItem({ card, isFlipped, onFlip }: FlashcardItemProps) {
       onClick={onFlip}
       role='button'
       tabIndex={0}
+      data-study-shortcut-surface='true'
       onKeyDown={handleKeyDown}
       aria-label='Flashcard'
     >
@@ -44,16 +65,19 @@ export function FlashcardItem({ card, isFlipped, onFlip }: FlashcardItemProps) {
         initial={false}
         animate={{ rotateX: isFlipped ? 180 : 0 }}
         transition={{
-          duration: 0.6,
-          type: 'spring',
-          stiffness: 260,
-          damping: 20,
+          duration: shouldReduceMotion ? 0 : 0.25,
+          ease: 'easeOut',
         }}
       >
         {/* Front */}
         <div className='bg-card text-card-foreground border-border absolute flex h-full w-full flex-col items-center justify-center rounded-2xl border p-8 shadow-lg backface-hidden'>
           <div className='absolute top-4 right-4 flex items-center gap-1'>
-            <CardStarButton card={card} />
+            <StarButton
+              isStarred={isStarred}
+              onClick={handleToggleStar}
+              disabled={isStarDisabled || isStarPending}
+              isPending={isStarPending}
+            />
             <Button
               variant='ghost'
               size='icon'
@@ -81,7 +105,12 @@ export function FlashcardItem({ card, isFlipped, onFlip }: FlashcardItemProps) {
           <div className='flex flex-1 flex-col'>
             <div className='mb-4 flex items-center justify-between'>
               <h3 className='text-primary text-xl font-semibold'>Definition</h3>
-              <CardStarButton card={card} />
+              <StarButton
+                isStarred={isStarred}
+                onClick={handleToggleStar}
+                disabled={isStarDisabled || isStarPending}
+                isPending={isStarPending}
+              />
             </div>
             <p className='mb-6 flex-1 text-lg leading-relaxed sm:text-xl'>
               {card.definition}
@@ -99,13 +128,14 @@ export function FlashcardItem({ card, isFlipped, onFlip }: FlashcardItemProps) {
             )}
           </div>
 
-          {card.imageUrl && (
+          {card.imageUrl && !hasImageError && (
             <div className='relative mt-6 h-32 w-full shrink-0 overflow-hidden rounded-lg'>
               <Image
                 src={card.imageUrl}
-                alt='Illustrative image for term'
+                alt={`Illustration for ${card.term}`}
                 fill
                 className='object-cover'
+                onError={() => setFailedImageUrl(card.imageUrl)}
               />
             </div>
           )}

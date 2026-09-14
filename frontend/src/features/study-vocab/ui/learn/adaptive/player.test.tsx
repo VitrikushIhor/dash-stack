@@ -136,8 +136,12 @@ describe('AdaptiveLearnPlayer', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       'Correct answer: apple'
     )
-    await waitFor(() => expect(speak).toHaveBeenCalledWith('apple'))
-    expect(speak).toHaveBeenCalledTimes(1)
+    await waitFor(() =>
+      expect(speak).toHaveBeenCalledWith(
+        'apple',
+        expect.objectContaining({ eventKey: expect.any(String) })
+      )
+    )
     expect(submitProgressAction).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })

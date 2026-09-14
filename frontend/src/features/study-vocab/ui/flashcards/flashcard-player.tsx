@@ -1,9 +1,17 @@
 'use client'
 
 import React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { Shuffle } from 'lucide-react'
+import { useSpeech } from '@/shared/lib/hooks/use-speech'
 import { Button } from '@/shared/ui/core/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui/core/tooltip'
 import { type StudyCard } from '@/entities/vocab'
+import { useStarCard } from '@/features/study-vocab/model/shared/use-star-card'
 import { useFlashcardShortcuts } from '../../model/flashcards/use-flashcard-shortcuts'
 import { useFlashcards } from '../../model/flashcards/use-flashcards'
 import { StudyEmptyState } from '../shared/study-empty-state'
@@ -17,22 +25,48 @@ interface FlashcardPlayerProps {
 }
 
 export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
+  const shouldReduceMotion = useReducedMotion()
   const {
     currentCard,
     isFlipped,
     progress,
+    results,
     flipCard,
     handleAnswer,
     isFinished,
     totalCards: sessionTotalCards,
     currentIndex,
+    goToNextCard,
+    goToPreviousCard,
+    shuffleCards,
   } = useFlashcards(cards, onComplete)
+  const { speak } = useSpeech({ lang: 'en-US' })
+
+  const {
+    isStarred,
+    toggleStar,
+    isPending: isStarPending,
+    isDisabled: isStarDisabled,
+  } = useStarCard(
+    currentCard?.deckId ?? '',
+    currentCard?.id ?? '',
+    currentCard?.progress.isStarred ?? false
+  )
+
+  const handleReplayPronunciation = () => {
+    if (!currentCard) return
+    speak(currentCard.term)
+  }
 
   useFlashcardShortcuts({
     isFinished,
     isFlipped,
     onFlip: flipCard,
     onAnswer: handleAnswer,
+    onPrevious: goToPreviousCard,
+    onNext: goToNextCard,
+    onStar: toggleStar,
+    onReplay: handleReplayPronunciation,
   })
 
   if (!cards.length) {
@@ -46,13 +80,32 @@ export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
   return (
     <StudySessionView>
       <StudySessionView.Progress progress={progress} />
+      <p className='text-muted-foreground text-sm' aria-live='polite'>
+        Answered {results.length} of {sessionTotalCards}
+      </p>
 
       <StudySessionView.Header>
         <span>
           Card {currentIndex + 1} of {sessionTotalCards}
         </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={shuffleCards}
+              aria-label='Shuffle flashcards'
+            >
+              <Shuffle className='h-4 w-4' />
+              Shuffle
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Changes the card order while keeping your answers.
+          </TooltipContent>
+        </Tooltip>
         <span className='hidden sm:inline'>
-          Shortcuts: Space (flip), 1 (don&apos;t know), 2 (know)
+          Shortcuts: ←/→ (navigate), Space (flip), ↑ (star), ⌘/Ctrl+J (audio)
         </span>
       </StudySessionView.Header>
 
@@ -63,13 +116,18 @@ export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
             className='w-full'
           >
             <FlashcardItem
               card={currentCard}
               isFlipped={isFlipped}
               onFlip={flipCard}
+              isStarred={isStarred}
+              isStarPending={isStarPending}
+              isStarDisabled={isStarDisabled}
+              onToggleStar={toggleStar}
+              onReplay={handleReplayPronunciation}
             />
           </motion.div>
         </AnimatePresence>
@@ -82,6 +140,7 @@ export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
               className='flex w-full max-w-md gap-4'
             >
               <Button

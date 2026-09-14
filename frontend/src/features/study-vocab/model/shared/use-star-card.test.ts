@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { type User, useCurrentUser } from '@/entities/user'
 import { useStarCard } from './use-star-card'
 
@@ -26,6 +26,74 @@ vi.mock('@/entities/user', () => ({
 }))
 
 describe('useStarCard', () => {
+  afterEach(() => vi.useRealTimers())
+  it('should_ignore_rapid_toggles_after_a_fast_response', async () => {
+    vi.useFakeTimers()
+    mockExecute.mockResolvedValue({ isStarred: true })
+    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(mockExecute).toHaveBeenCalledTimes(1)
+    expect(result.current.isPending).toBe(false)
+    expect(result.current.isDisabled).toBe(true)
+    act(() => vi.advanceTimersByTime(1000))
+    expect(result.current.isDisabled).toBe(false)
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(mockExecute).toHaveBeenCalledTimes(2)
+  })
+  it('should_ignore_repeated_toggles_until_request_settles', async () => {
+    vi.useFakeTimers()
+    let finish: (value: { isStarred: boolean }) => void = () => undefined
+    mockExecute.mockImplementationOnce(
+      () =>
+        new Promise<{ isStarred: boolean }>((resolve) => {
+          finish = resolve
+        })
+    )
+    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    let submission: Promise<void>
+    act(() => {
+      submission = result.current.toggleStar()
+      void result.current.toggleStar()
+    })
+    expect(mockExecute).toHaveBeenCalledTimes(1)
+    expect(result.current.isPending).toBe(true)
+    act(() => vi.advanceTimersByTime(1000))
+    expect(result.current.isDisabled).toBe(true)
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(mockExecute).toHaveBeenCalledTimes(1)
+    await act(async () => {
+      finish({ isStarred: true })
+      await submission
+    })
+    expect(result.current.isPending).toBe(false)
+    expect(result.current.isDisabled).toBe(false)
+  })
+  it('should_restore_last_saved_star_when_a_later_request_fails', async () => {
+    vi.useFakeTimers()
+    mockExecute
+      .mockResolvedValueOnce({ isStarred: true })
+      .mockResolvedValueOnce(undefined)
+    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    act(() => vi.advanceTimersByTime(1000))
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(result.current.isStarred).toBe(true)
+    expect(result.current.isPending).toBe(false)
+    expect(mockExecute).toHaveBeenCalledTimes(2)
+  })
   beforeEach(() => {
     vi.clearAllMocks()
     refetchMock.mockResolvedValue({ data: undefined })
@@ -83,6 +151,33 @@ describe('useStarCard', () => {
     rerender({ initialStarred: true })
 
     expect(result.current.isStarred).toBe(true)
+  })
+
+  it('keeps an optimistic star when navigating away and back to the card', async () => {
+    vi.useFakeTimers()
+    mockExecute.mockResolvedValue({ isStarred: true })
+    const { result, rerender } = renderHook(
+      ({ cardId, initialStarred }) =>
+        useStarCard('deck-1', cardId, initialStarred),
+      { initialProps: { cardId: 'card-1', initialStarred: false } }
+    )
+
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    rerender({ cardId: 'card-2', initialStarred: false })
+    rerender({ cardId: 'card-1', initialStarred: false })
+
+    expect(result.current.isStarred).toBe(true)
+    act(() => vi.advanceTimersByTime(1000))
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(mockExecute).toHaveBeenLastCalledWith({
+      deckId: 'deck-1',
+      cardId: 'card-1',
+      isStarred: false,
+    })
   })
 
   it('does not persist or update a star for a guest', async () => {

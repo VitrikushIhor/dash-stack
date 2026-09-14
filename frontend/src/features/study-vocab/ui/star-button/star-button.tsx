@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Star } from 'lucide-react'
+import { Loader2, Star } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 
@@ -9,12 +9,22 @@ interface StarButtonProps {
   isStarred: boolean
   onClick: (e?: React.MouseEvent) => void
   className?: string
+  disabled?: boolean
+  isPending?: boolean
 }
 
-export function StarButton({ isStarred, onClick, className }: StarButtonProps) {
+export function StarButton({
+  isStarred,
+  onClick,
+  className,
+  disabled,
+  isPending = false,
+}: StarButtonProps) {
   return (
     <Button
       variant='ghost'
+      disabled={disabled}
+      aria-busy={isPending}
       size='icon'
       className={cn(
         'rounded-full transition-colors',
@@ -27,7 +37,14 @@ export function StarButton({ isStarred, onClick, className }: StarButtonProps) {
       onMouseDown={(e) => e.preventDefault()}
       aria-label={isStarred ? 'Unstar card' : 'Star card'}
     >
-      <Star className={cn('h-5 w-5', isStarred && 'fill-current')} />
+      {isPending ? (
+        <Loader2
+          className='h-5 w-5 animate-spin motion-reduce:animate-none'
+          aria-label='Saving star'
+        />
+      ) : (
+        <Star className={cn('h-5 w-5', isStarred && 'fill-current')} />
+      )}
     </Button>
   )
 }

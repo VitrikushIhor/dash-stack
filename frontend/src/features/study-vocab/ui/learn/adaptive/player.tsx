@@ -1,9 +1,10 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useSpeech } from '@/shared/lib/hooks/use-speech'
 import { Button } from '@/shared/ui/core/button'
 import { type AdaptiveLearnPlayerProps } from '../../../model/learn/adaptive-player.contract'
-import { useLearnFeedbackSpeech } from '../../../model/learn/interaction/use-feedback-speech'
 import { getLearnSessionProgress } from '../../../model/learn/session/adaptive-session'
 import {
   LearnAnswerKind,
@@ -33,12 +34,12 @@ export function AdaptiveLearnPlayer({
       (item) => item.mastery.stage === LearnStage.Mastered
     ).length ?? 0
   const options = snapshot?.choices ?? []
+  const { speak } = useSpeech({ lang: 'en-US' })
 
-  useLearnFeedbackSpeech({
-    feedback: feedback ?? null,
-    questionId: snapshot?.session.questionId,
-    term: card?.term,
-  })
+  useEffect(() => {
+    if (!feedback || !snapshot?.session.questionId || !card?.term) return
+    speak(card.term, { eventKey: snapshot.session.questionId })
+  }, [card?.term, feedback, snapshot?.session.questionId, speak])
 
   if (learn.isLoading) return <StudySessionSkeleton />
 
