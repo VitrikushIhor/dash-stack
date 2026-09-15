@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { DeckStatus } from '../../domain/enums/vocab.enums';
+import { CEFRLevel, DeckStatus } from '../../domain/enums/vocab.enums';
 import { PaginationDto } from '../../../common/pagination/pagination.dto';
 
 export class MyDecksQueryDto {
@@ -15,6 +15,13 @@ export class MyDecksQueryDto {
 }
 
 export class PublicDecksQueryDto extends PaginationDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  @Type(() => Number)
+  perPage?: number = undefined;
+
   @ApiPropertyOptional({
     description: 'Search query across title, description, and tags',
   })
@@ -25,9 +32,9 @@ export class PublicDecksQueryDto extends PaginationDto {
   @ApiPropertyOptional({
     description: 'Filter by CEFR level',
   })
-  @IsString()
+  @IsEnum(CEFRLevel)
   @IsOptional()
-  level?: string;
+  level?: CEFRLevel;
 
   @ApiPropertyOptional({
     description: 'Filter by deck language code',

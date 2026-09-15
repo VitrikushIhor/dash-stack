@@ -1,4 +1,5 @@
-import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
+import { ImageSearchConfigurationException } from '../../../application/exceptions/image-search.exceptions';
 import { SearchUnsplashPhotosUseCase } from '../../../application/use-cases/search-unsplash-photos.use-case';
 import {
   UnsplashServicePort,
@@ -69,7 +70,7 @@ describe('SearchUnsplashPhotosUseCase & UnsplashAdapter', () => {
       expect(res2).toEqual(res1);
     });
 
-    it('should throw ServiceUnavailableException in production when access key is missing', async () => {
+    it('should throw ImageSearchConfigurationException in production when access key is missing', async () => {
       const mockConfigService = {
         get: jest.fn().mockImplementation((key: string) => {
           if (key === 'NODE_ENV') return 'production';
@@ -80,7 +81,7 @@ describe('SearchUnsplashPhotosUseCase & UnsplashAdapter', () => {
 
       const adapter = new UnsplashAdapter(mockConfigService);
       await expect(adapter.searchPhotos('nature', 1, 5)).rejects.toThrow(
-        ServiceUnavailableException,
+        ImageSearchConfigurationException,
       );
     });
   });

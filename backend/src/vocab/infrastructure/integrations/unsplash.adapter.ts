@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-  BadGatewayException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LRUCache } from 'lru-cache';
 import {
@@ -11,6 +6,12 @@ import {
   UnsplashSearchResult,
   UnsplashServicePort,
 } from '../../application/ports/unsplash-service.port';
+import {
+  ImageSearchConfigurationException,
+  ImageSearchUnavailableException,
+} from '../../application/exceptions/image-search.exceptions';
+import { parseUnsplashSearchResponse } from './unsplash-response.parser';
+import { paginateCollection } from '../../../common/pagination/paginate';
 
 @Injectable()
 export class UnsplashAdapter implements UnsplashServicePort {
@@ -37,18 +38,14 @@ export class UnsplashAdapter implements UnsplashServicePort {
       return cached;
     }
 
-    const accessKey =
-      this.configService.get<string>('UNSPLASH_ACCESS_KEY') || process.env.UNSPLASH_ACCESS_KEY;
-    const nodeEnv =
-      this.configService.get<string>('NODE_ENV') || process.env.NODE_ENV || 'development';
+    const accessKey = this.configService.get<string>('UNSPLASH_ACCESS_KEY');
+    const nodeEnv = this.configService.get<string>('NODE_ENV') || 'development';
     const isProduction = nodeEnv === 'production';
 
     if (!accessKey) {
       if (isProduction) {
         this.logger.error('UNSPLASH_ACCESS_KEY is missing in production environment');
-        throw new ServiceUnavailableException(
-          'Image search service is currently unavailable. Please contact support.',
-        );
+        throw new ImageSearchConfigurationException();
       }
       this.logger.debug(
         `UNSPLASH_ACCESS_KEY is not set. Returning curated mock results for query "${trimmedQuery}".`,
@@ -58,6 +55,8 @@ export class UnsplashAdapter implements UnsplashServicePort {
       return mockResult;
     }
 
+    const abortController = new AbortController();
+    const timeout = setTimeout(() => abortController.abort(), 5000);
     try {
       const url = new URL('https://api.unsplash.com/search/photos');
       url.searchParams.set('query', trimmedQuery);
@@ -66,6 +65,7 @@ export class UnsplashAdapter implements UnsplashServicePort {
       url.searchParams.set('orientation', 'landscape');
 
       const response = await fetch(url.toString(), {
+        signal: abortController.signal,
         headers: {
           Authorization: `Client-ID ${accessKey}`,
           'Accept-Version': 'v1',
@@ -74,54 +74,44 @@ export class UnsplashAdapter implements UnsplashServicePort {
 
       if (!response.ok) {
         this.logger.warn(`Unsplash API error: ${response.status} ${response.statusText}`);
-        if (isProduction) {
-          throw new BadGatewayException(
-            `Failed to fetch images from provider: ${response.statusText}`,
-          );
-        }
-        return this.generateMockResults(trimmedQuery, page, perPage);
+        throw new ImageSearchUnavailableException();
       }
 
-      const data = await response.json();
-      const results: UnsplashImageResult[] = (data.results || []).map(
-        (item: {
-          id: string;
-          urls?: { thumb?: string; small?: string; regular?: string };
-          alt_description?: string;
-          description?: string;
-          user?: { name?: string; links?: { html?: string } };
-        }) => ({
-          id: item.id,
-          thumbUrl: item.urls?.thumb || item.urls?.small || '',
-          regularUrl: item.urls?.regular || item.urls?.small || '',
-          altDescription: item.alt_description || item.description || trimmedQuery,
-          photographerName: item.user?.name || 'Unsplash Photographer',
-          photographerUrl: item.user?.links?.html || 'https://unsplash.com',
-        }),
-      );
+      const data: unknown = await response.json();
+      const providerResponse = parseUnsplashSearchResponse(data);
+      if (!providerResponse) {
+        throw new ImageSearchUnavailableException();
+      }
+      const results: UnsplashImageResult[] = providerResponse.results.map((item) => ({
+        id: item.id,
+        thumbUrl: item.urls?.thumb || item.urls?.small || '',
+        regularUrl: item.urls?.regular || item.urls?.small || '',
+        altDescription: item.altDescription || item.description || trimmedQuery,
+        photographerName: item.user?.name || 'Unsplash Photographer',
+        photographerUrl: item.user?.profileUrl || 'https://unsplash.com',
+      }));
 
       const searchResult: UnsplashSearchResult = {
         results,
-        total: data.total ?? results.length,
-        totalPages: data.total_pages ?? 1,
+        total: providerResponse.total,
+        totalPages: providerResponse.totalPages,
       };
 
       this.cache.set(cacheKey, searchResult);
       return searchResult;
     } catch (error) {
-      if (error instanceof ServiceUnavailableException || error instanceof BadGatewayException) {
+      if (error instanceof ImageSearchUnavailableException) {
         throw error;
       }
-      this.logger.error(`Error fetching photos from Unsplash: ${(error as Error)?.message}`);
-      if (isProduction) {
-        throw new BadGatewayException('Error communicating with external image provider');
-      }
-      return this.generateMockResults(trimmedQuery, page, perPage);
+      this.logger.error('Error communicating with Unsplash');
+      throw new ImageSearchUnavailableException();
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
   private generateMockResults(query: string, page: number, perPage: number): UnsplashSearchResult {
-    const mockImages: UnsplashImageResult[] = [
+    const templates: UnsplashImageResult[] = [
       {
         id: `mock-${query}-1`,
         thumbUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=300&fit=crop',
@@ -156,10 +146,16 @@ export class UnsplashAdapter implements UnsplashServicePort {
       },
     ];
 
+    const mockImages = Array.from({ length: 48 }, (_, index) => ({
+      ...templates[index % templates.length],
+      id: `mock-${query}-${index + 1}`,
+    }));
+    const pageResult = paginateCollection(mockImages, { page, perPage });
+
     return {
-      results: mockImages.slice(0, perPage),
-      total: mockImages.length,
-      totalPages: 1,
+      results: pageResult.data,
+      total: pageResult.meta.total,
+      totalPages: pageResult.meta.lastPage,
     };
   }
 }

@@ -59,11 +59,12 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
     const raw = await this.prisma.deck.findUnique({
       where: { id },
       include: {
+        owner: { select: { firstName: true, lastName: true, avatar: true } },
         flashcards: {
           orderBy: { position: OrderDirection.asc },
         },
         _count: {
-          select: { flashcards: true },
+          select: { flashcards: true, forks: true },
         },
       },
     });
@@ -139,10 +140,11 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
       this.prisma.deck,
       {
         where,
-        orderBy: { updatedAt: OrderDirection.desc },
+        orderBy: [{ updatedAt: OrderDirection.desc }, { id: OrderDirection.asc }],
         include: {
+          owner: { select: { firstName: true, lastName: true, avatar: true } },
           _count: {
-            select: { flashcards: true },
+            select: { flashcards: true, forks: true },
           },
         },
       },

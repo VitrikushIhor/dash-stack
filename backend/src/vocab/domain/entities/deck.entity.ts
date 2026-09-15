@@ -24,6 +24,8 @@ export interface DeckProps {
   type: DeckType;
   forkedFromDeckId?: string | null;
   cardCount?: number;
+  forkCount?: number;
+  creator?: { displayName: string | null; avatarUrl: string | null };
   flashcards?: Flashcard[];
   createdAt: Date;
   updatedAt: Date;
@@ -148,6 +150,14 @@ export class Deck {
 
   get cardCount(): number {
     return this.props.cardCount ?? this.props.flashcards?.length ?? 0;
+  }
+
+  get forkCount(): number {
+    return this.props.forkCount ?? 0;
+  }
+
+  get creator(): { displayName: string | null; avatarUrl: string | null } | undefined {
+    return this.props.creator;
   }
 
   get flashcards(): Flashcard[] | undefined {

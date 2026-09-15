@@ -54,6 +54,12 @@ export class DeckResponseDto {
   @ApiProperty({ example: 25 })
   cardCount: number;
 
+  @ApiProperty({ example: 4 })
+  forkCount: number;
+
+  @ApiPropertyOptional()
+  creator?: { displayName: string | null; avatarUrl: string | null };
+
   @ApiPropertyOptional({ type: [FlashcardResponseDto] })
   flashcards?: FlashcardResponseDto[];
 

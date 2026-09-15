@@ -21,6 +21,8 @@ export class DeckPresentationMapper {
       type: deck.type,
       forkedFromDeckId: deck.forkedFromDeckId ?? null,
       cardCount: deck.cardCount,
+      forkCount: deck.forkCount,
+      creator: deck.creator,
       flashcards: deck.flashcards
         ? FlashcardPresentationMapper.toResponseList(deck.flashcards)
         : undefined,

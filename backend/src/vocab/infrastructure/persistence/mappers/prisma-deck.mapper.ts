@@ -7,13 +7,16 @@ export type PrismaDeckWithRelations = PrismaDeck & {
   flashcards?: PrismaFlashcard[];
   _count?: {
     flashcards: number;
+    forks?: number;
   };
+  owner?: { firstName: string | null; lastName: string | null; avatar: string | null };
 };
 
 export class PrismaDeckMapper {
   static toDomain(raw: PrismaDeckWithRelations): Deck {
     const flashcards = raw.flashcards?.map((f) => PrismaFlashcardMapper.toDomain(f));
     const cardCount = raw._count?.flashcards ?? raw.flashcards?.length ?? 0;
+    const displayName = [raw.owner?.firstName, raw.owner?.lastName].filter(Boolean).join(' ');
 
     return Deck.reconstitute({
       id: raw.id,
@@ -29,6 +32,10 @@ export class PrismaDeckMapper {
       type: raw.type as DeckType,
       forkedFromDeckId: raw.forkedFromDeckId,
       cardCount,
+      forkCount: raw._count?.forks ?? 0,
+      creator: raw.owner
+        ? { displayName: displayName || null, avatarUrl: raw.owner.avatar }
+        : undefined,
       flashcards,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,

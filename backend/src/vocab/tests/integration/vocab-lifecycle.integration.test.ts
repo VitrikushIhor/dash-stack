@@ -7,13 +7,16 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { PrismaService } from 'nestjs-prisma';
 import { ArchiveDeckUseCase } from '../../application/use-cases/archive-deck.use-case';
+import { DeleteDeckUseCase } from '../../application/use-cases/delete-deck.use-case';
 import { DeleteFlashcardUseCase } from '../../application/use-cases/delete-flashcard.use-case';
+import { ForkDeckUseCase } from '../../application/use-cases/fork-deck.use-case';
 import { PublishDeckUseCase } from '../../application/use-cases/publish-deck.use-case';
 import { ReorderFlashcardsUseCase } from '../../application/use-cases/reorder-flashcards.use-case';
 import { RestoreDeckUseCase } from '../../application/use-cases/restore-deck.use-case';
 import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
 import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
 import {
+  DeckAccessForbiddenException,
   DeckLifecycleInvalidTransitionException,
   InvalidFlashcardDataException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
@@ -52,6 +55,20 @@ describe('Vocabulary lifecycle integration', () => {
         },
       },
       include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+  };
+
+  const createUser = async () => {
+    const id = `vocab-lifecycle-${randomUUID()}`;
+    await prisma.user.create({ data: { id, email: `${id}@example.test` } });
+    return id;
+  };
+
+  const createForkableDeck = async () => {
+    const deck = await createDeck(2);
+    return prisma.deck.update({
+      where: { id: deck.id },
+      data: { visibility: 'PUBLIC', status: 'PUBLISHED' },
     });
   };
 
@@ -236,6 +253,87 @@ describe('Vocabulary lifecycle integration', () => {
     });
     expect(unchanged.title).toBe(deck.title);
     expect(unchanged.flashcards).toHaveLength(2);
+  });
+
+  it('deletes only the self-created fork when the source owner forks their own deck', async () => {
+    const source = await createForkableDeck();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+    const fork = await forkDeck.execute({ deckId: source.id, targetUserId: ownerUserId });
+
+    await deleteDeck.execute({ deckId: fork.id, userId: ownerUserId });
+
+    expect(await prisma.deck.findUnique({ where: { id: fork.id } })).toBeNull();
+    expect(await prisma.deck.findUnique({ where: { id: source.id } })).not.toBeNull();
+  });
+
+  it('deletes only the requesting users fork and preserves the source and sibling forks', async () => {
+    const source = await createForkableDeck();
+    const firstForkOwnerId = await createUser();
+    const secondForkOwnerId = await createUser();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+
+    try {
+      const firstFork = await forkDeck.execute({
+        deckId: source.id,
+        targetUserId: firstForkOwnerId,
+      });
+      const siblingFork = await forkDeck.execute({
+        deckId: source.id,
+        targetUserId: secondForkOwnerId,
+      });
+
+      await expect(
+        deleteDeck.execute({ deckId: source.id, userId: firstForkOwnerId }),
+      ).rejects.toThrow(DeckAccessForbiddenException);
+
+      await deleteDeck.execute({ deckId: firstFork.id, userId: firstForkOwnerId });
+
+      expect(await prisma.deck.findUnique({ where: { id: firstFork.id } })).toBeNull();
+      expect(await prisma.deck.findUnique({ where: { id: source.id } })).not.toBeNull();
+      expect(await prisma.deck.findUnique({ where: { id: siblingFork.id } })).toMatchObject({
+        forkedFromDeckId: source.id,
+      });
+    } finally {
+      await prisma.user.deleteMany({
+        where: { id: { in: [firstForkOwnerId, secondForkOwnerId] } },
+      });
+    }
+  });
+
+  it('preserves every fork and clears its attribution when the source deck is deleted', async () => {
+    const source = await createForkableDeck();
+    const firstForkOwnerId = await createUser();
+    const secondForkOwnerId = await createUser();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+
+    try {
+      const forks = await Promise.all([
+        forkDeck.execute({ deckId: source.id, targetUserId: firstForkOwnerId }),
+        forkDeck.execute({ deckId: source.id, targetUserId: secondForkOwnerId }),
+      ]);
+
+      await deleteDeck.execute({ deckId: source.id, userId: ownerUserId });
+
+      expect(await prisma.deck.findUnique({ where: { id: source.id } })).toBeNull();
+      expect(
+        await prisma.deck.findMany({
+          where: { id: { in: forks.map((fork) => fork.id) } },
+          orderBy: { id: 'asc' },
+        }),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: forks[0].id, forkedFromDeckId: null }),
+          expect.objectContaining({ id: forks[1].id, forkedFromDeckId: null }),
+        ]),
+      );
+    } finally {
+      await prisma.user.deleteMany({
+        where: { id: { in: [firstForkOwnerId, secondForkOwnerId] } },
+      });
+    }
   });
 });
 
