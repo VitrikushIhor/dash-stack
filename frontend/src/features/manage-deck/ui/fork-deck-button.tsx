@@ -2,15 +2,16 @@
 
 import React from 'react'
 import { GitFork, Loader2 } from 'lucide-react'
+import { cn } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import { useForkDeck } from '../model/use-fork-deck'
 
-interface ForkDeckButtonProps {
+interface ForkDeckButtonProps extends Omit<
+  React.ComponentProps<typeof Button>,
+  'children' | 'disabled' | 'onClick'
+> {
   deckId: string
   deckTitle?: string
-  variant?: 'default' | 'outline' | 'secondary' | 'ghost'
-  size?: 'default' | 'sm' | 'lg' | 'icon'
-  className?: string
 }
 
 export function ForkDeckButton({
@@ -19,6 +20,7 @@ export function ForkDeckButton({
   variant = 'outline',
   size = 'sm',
   className,
+  ...buttonProps
 }: ForkDeckButtonProps) {
   const { isPending, handleFork } = useForkDeck(deckId, deckTitle)
 
@@ -32,7 +34,8 @@ export function ForkDeckButton({
         handleFork()
       }}
       disabled={isPending}
-      className={`gap-1.5 ${className || ''}`}
+      className={cn('gap-1.5', className)}
+      {...buttonProps}
     >
       {isPending ? (
         <Loader2 className='h-3.5 w-3.5 animate-spin' />

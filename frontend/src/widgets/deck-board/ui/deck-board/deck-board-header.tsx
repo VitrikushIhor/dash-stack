@@ -7,17 +7,20 @@ import { ROUTES } from '@/shared/config'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import { type Deck } from '@/entities/deck'
+import { ForkDeckButton } from '@/features/manage-deck'
 
 type DeckBoardHeaderProps = {
   deck: Deck
   cardCount: number
   isOwner: boolean
+  isAuthenticated: boolean
 }
 
 export function DeckBoardHeader({
   deck,
   cardCount,
   isOwner,
+  isAuthenticated,
 }: DeckBoardHeaderProps) {
   const copyLink = async () => {
     try {
@@ -60,6 +63,14 @@ export function DeckBoardHeader({
             <Languages />
             {deck.language}
           </span>
+          {deck.creator?.displayName ? (
+            <span>{deck.creator.displayName}</span>
+          ) : null}
+          {deck.forkCount !== undefined ? (
+            <span>
+              {deck.forkCount} {deck.forkCount === 1 ? 'fork' : 'forks'}
+            </span>
+          ) : null}
           <Badge variant='outline'>{deck.visibility.toLowerCase()}</Badge>
           {deck.level ? <Badge variant='secondary'>{deck.level}</Badge> : null}
           {deck.tags.map((tag) => (
@@ -84,7 +95,13 @@ export function DeckBoardHeader({
               <Pencil /> Edit deck
             </Link>
           </Button>
-        ) : null}
+        ) : isAuthenticated ? (
+          <ForkDeckButton deckId={deck.id} deckTitle={deck.title} />
+        ) : (
+          <Button asChild variant='outline' size='sm'>
+            <Link href={ROUTES.signIn}>Sign in to fork</Link>
+          </Button>
+        )}
       </div>
     </header>
   )

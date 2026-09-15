@@ -56,6 +56,8 @@ export type Deck = {
   type: DeckTypeEnum
   forkedFromDeckId?: string | null
   cardCount?: number
+  forkCount?: number
+  creator?: { displayName: string | null; avatarUrl: string | null }
   flashcards?: Flashcard[]
   createdAt: string
   updatedAt: string

@@ -6,3 +6,4 @@ export {
   type StudyRouteProps,
 } from './model/study-route'
 export { DeckBoardPage } from './ui/deck-board-page'
+export { CatalogPage } from './ui/catalog-page'

@@ -3,6 +3,8 @@
 import React, { type ReactNode, createContext, useContext } from 'react'
 import Link from 'next/link'
 import { Layers, MoreVertical, Sparkles } from 'lucide-react'
+import { getInitials } from '@/shared/lib'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/core/avatar'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import {
@@ -119,6 +121,22 @@ function Content() {
       </CardHeader>
 
       <CardContent className='pt-0 pb-3'>
+        {deck.creator ? (
+          <div className='text-muted-foreground mb-3 flex items-center gap-2 text-xs'>
+            <Avatar className='h-6 w-6'>
+              {deck.creator.avatarUrl ? (
+                <AvatarImage
+                  src={deck.creator.avatarUrl}
+                  alt={deck.creator.displayName ?? 'Creator avatar'}
+                />
+              ) : null}
+              <AvatarFallback>
+                {getInitials(deck.creator.displayName ?? 'Creator')}
+              </AvatarFallback>
+            </Avatar>
+            <span>{deck.creator.displayName ?? 'Creator'}</span>
+          </div>
+        ) : null}
         {deck.tags && deck.tags.length > 0 && (
           <div className='flex flex-wrap gap-1'>
             {deck.tags.slice(0, 3).map((tag) => (
@@ -153,6 +171,12 @@ function Footer({ children }: { children?: ReactNode }) {
           {cardCount} {cardCount === 1 ? 'card' : 'cards'}
         </span>
       </div>
+
+      {deck.forkCount !== undefined ? (
+        <span>
+          {deck.forkCount} {deck.forkCount === 1 ? 'fork' : 'forks'}
+        </span>
+      ) : null}
 
       {children && <div className='flex items-center gap-2'>{children}</div>}
     </CardFooter>

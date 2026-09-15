@@ -33,6 +33,7 @@ export function DeckBoard({
       <DeckBoardHeader
         deck={deck}
         cardCount={viewModel.cardCount}
+        isAuthenticated={isAuthenticated}
         isOwner={isOwner}
       />
 

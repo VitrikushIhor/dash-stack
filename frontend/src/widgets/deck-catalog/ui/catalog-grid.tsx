@@ -4,9 +4,11 @@ import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { EmptyState } from '@/shared/ui/feedback'
 import { type Deck, DeckCard } from '@/entities/deck'
+import { ForkDeckButton } from '@/features/manage-deck'
 
 interface CatalogGridProps {
   decks: Deck[]
+  isAuthenticated?: boolean
   currentQuery?: string
   currentLevel?: string
   currentLanguage?: string
@@ -17,6 +19,7 @@ interface CatalogGridProps {
 
 export function CatalogGrid({
   decks,
+  isAuthenticated = false,
   currentQuery = '',
   currentLevel,
   currentLanguage,
@@ -54,6 +57,13 @@ export function CatalogGrid({
             </DeckCard.Header>
             <DeckCard.Content />
             <DeckCard.Footer>
+              {isAuthenticated ? (
+                <ForkDeckButton deckId={deck.id} deckTitle={deck.title} />
+              ) : (
+                <Button asChild variant='outline' size='sm' className='h-8'>
+                  <Link href={ROUTES.signIn}>Sign in to fork</Link>
+                </Button>
+              )}
               <Button asChild size='sm' className='h-8 gap-1.5 shadow-sm'>
                 <Link href={ROUTES.vocabDeck(deck.id)}>
                   <BookOpen className='h-3.5 w-3.5' />

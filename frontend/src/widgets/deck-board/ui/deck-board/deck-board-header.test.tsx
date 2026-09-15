@@ -16,6 +16,8 @@ const deck: Deck = {
   status: 'PUBLISHED',
   type: 'USER_GENERATED',
   cardCount: 3,
+  forkCount: 2,
+  creator: { displayName: 'Ada Lovelace', avatarUrl: null },
   createdAt: '2026-09-08T00:00:00.000Z',
   updatedAt: '2026-09-08T00:00:00.000Z',
 }
@@ -35,7 +37,14 @@ describe('DeckBoardHeader', () => {
       '/vocab/decks/deck-1?onlyDue=true&onlyStarred=true'
     )
 
-    render(<DeckBoardHeader deck={deck} cardCount={3} isOwner={false} />)
+    render(
+      <DeckBoardHeader
+        deck={deck}
+        cardCount={3}
+        isAuthenticated={false}
+        isOwner={false}
+      />
+    )
     await userEvent.click(
       screen.getByRole('button', { name: 'Copy deck link' })
     )
@@ -43,5 +52,22 @@ describe('DeckBoardHeader', () => {
     expect(writeText).toHaveBeenCalledWith(
       `${window.location.origin}/vocab/decks/deck-1`
     )
+  })
+
+  it('offers_a_sign_in_path_to_fork_for_a_guest', () => {
+    render(
+      <DeckBoardHeader
+        deck={deck}
+        cardCount={3}
+        isAuthenticated={false}
+        isOwner={false}
+      />
+    )
+
+    expect(
+      screen.getByRole('link', { name: 'Sign in to fork' })
+    ).toHaveAttribute('href', '/sign-in')
+    expect(screen.getByText('Ada Lovelace')).toBeVisible()
+    expect(screen.getByText('2 forks')).toBeVisible()
   })
 })

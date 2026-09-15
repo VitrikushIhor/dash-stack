@@ -15,6 +15,7 @@ interface PublicDeckCatalogProps {
   currentLanguage?: string
   currentTags?: string[]
   currentPage?: number
+  isAuthenticated?: boolean
 }
 
 export function PublicDeckCatalog({
@@ -24,6 +25,7 @@ export function PublicDeckCatalog({
   currentLanguage,
   currentTags,
   currentPage = 1,
+  isAuthenticated = false,
 }: PublicDeckCatalogProps) {
   const [, setParams] = useVocabSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -55,6 +57,7 @@ export function PublicDeckCatalog({
       >
         <CatalogGrid
           decks={decks}
+          isAuthenticated={isAuthenticated}
           currentQuery={currentQuery}
           currentLevel={currentLevel}
           currentLanguage={currentLanguage}
