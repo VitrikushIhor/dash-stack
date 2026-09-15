@@ -1390,10 +1390,11 @@ so that **I focus my time on the terms I find most challenging**.
 
 ### ⚙️ Requirements & API Contracts
 
-**POST /api/v1/vocab/cards/:cardId/star**
+**PUT /api/v1/vocab/cards/:cardId/star**
 - Auth: Required
-- No body. Toggles `isStarred` on the user's `VocabProgress` record.
-- If no `VocabProgress` record exists, creates one with `isStarred = true`.
+- Body: `{ "isStarred": boolean }`.
+- Idempotently sets `isStarred` on the user's `VocabProgress` record.
+- If no `VocabProgress` record exists, creates one with the requested state.
 - Response `200 OK`: `{ "flashcardId": "...", "isStarred": true }`.
 
 **Study Filter:**
@@ -1404,11 +1405,12 @@ so that **I focus my time on the terms I find most challenging**.
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] Toggling star on an unstarred card sets `isStarred = true`.
-- [ ] Toggling star on a starred card sets `isStarred = false`.
+- [ ] Setting an unstarred card to `true` sets `isStarred = true`.
+- [ ] Setting a starred card to `false` sets `isStarred = false`.
+- [ ] Repeating a request with the same `isStarred` value does not change it.
 - [ ] Star state is user-specific: User A starring card does not affect User B.
 - [ ] `?onlyStarred=true` with 10 cards (3 starred) returns exactly 3 cards.
-- [ ] `?onlyStarred=true` with 0 starred cards returns `400` or empty set with
+- [ ] `?onlyStarred=true` with 0 starred cards returns an empty set with a
       client-side prompt to star cards first.
 - [ ] Star icon in Flashcards mode reflects current star state (filled/outlined).
 - [ ] Star toggle is instant (optimistic update) with background API sync.
@@ -1441,8 +1443,8 @@ so that **I focus my time on the terms I find most challenging**.
 
 ```markdown
 ### 🎯 User Story / Goal
-As a **deck owner migrating from Quizlet**,  
-I want to **paste Tab-separated terms and definitions to bulk-create cards,
+As a **deck owner migrating from Quizlet, Anki, Quenti, or a spreadsheet**,
+I want to **import pasted text or CSV, TSV, and TXT files to bulk-create cards,
 and export my deck as CSV/JSON**,  
 so that **I can quickly import existing study material and back up my data**.
 
@@ -1456,24 +1458,29 @@ so that **I can quickly import existing study material and back up my data**.
 ### ⚙️ Requirements
 
 **Import (Frontend-heavy):**
-- Modal/drawer with a large textarea for pasting.
-- Parser supports: Tab-separated (`term\tdefinition`), Comma-separated (`term,definition`).
-- Auto-detect separator (Tab vs Comma) from first line.
-- Preview: parsed results shown in a table before confirming.
-- Validation: highlight rows with missing definition or empty term.
+- Modal/drawer accepts pasted text and `.csv`, `.tsv`, or `.txt` files.
+- Parser supports quoted CSV plus tab, comma, and semicolon delimiters.
+- Auto-detect separator and offer presets for Quizlet, Anki text export, Quenti,
+  and generic delimited input.
+- Preview: parsed results shown in a table with editable mapping for term,
+  definition, and optional example columns before confirming.
+- Validation: highlight rows with missing definition or empty term; allow the
+  owner to correct or exclude invalid rows.
 - On confirm: calls `POST /decks/:id/cards` with bulk body.
 
 **Export (Backend endpoint):**
-- `GET /api/v1/vocab/decks/:id/export?format=csv|tsv|json`
-- Auth: Deck owner or public/unlisted deck viewer.
+- `GET /api/v1/vocab/decks/:id/export?format=csv|json`
+- Auth: Deck owner only.
 - Response: File download with appropriate `Content-Type` and `Content-Disposition` headers.
 
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] Pasting 10 lines of `term\tdefinition` parses into 10 rows in preview table.
+- [ ] Quizlet TSV, Anki text export, Quenti output, and generic CSV/TSV parse
+      into correctly mapped preview rows.
 - [ ] Empty lines are silently ignored.
-- [ ] Lines without a separator are highlighted red with "Missing definition" message.
+- [ ] Invalid rows are highlighted with actionable validation messages and can
+      be corrected or excluded before import.
 - [ ] Confirming import creates 10 flashcards in the correct deck.
 - [ ] `GET /export?format=csv` returns a downloadable `.csv` file with headers
       `term,definition,example`.
@@ -1489,11 +1496,12 @@ so that **I can quickly import existing study material and back up my data**.
   - [ ] Support `Content-Disposition: attachment; filename="deck-slug.csv"`
 - [ ] **Frontend:**
   - [ ] `frontend/src/features/import-flashcards/ui/ImportDialog.tsx`
-  - [ ] `frontend/src/features/import-flashcards/model/tsv-parser.ts` — parser logic
+- [ ] `frontend/src/features/import-flashcards/model/delimited-text-parser.ts` — parser and mapping logic
   - [ ] `frontend/src/features/import-flashcards/ui/ImportPreviewTable.tsx`
   - [ ] "Import" and "Export" buttons on deck detail page
 - [ ] **Tests:**
-  - [ ] Unit test: TSV parser with valid, empty, and malformed input
+- [ ] Unit tests: Quizlet TSV, Anki text export, Quenti output, CSV quoting,
+      mapping, empty rows, and malformed input
   - [ ] Unit test: CSV export formatting with special characters (commas, quotes)
 
 ---

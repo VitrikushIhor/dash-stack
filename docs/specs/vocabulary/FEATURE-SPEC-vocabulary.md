@@ -184,6 +184,18 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
                               FORGOTTEN when the previous box was 3, 4, or 5
 ```
 
+### Progress submission consistency
+
+- A batch contains 1–100 results with unique `flashcardId` values. Repeated IDs
+  and cards outside the requested deck return `400` without persisting any result.
+- `isCorrect` must be a JSON boolean. Boolean query filters accept `true`/`false`
+  (also `1`/`0`); invalid values return `400`.
+- Access, membership checks, reading progress, calculating reviews and persisting
+  the full batch execute in one serializable transaction. Conflicting writes are
+  retried with fresh state up to four attempts; exhaustion returns `409`.
+- Star writes participate in the same transaction protocol and never replace a
+  concurrent review with stale counters. See [ADR-002](./decisions/ADR-002-vocabulary-progress-transactions.md).
+
 ### 5.3. Deck Access and Personalized Study Filters
 
 - `DRAFT` and `ARCHIVED` decks are accessible only to their owner. They are not
@@ -291,13 +303,15 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 - As a student, I want to star difficult words during a session so that I can restart practice with only the starred cards.
 
 **Processing:**
-- Toggling star updates `isStarred` boolean in the user's `VocabProgress` record.
+- Setting star state updates `isStarred` boolean in the user's `VocabProgress` record.
+- The client sends the desired boolean state, so repeated requests cannot invert
+  a user's intended selection.
 - Every study mode supports an optional filter: `onlyStarred=true`.
 
 **Acceptance Criteria:**
-- **AC-1 (Toggle Star):** Given I am studying a deck, when I click the star button on Card 1, then a `VocabProgress` record is upserted with `isStarred = true`.
+- **AC-1 (Set Star):** Given I am studying a deck, when I set the star button on Card 1, then a `VocabProgress` record is upserted with `isStarred = true`.
 - **AC-2 (Filter Starred):** Given a deck with 10 cards where I starred 3, when I request `/study?onlyStarred=true`, then exactly those 3 cards are returned for the session.
-- **AC-3 (Empty Starred Guard):** Given a deck with 0 starred cards, when requesting `/study?onlyStarred=true`, then the client receives `400 Bad Request` or an empty study state prompting the user to star words first.
+- **AC-3 (Empty Starred State):** Given a deck with 0 starred cards, when requesting `/study?onlyStarred=true`, then the client receives an empty study state prompting the user to star words first.
 
 ---
 
@@ -418,19 +432,39 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 
 ---
 
+The authenticated Vocabulary sidebar displays the global due count. My Decks
+includes a due-review queue for every accessible deck with due cards, including
+shared decks. Each entry opens Flashcards with `onlyDue=true`.
+
+Flashcards, Learn and Match expose `Due only` and `Starred only` URL filters, an
+`All cards` reset, and mode links preserving the selection. An empty selection
+shows an empty state; Match requires six selected cards before initializing the
+game. A completed Flashcards/Learn summary remains visible when the saved review
+removes the last card from the due selection.
+
 ### FR-VOCAB-010 – Import & Export Flashcards
 
 **Priority:** Should  
 **Role(s):** Deck Owner  
 
 **Features:**
-- **Import:** Fast bulk paste dialog supporting Tab/Comma-separated text (Quizlet format).
-- **Export:** Instant download of deck content as CSV, TSV, or JSON.
+- **Import:** Preview-first import from pasted text or `.csv`, `.tsv`, and
+  `.txt` files. It supports Quizlet, Anki text export, Quenti, spreadsheets,
+  and generic delimited text through separator detection and column mapping.
+- **Export:** Instant owner download of deck content as CSV or JSON.
 
 **Acceptance Criteria:**
-- **AC-1 (TSV Import):** Given 10 lines of `term\tdefinition` pasted in the import box, when submitted, then 10 new `Flashcard` records are created in the deck with matching positions.
-- **AC-2 (Malformed Input Handling):** Given empty lines or lines without a separator, then the parser ignores empty rows and highlights rows lacking a definition with validation messages.
-- **AC-3 (Export):** Given a deck with 20 cards, when clicking "Export CSV", then a properly escaped `.csv` file download begins immediately.
+- **AC-1 (Import Preview):** Given an owner supplies Quizlet TSV, Anki text
+  export, Quenti output, or generic CSV/TSV, when the input is parsed, then the
+  preview maps term, definition, and optional example columns before import.
+- **AC-2 (Malformed Input Handling):** Given empty lines or invalid rows, then
+  the parser ignores empty rows and highlights invalid rows with actionable
+  validation messages; the owner can correct or exclude them.
+- **AC-3 (Atomic Import):** Given valid selected preview rows, when the owner
+  confirms import, then all rows are created in deterministic order or none are
+  persisted.
+- **AC-4 (Export):** Given a deck with 20 cards, when the owner clicks Export
+  CSV or Export JSON, then a properly escaped download begins immediately.
 
 ---
 
@@ -447,6 +481,7 @@ GET    /api/v1/vocab/decks/:id                  # Get deck details & cards
 PATCH  /api/v1/vocab/decks/:id                  # Update deck metadata (Owner/Admin)
 DELETE /api/v1/vocab/decks/:id                  # Cascade delete deck (Owner/Admin)
 POST   /api/v1/vocab/decks/:id/fork             # Fork deck to personal library
+GET    /api/v1/vocab/decks/:id/export            # Owner export (format: csv or json)
 POST   /api/v1/vocab/decks/:id/publish          # Publish a draft deck
 POST   /api/v1/vocab/decks/:id/unpublish        # Return a published deck to draft
 POST   /api/v1/vocab/decks/:id/archive          # Archive a published deck
@@ -463,7 +498,7 @@ GET    /api/v1/vocab/unsplash/search?q=:term    # Search Unsplash images for ter
 GET    /api/v1/vocab/reviews/due                # Get all due cards across decks (or counts per deck)
 GET    /api/v1/vocab/decks/:id/study            # Get cards for study session (params: mode, onlyStarred, onlyDue)
 POST   /api/v1/vocab/decks/:id/progress         # Submit study results (updates box, streak, nextReviewAt)
-POST   /api/v1/vocab/cards/:cardId/star         # Toggle star on a card
+PUT    /api/v1/vocab/cards/:cardId/star         # Set star state ({ isStarred: boolean })
 POST   /api/v1/vocab/decks/:id/match/sessions   # Create an authenticated Match session
 POST   /api/v1/vocab/decks/:id/match/sessions/:sessionId/complete # Complete a Match session
 GET    /api/v1/vocab/decks/:id/leaderboard      # Get top Match game scores
@@ -493,7 +528,7 @@ GET    /api/v1/vocab/decks/:id/leaderboard      # Get top Match game scores
 - **401 Unauthorized:** A guest attempts a personalized write action.
 - **403 Forbidden:** Attempting to edit or delete a deck owned by another user.
 - **404 Not Found:** Deck does not exist or is marked `PRIVATE` while requested by a non-owner.
-- **409 Conflict:** Duplicate slug or import format parsing error.
+- **409 Conflict:** Duplicate slug or exhausted transactional write retry.
 - **502 Bad Gateway:** External Image Search provider rate limit / downtime (client gracefully falls back to text-only mode).
 
 ### 8.2. UX Flow Notes
