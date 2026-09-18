@@ -18,7 +18,9 @@ const initial: DeckEditorDraftState = {
   cards: [{ id: 'card-1', term: 'Term', definition: 'Definition' }],
   deletedCardIds: [],
 }
+
 const key = 'vocab-deck-editor:v1:owner:deck'
+
 function useEditor() {
   const [state, setState] = useState(initial)
   const draft = useDeckEditorDraft({
@@ -28,6 +30,7 @@ function useEditor() {
     state,
     onRestore: setState,
   })
+
   return { state, setState, ...draft }
 }
 
@@ -43,6 +46,7 @@ describe('useDeckEditorDraft', () => {
 
   it('restores edits and deletions without overwriting them with initial state', () => {
     const edited = { ...initial, cards: [], deletedCardIds: ['card-1'] }
+
     localStorage.setItem(
       key,
       JSON.stringify({
@@ -51,6 +55,7 @@ describe('useDeckEditorDraft', () => {
       })
     )
     const { result } = renderHook(useEditor)
+
     act(() => {
       vi.advanceTimersByTime(500)
     })
@@ -62,6 +67,7 @@ describe('useDeckEditorDraft', () => {
 
   it('stores only changed state after debounce and cancels pending writes on save', () => {
     const { result } = renderHook(useEditor)
+
     act(() => {
       vi.advanceTimersByTime(500)
     })
@@ -70,6 +76,7 @@ describe('useDeckEditorDraft', () => {
       ...initial,
       metadata: { ...initial.metadata, title: 'Edited' },
     }
+
     act(() => result.current.setState(edited))
     expect(localStorage.getItem(key)).toBeNull()
     act(() => {
@@ -102,6 +109,7 @@ describe('useDeckEditorDraft', () => {
   ])('does not restore an invalid or stale draft: %s', (raw) => {
     localStorage.setItem(key, raw)
     const { result } = renderHook(useEditor)
+
     expect(result.current.state).toEqual(initial)
   })
 
@@ -116,6 +124,7 @@ describe('useDeckEditorDraft', () => {
       throw new Error('Denied')
     })
     const { result } = renderHook(useEditor)
+
     act(() => result.current.setState({ ...initial, cards: [] }))
     act(() => {
       vi.advanceTimersByTime(500)
@@ -125,10 +134,12 @@ describe('useDeckEditorDraft', () => {
 
   it('preserves stale drafts through StrictMode and subsequent edits', () => {
     const raw = JSON.stringify({ version: 1, revision: 'old', state: initial })
+
     localStorage.setItem(key, raw)
     const { result } = renderHook(useEditor, {
       wrapper: ({ children }) => createElement(StrictMode, null, children),
     })
+
     act(() => result.current.setState({ ...initial, cards: [] }))
     act(() => vi.advanceTimersByTime(1000))
     expect(localStorage.getItem(key)).toBe(raw)
@@ -138,10 +149,12 @@ describe('useDeckEditorDraft', () => {
     const onError = vi.fn(() => {
       throw new Error('Diagnostics unavailable')
     })
+
     const invalid = {
       ...initial,
       metadata: { ...initial.metadata, level: 'invalid' },
     } as unknown as DeckEditorDraftState
+
     const { result } = renderHook(() =>
       useDeckEditorDraft({
         ownerId: 'owner',
@@ -152,6 +165,7 @@ describe('useDeckEditorDraft', () => {
         onError,
       })
     )
+
     expect(onError).toHaveBeenCalledWith(expect.anything(), 'validate')
     expect(() => result.current.markSaved(invalid, 'revision-2')).not.toThrow()
     act(() => vi.advanceTimersByTime(1000))
@@ -161,6 +175,7 @@ describe('useDeckEditorDraft', () => {
   it('keeps the save acknowledgement callback stable on unrelated renders', () => {
     const { result, rerender } = renderHook(useEditor)
     const markSaved = result.current.markSaved
+
     rerender()
     expect(result.current.markSaved).toBe(markSaved)
   })
@@ -171,10 +186,12 @@ describe('useDeckEditorDraft', () => {
       ...initial,
       metadata: { ...initial.metadata, title: 'Edited' },
     }
+
     act(() => first.result.current.setState(edited))
     act(() => vi.advanceTimersByTime(500))
     first.unmount()
     const second = renderHook(useEditor)
+
     expect(second.result.current.state).toEqual(edited)
     act(() => second.result.current.markSaved(edited, 'revision-2'))
     expect(localStorage.getItem(key)).toBeNull()
@@ -192,6 +209,7 @@ describe('useDeckEditorDraft', () => {
       throw new Error('Storage access denied')
     })
     const { result } = renderHook(useEditor)
+
     expect(() => result.current.markSaved(initial, 'revision-2')).not.toThrow()
   })
 
@@ -201,6 +219,7 @@ describe('useDeckEditorDraft', () => {
       ...initial,
       metadata: { ...initial.metadata, title: 'Saved' },
     }
+
     act(() => result.current.setState(edited))
     act(() => result.current.markSaved(edited, 'revision-2'))
     act(() => vi.advanceTimersByTime(500))

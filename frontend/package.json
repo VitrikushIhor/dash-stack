@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:related": "vitest related --run --passWithNoTests",
-    "knip": "pnpm --filter dash-stack run knip",
+    "knip": "pnpm --filter dash-stack exec knip --workspace frontend",
     "audit": "pnpm audit --audit-level=moderate",
     "audit:fix": "pnpm audit --fix",
     "validate": "pnpm run type-check && pnpm run lint && pnpm run lint:fsd && pnpm run format:check && pnpm run knip"

@@ -48,8 +48,10 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
       .sort((a, b) => {
         const aSelected = selectedIds.has(a.id)
         const bSelected = selectedIds.has(b.id)
+
         if (aSelected && !bSelected) return -1
         if (!aSelected && bSelected) return 1
+
         return 0
       })
   }, [availableMembers, searchQuery, selectedIds])
@@ -60,6 +62,7 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
     } else {
       if (maxMembers && selectedMembers.length >= maxMembers) {
         toast.info(`Maximum ${maxMembers} members allowed`)
+
         return
       }
       onMembersChange([...selectedMembers, member])
@@ -82,6 +85,7 @@ export const TeamMemberSelector = memo(function TeamMemberSelector({
         <CommandGroup>
           {filteredAvailableMembers.map((member) => {
             const isSelected = selectedIds.has(member.id)
+
             return (
               <CommandItem
                 key={member.id}

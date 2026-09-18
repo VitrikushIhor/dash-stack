@@ -14,6 +14,7 @@ export function createLearnSession(
     sessionId,
     cards: cards.map((card) => {
       const requiresMcq = Boolean(createLearnChoices(card, cards))
+
       return {
         id: card.id,
         requiresMcq,
@@ -36,6 +37,7 @@ function advanceMastery(
   isCorrect: boolean
 ): LearnMastery {
   const { mastery } = card
+
   if (mastery.stage === LearnStage.Mastered) return mastery
   if (!isCorrect) {
     return {
@@ -46,6 +48,7 @@ function advanceMastery(
   if (mastery.stage === LearnStage.Mcq)
     return { stage: LearnStage.Typing, streak: 1 }
   if (mastery.streak === 0) return { stage: LearnStage.Typing, streak: 1 }
+
   return { stage: LearnStage.Mastered }
 }
 
@@ -60,6 +63,7 @@ export function answerLearnQuestion(
   ) {
     return session
   }
+
   return {
     ...session,
     cards: session.cards.map((card, index) =>
@@ -81,6 +85,7 @@ export function continueLearnSession(
 ): AdaptiveLearnSession {
   if (session.phase !== LearnPhase.Feedback) return session
   const currentCard = session.cards[session.currentIndex]
+
   if (
     currentCard?.mastery.stage === LearnStage.Typing &&
     currentCard.mastery.streak === 1
@@ -93,6 +98,7 @@ export function continueLearnSession(
   }
   for (let offset = 1; offset <= session.cards.length; offset += 1) {
     const index = (session.currentIndex + offset) % session.cards.length
+
     if (session.cards[index].mastery.stage !== LearnStage.Mastered) {
       return {
         ...session,
@@ -102,6 +108,7 @@ export function continueLearnSession(
       }
     }
   }
+
   return { ...session, phase: LearnPhase.Complete }
 }
 
@@ -119,5 +126,6 @@ export function getLearnSessionProgress(session: AdaptiveLearnSession): {
           : 0),
     0
   )
+
   return { completed, total: session.cards.length * 2 }
 }

@@ -49,6 +49,7 @@ export const batchSaveFlashcardsAction = createAction(
     if (existingCards.length > 0) {
       for (const card of existingCards) {
         const { id, ...data } = card
+
         promises.push(
           flashcardServerApi.update(deckId, id, {
             term: data.term,
@@ -76,6 +77,7 @@ export const batchSaveFlashcardsAction = createAction(
         firstError instanceof Error
           ? firstError.message
           : `Failed to save flashcards: ${rejected.length} operations failed`
+
       throw new Error(message)
     }
 

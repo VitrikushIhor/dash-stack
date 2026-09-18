@@ -33,6 +33,7 @@ describe('isTermMatch', () => {
 
   it('handles single form in parentheses', () => {
     const term = 'run (ran)'
+
     expect(isTermMatch('run', term)).toBe(true)
     expect(isTermMatch('ran', term)).toBe(true)
     expect(isTermMatch('running', term)).toBe(false)

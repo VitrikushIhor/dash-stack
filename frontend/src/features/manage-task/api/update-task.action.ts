@@ -16,8 +16,10 @@ export const updateTaskAction = createAction(
   }),
   async ({ slug, id, data }) => {
     const res = await taskServerApi.update(slug, id, data)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
     revalidateTag(SERVER_CACHE_TAGS.taskDetail(id))
+
     return res
   }
 )

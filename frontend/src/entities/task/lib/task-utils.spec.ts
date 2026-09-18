@@ -13,6 +13,7 @@ describe('task-utils', () => {
   describe('calculateTaskProgress', () => {
     it('should return 0/0 if task has no checklists', () => {
       const task = { checklists: [] } as unknown as Task
+
       expect(calculateTaskProgress(task)).toEqual({
         totalItems: 0,
         completedItems: 0,
@@ -44,6 +45,7 @@ describe('task-utils', () => {
       const task = {
         checklists: [{ items: undefined }],
       } as unknown as Task
+
       expect(calculateTaskProgress(task)).toEqual({
         totalItems: 0,
         completedItems: 0,
@@ -66,6 +68,7 @@ describe('task-utils', () => {
         dueDate: undefined,
         completedAt: null,
       } as unknown as Task
+
       expect(isTaskOverdue(task)).toBe(false)
     })
 
@@ -74,6 +77,7 @@ describe('task-utils', () => {
         dueDate: '2026-04-26T10:00:00Z',
         completedAt: null,
       } as unknown as Task
+
       expect(isTaskOverdue(task)).toBe(true)
     })
 
@@ -82,6 +86,7 @@ describe('task-utils', () => {
         dueDate: '2026-04-26T10:00:00Z',
         completedAt: '2026-04-26T10:30:00Z',
       } as unknown as Task
+
       expect(isTaskOverdue(task)).toBe(false)
     })
 
@@ -90,6 +95,7 @@ describe('task-utils', () => {
         dueDate: '2026-04-26T14:00:00Z',
         completedAt: null,
       } as unknown as Task
+
       expect(isTaskOverdue(task)).toBe(false)
     })
   })
@@ -97,11 +103,13 @@ describe('task-utils', () => {
   describe('isTaskCompleted', () => {
     it('returns true if completedAt is set', () => {
       const task = { completedAt: '2026-04-26T10:30:00Z' } as unknown as Task
+
       expect(isTaskCompleted(task)).toBe(true)
     })
 
     it('returns false if completedAt is null', () => {
       const task = { completedAt: null } as unknown as Task
+
       expect(isTaskCompleted(task)).toBe(false)
     })
   })
@@ -112,11 +120,13 @@ describe('task-utils', () => {
         startDate: 'start',
         createdAt: 'create',
       } as unknown as Task
+
       expect(getTaskEffectiveStart(task)).toBe('start')
     })
 
     it('returns createdAt if startDate is missing', () => {
       const task = { startDate: null, createdAt: 'create' } as unknown as Task
+
       expect(getTaskEffectiveStart(task)).toBe('create')
     })
   })
@@ -124,16 +134,19 @@ describe('task-utils', () => {
   describe('getTaskCalendarAnchor', () => {
     it('returns dueDate if present', () => {
       const task = { dueDate: 'due', startDate: 'start' } as unknown as Task
+
       expect(getTaskCalendarAnchor(task)).toBe('due')
     })
 
     it('returns startDate if dueDate is missing', () => {
       const task = { dueDate: null, startDate: 'start' } as unknown as Task
+
       expect(getTaskCalendarAnchor(task)).toBe('start')
     })
 
     it('returns undefined if both are missing', () => {
       const task = { dueDate: null, startDate: null } as unknown as Task
+
       expect(getTaskCalendarAnchor(task)).toBeUndefined()
     })
   })
@@ -141,6 +154,7 @@ describe('task-utils', () => {
   describe('hasTaskDateRange', () => {
     it('returns true if both dates are present', () => {
       const task = { dueDate: 'due', startDate: 'start' } as unknown as Task
+
       expect(hasTaskDateRange(task)).toBe(true)
     })
 

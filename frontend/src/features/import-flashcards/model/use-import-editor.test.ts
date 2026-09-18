@@ -21,6 +21,7 @@ describe('useImportEditor', () => {
 
     act(() => result.current.createPreview('term,definition', options))
     const firstImportId = result.current.importId.current
+
     act(() => result.current.createPreview('term,definition', options))
     act(() => result.current.createPreview('next,definition', options))
 

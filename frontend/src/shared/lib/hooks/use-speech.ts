@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useId, useRef } from 'react'
 
-export interface UseSpeechOptions {
+interface UseSpeechOptions {
   lang?: string
   pitch?: number
   rate?: number
   volume?: number
 }
 
-export interface SpeakOptions extends UseSpeechOptions {
+interface SpeakOptions extends UseSpeechOptions {
   eventKey?: string
 }
 
@@ -45,19 +45,23 @@ const findEnglishVoice = (voices: SpeechSynthesisVoice[]) =>
 
 const getController = (speech: SpeechSynthesis): SpeechController => {
   const existingController = controllers.get(speech)
+
   if (existingController) return existingController
 
   const controller: SpeechController = {
     activeSpeech: null,
     spokenEventKeys: new Set(),
   }
+
   controllers.set(speech, controller)
+
   return controller
 }
 
 const cancelOwnedSpeech = (speech: SpeechSynthesis, ownerId: string) => {
   const controller = getController(speech)
   const activeSpeech = controller.activeSpeech
+
   if (!activeSpeech || activeSpeech.ownerId !== ownerId) return
 
   if (activeSpeech.eventKey) {
@@ -86,6 +90,7 @@ export function useSpeech(defaultOptions: UseSpeechOptions = {}) {
       const controller = getController(speech)
       const finalOptions = { ...optionsRef.current, ...options }
       const activeSpeech = controller.activeSpeech
+
       if (
         activeSpeech?.ownerId === ownerId &&
         activeSpeech.utterance.text === text &&
@@ -113,9 +118,11 @@ export function useSpeech(defaultOptions: UseSpeechOptions = {}) {
       }
 
       const voice = findEnglishVoice(voicesRef.current)
+
       if (voice) utterance.voice = voice
 
       const previousSpeech = controller.activeSpeech
+
       if (previousSpeech) {
         if (previousSpeech.eventKey) {
           controller.spokenEventKeys.delete(previousSpeech.eventKey)
@@ -166,11 +173,13 @@ export function useSpeech(defaultOptions: UseSpeechOptions = {}) {
         pendingSpeechRef.current = { options, text }
         pendingSpeechTimeoutRef.current = window.setTimeout(() => {
           const pendingSpeech = pendingSpeechRef.current
+
           clearPendingSpeech()
           if (pendingSpeech) {
             speakImmediately(pendingSpeech.text, pendingSpeech.options)
           }
         }, 250)
+
         return
       }
 
@@ -187,6 +196,7 @@ export function useSpeech(defaultOptions: UseSpeechOptions = {}) {
     const loadVoices = () => {
       voicesRef.current = speech.getVoices()
       const pendingSpeech = pendingSpeechRef.current
+
       if (!pendingSpeech || voicesRef.current.length === 0) return
 
       clearPendingSpeech()

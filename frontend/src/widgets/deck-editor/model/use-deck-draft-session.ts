@@ -46,29 +46,35 @@ export function useDeckDraftSession({
   useEffect(() => {
     if (snapshot.data === null) {
       report(snapshot.error, 'validate')
+
       return
     }
     if (session.current?.key !== key) {
       session.current = { key, baseline: snapshot.serialized, revision }
       try {
         const draft = read()
+
         if (draft) {
           if (draft.revision !== revision) {
             session.current.blocked = true
             report(new Error('Stale editor draft'), 'conflict')
+
             return
           }
           session.current.awaitingRestore = JSON.stringify(draft.state)
           onRestore(draft.state)
+
           return
         }
       } catch (error) {
         session.current.blocked = true
         report(error, 'restore')
+
         return
       }
     }
     const current = session.current
+
     if (current.blocked) return
     if (current.awaitingRestore !== undefined) {
       if (snapshot.serialized !== current.awaitingRestore) return

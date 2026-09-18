@@ -43,6 +43,7 @@ export function CalendarViewClient({
 
   const handleTaskUpdate = async (id: string, data: Partial<Task>) => {
     const result = await execute({ slug, id, data })
+
     if (result === undefined) {
       throw new Error('Failed to update task date')
     }

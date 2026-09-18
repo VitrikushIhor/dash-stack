@@ -14,6 +14,7 @@ const mockUser: User = {
 
 vi.mock('@/shared/lib', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/lib')>()
+
   return {
     ...actual,
     useAction: () => ({ execute: executeMock, isPending: false }),
@@ -28,7 +29,9 @@ describe('useSubmitProgress', () => {
 
   function renderSubmission(user: User | null | undefined) {
     const client = new QueryClient()
+
     if (user !== undefined) client.setQueryData(userKeys.me(), user)
+
     return renderHook(() => useSubmitProgress(), {
       wrapper: ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={client}>{children}</QueryClientProvider>
@@ -39,6 +42,7 @@ describe('useSubmitProgress', () => {
   it('does not submit study progress or request authentication for a confirmed guest', async () => {
     const getMe = vi.spyOn(userApi, 'getMe')
     const { result } = renderSubmission(null)
+
     await act(async () => {
       await result.current.submitProgress('deck-1', [
         { flashcardId: 'card-1', isCorrect: true },
@@ -54,10 +58,12 @@ describe('useSubmitProgress', () => {
   it('submits study progress immediately using the cached user', async () => {
     const getMe = vi.spyOn(userApi, 'getMe')
     const { result } = renderSubmission(mockUser)
+
     await act(async () => {
       const submission = result.current.submitProgress('deck-1', [
         { flashcardId: 'card-1', isCorrect: true },
       ])
+
       expect(executeMock).toHaveBeenCalledWith({
         deckId: 'deck-1',
         results: [{ flashcardId: 'card-1', isCorrect: true }],
@@ -72,10 +78,12 @@ describe('useSubmitProgress', () => {
       .spyOn(userApi, 'getMe')
       .mockReturnValue(new Promise<User>(() => {}))
     const { result } = renderSubmission(undefined)
+
     await act(async () => {
       const submission = result.current.submitProgress('deck-1', [
         { flashcardId: 'card-1', isCorrect: true },
       ])
+
       expect(executeMock).toHaveBeenCalledWith({
         deckId: 'deck-1',
         results: [{ flashcardId: 'card-1', isCorrect: true }],

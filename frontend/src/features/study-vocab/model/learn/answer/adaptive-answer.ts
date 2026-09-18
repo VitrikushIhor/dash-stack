@@ -28,6 +28,7 @@ export function answerAdaptiveLearnQuestion(
     answer.kind === LearnAnswerKind.Mcq
       ? snapshot.choices?.find((choice) => choice.id === answer.choiceId)
       : null
+
   if (answer.kind === LearnAnswerKind.Mcq && !selectedChoice) return null
 
   const evaluation =

@@ -44,6 +44,7 @@ export const AvatarGroup = memo(function AvatarGroup({
     if (member.user?.firstName) return member.user.firstName
     if (member.first_name)
       return `${member.first_name} ${member.last_name || ''}`
+
     return 'User'
   }
 
@@ -57,6 +58,7 @@ export const AvatarGroup = memo(function AvatarGroup({
         {visibleMembers.map((member) => {
           const name = getName(member)
           const avatar = getAvatar(member)
+
           return (
             <Tooltip key={member.id}>
               <TooltipTrigger asChild>

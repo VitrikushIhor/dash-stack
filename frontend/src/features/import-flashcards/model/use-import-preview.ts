@@ -87,13 +87,18 @@ export function useImportPreview({ onConfirm }: ImportDialogProps) {
 
     const previewImportId = importId.current
     const confirmedCards = included.map((row) => row.card)
+
     if (
       new TextEncoder().encode(
-        JSON.stringify({ deckId: 'deck', importId: previewImportId, cards: confirmedCards })
+        JSON.stringify({
+          deckId: 'deck',
+          importId: previewImportId,
+          cards: confirmedCards,
+        })
       ).byteLength > IMPORT_MAX_BYTES
     ) {
       setError('Import payload exceeds 4 MiB')
-      
+
       return
     }
 

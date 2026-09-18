@@ -34,6 +34,7 @@ export function MonthTaskBadge({
   onTaskClick,
 }: IProps) {
   const anchor = getTaskCalendarAnchor(task)
+
   if (!anchor) return null
 
   const itemStart = startOfDay(parseISO(anchor))
@@ -47,6 +48,7 @@ export function MonthTaskBadge({
     if (isSameDay(itemStart, itemEnd)) return 'none'
     if (isSameDay(cellDate, itemStart)) return 'first'
     if (isSameDay(cellDate, itemEnd)) return 'last'
+
     return 'middle'
   })()
 

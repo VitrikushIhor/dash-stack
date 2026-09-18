@@ -18,6 +18,7 @@ describe('MatchLeaderboard', () => {
         avatar: null,
       },
     }
+
     render(
       <MatchLeaderboard
         board={{
@@ -52,6 +53,7 @@ describe('MatchLeaderboard', () => {
       createdAt: '',
       user: { id: 'u', firstName: 'Ada', lastName: null, avatar: null },
     }
+
     render(
       <MatchLeaderboard
         board={{

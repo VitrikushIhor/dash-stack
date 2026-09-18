@@ -25,9 +25,11 @@ function MetadataFormHarness() {
 describe('DeckMetadataForm', () => {
   it('allows editing the language and tags', async () => {
     const user = userEvent.setup()
+
     render(<MetadataFormHarness />)
 
     const language = screen.getByLabelText('Language')
+
     await user.clear(language)
     await user.type(language, 'pl')
     await user.type(screen.getByLabelText('Tags'), 'daily use{Enter}')

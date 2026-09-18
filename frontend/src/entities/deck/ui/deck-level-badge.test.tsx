@@ -16,6 +16,7 @@ describe('DeckLevelBadge', () => {
 
   it('renders null when level is null or undefined', () => {
     const { container } = render(<DeckLevelBadge level={null} />)
+
     expect(container.firstChild).toBeNull()
   })
 })

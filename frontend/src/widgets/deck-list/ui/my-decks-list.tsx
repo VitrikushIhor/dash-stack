@@ -5,9 +5,10 @@ import { ROUTES } from '@/shared/config'
 import { Button } from '@/shared/ui/core/button'
 import { EmptyState } from '@/shared/ui/feedback/empty-state'
 import { type Deck, DeckCard, DeckStatusBadge } from '@/entities/deck'
-import { CreateDeckDialog, MyDeckCardActions } from '@/features/manage-deck'
+import { CreateDeckDialog } from '@/features/manage-deck'
 import { DeckDueBadge, DueReviewsProvider } from '@/features/study-vocab'
 import type { FilterTab } from '../model/use-my-decks-filter'
+import { MyDeckCardActions } from './my-deck-card-actions'
 
 interface MyDecksListProps {
   decks: Deck[]

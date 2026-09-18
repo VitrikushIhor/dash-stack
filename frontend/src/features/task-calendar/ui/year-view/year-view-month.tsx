@@ -36,6 +36,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
 
   const handleClick = () => {
     const firstDay = new Date(month.getFullYear(), month.getMonth(), 1)
+
     navigateToMonth(firstDay)
   }
 
@@ -69,6 +70,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
             const date = new Date(month.getFullYear(), month.getMonth(), day)
             const dayEvents = tasks.filter((task) => {
               const anchor = getTaskCalendarAnchor(task)
+
               return anchor && isSameDay(parseISO(anchor), date)
             })
 

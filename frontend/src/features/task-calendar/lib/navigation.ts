@@ -14,9 +14,11 @@ export function getCalendarViewUrl(
   date?: Date
 ): string {
   const dateQuery = date ? `?date=${formatCalendarDate(date)}` : ''
+
   if (view === 'month') {
     return `${ROUTES.orgCalendar(slug)}${dateQuery}`
   }
+
   return `${ROUTES.orgCalendarView(slug, view as 'day' | 'week' | 'month')}${dateQuery}`
 }
 

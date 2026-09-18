@@ -5,6 +5,7 @@ import { SignUp } from './sign-up'
 
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     SignUpForm: () => (
@@ -27,14 +28,17 @@ describe('SignUp Page View', () => {
     render(<SignUp />)
 
     const signInLink = screen.getByRole('link', { name: /sign in/i })
+
     expect(signInLink).toBeInTheDocument()
     expect(signInLink).toHaveAttribute('href', ROUTES.signIn)
 
     const termsLink = screen.getByRole('link', { name: /terms of service/i })
+
     expect(termsLink).toBeInTheDocument()
     expect(termsLink).toHaveAttribute('href', '/terms')
 
     const privacyLink = screen.getByRole('link', { name: /privacy policy/i })
+
     expect(privacyLink).toBeInTheDocument()
     expect(privacyLink).toHaveAttribute('href', '/privacy')
   })

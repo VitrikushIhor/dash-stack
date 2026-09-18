@@ -55,7 +55,9 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
         ) : (
           <>
             Are you sure you want to delete{' '}
-            <strong>{selectedTask?.title}</strong>? <br />
+            <strong>{selectedTask?.title}</strong>
+            ?
+            <br />
             This action cannot be undone.
           </>
         )

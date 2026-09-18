@@ -46,6 +46,7 @@ export function createAdaptiveLearnStore({
       if (get().snapshot?.session.questionId !== attemptId) return false
       saveLearnSnapshot(storageKey, next)
       set({ snapshot: next })
+
       return true
     },
     setError: (nextError) =>
@@ -53,11 +54,13 @@ export function createAdaptiveLearnStore({
     setErrorIfActive: (nextError, lease) => {
       if (activeLease !== lease) return false
       set({ error: nextError === null ? null : getErrorMessage(nextError) })
+
       return true
     },
     beginAnswer: () => {
       if (activeLease === null || answeringLease !== null) return null
       answeringLease = activeLease
+
       return activeLease
     },
     finishAnswer: (lease) => {
@@ -67,6 +70,7 @@ export function createAdaptiveLearnStore({
       if (activeLease === null || syncingLease !== null) return null
       syncingLease = activeLease
       set({ isSyncing: true, syncingAttemptId: attemptId })
+
       return activeLease
     },
     finishSync: (attemptId, lease) => {
@@ -82,6 +86,7 @@ export function createAdaptiveLearnStore({
     activate: () => {
       leaseSequence += 1
       activeLease = leaseSequence
+
       return activeLease
     },
     deactivate: (lease) => {

@@ -12,6 +12,7 @@ describe('isInputActive', () => {
 
   it('returns true when input element is focused', () => {
     const input = document.createElement('input')
+
     document.body.appendChild(input)
     input.focus()
     expect(isInputActive()).toBe(true)
@@ -19,6 +20,7 @@ describe('isInputActive', () => {
 
   it('returns true when textarea is focused', () => {
     const textarea = document.createElement('textarea')
+
     document.body.appendChild(textarea)
     textarea.focus()
     expect(isInputActive()).toBe(true)
@@ -26,6 +28,7 @@ describe('isInputActive', () => {
 
   it('returns true when contentEditable element is focused', () => {
     const div = document.createElement('div')
+
     div.tabIndex = 0
     div.setAttribute('contenteditable', 'true')
     document.body.appendChild(div)
@@ -35,6 +38,7 @@ describe('isInputActive', () => {
 
   it('returns true when a standard control is focused', () => {
     const btn = document.createElement('button')
+
     document.body.appendChild(btn)
     btn.focus()
     expect(isInputActive()).toBe(true)
@@ -42,6 +46,7 @@ describe('isInputActive', () => {
 
   it('returns true when a select is focused', () => {
     const select = document.createElement('select')
+
     document.body.appendChild(select)
     select.focus()
     expect(isInputActive()).toBe(true)
@@ -49,6 +54,7 @@ describe('isInputActive', () => {
 
   it('allows shortcuts when the focused flashcard surface opts in', () => {
     const flashcard = document.createElement('div')
+
     flashcard.tabIndex = 0
     flashcard.setAttribute('role', 'button')
     flashcard.setAttribute('data-study-shortcut-surface', 'true')
@@ -60,8 +66,10 @@ describe('isInputActive', () => {
 
   it('keeps nested controls inside the shortcut surface active', () => {
     const flashcard = document.createElement('div')
+
     flashcard.setAttribute('data-study-shortcut-surface', 'true')
     const button = document.createElement('button')
+
     flashcard.appendChild(button)
     document.body.appendChild(flashcard)
     button.focus()

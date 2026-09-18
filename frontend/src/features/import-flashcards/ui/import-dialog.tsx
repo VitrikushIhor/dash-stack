@@ -12,8 +12,8 @@ import {
   DialogTrigger,
 } from '@/shared/ui/core/dialog'
 import { Form } from '@/shared/ui/core/form'
-import { GradientHeading } from '@/shared/ui/gradient-heading'
 import { Skeleton } from '@/shared/ui/core/skeleton'
+import { GradientHeading } from '@/shared/ui/gradient-heading'
 import type { ImportDialogProps } from '../model/import-dialog.types'
 import { useImportPreview } from '../model/use-import-preview'
 import { ImportInputs } from './import-inputs'

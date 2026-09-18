@@ -22,6 +22,7 @@ export function useChecklistWidget(
 
   const handleNameSave = useCallback(() => {
     const trimmedName = editedName.trim()
+
     if (trimmedName && trimmedName !== checklist.name) {
       onChange({ ...checklist, name: trimmedName })
     }
@@ -35,6 +36,7 @@ export function useChecklistWidget(
 
   const handleAddTask = useCallback(() => {
     const trimmedTitle = newTaskTitle.trim()
+
     if (trimmedTitle) {
       onChange({
         ...checklist,

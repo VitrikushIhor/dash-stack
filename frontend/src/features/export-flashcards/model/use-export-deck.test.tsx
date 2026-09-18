@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'sonner'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExportFormat, useExportDeck } from './use-export-deck'
 
 vi.mock('sonner', () => ({
@@ -22,11 +22,19 @@ describe('useExportDeck', () => {
       createObjectURL: createObjectUrl,
       revokeObjectURL: revokeObjectUrl,
     })
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const element = document.createElementNS('http://www.w3.org/1999/xhtml', tagName)
-      if (tagName === 'a') vi.spyOn(element, 'click').mockImplementation(downloadClick)
-      return element
-    })
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const element = document.createElementNS(
+          'http://www.w3.org/1999/xhtml',
+          tagName
+        )
+
+        if (tagName === 'a')
+          vi.spyOn(element, 'click').mockImplementation(downloadClick)
+
+        return element
+      }
+    )
   })
 
   it('downloads an owner export without navigating to the proxy URL', async () => {
@@ -63,6 +71,8 @@ describe('useExportDeck', () => {
     })
 
     expect(downloadClick).not.toHaveBeenCalled()
-    expect(toast.error).toHaveBeenCalledWith('Could not export this deck. Please try again.')
+    expect(toast.error).toHaveBeenCalledWith(
+      'Could not export this deck. Please try again.'
+    )
   })
 })

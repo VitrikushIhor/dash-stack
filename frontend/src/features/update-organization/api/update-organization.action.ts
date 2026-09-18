@@ -23,8 +23,10 @@ export async function updateOrganizationAction(
       slug: validSlug,
       dto: validDto,
     })
+
     revalidateTag(SERVER_CACHE_TAGS.organizations)
     revalidateTag(SERVER_CACHE_TAGS.orgDetail(validSlug))
+
     return { success: true, data: res }
   } catch (error) {
     if (error instanceof ApiError) {
@@ -34,6 +36,7 @@ export async function updateOrganizationAction(
         validationMessages: error.validationMessages,
       }
     }
+
     return { success: false, error: getErrorMessage(error) }
   }
 }

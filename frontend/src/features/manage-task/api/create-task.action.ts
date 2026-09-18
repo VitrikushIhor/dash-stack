@@ -15,7 +15,9 @@ export const createTaskAction = createAction(
   }),
   async ({ slug, data }) => {
     const res = await taskServerApi.create(slug, data)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
+
     return res
   }
 )

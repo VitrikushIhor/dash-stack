@@ -66,6 +66,7 @@ export function useDeckBoardViewModel({
         previewHasNextPage
       ) {
         const result = await fetchNextPreviewPage()
+
         if (result.isError) return
         const loadedCardCount =
           result.data?.pages.reduce(
@@ -92,6 +93,7 @@ export function useDeckBoardViewModel({
   const handleToggleStar = useCallback(
     async (cardId: string, isStarred: boolean) => {
       const result = await toggleStar(cardId, isStarred)
+
       if (result === undefined) return
       setCardStarred(cardId, result.isStarred)
       board.clearStarOverride(cardId)

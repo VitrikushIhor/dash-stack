@@ -41,6 +41,7 @@ export function useVerifyEmail(token: string | null) {
     const timeoutId = setTimeout(() => {
       router.replace(ROUTES.signIn)
     }, REDIRECT_DELAY_MS)
+
     return () => clearTimeout(timeoutId)
   }, [status, router])
 

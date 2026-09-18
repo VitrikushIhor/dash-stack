@@ -1,6 +1,6 @@
 import type { Delimiter, ParsedRow } from './delimited-text.types'
 
-export type { Delimiter, ParsedRow } from './delimited-text.types'
+export type { Delimiter } from './delimited-text.types'
 
 export const parseDelimitedText = (
   input: string,
@@ -33,6 +33,7 @@ export const parseDelimitedText = (
 
   for (let index = 0; index < text.length; index += 1) {
     const character = text[index]
+
     if (state === 'quoted') {
       if (character === '"') {
         if (text[index + 1] === '"') {
@@ -83,6 +84,7 @@ export const detectDelimiter = (input: string): Delimiter | null => {
   const matches = candidates.filter((delimiter) => {
     const rows = parseDelimitedText(input, delimiter)
     const width = rows[0]?.fields.length ?? 0
+
     return (
       width > 1 &&
       rows.every(
@@ -90,5 +92,6 @@ export const detectDelimiter = (input: string): Delimiter | null => {
       )
     )
   })
+
   return matches.length === 1 ? matches[0]! : null
 }

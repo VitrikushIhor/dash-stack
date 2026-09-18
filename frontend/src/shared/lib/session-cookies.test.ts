@@ -60,6 +60,7 @@ describe('session-cookies', () => {
   describe('setAuthCookies', () => {
     it('sets access_token cookie when accessToken is provided', async () => {
       const mockSet = vi.fn()
+
       vi.mocked(cookies).mockResolvedValue({
         set: mockSet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -80,6 +81,7 @@ describe('session-cookies', () => {
 
     it('sets refresh_token cookie when refreshToken is provided', async () => {
       const mockSet = vi.fn()
+
       vi.mocked(cookies).mockResolvedValue({
         set: mockSet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -100,6 +102,7 @@ describe('session-cookies', () => {
 
     it('sets both cookies when both access and refresh tokens are provided', async () => {
       const mockSet = vi.fn()
+
       vi.mocked(cookies).mockResolvedValue({
         set: mockSet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -128,6 +131,7 @@ describe('session-cookies', () => {
   describe('clearAuthCookies', () => {
     it('deletes both access_token and refresh_token cookies', async () => {
       const mockDelete = vi.fn()
+
       vi.mocked(cookies).mockResolvedValue({
         delete: mockDelete,
       } as unknown as Awaited<ReturnType<typeof cookies>>)

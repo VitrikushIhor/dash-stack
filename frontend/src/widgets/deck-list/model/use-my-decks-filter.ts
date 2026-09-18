@@ -45,6 +45,7 @@ export function useMyDecksFilter(initialDecks: Deck[]) {
         const titleMatch = deck.title.toLowerCase().includes(query)
         const descMatch = deck.description?.toLowerCase().includes(query)
         const tagMatch = deck.tags.some((t) => t.toLowerCase().includes(query))
+
         return titleMatch || descMatch || tagMatch
       }
 
@@ -56,11 +57,14 @@ export function useMyDecksFilter(initialDecks: Deck[]) {
     const published = decks.filter(
       (d) => d.status === DeckStatusEnum.PUBLISHED
     ).length
+
     const draft = decks.filter((d) => d.status === DeckStatusEnum.DRAFT).length
     const archived = decks.filter(
       (d) => d.status === DeckStatusEnum.ARCHIVED
     ).length
+
     const activeTotal = published + draft
+
     return { all: activeTotal, published, draft, archived }
   }, [decks])
 

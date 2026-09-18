@@ -8,6 +8,7 @@ export const recordMatchPairAction = createAction(
   RecordMatchPairPayloadSchema,
   async ({ deckId, sessionId, cardId }) => {
     await vocabServerApi.recordMatchPair(deckId, sessionId, cardId)
+
     return { cardId }
   }
 )

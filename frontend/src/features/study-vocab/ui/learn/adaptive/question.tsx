@@ -26,6 +26,7 @@ export function AdaptiveLearnQuestion({
     isDisabled: !isQuestion || isSyncing,
     onSelectIndex: (index) => {
       const choice = choices[index]
+
       if (choice) onSelectChoice(choice.id)
     },
   })

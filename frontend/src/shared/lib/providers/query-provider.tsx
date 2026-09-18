@@ -13,6 +13,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           queries: {
             retry: (_failureCount) => {
               if (process.env.NODE_ENV === 'development') return false
+
               return _failureCount <= 3
             },
             refetchOnWindowFocus: process.env.NODE_ENV === 'production',

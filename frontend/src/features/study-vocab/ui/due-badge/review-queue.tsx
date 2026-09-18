@@ -42,6 +42,7 @@ export function ReviewQueue() {
   const handleRetry = () => refetch()
 
   if (!user) return null
+
   return (
     <section
       id='due-reviews'

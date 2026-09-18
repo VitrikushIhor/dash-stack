@@ -10,7 +10,9 @@ export const createFlashcardAction = createAction(
   CreateFlashcardPayloadSchema,
   async ({ deckId, data }) => {
     const res = await flashcardServerApi.create(deckId, { cards: [data] })
+
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(deckId))
+
     return res[0]
   }
 )

@@ -10,8 +10,10 @@ export const updateDeckAction = createAction(
   UpdateDeckPayloadSchema,
   async ({ id, data }) => {
     const res = await deckServerApi.update(id, data)
+
     revalidateTag(SERVER_CACHE_TAGS.decks)
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(id))
+
     return res
   }
 )

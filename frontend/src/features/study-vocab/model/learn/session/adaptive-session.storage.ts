@@ -68,6 +68,7 @@ const snapshotSchema = z
 
 export function createLearnSnapshot(cards: StudyCard[]): LearnSnapshot {
   const session = createLearnSession(crypto.randomUUID(), cards)
+
   return {
     version: 1,
     cards,
@@ -85,12 +86,15 @@ export function loadLearnSnapshot(
   deckId: string
 ): LearnSnapshot | null {
   const raw = localStorage.getItem(key)
+
   if (!raw) return null
   const parsed: unknown = JSON.parse(raw)
   const snapshot = snapshotSchema.parse(parsed)
+
   if (snapshot.cards.some((card) => card.deckId !== deckId)) {
     throw new Error('Saved Learn session belongs to a different deck')
   }
+
   return snapshot
 }
 

@@ -23,9 +23,11 @@ export function createServerQuery<TInput, TOutput>(
 ) {
   if (typeof schemaOrHandler === 'function') {
     const handler = schemaOrHandler
+
     return async (): Promise<QueryResult<TOutput>> => {
       try {
         const data = await handler()
+
         return { ok: true, data }
       } catch (error) {
         return handleQueryError(error, queryName)
@@ -52,6 +54,7 @@ export function createServerQuery<TInput, TOutput>(
 
     try {
       const data = await handler(parsed.data)
+
       return { ok: true, data }
     } catch (error) {
       return handleQueryError(error, queryName)

@@ -26,6 +26,7 @@ export function useImportEditor() {
       resetPreview()
       try {
         const nextPreviewInput = JSON.stringify({ text, options })
+
         if (previewInput.current !== nextPreviewInput) {
           importId.current = crypto.randomUUID()
           previewInput.current = nextPreviewInput

@@ -24,6 +24,7 @@ export function useMultipleChoiceShortcuts({
       if (e.repeat || isDisabledRef.current || isInputActive()) return
 
       const keyIndex = ['1', '2', '3', '4'].indexOf(e.key)
+
       if (keyIndex !== -1 && keyIndex < optionsCountRef.current) {
         e.preventDefault()
         onSelectIndexRef.current(keyIndex)
@@ -31,6 +32,7 @@ export function useMultipleChoiceShortcuts({
     }
 
     window.addEventListener('keydown', handleKeyDown)
+
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 }

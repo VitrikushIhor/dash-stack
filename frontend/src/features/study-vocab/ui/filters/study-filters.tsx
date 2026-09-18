@@ -6,6 +6,7 @@ import { useStudySearchParams } from '../../model/filters/use-search-params'
 
 export function StudyFilters() {
   const { filters, setFilters, isPending } = useStudySearchParams()
+
   return (
     <fieldset
       aria-label='Study filters'

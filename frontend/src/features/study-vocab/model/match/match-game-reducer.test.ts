@@ -46,6 +46,7 @@ describe('match-game-reducer', () => {
 
     it('creates matching pairs from the server-selected cards', () => {
       const tiles = createInitialTiles(mockCards.slice(0, MAX_MATCH_CARDS))
+
       expect(tiles).toHaveLength(MAX_MATCH_CARDS * 2)
 
       const termTiles = tiles.filter((t) => t.type === TILE_TYPES.TERM)
@@ -156,6 +157,7 @@ describe('match-game-reducer', () => {
         type: MATCH_ACTIONS.SELECT_TILE,
         payload: 'term-2',
       })
+
       expect(blockedState).toBe(state2)
     })
 
@@ -182,6 +184,7 @@ describe('match-game-reducer', () => {
         type: MATCH_ACTIONS.SELECT_TILE,
         payload: 'term-1',
       })
+
       expect(nextState).toBe(state)
     })
 

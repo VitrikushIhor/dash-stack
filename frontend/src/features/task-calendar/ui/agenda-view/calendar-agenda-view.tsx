@@ -21,8 +21,10 @@ export function CalendarAgendaView({
 
     tasks.forEach((task) => {
       const anchor = getTaskCalendarAnchor(task)
+
       if (!anchor) return
       const eventDate = parseISO(anchor)
+
       if (!isSameMonth(eventDate, selectedDate)) return
 
       const dateKey = format(eventDate, 'yyyy-MM-dd')

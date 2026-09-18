@@ -31,6 +31,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
     if (error) {
       toast.error(`Authentication failed: ${error}`)
       router.replace(ROUTES.signIn)
+
       return
     }
 
@@ -38,6 +39,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
 
     if (!token) {
       router.replace(ROUTES.signIn)
+
       return
     }
 

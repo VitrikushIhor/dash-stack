@@ -44,10 +44,13 @@ export function useDeckEditorDraft({
     onRestore,
     onError,
   })
+
   const debounced = useDebounce(snapshot, DRAFT_SAVE_DEBOUNCE_MS)
   const acknowledged = useRef<typeof snapshot | null>(null)
+
   useEffect(() => {
     const current = sessionRef.current
+
     if (
       !current ||
       current.key !== key ||
@@ -73,8 +76,10 @@ export function useDeckEditorDraft({
     (saved: DeckEditorDraftState, savedRevision: string) => {
       acknowledged.current = snapshot
       const result = createDraftSnapshot(saved)
+
       if (!result.data) {
         report(result.error, 'validate')
+
         return
       }
       acknowledge(result.serialized, savedRevision)

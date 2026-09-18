@@ -41,6 +41,7 @@ export function CreateDeckForm() {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
       const trimmed = normalizeDeckTag(tagInput)
+
       if (trimmed && !currentTags.includes(trimmed)) {
         onChange([...currentTags, trimmed])
         setTagInput('')

@@ -119,6 +119,7 @@ function getCommonPinningStyles<TData>({
   const isFirstRightPinnedColumn =
     isPinned === 'right' && column.getIsFirstColumn('right')
   let boxShadow: string | undefined = undefined
+
   if (withBorder) {
     if (isLastLeftPinnedColumn) {
       boxShadow = '-4px 0 4px -4px var(--border) inset'

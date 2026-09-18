@@ -13,6 +13,7 @@ const mockUser: User = {
 
 vi.mock('@/shared/lib', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/lib')>()
+
   return {
     ...actual,
     useAction: () => ({
@@ -31,6 +32,7 @@ describe('useStarCard', () => {
     vi.useFakeTimers()
     mockExecute.mockResolvedValue({ isStarred: true })
     const { result } = renderHook(() => useStarCard('card-1', false))
+
     await act(async () => {
       await result.current.toggleStar()
     })
@@ -50,6 +52,7 @@ describe('useStarCard', () => {
   it('should_ignore_repeated_toggles_until_request_settles', async () => {
     vi.useFakeTimers()
     let finish: (value: { isStarred: boolean }) => void = () => undefined
+
     mockExecute.mockImplementationOnce(
       () =>
         new Promise<{ isStarred: boolean }>((resolve) => {
@@ -58,6 +61,7 @@ describe('useStarCard', () => {
     )
     const { result } = renderHook(() => useStarCard('card-1', false))
     let submission: Promise<void>
+
     act(() => {
       submission = result.current.toggleStar()
       void result.current.toggleStar()
@@ -83,6 +87,7 @@ describe('useStarCard', () => {
       .mockResolvedValueOnce({ isStarred: true })
       .mockResolvedValueOnce(undefined)
     const { result } = renderHook(() => useStarCard('card-1', false))
+
     await act(async () => {
       await result.current.toggleStar()
     })
@@ -108,6 +113,7 @@ describe('useStarCard', () => {
   it('should_reconcile_with_server_state_when_response_differs', async () => {
     mockExecute.mockResolvedValueOnce({ isStarred: false })
     const { result } = renderHook(() => useStarCard('card-1', false))
+
     await act(async () => {
       await result.current.toggleStar()
     })
@@ -165,8 +171,7 @@ describe('useStarCard', () => {
     vi.useFakeTimers()
     mockExecute.mockResolvedValue({ isStarred: true })
     const { result, rerender } = renderHook(
-      ({ cardId, initialStarred }) =>
-        useStarCard(cardId, initialStarred),
+      ({ cardId, initialStarred }) => useStarCard(cardId, initialStarred),
       { initialProps: { cardId: 'card-1', initialStarred: false } }
     )
 
@@ -217,6 +222,7 @@ describe('useStarCard', () => {
 
     await act(async () => {
       const submission = result.current.toggleStar()
+
       expect(mockExecute).toHaveBeenCalled()
       await submission
     })

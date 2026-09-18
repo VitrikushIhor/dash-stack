@@ -99,6 +99,7 @@ describe('DeckCardList', () => {
     )
 
     const status = screen.getByRole('status', { name: 'Searching cards' })
+
     expect(status.children).toHaveLength(3)
   })
 
@@ -239,6 +240,7 @@ describe('DeckCardList', () => {
     const status = screen.getByRole('status', {
       name: 'Loading more cards',
     })
+
     expect(status.children).toHaveLength(1)
     expect(screen.queryByText('Loading more cards…')).not.toBeInTheDocument()
   })

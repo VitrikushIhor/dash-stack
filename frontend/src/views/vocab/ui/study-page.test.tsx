@@ -129,6 +129,7 @@ describe('study route composition', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity } },
     })
+
     client.setQueryData(userKeys.me(), {
       id: 'learner',
       firstName: 'Learner',

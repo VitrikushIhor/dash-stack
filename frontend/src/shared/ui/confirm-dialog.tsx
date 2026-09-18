@@ -41,6 +41,7 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
     onOpenChange,
     ...actions
   } = props
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange} {...actions}>
       <AlertDialogContent className={cn(className && className)}>

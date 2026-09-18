@@ -46,6 +46,7 @@ function installSpeech(availableVoices: SpeechSynthesisVoice[]): SpeechFixture {
     if (event !== 'voiceschanged') return
     voicesChangedListener = () => {
       const voicesChangedEvent = new Event('voiceschanged')
+
       if (typeof listener === 'function') listener(voicesChangedEvent)
       else listener.handleEvent(voicesChangedEvent)
     }
@@ -76,6 +77,7 @@ function installSpeech(availableVoices: SpeechSynthesisVoice[]): SpeechFixture {
 
     constructor(readonly text: string) {}
   }
+
   Object.defineProperty(window, 'SpeechSynthesisUtterance', {
     configurable: true,
     value: MockUtterance,
@@ -93,6 +95,7 @@ describe('useSpeech', () => {
   it('should_not_interrupt_the_same_term_while_it_is_speaking', () => {
     const speech = installSpeech(voices({ name: 'American', lang: 'en-US' }))
     const { result } = renderHook(() => useSpeech())
+
     act(() => {
       result.current.speak('hello')
       result.current.speak('hello')
@@ -100,6 +103,7 @@ describe('useSpeech', () => {
     expect(speech.speak).toHaveBeenCalledTimes(1)
     expect(speech.cancel).not.toHaveBeenCalled()
     const utterance = speech.speak.mock.calls[0]?.[0]
+
     if (!utterance) throw new Error('Expected an utterance')
     act(() => {
       utterance.onend?.call(utterance, new Event('end') as SpeechSynthesisEvent)
@@ -120,6 +124,7 @@ describe('useSpeech', () => {
 
     const utterance = speech.speak.mock
       .calls[0]?.[0] as SpeechSynthesisUtterance
+
     expect(utterance.lang).toBe('en-US')
     expect(utterance.voice?.name).toBe('American')
   })
@@ -132,6 +137,7 @@ describe('useSpeech', () => {
 
     const utterance = speech.speak.mock
       .calls[0]?.[0] as SpeechSynthesisUtterance
+
     expect(utterance.voice?.name).toBe('British')
   })
 
@@ -143,6 +149,7 @@ describe('useSpeech', () => {
 
     const utterance = speech.speak.mock
       .calls[0]?.[0] as SpeechSynthesisUtterance
+
     expect(utterance.voice?.name).toBe('Australian')
   })
 
@@ -154,6 +161,7 @@ describe('useSpeech', () => {
 
     const utterance = speech.speak.mock
       .calls[0]?.[0] as SpeechSynthesisUtterance
+
     expect(utterance.voice?.name).toBe('English')
   })
 
@@ -178,6 +186,7 @@ describe('useSpeech', () => {
 
     const utterance = speech.speak.mock
       .calls[0]?.[0] as SpeechSynthesisUtterance
+
     expect(utterance.voice?.name).toBe('British')
   })
 
@@ -227,9 +236,11 @@ describe('useSpeech', () => {
 
     function RevealSpeech() {
       const { speak } = useSpeech()
+
       useEffect(() => {
         speak('hello', { eventKey: 'reveal-card-1' })
       }, [speak])
+
       return null
     }
 

@@ -76,6 +76,7 @@ export function useTasksTableState({
   const onGlobalFilterChange: OnChangeFn<string> = (updater) => {
     const next =
       typeof updater === 'function' ? updater(searchParams.filter) : updater
+
     setSearchParams({
       filter: next ? next.trim() : null,
       page: 1,
@@ -84,6 +85,7 @@ export function useTasksTableState({
 
   const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
     const next = typeof updater === 'function' ? updater(pagination) : updater
+
     setSearchParams({
       page: next.pageIndex + 1,
       perPage: next.pageSize === DEFAULT_PAGE_SIZE ? null : next.pageSize,
@@ -128,6 +130,7 @@ export function useTasksTableState({
 
   // Optionally ensure that page is bounded to pageCount
   const actualPageCount = table.getPageCount()
+
   useEffect(() => {
     if (actualPageCount > 0 && searchParams.page > actualPageCount) {
       setSearchParams({ page: Math.max(1, actualPageCount) })

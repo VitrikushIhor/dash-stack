@@ -15,6 +15,7 @@ const cards = [
 
 function answerRound(state: AdaptiveLearnSession): AdaptiveLearnSession {
   let next = state
+
   for (let index = 0; index < cards.length; index += 1) {
     next = continueLearnSession(
       answerLearnQuestion(next, next.questionId, true)
@@ -23,12 +24,14 @@ function answerRound(state: AdaptiveLearnSession): AdaptiveLearnSession {
       answerLearnQuestion(next, next.questionId, true)
     )
   }
+
   return next
 }
 
 describe('adaptive Learn', () => {
   it('should_require_one_mcq_and_one_typing_success_per_card_when_learning', () => {
     let session = createLearnSession('session-1', cards)
+
     expect(session.cards.map((card) => card.mastery)).toEqual(
       cards.map(() => ({ stage: 'mcq', streak: 0 }))
     )
@@ -70,6 +73,7 @@ describe('adaptive Learn', () => {
       answered
     )
     const next = continueLearnSession(answered)
+
     expect(answerLearnQuestion(next, initial.questionId, true)).toBe(next)
     expect(next.questionId).not.toBe(initial.questionId)
     expect(next.attemptCount).toBe(1)
@@ -77,6 +81,7 @@ describe('adaptive Learn', () => {
 
   it('should_start_with_typing_and_complete_after_two_successes_when_only_one_card', () => {
     let session = createLearnSession('session-1', cards.slice(0, 1))
+
     expect(session.cards[0].mastery).toEqual({ stage: 'typing', streak: 0 })
     session = continueLearnSession(
       answerLearnQuestion(session, session.questionId, true)
@@ -93,6 +98,7 @@ describe('adaptive Learn', () => {
       'session-1',
       cards.map((card) => ({ ...card, definition: 'same' }))
     )
+
     expect(session.cards.every((card) => card.mastery.stage === 'typing')).toBe(
       true
     )
@@ -100,6 +106,7 @@ describe('adaptive Learn', () => {
 
   it('should_handle_empty_selection_without_creating_a_question', () => {
     const session = createLearnSession('session-1', [])
+
     expect(session.phase).toBe('complete')
     expect(answerLearnQuestion(session, session.questionId, true)).toBe(session)
   })

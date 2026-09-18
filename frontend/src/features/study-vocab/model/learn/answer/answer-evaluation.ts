@@ -8,10 +8,12 @@ function levenshteinDistance(left: string, right: string): number {
   const source = Array.from(left)
   const target = Array.from(right)
   let previous = target.map((_, index) => index + 1)
+
   previous.unshift(0)
 
   for (let row = 1; row <= source.length; row += 1) {
     const current = [row]
+
     for (let column = 1; column <= target.length; column += 1) {
       current[column] = Math.min(
         current[column - 1] + 1,
@@ -31,6 +33,7 @@ export function evaluateLearnAnswer(
 ): LearnAnswerEvaluation {
   const normalizedAnswer = normalizeLearnAnswer(answer)
   const normalizedExpected = normalizeLearnAnswer(expected)
+
   if (!normalizedAnswer || !normalizedExpected) {
     return { kind: 'incorrect', isCorrect: false }
   }
@@ -41,5 +44,6 @@ export function evaluateLearnAnswer(
   if (levenshteinDistance(normalizedAnswer, normalizedExpected) <= 2) {
     return { kind: 'almost', isCorrect: true }
   }
+
   return { kind: 'incorrect', isCorrect: false }
 }

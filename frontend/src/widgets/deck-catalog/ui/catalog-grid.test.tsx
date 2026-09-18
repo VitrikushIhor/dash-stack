@@ -45,6 +45,7 @@ describe('CatalogGrid', () => {
     const { rerender } = render(
       <CatalogGrid decks={[deck]} isAuthenticated onResetFilters={vi.fn()} />
     )
+
     expect(screen.getByRole('button', { name: 'Fork deck-1' })).toBeVisible()
 
     rerender(

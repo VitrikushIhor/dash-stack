@@ -6,7 +6,6 @@ export {
 export { useCreateDeckForm } from './model/use-create-deck-form'
 export { useForkDeck } from './model/use-fork-deck'
 
-export { MyDeckCardActions } from './ui/my-deck-card-actions'
 export { DeleteDeckModal } from './ui/delete-deck-modal'
 export { CreateDeckDialog } from './ui/create-deck-dialog'
 export { CreateDeckForm } from './ui/create-deck-form'

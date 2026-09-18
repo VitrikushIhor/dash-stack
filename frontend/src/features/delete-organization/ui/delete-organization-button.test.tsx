@@ -29,11 +29,13 @@ describe('DeleteOrganizationButton', () => {
 
   it('opens confirmation modal and triggers deletion when confirmed', async () => {
     const user = userEvent.setup()
+
     render(<DeleteOrganizationButton slug='org-1' />)
 
     const triggerBtn = screen.getByRole('button', {
       name: /delete organization/i,
     })
+
     await user.click(triggerBtn)
 
     expect(screen.getByText('Are you absolutely sure?')).toBeInTheDocument()
@@ -41,6 +43,7 @@ describe('DeleteOrganizationButton', () => {
     const confirmBtn = screen.getByRole('button', {
       name: 'Delete Organization',
     })
+
     await user.click(confirmBtn)
 
     expect(mockDeleteOrganization).toHaveBeenCalledWith('org-1')

@@ -34,6 +34,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
         options?.redirectTo,
         ROUTES.organizations
       )
+
       router.replace(targetPath)
     },
   })

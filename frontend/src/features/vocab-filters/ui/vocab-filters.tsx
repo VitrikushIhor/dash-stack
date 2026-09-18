@@ -39,6 +39,7 @@ export function VocabFilters() {
 
     event.preventDefault()
     const tag = normalizeDeckTag(tagInput)
+
     if (tag && !params.tags.includes(tag)) {
       startTransition(() => {
         setParams({ tags: [...params.tags, tag], page: 1 })

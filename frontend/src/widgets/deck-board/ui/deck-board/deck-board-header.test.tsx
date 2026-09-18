@@ -27,6 +27,7 @@ describe('DeckBoardHeader', () => {
 
   it('should_copy_the_canonical_deck_url_without_personal_filters', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
+
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: { writeText },

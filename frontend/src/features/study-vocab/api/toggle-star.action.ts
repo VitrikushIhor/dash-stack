@@ -8,6 +8,7 @@ export const toggleStarAction = createAction(
   ToggleStarPayloadSchema,
   async ({ cardId, isStarred }) => {
     const res = await vocabServerApi.setStar(cardId, { isStarred })
+
     return res
   }
 )

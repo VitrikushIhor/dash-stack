@@ -10,7 +10,9 @@ export const forkDeckAction = createAction(
   DeckIdPayloadSchema,
   async ({ id }) => {
     const res = await deckServerApi.fork(id)
+
     revalidateTag(SERVER_CACHE_TAGS.decks)
+
     return res
   }
 )

@@ -13,8 +13,10 @@ export const importFlashcardsAction = createAction(
       importId,
       cards,
     })
+
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(deckId))
     revalidateTag(SERVER_CACHE_TAGS.studySession(deckId))
+
     return response
   }
 )

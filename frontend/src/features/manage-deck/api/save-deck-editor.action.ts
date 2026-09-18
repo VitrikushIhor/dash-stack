@@ -14,11 +14,13 @@ export const saveDeckEditorAction = createAction(
   async ({ id, data }) => {
     const savedDeck = await deckServerApi.saveEditor(id, data)
     const parsedResponse = DeckEditorSaveResponseSchema.safeParse(savedDeck)
+
     if (!parsedResponse.success) {
       throw new Error('Deck editor save returned an incomplete response')
     }
     revalidateTag(SERVER_CACHE_TAGS.decks)
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(id))
+
     return savedDeck
   }
 )

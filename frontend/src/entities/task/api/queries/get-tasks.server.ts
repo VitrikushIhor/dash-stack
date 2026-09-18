@@ -16,6 +16,7 @@ export const getOrganizationTasks = async (
 ): Promise<GetTasksResponse> => {
   try {
     const result = await taskServerApi.findAll(slug, filters)
+
     return { data: result.data, meta: result.meta, error: null }
   } catch (error) {
     return { data: null, meta: null, error: getErrorMessage(error) }
@@ -33,6 +34,7 @@ export const getTasksUnpaginated = async (
 ): Promise<GetTasksUnpaginatedResponse> => {
   try {
     const result = await taskServerApi.findAllUnpaginated(slug, filters)
+
     return { data: result, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

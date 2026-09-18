@@ -11,5 +11,6 @@ export function useStudySearchParams() {
     history: 'push',
     startTransition,
   })
+
   return { filters, setFilters, isPending }
 }

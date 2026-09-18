@@ -15,7 +15,9 @@ export const createLabelAction = createAction(
   }),
   async ({ slug, data }) => {
     const res = await labelServerApi.create(slug, data)
+
     revalidateTag(SERVER_CACHE_TAGS.labels(slug))
+
     return res
   }
 )

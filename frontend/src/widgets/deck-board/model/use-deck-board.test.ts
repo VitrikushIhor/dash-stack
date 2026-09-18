@@ -26,6 +26,7 @@ describe('useDeckBoard star', () => {
 
   it('should_block_same_card_interactions_when_the_first_request_is_pending', async () => {
     const pending = pendingStar()
+
     vi.mocked(toggleStarAction).mockReturnValue(pending.promise)
     const { result } = renderHook(() => useDeckBoard('deck-1'))
     const submissions: Promise<unknown>[] = []
@@ -35,6 +36,7 @@ describe('useDeckBoard star', () => {
       submissions.push(result.current.toggleStar('card-1', false))
     })
     const submittedCount = vi.mocked(toggleStarAction).mock.calls.length
+
     await act(async () => {
       pending.resolve(success)
       await Promise.all(submissions)
@@ -49,6 +51,7 @@ describe('useDeckBoard star', () => {
 
   it('should_allow_another_card_when_one_card_has_a_pending_request', async () => {
     const pending = pendingStar()
+
     vi.mocked(toggleStarAction).mockReturnValue(pending.promise)
     const { result } = renderHook(() => useDeckBoard('deck-1'))
     const submissions: Promise<unknown>[] = []

@@ -40,6 +40,7 @@ describe('useDeckEditor save', () => {
     let resolveSave!: (
       result: Awaited<ReturnType<typeof saveDeckEditorAction>>
     ) => void
+
     vi.mocked(saveDeckEditorAction).mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -47,6 +48,7 @@ describe('useDeckEditor save', () => {
         })
     )
     const { result } = renderHook(() => useDeckEditor(deck))
+
     act(() => {
       result.current.handleSaveChanges()
       result.current.handleSaveChanges()
@@ -67,6 +69,7 @@ describe('useDeckEditor save', () => {
         },
       ],
     }
+
     await act(async () => {
       resolveSave({ success: true, data: saved })
     })
@@ -92,6 +95,7 @@ describe('useDeckEditor save', () => {
       error: 'Unavailable',
     })
     const { result } = renderHook(() => useDeckEditor(deck))
+
     act(() => result.current.metadata.setTitle('Unsaved title'))
     await act(async () => result.current.handleSaveChanges())
     expect(result.current.metadata.title).toBe('Unsaved title')
@@ -114,6 +118,7 @@ describe('useDeckEditor save', () => {
 
   it('does not submit an empty title', async () => {
     const { result } = renderHook(() => useDeckEditor(deck))
+
     act(() => result.current.metadata.setTitle('   '))
 
     await act(async () => result.current.handleSaveChanges())
@@ -127,6 +132,7 @@ describe('useDeckEditor save', () => {
       language: 'uk',
       tags: ['verbs', 'daily-use'],
     }
+
     vi.mocked(saveDeckEditorAction).mockResolvedValueOnce({
       success: true,
       data: { ...initialDeck, flashcards: [] },

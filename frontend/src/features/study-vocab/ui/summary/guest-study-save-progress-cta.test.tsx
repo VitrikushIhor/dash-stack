@@ -9,7 +9,9 @@ afterEach(() => vi.restoreAllMocks())
 describe('GuestStudySaveProgressCta', () => {
   function renderCta(user: User | null) {
     const client = new QueryClient()
+
     client.setQueryData(userKeys.me(), user)
+
     return render(
       <QueryClientProvider client={client}>
         <GuestStudySaveProgressCta />
@@ -19,6 +21,7 @@ describe('GuestStudySaveProgressCta', () => {
 
   it('offers sign-in and account creation after a guest study session', () => {
     const getMe = vi.spyOn(userApi, 'getMe')
+
     renderCta(null)
 
     expect(

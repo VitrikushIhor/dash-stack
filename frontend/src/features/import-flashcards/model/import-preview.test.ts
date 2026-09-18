@@ -17,6 +17,7 @@ describe('import preview', () => {
         hasHeader: false,
         mapping,
       })
+
       expect(preview.rows.map((row) => row.card.term)).toEqual([
         'hello',
         'world',
@@ -34,6 +35,7 @@ describe('import preview', () => {
         mapping: { ...mapping, example: 2 },
       }
     )
+
     expect(preview.delimiter).toBe('\t')
     expect(preview.rows[0]).toMatchObject({
       sourceRow: 4,
@@ -64,6 +66,7 @@ describe('import preview', () => {
         mapping: { term: 2, definition: 0, example: 1, imageUrl: null },
       }
     )
+
     expect(preview.rows[0]).toMatchObject({
       sourceRow: 2,
       card: { term: 'word', definition: 'meaning', example: 'sentence' },
@@ -76,6 +79,7 @@ describe('import preview', () => {
       hasHeader: false,
       mapping,
     })
+
     expect(preview.rows[0]?.errors.length).toBeGreaterThan(0)
     expect(preview.rows[0]?.warnings).toContain('Unmapped non-empty columns: 3')
     expect(
@@ -92,6 +96,7 @@ describe('import preview', () => {
       'term\t{{c1::answer}} [sound:a.mp3] <img src=x>',
       { source: 'anki', delimiter: '\t', hasHeader: false, mapping }
     )
+
     expect(preview.rows[0]?.card.definition).toContain('<img src=x>')
     expect(preview.rows[0]?.warnings.length).toBeGreaterThan(0)
   })
@@ -112,6 +117,7 @@ describe('import preview', () => {
       hasHeader: false,
       mapping,
     })
+
     expect(preview.rows.map((row) => row.card.term)).toEqual(["'word", "'word"])
   })
 

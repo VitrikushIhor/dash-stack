@@ -34,12 +34,14 @@ export function useAction<TInput, TOutput>(
 
         if (!result.success) {
           const errorMessage = result.error || 'An unexpected error occurred'
+
           handleServerError(
             result.validationMessages?.length
               ? result.validationMessages
               : errorMessage
           )
           currentOptions?.onError?.(errorMessage)
+
           return undefined
         }
 
@@ -48,13 +50,16 @@ export function useAction<TInput, TOutput>(
         }
 
         currentOptions?.onSuccess?.(result.data)
+
         return result.data
       } catch (err) {
         const currentOptions = optionsRef.current
         const errorMessage =
           err instanceof Error ? err.message : 'An unexpected error occurred'
+
         handleServerError(errorMessage)
         currentOptions?.onError?.(errorMessage)
+
         return undefined
       } finally {
         setIsPending(false)

@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test'
 import { SignUpForm } from './sign-up-form'
 
 const mockSignUpAction = vi.fn()
+
 vi.mock('../api/actions/sign-up.action', () => ({
   signUpAction: (...args: unknown[]) => mockSignUpAction(...args),
 }))
@@ -26,6 +27,7 @@ describe('SignUpForm Component', () => {
 
   it('displays validation errors on empty submission', async () => {
     const user = userEvent.setup()
+
     render(<SignUpForm />)
 
     await user.click(screen.getByRole('button', { name: /create account/i }))
@@ -41,6 +43,7 @@ describe('SignUpForm Component', () => {
 
   it('displays validation error when passwords do not match', async () => {
     const user = userEvent.setup()
+
     render(<SignUpForm />)
 
     await user.type(screen.getByLabelText(/email/i), 'user@example.com')
@@ -59,6 +62,7 @@ describe('SignUpForm Component', () => {
 
   it('submits form with valid data and switches to check email confirmation view', async () => {
     const user = userEvent.setup()
+
     mockSignUpAction.mockResolvedValueOnce({ success: true })
 
     render(<SignUpForm />)

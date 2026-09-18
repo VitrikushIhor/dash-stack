@@ -12,6 +12,7 @@ export function useAdaptiveLearnStore(storageKey: string, deckId: string) {
 
   useEffect(() => {
     const lease = store.getState().activate()
+
     return () => {
       store.getState().deactivate(lease)
     }

@@ -31,17 +31,6 @@
     "knip": "^5.88.1",
     "lint-staged": "^16.2.7"
   },
-  "lint-staged": {
-    "frontend/**/*.{ts,tsx}": [
-      "pnpm --filter frontend run lint:fix",
-      "pnpm --filter frontend run format",
-      "pnpm --filter frontend run test:related"
-    ],
-    "backend/**/*.ts": [
-      "pnpm --filter backend run lint",
-      "pnpm --filter backend run format"
-    ]
-  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",

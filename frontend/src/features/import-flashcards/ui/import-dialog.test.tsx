@@ -16,6 +16,7 @@ describe('import dialog', () => {
   it('should_correct_and_exclude_invalid_rows_before_confirming', async () => {
     const user = userEvent.setup()
     const onConfirm = vi.fn().mockResolvedValue(true)
+
     render(<ImportDialog onConfirm={onConfirm} />, {
       wrapper: ({ children }) => (
         <NuqsTestingAdapter searchParams='?import-cards=true'>
@@ -51,6 +52,7 @@ describe('import dialog', () => {
   it('should_cancel_without_persisting', async () => {
     const user = userEvent.setup()
     const onConfirm = vi.fn()
+
     render(<ImportDialog onConfirm={onConfirm} />, {
       wrapper: ({ children }) => (
         <NuqsTestingAdapter searchParams='?import-cards=true'>

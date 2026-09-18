@@ -51,6 +51,7 @@ export const TodoItem = memo(function TodoItem({
 
   const handleSaveEdit = useCallback(() => {
     const trimmedTitle = editedTitle.trim()
+
     if (trimmedTitle && trimmedTitle !== task.title) {
       onUpdate(task.id, trimmedTitle)
     }

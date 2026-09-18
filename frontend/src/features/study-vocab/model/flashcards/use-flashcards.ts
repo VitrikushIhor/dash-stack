@@ -52,6 +52,7 @@ export function useFlashcards(
 
   const allCards = orderedCardIds.flatMap((cardId) => {
     const card = cardsById.get(cardId)
+
     return card ? [card] : []
   })
   const totalCards = orderedCardIds.length
@@ -78,23 +79,28 @@ export function useFlashcards(
         ...resultsRef.current,
         { flashcardId: currentCard.id, isCorrect },
       ]
+
       resultsRef.current = newResults
       setResults(newResults)
       setIsFlipped(false)
 
       if (newResults.length === totalCards) {
         onCompleteRef.current(newResults)
+
         return
       }
 
       const answeredCardIds = new Set(
         newResults.map((result) => result.flashcardId)
       )
+
       for (let offset = 1; offset <= totalCards; offset += 1) {
         const nextIndex = (currentIndex + offset) % totalCards
         const nextCardId = orderedCardIds[nextIndex]
+
         if (nextCardId && !answeredCardIds.has(nextCardId)) {
           setCurrentIndex(nextIndex)
+
           return
         }
       }
@@ -117,8 +123,10 @@ export function useFlashcards(
   const shuffleCards = useCallback(() => {
     if (!currentCard || totalCards < 2) return
     const shuffledCardIds = [...orderedCardIds]
+
     for (let index = shuffledCardIds.length - 1; index > 0; index -= 1) {
       const targetIndex = Math.floor(Math.random() * (index + 1))
+
       ;[shuffledCardIds[index], shuffledCardIds[targetIndex]] = [
         shuffledCardIds[targetIndex],
         shuffledCardIds[index],

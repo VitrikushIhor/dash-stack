@@ -57,6 +57,7 @@ describe('VerifyEmailCard Component', () => {
 
   it('redirects to sign-in when clicking continue or back to sign in button', async () => {
     const user = userEvent.setup()
+
     render(<VerifyEmailCard />)
 
     await user.click(screen.getByRole('button', { name: /back to sign in/i }))

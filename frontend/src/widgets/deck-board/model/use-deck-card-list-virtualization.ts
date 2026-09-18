@@ -50,6 +50,7 @@ export function useDeckCardListVirtualization({
 
   const handleScroll = useCallback(() => {
     const element = scrollContainerRef.current
+
     if (
       !element ||
       !hasNextPage ||

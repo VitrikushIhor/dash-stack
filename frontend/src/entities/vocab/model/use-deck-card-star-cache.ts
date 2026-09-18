@@ -8,13 +8,18 @@ export function useDeckCardStarCache(deckId: string) {
 
   return useCallback(
     (cardId: string, isStarred: boolean) => {
-      const cachedPages = queryClient.getQueriesData<InfiniteData<DeckCardsPage>>({
+      const cachedPages = queryClient.getQueriesData<
+        InfiniteData<DeckCardsPage>
+      >({
         queryKey: vocabKeys.deckCardsForDeck(deckId),
       })
       const cardToUpdate = cachedPages
         .flatMap(([, cached]) => cached?.pages ?? [])
         .flatMap((page) => page.data)
-        .find((card) => card.id === cardId && card.progress.isStarred !== isStarred)
+        .find(
+          (card) => card.id === cardId && card.progress.isStarred !== isStarred
+        )
+
       if (!cardToUpdate) return
 
       const starredDelta = isStarred ? 1 : -1
@@ -23,10 +28,12 @@ export function useDeckCardStarCache(deckId: string) {
         new Date(cardToUpdate.progress.nextReviewAt).getTime() <= Date.now()
           ? starredDelta
           : 0
+
       queryClient.setQueriesData<InfiniteData<DeckCardsPage>>(
         { queryKey: vocabKeys.deckCardsForDeck(deckId) },
         (cached) => {
           if (!cached) return cached
+
           return {
             ...cached,
             pages: cached.pages.map((page) => ({

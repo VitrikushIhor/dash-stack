@@ -40,6 +40,7 @@ export const useCreateOrganizationForm = ({
         const target = newOrg?.slug
           ? ROUTES.orgTasks(newOrg.slug)
           : ROUTES.organizations
+
         router.replace(target)
       },
     })

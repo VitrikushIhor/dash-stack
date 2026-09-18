@@ -35,6 +35,7 @@ export type DraftStoreState = z.infer<typeof persistedSchema>
 
 export function createDraftSnapshot(state: DeckEditorDraftState) {
   const result = draftStateSchema.safeParse(state)
+
   return result.success
     ? {
         data: result.data,

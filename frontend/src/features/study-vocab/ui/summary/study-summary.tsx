@@ -31,7 +31,7 @@ interface MatchSummaryProps extends BaseSummaryProps {
   onRetryIncorrect?: never
 }
 
-export type StudySummaryProps = CardsSummaryProps | MatchSummaryProps
+type StudySummaryProps = CardsSummaryProps | MatchSummaryProps
 
 export function StudySummary(props: StudySummaryProps) {
   const { onRestart, isSubmitting = false } = props

@@ -7,14 +7,12 @@ import { toggleStarAction } from '../../server'
 
 const STAR_COOLDOWN_MS = 1000
 
-export function useStarCard(
-  cardId: string,
-  initialIsStarred: boolean
-) {
+export function useStarCard(cardId: string, initialIsStarred: boolean) {
   const { data: user } = useCurrentUser()
   const nextAllowedAtRef = useRef(0)
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [isCoolingDown, setIsCoolingDown] = useState(false)
+
   useEffect(
     () => () => {
       if (cooldownTimerRef.current !== null)
@@ -53,6 +51,7 @@ export function useStarCard(
       setPendingCards(new Set(pendingCardsRef.current))
 
       const nextValue = !isStarred
+
       setStarredOverrides((previous) => ({
         ...previous,
         [cardId]: nextValue,
@@ -60,6 +59,7 @@ export function useStarCard(
 
       try {
         const result = await execute({ cardId, isStarred: nextValue })
+
         setStarredOverrides((previous) => ({
           ...previous,
           [cardId]: result?.isStarred ?? isStarred,

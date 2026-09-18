@@ -21,6 +21,7 @@ export function isTermMatch(answer: string, term: string): boolean {
 
   // Parse "baseTerm (form1, form2, ...)" pattern
   const match = normalizedTerm.match(/^([^(]+?)(?:\s*\(([^)]+)\))?\s*$/)
+
   if (!match) return false
 
   const baseTerm = normalize(match[1])

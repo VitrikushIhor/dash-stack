@@ -15,8 +15,10 @@ export const deleteTaskAction = createAction(
   }),
   async ({ slug, id }) => {
     const res = await taskServerApi.delete(slug, id)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
     revalidateTag(SERVER_CACHE_TAGS.taskDetail(id))
+
     return res
   }
 )

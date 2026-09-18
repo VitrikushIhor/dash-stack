@@ -61,7 +61,9 @@ export function DeleteDeckModal({ decks }: DeleteDeckModalProps) {
         <div className='text-foreground space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete the deck{' '}
-            <strong>{selectedDeck?.title}</strong>? <br />
+            <strong>{selectedDeck?.title}</strong>
+            ?
+            <br />
             This action cannot be undone.
           </p>
 

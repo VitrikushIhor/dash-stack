@@ -30,11 +30,13 @@ interface DeckCardContextValue {
 
 const DeckCardContext = createContext<DeckCardContextValue | null>(null)
 
-export function useDeckCard() {
+function useDeckCard() {
   const context = useContext(DeckCardContext)
+
   if (!context) {
     throw new Error('DeckCard components must be used within DeckCard')
   }
+
   return context
 }
 
@@ -165,18 +167,19 @@ function Footer({ children }: { children?: ReactNode }) {
 
   return (
     <CardFooter className='border-border/40 bg-muted/20 text-muted-foreground flex items-center justify-between border-t px-6 py-3 text-xs'>
-      <div className='flex items-center gap-1.5 font-medium'>
-        <Layers className='text-primary h-3.5 w-3.5' />
-        <span>
-          {cardCount} {cardCount === 1 ? 'card' : 'cards'}
-        </span>
+      <div className='flex items-center gap-3 font-medium'>
+        <div className='flex items-center gap-1.5'>
+          <Layers className='text-primary h-3.5 w-3.5' />
+          <span>
+            {cardCount} {cardCount === 1 ? 'card' : 'cards'}
+          </span>
+        </div>
+        {deck.forkCount !== undefined ? (
+          <span>
+            {deck.forkCount} {deck.forkCount === 1 ? 'fork' : 'forks'}
+          </span>
+        ) : null}
       </div>
-
-      {deck.forkCount !== undefined ? (
-        <span>
-          {deck.forkCount} {deck.forkCount === 1 ? 'fork' : 'forks'}
-        </span>
-      ) : null}
 
       {children && <div className='flex items-center gap-2'>{children}</div>}
     </CardFooter>

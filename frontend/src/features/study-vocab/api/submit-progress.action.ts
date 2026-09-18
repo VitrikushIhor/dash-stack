@@ -13,9 +13,11 @@ export const submitProgressAction = createAction(
       results,
       attemptId,
     })
+
     revalidateTag(SERVER_CACHE_TAGS.dueReviews)
     revalidateTag(SERVER_CACHE_TAGS.studySession(deckId))
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(deckId))
+
     return res
   }
 )

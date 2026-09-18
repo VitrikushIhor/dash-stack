@@ -27,6 +27,7 @@ vi.mock('@/shared/api/server', () => ({
 vi.mock('@/shared/lib/session-cookies', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@/shared/lib/session-cookies')>()
+
   return {
     ...actual,
     setAuthCookies: vi.fn(),
@@ -81,6 +82,7 @@ describe('Auth Server Actions', () => {
   describe('signUpAction', () => {
     it('calls serverApi.post with sign up data and returns success ActionState', async () => {
       const response = { message: 'User registered' }
+
       vi.mocked(serverApi.post).mockResolvedValueOnce(response)
 
       const input = {
@@ -137,6 +139,7 @@ describe('Auth Server Actions', () => {
 
     it('returns validation failure when token is empty', async () => {
       const result = await verifyEmailAction({ token: '' })
+
       expect(result.success).toBe(false)
       expect(serverApi.post).not.toHaveBeenCalled()
     })
@@ -147,6 +150,7 @@ describe('Auth Server Actions', () => {
       const mockGet = vi
         .fn()
         .mockReturnValue({ value: 'existing-refresh-token' })
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -169,6 +173,7 @@ describe('Auth Server Actions', () => {
       const mockGet = vi
         .fn()
         .mockReturnValue({ value: 'existing-refresh-token' })
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -187,6 +192,7 @@ describe('Auth Server Actions', () => {
 
     it('clears cookies without calling backend if no refresh token exists', async () => {
       const mockGet = vi.fn().mockReturnValue(undefined)
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
@@ -205,6 +211,7 @@ describe('Auth Server Actions', () => {
   describe('forgotPasswordAction', () => {
     it('calls serverApi.post with valid email and returns success ActionState', async () => {
       const response = { message: 'Reset email sent' }
+
       vi.mocked(serverApi.post).mockResolvedValueOnce(response)
 
       const result = await forgotPasswordAction({ email: 'user@example.com' })
@@ -222,6 +229,7 @@ describe('Auth Server Actions', () => {
 
     it('returns validation failure for empty email', async () => {
       const result = await forgotPasswordAction({ email: '' })
+
       expect(result.success).toBe(false)
       expect(serverApi.post).not.toHaveBeenCalled()
     })
@@ -230,6 +238,7 @@ describe('Auth Server Actions', () => {
   describe('resetPasswordAction', () => {
     it('calls serverApi.post with token and valid password, and returns success ActionState', async () => {
       const response = { message: 'Password updated' }
+
       vi.mocked(serverApi.post).mockResolvedValueOnce(response)
 
       const result = await resetPasswordAction({
@@ -283,6 +292,7 @@ describe('Auth Server Actions', () => {
 
     it('returns validation failure when token is empty', async () => {
       const result = await oauthExchangeAction({ token: '' })
+
       expect(result.success).toBe(false)
       expect(serverApi.post).not.toHaveBeenCalled()
     })

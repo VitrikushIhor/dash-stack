@@ -87,6 +87,7 @@ export function TaskUrlFacetedFilter({
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value)
+
                 return (
                   <CommandItem
                     key={option.value}
@@ -97,6 +98,7 @@ export function TaskUrlFacetedFilter({
                         selectedValues.add(option.value)
                       }
                       const filterValues = Array.from(selectedValues)
+
                       onChange(filterValues.length ? filterValues : undefined)
                     }}
                   >

@@ -8,5 +8,6 @@ interface Props {
 
 export async function CalendarWeekPage({ slug, searchParams }: Props) {
   const { tasks } = await fetchCalendarTasks(slug, 'week', searchParams)
+
   return <CalendarViewClient slug={slug} tasks={tasks} view='week' />
 }

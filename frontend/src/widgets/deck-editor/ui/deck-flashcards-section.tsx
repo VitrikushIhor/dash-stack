@@ -17,6 +17,7 @@ export function DeckFlashcardsSection({
   const { cards, setCards, handleAddCard, handleCardChange, handleCardDelete } =
     state
   const { handleOpenImagePicker } = imagePickerState
+
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>

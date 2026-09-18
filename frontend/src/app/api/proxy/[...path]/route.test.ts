@@ -110,7 +110,9 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
       })
     )
 
-    const req = new NextRequest('http://localhost:3000/api/proxy/v1/vocab/decks/deck-id/export?format=json')
+    const req = new NextRequest(
+      'http://localhost:3000/api/proxy/v1/vocab/decks/deck-id/export?format=json'
+    )
     const params = Promise.resolve({
       path: ['v1', 'vocab', 'decks', 'deck-id', 'export'],
     })
@@ -273,11 +275,13 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
 
     // Verify access_token cookie on the response
     const accessCookie = res.cookies.get(COOKIE_CONFIG.ACCESS_TOKEN.name)
+
     expect(accessCookie).toBeDefined()
     expect(accessCookie?.value).toBe('fresh-access')
 
     // Verify refresh_token cookie on the response
     const refreshCookie = res.cookies.get(COOKIE_CONFIG.REFRESH_TOKEN.name)
+
     expect(refreshCookie).toBeDefined()
     expect(refreshCookie?.value).toBe('fresh-refresh')
 
@@ -399,6 +403,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const refreshClear = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(accessClear).toBeDefined()
     expect(accessClear).toContain('Expires=Thu, 01 Jan 1970')
     expect(refreshClear).toBeDefined()
@@ -438,6 +443,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const refreshClear = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(accessClear).toBeDefined()
     expect(accessClear).toContain('Expires=Thu, 01 Jan 1970')
     expect(refreshClear).toBeDefined()
@@ -477,6 +483,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const refreshClear = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(accessClear).toBeDefined()
     expect(accessClear).toContain('Expires=Thu, 01 Jan 1970')
     expect(refreshClear).toBeDefined()
@@ -523,6 +530,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const refreshClear = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(accessClear).toBeDefined()
     expect(accessClear).toContain('Expires=Thu, 01 Jan 1970')
     expect(accessClear).toContain('Path=/')
@@ -564,6 +572,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const hasClearCookie = setCookieHeaders.some(
       (h) => h.includes('access_token') || h.includes('refresh_token')
     )
+
     expect(hasClearCookie).toBe(false)
   })
 
@@ -593,6 +602,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const hasClearCookie = setCookieHeaders.some(
       (h) => h.includes('access_token') || h.includes('refresh_token')
     )
+
     expect(hasClearCookie).toBe(false)
   })
 
@@ -633,6 +643,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const refreshSetCookie = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(accessSetCookie).toBeDefined()
     expect(accessSetCookie).toContain('brand-new-access')
     expect(refreshSetCookie).toBeDefined()
@@ -668,12 +679,14 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const accessClear = setCookieHeaders.find((h) =>
       h.startsWith('access_token=')
     )
+
     expect(accessClear).toBeDefined()
     expect(accessClear).toContain('Expires=Thu, 01 Jan 1970')
 
     const refreshClear = setCookieHeaders.find((h) =>
       h.startsWith('refresh_token=')
     )
+
     expect(refreshClear).toBeUndefined()
   })
 
@@ -688,6 +701,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
+
     upstreamResponse.headers.append(
       'set-cookie',
       'session_id=abc123; Path=/; HttpOnly'
@@ -728,6 +742,7 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
+
     retryResponse.headers.append(
       'set-cookie',
       'access_token=old-nest-value; Path=/; HttpOnly'
@@ -758,12 +773,14 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     const trackingCookie = setCookieHeaders.find((h) =>
       h.startsWith('tracking=')
     )
+
     expect(trackingCookie).toBe('tracking=xyz; Path=/')
 
     // Auth cookies should come from proxy (fresh values), not duplicated from Nest
     const accessCookies = setCookieHeaders.filter((h) =>
       h.startsWith('access_token=')
     )
+
     expect(accessCookies).toHaveLength(1)
     expect(accessCookies[0]).toContain('proxy-new-access')
   })

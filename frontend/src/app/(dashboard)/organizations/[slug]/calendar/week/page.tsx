@@ -12,5 +12,6 @@ export default async function OrganizationCalendarWeekRoute({
   searchParams,
 }: PageProps) {
   const { slug } = await params
+
   return <CalendarWeekPage slug={slug} searchParams={searchParams} />
 }

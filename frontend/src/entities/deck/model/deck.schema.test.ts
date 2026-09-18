@@ -14,6 +14,7 @@ describe('CreateDeckSchema', () => {
     }
 
     const result = CreateDeckSchema.safeParse(validData)
+
     expect(result.success).toBe(true)
   })
 
@@ -26,6 +27,7 @@ describe('CreateDeckSchema', () => {
     }
 
     const result = CreateDeckSchema.safeParse(invalidData)
+
     expect(result.success).toBe(false)
   })
 
@@ -38,6 +40,7 @@ describe('CreateDeckSchema', () => {
     }
 
     const result = CreateDeckSchema.safeParse(invalidData)
+
     expect(result.success).toBe(false)
   })
 })
@@ -53,6 +56,7 @@ describe('FlashcardSchema', () => {
     }
 
     const result = FlashcardSchema.safeParse(validCard)
+
     expect(result.success).toBe(true)
   })
 
@@ -64,6 +68,7 @@ describe('FlashcardSchema', () => {
     }
 
     const result = FlashcardSchema.safeParse(validCard)
+
     expect(result.success).toBe(true)
   })
 

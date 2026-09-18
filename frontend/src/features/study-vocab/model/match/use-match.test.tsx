@@ -38,6 +38,7 @@ describe('useMatch', () => {
     })
 
     const gameState = result.current.gameState
+
     if (gameState.type !== GAME_STATUS.PLAYING) {
       throw new Error('Expected the game to remain in the playing state')
     }

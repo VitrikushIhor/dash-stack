@@ -33,6 +33,7 @@ const card: StudyCard = {
 describe('FlashcardItem', () => {
   it('should_show_loading_and_block_star_clicks_while_saving', () => {
     const onToggleStar = vi.fn()
+
     render(
       <FlashcardItem
         card={card}
@@ -45,6 +46,7 @@ describe('FlashcardItem', () => {
       />
     )
     const button = screen.getAllByRole('button', { name: 'Star card' })[0]
+
     expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
     expect(screen.getAllByLabelText('Saving star').length).toBeGreaterThan(0)
@@ -64,6 +66,7 @@ describe('FlashcardItem', () => {
     )
 
     const image = screen.getByAltText('Illustration for apple')
+
     fireEvent.error(image)
 
     await waitFor(() =>
@@ -78,6 +81,7 @@ describe('FlashcardItem', () => {
     const onFlip = vi.fn()
     const onReplay = vi.fn()
     const onToggleStar = vi.fn()
+
     render(
       <FlashcardItem
         card={card}

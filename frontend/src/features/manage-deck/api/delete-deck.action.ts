@@ -12,6 +12,7 @@ export const deleteDeckAction = createAction(
     await deckServerApi.delete(id)
     revalidateTag(SERVER_CACHE_TAGS.decks)
     revalidateTag(SERVER_CACHE_TAGS.deckDetail(id))
+
     return { id }
   }
 )

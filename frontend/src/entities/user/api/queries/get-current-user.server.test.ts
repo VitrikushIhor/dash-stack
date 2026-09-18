@@ -21,6 +21,7 @@ describe('getCurrentUser', () => {
       lastName: 'Smith',
       email: 'alice@example.com',
     }
+
     vi.mocked(userServerApi.getMe).mockResolvedValue(mockUser)
 
     const result = await getCurrentUser()

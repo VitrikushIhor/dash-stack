@@ -11,6 +11,7 @@ import { AdaptiveLearnPlayer } from './player'
 vi.mock('../../../server', () => ({ submitProgressAction: vi.fn() }))
 
 const speak = vi.fn()
+
 vi.mock('@/shared/lib/hooks/use-speech', () => ({
   useSpeech: () => ({ speak, stop: vi.fn(), isSupported: true }),
 }))
@@ -42,7 +43,9 @@ function wrapper(children: ReactNode) {
   const client = new QueryClient({
     defaultOptions: { queries: { staleTime: Infinity, retry: false } },
   })
+
   client.setQueryData(userKeys.me(), { id: 'user', email: 'user@example.test' })
+
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>
 }
 
@@ -65,6 +68,7 @@ describe('AdaptiveLearnPlayer', () => {
     const choices = screen
       .getAllByRole('button')
       .filter((button) => /^[1-4]/.test(button.textContent ?? ''))
+
     expect(choices).toHaveLength(4)
     expect(new Set(choices.map((button) => button.textContent)).size).toBe(4)
   })
@@ -107,6 +111,7 @@ describe('AdaptiveLearnPlayer', () => {
         (button) =>
           button !== correctChoice && /^[1-4]/.test(button.textContent ?? '')
       )
+
     if (!wrongChoice) throw new Error('Expected an incorrect choice')
     await userEvent.click(wrongChoice)
 
@@ -206,6 +211,7 @@ describe('AdaptiveLearnPlayer', () => {
       ...card,
       definition: ['cat', 'cats', 'dog', 'bird'][index],
     }))
+
     render(<AdaptiveLearnPlayer deckId='deck' cards={closeChoices} />, {
       wrapper: ({ children }) => wrapper(children),
     })
@@ -224,13 +230,16 @@ describe('AdaptiveLearnPlayer', () => {
 
   it('should_complete_the_full_adaptive_flow_and_retry_the_last_attempt', async () => {
     let submissionCount = 0
+
     vi.mocked(submitProgressAction).mockImplementation(async () => {
       submissionCount += 1
+
       return submissionCount === 8
         ? { success: false, error: 'Connection lost' }
         : { success: true, data: [] }
     })
     const user = userEvent.setup()
+
     render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
     await user.click(
       await screen.findByRole('button', { name: 'Start adaptive session' })
@@ -255,11 +264,13 @@ describe('AdaptiveLearnPlayer', () => {
       expect(await screen.findByRole('status')).toHaveTextContent('Correct!')
 
       const isLastAttempt = index === learnCards.length - 1
+
       if (isLastAttempt) {
         expect(await screen.findByRole('alert')).toHaveTextContent(
           'Connection lost'
         )
         const failedAttempt = vi.mocked(submitProgressAction).mock.calls[7][0]
+
         await user.click(screen.getByRole('button', { name: 'Retry' }))
         await waitFor(() =>
           expect(screen.queryByRole('alert')).not.toBeInTheDocument()

@@ -15,6 +15,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     useUploadImage: () => ({
@@ -61,6 +62,7 @@ describe('useUpdateOrganization', () => {
     const { result } = renderHook(() => useUpdateOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateOrganization(
         baseOrg,
@@ -92,6 +94,7 @@ describe('useUpdateOrganization', () => {
     const { result } = renderHook(() => useUpdateOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateOrganization(baseOrg, {
         name: 'Original Name',
@@ -120,6 +123,7 @@ describe('useUpdateOrganization', () => {
     const { result } = renderHook(() => useUpdateOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateOrganization(baseOrg, {
         name: 'Failed Name Change',

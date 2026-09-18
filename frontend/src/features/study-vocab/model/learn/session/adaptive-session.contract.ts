@@ -5,7 +5,7 @@ import type {
   LearnStage,
 } from './adaptive-session.constants'
 
-export type LearnStage = (typeof LearnStage)[keyof typeof LearnStage]
+type LearnStage = (typeof LearnStage)[keyof typeof LearnStage]
 export type LearnPhase = (typeof LearnPhase)[keyof typeof LearnPhase]
 
 export type LearnMastery =
@@ -96,12 +96,6 @@ export type LearnProgressSyncParams = Pick<
   deckId: string
   isIdentityLoading: boolean
   shouldSync: boolean
-}
-
-export type LearnFeedbackSpeechParams = {
-  feedback: LearnSnapshot['feedback']
-  questionId: string | undefined
-  term: string | undefined
 }
 
 export type MultipleChoiceShortcutsOptions = {

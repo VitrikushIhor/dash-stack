@@ -31,6 +31,7 @@ export function TypingQuestion({ card, onAnswer }: TypingQuestionProps) {
       const timer = setTimeout(() => {
         onAnswerRef.current(isCorrect)
       }, TYPING_FEEDBACK_DELAY_MS)
+
       return () => clearTimeout(timer)
     }
   }, [submittedAnswer, isCorrect])

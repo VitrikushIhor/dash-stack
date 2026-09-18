@@ -31,6 +31,7 @@ export function isSafeRedirectPath(path: string | null | undefined): boolean {
   ) {
     return false
   }
+
   return true
 }
 
@@ -50,7 +51,9 @@ export function middleware(req: NextRequest) {
   if (isProtected && !isAuthenticated) {
     const signInUrl = new URL(ROUTES.signIn, req.url)
     const targetUrl = req.nextUrl.pathname + req.nextUrl.search
+
     signInUrl.searchParams.set('redirect', targetUrl)
+
     return NextResponse.redirect(signInUrl)
   }
 
@@ -59,6 +62,7 @@ export function middleware(req: NextRequest) {
     const targetPath = isSafeRedirectPath(redirectParam)
       ? redirectParam!
       : ROUTES.organizations
+
     return NextResponse.redirect(new URL(targetPath, req.url))
   }
 

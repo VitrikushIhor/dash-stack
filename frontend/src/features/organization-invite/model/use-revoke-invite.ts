@@ -13,8 +13,10 @@ export function useRevokeInvite() {
   const revokeInvite = (slug: string, invitationId: string) => {
     startTransition(async () => {
       const result = await revokeInviteAction(slug, invitationId)
+
       if (!result.success) {
         handleServerError(result.error)
+
         return
       }
       toast.success('Invitation revoked')

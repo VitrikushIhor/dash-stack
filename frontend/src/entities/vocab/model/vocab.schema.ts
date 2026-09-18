@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { StudyMode } from './types'
 
-export const StudyModeSchema = z.enum([
+const StudyModeSchema = z.enum([
   StudyMode.FLASHCARDS,
   StudyMode.LEARN,
   StudyMode.TEST,

@@ -130,6 +130,7 @@ describe('useDeckCards', () => {
 
   it('should_invalidate_every_search_cache_for_the_deck', async () => {
     const client = new QueryClient()
+
     client.setQueryData(vocabKeys.deckCards('deck-1', 'alpha'), initialPage)
     client.setQueryData(vocabKeys.deckCards('deck-1', 'beta'), initialPage)
     const invalidate = vi.spyOn(client, 'invalidateQueries')
@@ -150,6 +151,7 @@ describe('useDeckCards', () => {
 
   it('should_keep_cards_visible_during_a_background_refetch', async () => {
     let resolveBrowse: ((page: DeckCardsPage) => void) | undefined
+
     vi.spyOn(vocabApi, 'browseDeckCards').mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -166,6 +168,7 @@ describe('useDeckCards', () => {
     )
 
     const invalidation = result.current.invalidateDeckCards()
+
     await waitFor(() => expect(vocabApi.browseDeckCards).toHaveBeenCalledOnce())
 
     expect(result.current.isSearchPending).toBe(false)
@@ -229,10 +232,9 @@ describe('useDeckCards', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     )
-    const { result } = renderHook(
-      () => useDeckCards('deck-1', '', pageOne),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useDeckCards('deck-1', '', pageOne), {
+      wrapper,
+    })
 
     act(() => {
       client.setQueryData(vocabKeys.deckCards('deck-1', ''), {
@@ -246,10 +248,9 @@ describe('useDeckCards', () => {
       vocabKeys.deckCards('deck-1', '')
     )
 
-    expect(cached?.pages.flatMap((page) => page.data).map((card) => card.id)).toEqual([
-      'card-1',
-      'card-2',
-    ])
+    expect(
+      cached?.pages.flatMap((page) => page.data).map((card) => card.id)
+    ).toEqual(['card-1', 'card-2'])
     expect(cached?.pages[1]?.data[0]?.progress.isStarred).toBe(true)
     expect(cached?.pages[0]?.summary.starred).toBe(1)
     expect(invalidate).not.toHaveBeenCalled()
@@ -314,5 +315,4 @@ describe('useDeckCards', () => {
     expect(searched?.pages[0]?.summary.starred).toBe(5)
     expect(searched?.pages[0]?.data[0]?.progress.isStarred).toBe(true)
   })
-
 })

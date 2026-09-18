@@ -22,6 +22,7 @@ export function createDeckApi(client: HttpClient) {
   return {
     getMyDecks: (status?: DeckStatusEnum): Promise<Deck[]> => {
       const params = status ? { status } : undefined
+
       return client.get<Deck[]>('/v1/vocab/decks', {
         params,
         next: { tags: [SERVER_CACHE_TAGS.decks] },
@@ -39,6 +40,7 @@ export function createDeckApi(client: HttpClient) {
         page: filters?.page?.toString(),
         perPage: filters?.perPage?.toString(),
       }
+
       return client.get<PaginatedResult<Deck>>('/v1/vocab/decks/public', {
         params,
         next: { tags: [SERVER_CACHE_TAGS.decks] },

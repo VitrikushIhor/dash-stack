@@ -30,11 +30,14 @@ export function useLearnProgressSync({
       consumeOnFinish = false
     ): Promise<boolean> => {
       const feedback = pending.feedback
+
       if (!feedback || feedback.sync !== 'pending') return true
       const current = pending.cards[pending.session.currentIndex]
+
       if (!current) return false
       const attemptId = pending.session.questionId
       const lease = beginSync(attemptId)
+
       if (lease === null) return false
 
       try {
@@ -48,8 +51,10 @@ export function useLearnProgressSync({
             },
           ],
         })
+
         if (!result.success) {
           setErrorIfActive(new Error(result.error), lease)
+
           return false
         }
 
@@ -63,9 +68,11 @@ export function useLearnProgressSync({
         )
         setErrorIfActive(null, lease)
         void queryClient.invalidateQueries({ queryKey: vocabKeys.dueReviews() })
+
         return true
       } catch (syncError: unknown) {
         setErrorIfActive(syncError, lease)
+
         return false
       } finally {
         finishSync(attemptId, lease)

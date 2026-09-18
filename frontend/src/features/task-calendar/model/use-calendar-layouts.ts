@@ -27,12 +27,15 @@ export function useTimelineLayout(tasks: Task[], date: Date) {
       return tasks
         .filter((task) => {
           const anchor = getTaskCalendarAnchor(task)
+
           return anchor && isSameDay(parseISO(anchor), day)
         })
         .sort((a, b) => {
           const anchorA = getTaskCalendarAnchor(a)
           const anchorB = getTaskCalendarAnchor(b)
+
           if (!anchorA || !anchorB) return 0
+
           return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
         })
     })

@@ -44,6 +44,7 @@ export function createVocabApi(client: HttpClient) {
         onlyDue:
           query?.onlyDue !== undefined ? String(query.onlyDue) : undefined,
       }
+
       return client.get<StudyCard[]>(`/v1/vocab/decks/${deckId}/study`, {
         params,
         next: { tags: [SERVER_CACHE_TAGS.studySession(deckId)] },
@@ -61,6 +62,7 @@ export function createVocabApi(client: HttpClient) {
 
     getDueReviews: (deckId?: string): Promise<DueReviewsResponse> => {
       const params = deckId ? { deckId } : undefined
+
       return client.get<DueReviewsResponse>('/v1/vocab/reviews/due', {
         params,
         next: { tags: [SERVER_CACHE_TAGS.dueReviews] },

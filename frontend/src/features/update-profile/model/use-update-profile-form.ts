@@ -16,7 +16,9 @@ interface UseUpdateProfileFormProps {
 function parseDob(dobString?: string | null): Date | undefined {
   if (!dobString) return undefined
   const [year, month, day] = dobString.split('-').map(Number)
+
   if (!year || !month || !day) return undefined
+
   return new Date(year, month - 1, day)
 }
 

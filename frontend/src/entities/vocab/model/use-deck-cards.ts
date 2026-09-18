@@ -1,10 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import {
-  useInfiniteQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@/shared/lib'
 import { vocabApi } from '../api/vocab-api'
 import { vocabKeys } from '../api/vocab-query-keys'

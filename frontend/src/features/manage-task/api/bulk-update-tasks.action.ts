@@ -16,7 +16,9 @@ export const bulkUpdateTasksAction = createAction(
   }),
   async ({ slug, ids, data }) => {
     const res = await taskServerApi.bulkUpdate(slug, ids, data)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
+
     return res
   }
 )

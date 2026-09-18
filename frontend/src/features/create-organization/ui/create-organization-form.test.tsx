@@ -44,17 +44,21 @@ describe('CreateOrganizationForm', () => {
 
   it('submits filled form values when submit button is clicked', async () => {
     const user = userEvent.setup()
+
     mockCreateOrganization.mockImplementation(async (_values, options) => {
       options?.onSuccess?.()
+
       return true
     })
 
     render(<CreateOrganizationForm />)
 
     const nameInput = screen.getByLabelText(/name/i)
+
     await user.type(nameInput, 'Stark Industries')
 
     const submitBtn = screen.getByRole('button', { name: 'Create' })
+
     await user.click(submitBtn)
 
     expect(mockCreateOrganization).toHaveBeenCalledWith(

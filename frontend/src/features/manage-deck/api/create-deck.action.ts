@@ -8,6 +8,8 @@ import { deckServerApi } from '@/entities/deck/server'
 
 export const createDeckAction = createAction(CreateDeckSchema, async (data) => {
   const res = await deckServerApi.create(data)
+
   revalidateTag(SERVER_CACHE_TAGS.decks)
+
   return res
 })

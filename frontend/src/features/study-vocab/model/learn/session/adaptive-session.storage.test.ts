@@ -35,6 +35,7 @@ beforeEach(() => localStorage.clear())
 describe('Learn session storage', () => {
   it('should_restore_streak_and_pending_attempt_when_session_was_interrupted', () => {
     const snapshot = createLearnSnapshot(learnCards)
+
     snapshot.session = answerLearnQuestion(
       snapshot.session,
       snapshot.session.questionId,
@@ -60,6 +61,7 @@ describe('Learn session storage', () => {
   })
   it('should_preserve_question_choices_when_reloaded_before_answer', () => {
     const snapshot = createLearnSnapshot(learnCards)
+
     saveLearnSnapshot('learn', snapshot)
     expect(loadLearnSnapshot('learn', 'deck')?.choices).toEqual(
       snapshot.choices
@@ -67,6 +69,7 @@ describe('Learn session storage', () => {
   })
   it('should_reject_inconsistent_card_state_when_storage_was_modified', () => {
     const snapshot = createLearnSnapshot(learnCards)
+
     localStorage.setItem(
       'learn',
       JSON.stringify({

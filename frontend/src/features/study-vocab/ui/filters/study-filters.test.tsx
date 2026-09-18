@@ -7,6 +7,7 @@ import { StudyFilters } from './study-filters'
 describe('StudyFilters', () => {
   it('should_preserve_starred_filter_when_due_filter_is_enabled', async () => {
     const onUrlUpdate = vi.fn()
+
     render(
       <NuqsTestingAdapter
         searchParams='?onlyStarred=true'
@@ -27,6 +28,7 @@ describe('StudyFilters', () => {
 
   it('should_clear_both_filters_when_reset_is_clicked', async () => {
     const onUrlUpdate = vi.fn()
+
     render(
       <NuqsTestingAdapter
         searchParams='?onlyDue=true&onlyStarred=true'

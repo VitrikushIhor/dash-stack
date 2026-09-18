@@ -32,6 +32,7 @@ describe('updateOrganizationAction', () => {
       createdAt: '2026-01-01',
       updatedAt: '2026-01-02',
     }
+
     vi.mocked(organizationServerApi.update).mockResolvedValue(mockUpdatedOrg)
 
     const result = await updateOrganizationAction(validSlug, {

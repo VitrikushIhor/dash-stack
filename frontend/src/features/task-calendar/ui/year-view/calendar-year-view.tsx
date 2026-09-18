@@ -16,6 +16,7 @@ export function CalendarYearView({
 }: IProps) {
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)
+
     return Array.from({ length: 12 }, (_, i) => addMonths(yearStart, i))
   }, [selectedDate])
 

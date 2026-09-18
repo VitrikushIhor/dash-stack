@@ -7,7 +7,9 @@ const DueReviewsContext = createContext<Map<string, number> | null>(null)
 
 export function useDueCount(deckId: string): number | null {
   const ctx = useContext(DueReviewsContext)
+
   if (!ctx) return null
+
   return ctx.get(deckId) ?? 0
 }
 

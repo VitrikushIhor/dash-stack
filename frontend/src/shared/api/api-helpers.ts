@@ -9,6 +9,7 @@ export const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
     return error.message
   }
+
   return 'An unexpected error occurred'
 }
 
@@ -19,25 +20,30 @@ export function handleServerError(error: unknown): void {
     error.forEach((msg) => {
       if (typeof msg === 'string') toast.error(msg)
     })
+
     return
   }
 
   if (typeof error === 'string') {
     toast.error(error)
+
     return
   }
 
   if (error instanceof ApiError) {
     if (error.isValidationError && error.validationMessages.length > 0) {
       error.validationMessages.forEach((msg) => toast.error(msg))
+
       return
     }
     toast.error(error.message)
+
     return
   }
 
   if (error instanceof Error) {
     toast.error(error.message)
+
     return
   }
 
@@ -50,5 +56,6 @@ export const getFileUrl = (
   if (!key) return undefined
   if (key.startsWith('http')) return key
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
   return `${baseUrl}/uploads/${key}`
 }

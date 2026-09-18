@@ -36,6 +36,7 @@ export function FormChecklist({
             name: `Checklist ${checklists.length + 1}`,
             items: [],
           }
+
           field.onChange([...checklists, newChecklist])
         }
 
@@ -43,11 +44,13 @@ export function FormChecklist({
           const newChecklists = checklists.map((c) =>
             c.id === updatedChecklist.id ? updatedChecklist : c
           )
+
           field.onChange(newChecklists)
         }
 
         const handleChecklistDelete = (checklistId: string) => {
           const newChecklists = checklists.filter((c) => c.id !== checklistId)
+
           field.onChange(newChecklists)
         }
 

@@ -12,6 +12,7 @@ export function useImagePicker(
   const [activeCardIdForImage, setActiveCardIdForImage] = React.useState<
     string | null
   >(null)
+
   const [isImagePickerOpen, setIsImagePickerOpen] = React.useState(false)
 
   const handleOpenImagePicker = React.useCallback((cardId: string) => {
@@ -31,6 +32,7 @@ export function useImagePicker(
   const activeCardTerm = React.useMemo(() => {
     if (!activeCardIdForImage) return ''
     const card = cards.find((c) => c.id === activeCardIdForImage)
+
     return card?.term || ''
   }, [activeCardIdForImage, cards])
 

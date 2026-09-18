@@ -22,6 +22,7 @@ export function createDeckEditorDraftStore(name: string) {
       },
       onRehydrateStorage: () => {
         hydrationError = undefined
+
         return (_state, error) => {
           hydrationError = error
         }
@@ -42,8 +43,10 @@ export function createDeckEditorDraftStore(name: string) {
     if (!store.persist.hasHydrated()) {
       throw hydrationError ?? new Error('Draft hydration failed')
     }
+
     return store.getState().draft
   }
   const write = (draft: DraftStoreState['draft']) => store.setState({ draft })
+
   return { read, write, clear }
 }

@@ -16,7 +16,9 @@ export const updateLabelAction = createAction(
   }),
   async ({ slug, id, data }) => {
     const res = await labelServerApi.update(slug, id, data)
+
     revalidateTag(SERVER_CACHE_TAGS.labels(slug))
+
     return res
   }
 )

@@ -111,6 +111,12 @@ jobs:
       - name: Run ESLint
         run: pnpm --filter backend run lint
 
+      - name: Run TypeScript type check
+        run: pnpm --filter backend run type-check
+
+      - name: Check code formatting
+        run: pnpm --filter backend run format:check
+
   # ============================================
   # BUILD - FRONTEND
   # ============================================

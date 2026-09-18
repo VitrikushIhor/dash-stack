@@ -32,10 +32,12 @@ export function MultipleChoiceQuestion({
     )
     const shuffledDistractors = shuffle(distractors).slice(0, 3)
     const combined = [card, ...shuffledDistractors]
+
     return shuffle(combined)
   }, [card, allCards])
 
   const onAnswerRef = useRef(onAnswer)
+
   useEffect(() => {
     onAnswerRef.current = onAnswer
   }, [onAnswer])
@@ -46,6 +48,7 @@ export function MultipleChoiceQuestion({
       const timer = setTimeout(() => {
         onAnswerRef.current(isCorrect)
       }, ANSWER_FEEDBACK_DELAY_MS)
+
       return () => clearTimeout(timer)
     }
   }, [selectedAnswer, card.id])
@@ -68,6 +71,7 @@ export function MultipleChoiceQuestion({
     isDisabled: !!selectedAnswer,
     onSelectIndex: (index) => {
       const targetOption = options[index]
+
       if (targetOption) {
         handleSelect(targetOption.id)
       }

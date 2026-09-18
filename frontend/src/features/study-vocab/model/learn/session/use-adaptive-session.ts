@@ -65,6 +65,7 @@ export function useAdaptiveLearn(
     async (answerValue: LearnAnswer) => {
       if (!snapshot || snapshot.session.phase !== LearnPhase.Question) return
       const lease = beginAnswer()
+
       if (lease === null) return
       try {
         const answered = answerAdaptiveLearnQuestion(
@@ -72,6 +73,7 @@ export function useAdaptiveLearn(
           answerValue,
           user ? 'pending' : 'guest'
         )
+
         if (!answered) return
         persist(answered)
         setError(null)
@@ -101,6 +103,7 @@ export function useAdaptiveLearn(
           : null,
       feedback: null,
     }
+
     try {
       persist(nextSnapshot)
       setError(null)
@@ -118,6 +121,7 @@ export function useAdaptiveLearn(
       const fresh = createLearnSnapshot(
         initialCards.length ? initialCards : (snapshot?.cards ?? [])
       )
+
       persist(fresh)
       setError(null)
     } catch (storageError: unknown) {

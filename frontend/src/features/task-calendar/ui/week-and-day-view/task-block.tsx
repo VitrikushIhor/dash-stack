@@ -12,7 +12,7 @@ import { calendarWeekEventCardVariants } from '../variants'
 const MIN_FLEX_COLUMN_DURATION = 35
 const MIN_TIME_LABEL_DURATION = 25
 
-export interface TaskBlockProps extends Omit<
+interface TaskBlockProps extends Omit<
   VariantProps<typeof calendarWeekEventCardVariants>,
   'color'
 > {
@@ -29,6 +29,7 @@ export function TaskBlock({
   onTaskClick,
 }: TaskBlockProps) {
   const anchor = getTaskCalendarAnchor(task)
+
   if (!anchor) return null
   const start = parseISO(anchor)
   const end = start

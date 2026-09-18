@@ -24,6 +24,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     handleServerError: vi.fn(),
@@ -93,6 +94,7 @@ describe('useSendInvite', () => {
 
   it('handles server errors correctly (without validation messages)', async () => {
     const errorResponse = { success: false as const, error: 'Failed to send' }
+
     vi.mocked(sendInviteAction).mockResolvedValue(errorResponse)
 
     const { result } = renderHook(() => useSendInvite())
@@ -124,6 +126,7 @@ describe('useSendInvite', () => {
       error: 'General Error',
       validationMessages: ['Invalid email format'],
     }
+
     vi.mocked(sendInviteAction).mockResolvedValue(errorResponse)
 
     const { result } = renderHook(() => useSendInvite())

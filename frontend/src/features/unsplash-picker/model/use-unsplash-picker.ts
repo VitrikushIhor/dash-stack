@@ -21,6 +21,7 @@ export function useUnsplashPicker(
   const [activeQuery, setActiveQuery] = React.useState(
     initialQuery || 'learning'
   )
+
   const prevOpenRef = React.useRef(open)
 
   React.useEffect(() => {

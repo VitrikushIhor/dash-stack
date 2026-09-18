@@ -15,7 +15,9 @@ export const bulkDeleteTasksAction = createAction(
   }),
   async ({ slug, ids }) => {
     const res = await taskServerApi.bulkDelete(slug, ids)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
+
     return res
   }
 )

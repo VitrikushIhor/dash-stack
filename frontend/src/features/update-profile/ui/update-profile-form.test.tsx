@@ -44,15 +44,18 @@ describe('UpdateProfileForm', () => {
 
   it('submits updated profile data when user changes input and clicks save', async () => {
     const user = userEvent.setup()
+
     mockUpdateProfile.mockResolvedValue(true)
 
     render(<UpdateProfileForm user={mockUser} />)
 
     const firstNameInput = screen.getByLabelText(/first name/i)
+
     await user.clear(firstNameInput)
     await user.type(firstNameInput, 'Johnny')
 
     const saveBtn = screen.getByRole('button', { name: /update profile/i })
+
     await user.click(saveBtn)
 
     expect(mockUpdateProfile).toHaveBeenCalledWith(
@@ -75,6 +78,7 @@ describe('UpdateProfileForm', () => {
     render(<UpdateProfileForm user={mockUser} />)
 
     const saveBtn = screen.getByRole('button', { name: /saving\.\.\./i })
+
     expect(saveBtn).toBeDisabled()
   })
 })

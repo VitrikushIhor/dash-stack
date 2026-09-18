@@ -29,6 +29,7 @@ export function MatchLeaderboard({ board }: { board: MatchLeaderboardData }) {
               [entry.user.firstName, entry.user.lastName]
                 .filter(Boolean)
                 .join(' ') || 'Learner'
+
             return (
               <li
                 key={entry.id}

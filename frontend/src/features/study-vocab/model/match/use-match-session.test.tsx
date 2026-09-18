@@ -65,7 +65,9 @@ function renderSession(currentUser: User | null | undefined = user) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
+
   if (currentUser !== undefined) client.setQueryData(userKeys.me(), currentUser)
+
   return renderHook(
     () => useMatchSession('deck-1', { onlyDue: true, onlyStarred: false }),
     {
@@ -104,6 +106,7 @@ describe('useMatchSession', () => {
 
   it('should_create_server_session_before_exposing_cards_to_the_reducer', async () => {
     const { result } = renderSession()
+
     expect(result.current.session).toBeNull()
     await waitFor(() => expect(result.current.status).toBe('playing'))
     expect(createMatchSessionAction).toHaveBeenCalledWith({
@@ -117,6 +120,7 @@ describe('useMatchSession', () => {
 
   it('should_complete_each_server_session_exactly_once', async () => {
     const { result } = renderSession()
+
     await waitFor(() => expect(result.current.status).toBe('playing'))
     await act(async () => {
       await Promise.all([result.current.complete(), result.current.complete()])
@@ -143,6 +147,7 @@ describe('useMatchSession', () => {
         },
       })
     const { result } = renderSession()
+
     await waitFor(() => expect(result.current.status).toBe('playing'))
     await act(async () => {
       await result.current.complete()
@@ -159,6 +164,7 @@ describe('useMatchSession', () => {
 
   it('should_not_create_a_session_for_a_confirmed_guest', async () => {
     const { result } = renderSession(null)
+
     await waitFor(() => expect(result.current.status).toBe('guest'))
     expect(createMatchSessionAction).not.toHaveBeenCalled()
   })

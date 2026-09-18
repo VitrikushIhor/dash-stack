@@ -14,6 +14,7 @@ export const getCurrentUser = cache(
   async (): Promise<GetCurrentUserResponse> => {
     try {
       const data = await userServerApi.getMe()
+
       return { data, error: null, statusCode: null }
     } catch (error) {
       return {

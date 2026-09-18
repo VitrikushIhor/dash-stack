@@ -88,6 +88,7 @@ export function SortableFlashcardList({
               position: idx,
             })
           )
+
           onCardsReorder(reordered)
         }
       }
@@ -131,6 +132,7 @@ export function SortableFlashcardList({
             >
               {virtualizer.getVirtualItems().map((virtualCard) => {
                 const card = cards[virtualCard.index]
+
                 if (!card) return null
 
                 return (

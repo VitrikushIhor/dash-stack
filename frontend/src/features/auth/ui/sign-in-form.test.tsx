@@ -5,6 +5,7 @@ import { render, screen, waitFor } from '@/shared/lib/test'
 import { SignInForm } from './sign-in-form'
 
 const mockReplace = vi.fn()
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     replace: mockReplace,
@@ -13,6 +14,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const mockSignInAction = vi.fn()
+
 vi.mock('../api/actions/sign-in.action', () => ({
   signInAction: (...args: unknown[]) => mockSignInAction(...args),
 }))
@@ -36,6 +38,7 @@ describe('SignInForm Component', () => {
 
   it('displays validation errors when submitting empty form', async () => {
     const user = userEvent.setup()
+
     render(<SignInForm />)
 
     await user.click(screen.getByRole('button', { name: /sign in/i }))
@@ -51,6 +54,7 @@ describe('SignInForm Component', () => {
 
   it('submits form with valid user credentials and redirects to create-organization by default', async () => {
     const user = userEvent.setup()
+
     mockSignInAction.mockResolvedValueOnce({ success: true })
 
     render(<SignInForm />)
@@ -73,6 +77,7 @@ describe('SignInForm Component', () => {
 
   it('redirects to custom target URL when redirectTo prop is specified', async () => {
     const user = userEvent.setup()
+
     mockSignInAction.mockResolvedValueOnce({ success: true })
 
     render(<SignInForm redirectTo='/analytics' />)

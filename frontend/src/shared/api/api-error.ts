@@ -46,7 +46,9 @@ export function extractErrorMessage(
 ): string {
   if (!payload || typeof payload !== 'object') return fallback
   const data = payload as Partial<ApiErrorResponse>
+
   if (Array.isArray(data.message)) return data.message[0] ?? fallback
   if (typeof data.message === 'string') return data.message
+
   return fallback
 }

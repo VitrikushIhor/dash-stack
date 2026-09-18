@@ -13,10 +13,13 @@ export function sleep(ms: number = 1000) {
 
 export function shuffle<T>(array: T[]): T[] {
   const newArr = [...array]
+
   for (let i = newArr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
+
     ;[newArr[i], newArr[j]] = [newArr[j], newArr[i]]
   }
+
   return newArr
 }
 
@@ -25,6 +28,7 @@ export function formatTime(ms: number) {
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
   const tenths = Math.floor((ms % 1000) / 100)
+
   return `${minutes > 0 ? `${minutes}:` : ''}${minutes > 0 && seconds < 10 ? '0' : ''}${seconds}.${tenths}`
 }
 
@@ -90,10 +94,12 @@ export function getInitials(name: string): string {
 
 export function stringToColor(str: string): string {
   let hash = 0
+
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash)
   }
   const hue = hash % 360
+
   return `hsl(${hue}, 65%, 50%)`
 }
 
@@ -106,6 +112,7 @@ export function getUserInitials(
     return `${firstName[0]}${lastName[0]}`.toUpperCase()
   if (firstName) return firstName.slice(0, 2).toUpperCase()
   if (email) return email.slice(0, 2).toUpperCase()
+
   return 'U'
 }
 
@@ -117,6 +124,7 @@ export function getUserDisplayName(
   if (firstName && lastName) return `${firstName} ${lastName}`
   if (firstName) return firstName
   if (email) return email
+
   return 'User'
 }
 
@@ -126,6 +134,7 @@ export function sanitizeRedirectUrl(
 ): string {
   if (!url || typeof url !== 'string') return fallback
   const trimmed = url.trim()
+
   if (
     trimmed.startsWith('/') &&
     !trimmed.startsWith('//') &&
@@ -133,6 +142,7 @@ export function sanitizeRedirectUrl(
   ) {
     return trimmed
   }
+
   return fallback
 }
 
@@ -146,6 +156,8 @@ export function formatDate(
 ): string | null {
   if (!dateValue) return null
   const date = typeof dateValue === 'string' ? parseISO(dateValue) : dateValue
+
   if (!isValid(date)) return null
+
   return format(date, formatStr)
 }

@@ -31,6 +31,7 @@ describe('OrganizationSlugSchema', () => {
     expect(() => OrganizationSlugSchema.parse('')).toThrow()
 
     const longSlug = 'a'.repeat(101)
+
     expect(() => OrganizationSlugSchema.parse(longSlug)).toThrow()
   })
 })

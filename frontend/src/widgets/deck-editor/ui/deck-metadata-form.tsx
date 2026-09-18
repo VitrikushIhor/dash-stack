@@ -38,6 +38,7 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
 
   const addTag = (value: string) => {
     const tag = normalizeDeckTag(value)
+
     if (tag && !tags.includes(tag)) setTags([...tags, tag])
     setTagInput('')
   }
@@ -48,6 +49,7 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
       addTag(tagInput)
     }
   }
+
   return (
     <div className='border-border/70 bg-card/60 rounded-2xl border p-6 shadow-sm backdrop-blur-sm'>
       <div className='space-y-4'>

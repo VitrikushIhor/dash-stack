@@ -19,6 +19,7 @@ export function useImportFile({
 
   const readFile = async (file: File) => {
     const version = ++fileVersion.current
+
     resetPreview()
     setReading(true)
     try {

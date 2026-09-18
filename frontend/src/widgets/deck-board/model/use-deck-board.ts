@@ -62,6 +62,7 @@ export function useDeckBoard(deckId: string) {
     setStarOverrides((current) => {
       if (!(cardId in current)) return current
       const { [cardId]: _, ...remaining } = current
+
       return remaining
     })
   }, [])

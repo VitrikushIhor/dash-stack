@@ -22,6 +22,7 @@ export function ImportMappingFields({ model }: { model: ImportViewModel }) {
   const handleMappingChange = useCallback(
     (field: keyof ImportMapping, value: string) => {
       const column = value === '' ? null : Number(value) - 1
+
       if (column === null && (field === 'term' || field === 'definition'))
         return
       if (column !== null && (!Number.isInteger(column) || column < 0)) return

@@ -28,28 +28,36 @@ export function attachServerData(
   data: Pick<UploadResponse, 'key' | 'url'>
 ): FileWithServerData {
   const f = file as FileWithServerData
+
   f.s3Key = data.key
   f.s3Url = data.url
+
   return f
 }
 
 export function createFileFromKey(key: string): FileWithServerData {
   const filename = key.split('/').pop() ?? key
   const file = new File([], filename) as FileWithServerData
+
   file.s3Key = key
+
   return file
 }
 
 export const storageApi = {
   uploadImage(file: File): Promise<UploadResponse> {
     const formData = new FormData()
+
     formData.append('file', file)
+
     return api.post<UploadResponse>('/storage/image', formData)
   },
 
   uploadFile(file: File): Promise<UploadResponse> {
     const formData = new FormData()
+
     formData.append('file', file)
+
     return api.post<UploadResponse>('/storage/file', formData)
   },
 }
@@ -69,9 +77,11 @@ export async function resolveLogoUrl(
 
   if (isFileWithServerData(logoFile)) {
     const url = logoFile.s3Url || logoFile.s3Key
+
     if (url) return url
   }
 
   const res = await uploadImage(logoFile)
+
   return res.url
 }

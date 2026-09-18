@@ -29,6 +29,7 @@ describe('createOrganizationAction', () => {
       createdAt: '2026-01-01',
       updatedAt: '2026-01-01',
     }
+
     vi.mocked(organizationServerApi.create).mockResolvedValue(mockOrg)
 
     const result = await createOrganizationAction({

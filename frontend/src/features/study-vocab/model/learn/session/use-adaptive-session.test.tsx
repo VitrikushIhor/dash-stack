@@ -42,10 +42,12 @@ function wrapper(guest = false) {
   const client = new QueryClient({
     defaultOptions: { queries: { staleTime: Infinity, retry: false } },
   })
+
   client.setQueryData(
     userKeys.me(),
     guest ? null : { id: 'user', email: 'user@example.test' }
   )
+
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
@@ -68,6 +70,7 @@ describe('useAdaptiveLearn', () => {
     const { result } = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     await act(() => result.current.start())
     await act(async () => {
@@ -84,6 +87,7 @@ describe('useAdaptiveLearn', () => {
     expect(result.current.snapshot?.session.phase).toBe('complete')
     expect(submitProgressAction).toHaveBeenCalledTimes(2)
     const [first, second] = vi.mocked(submitProgressAction).mock.calls
+
     expect(first[0].attemptId).not.toBe(second[0].attemptId)
   })
 
@@ -95,6 +99,7 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     await act(() =>
@@ -102,11 +107,13 @@ describe('useAdaptiveLearn', () => {
     )
     expect(view.result.current.error).toContain('Connection lost')
     const firstId = vi.mocked(submitProgressAction).mock.calls[0][0].attemptId
+
     view.unmount()
 
     const resumed = renderHook(() => useAdaptiveLearn('deck', []), {
       wrapper: wrapper(),
     })
+
     await waitFor(() =>
       expect(resumed.result.current.snapshot?.feedback?.sync).toBe('saved')
     )
@@ -123,6 +130,7 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(true),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     await act(() =>
@@ -136,6 +144,7 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     const setItem = vi
@@ -143,6 +152,7 @@ describe('useAdaptiveLearn', () => {
       .mockImplementation(() => {
         throw new Error('Storage full')
       })
+
     try {
       await act(() =>
         view.result.current.answer({ kind: 'typing', value: 'apple' })
@@ -162,6 +172,7 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     await act(() =>
@@ -178,6 +189,7 @@ describe('useAdaptiveLearn', () => {
       () => useAdaptiveLearn('deck', cards, 'deck:learn:false:false'),
       { wrapper: wrapper() }
     )
+
     await waitFor(() => expect(allCards.result.current.isLoading).toBe(false))
     await act(() => allCards.result.current.start())
     allCards.unmount()
@@ -186,6 +198,7 @@ describe('useAdaptiveLearn', () => {
       () => useAdaptiveLearn('deck', [], 'deck:learn:true:false'),
       { wrapper: wrapper() }
     )
+
     await waitFor(() => expect(dueCards.result.current.isLoading).toBe(false))
 
     expect(dueCards.result.current.snapshot).toBeNull()
@@ -199,6 +212,7 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     await act(() =>
@@ -207,6 +221,7 @@ describe('useAdaptiveLearn', () => {
 
     let resolveRetry: (result: { success: true; data: [] }) => void = () =>
       undefined
+
     vi.mocked(submitProgressAction).mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -214,6 +229,7 @@ describe('useAdaptiveLearn', () => {
         })
     )
     let retries: Promise<void>[] = []
+
     await act(async () => {
       retries = [view.result.current.retry(), view.result.current.retry()]
       await Promise.resolve()
@@ -238,6 +254,7 @@ describe('useAdaptiveLearn', () => {
       { kind: LearnAnswerKind.Typing, value: 'apple' },
       'pending'
     )
+
     expect(firstPending).not.toBeNull()
     expect(secondPending).not.toBeNull()
     if (!firstPending || !secondPending) return
@@ -246,6 +263,7 @@ describe('useAdaptiveLearn', () => {
 
     let resolveFirst: (result: { success: true; data: [] }) => void = () =>
       undefined
+
     vi.mocked(submitProgressAction)
       .mockImplementationOnce(
         () =>
@@ -257,6 +275,7 @@ describe('useAdaptiveLearn', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity, retry: false } },
     })
+
     client.setQueryData(userKeys.me(), {
       id: 'user-1',
       email: 'first@example.test',
@@ -280,6 +299,7 @@ describe('useAdaptiveLearn', () => {
   it('should_ignore_a_late_response_from_a_store_that_was_unmounted', async () => {
     let resolveOldRequest: (result: { success: true; data: [] }) => void = () =>
       undefined
+
     vi.mocked(submitProgressAction)
       .mockImplementationOnce(
         () =>
@@ -291,9 +311,11 @@ describe('useAdaptiveLearn', () => {
     const first = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(first.result.current.isLoading).toBe(false))
     await act(() => first.result.current.start())
     let oldAnswer: Promise<void> = Promise.resolve()
+
     act(() => {
       oldAnswer = first.result.current.answer({
         kind: LearnAnswerKind.Typing,
@@ -306,6 +328,7 @@ describe('useAdaptiveLearn', () => {
     const resumed = renderHook(() => useAdaptiveLearn('deck', []), {
       wrapper: wrapper(),
     })
+
     await waitFor(() =>
       expect(resumed.result.current.snapshot?.feedback?.sync).toBe('saved')
     )
@@ -318,6 +341,7 @@ describe('useAdaptiveLearn', () => {
     const reloaded = renderHook(() => useAdaptiveLearn('deck', []), {
       wrapper: wrapper(),
     })
+
     await waitFor(() => expect(reloaded.result.current.isLoading).toBe(false))
 
     expect(reloaded.result.current.snapshot?.session.phase).toBe('question')
@@ -333,6 +357,7 @@ describe('useAdaptiveLearn', () => {
         </StrictMode>
       ),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
 
     await act(() => view.result.current.start())
@@ -350,6 +375,7 @@ describe('useAdaptiveLearn', () => {
   it('should_not_block_a_new_identity_while_the_old_answer_is_pending', async () => {
     let resolveOldAnswer: (result: { success: true; data: [] }) => void = () =>
       undefined
+
     vi.mocked(submitProgressAction)
       .mockImplementationOnce(
         () =>
@@ -361,6 +387,7 @@ describe('useAdaptiveLearn', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity, retry: false } },
     })
+
     client.setQueryData(userKeys.me(), {
       id: 'user-1',
       email: 'first@example.test',
@@ -368,9 +395,11 @@ describe('useAdaptiveLearn', () => {
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
       wrapper: wrapperWithClient(client),
     })
+
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))
     await act(() => view.result.current.start())
     let oldAnswer: Promise<void> = Promise.resolve()
+
     act(() => {
       oldAnswer = view.result.current.answer({
         kind: LearnAnswerKind.Typing,

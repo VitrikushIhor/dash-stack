@@ -18,6 +18,7 @@ describe('useFlashcardShortcuts', () => {
     const onNext = vi.fn()
     const onStar = vi.fn()
     const onReplay = vi.fn()
+
     renderHook(() =>
       useFlashcardShortcuts({
         isFinished: false,
@@ -57,6 +58,7 @@ describe('useFlashcardShortcuts', () => {
     const onNext = vi.fn()
     const onStar = vi.fn()
     const onReplay = vi.fn()
+
     renderHook(() =>
       useFlashcardShortcuts({
         isFinished: false,
@@ -73,12 +75,14 @@ describe('useFlashcardShortcuts', () => {
 
     for (const tagName of controls) {
       const control = document.createElement(tagName)
+
       document.body.appendChild(control)
       control.focus()
       act(() => dispatchKey('ArrowRight'))
       control.remove()
     }
     const editable = document.createElement('div')
+
     editable.setAttribute('contenteditable', 'true')
     editable.tabIndex = 0
     document.body.appendChild(editable)

@@ -48,6 +48,7 @@ export function useMatch(
       const timer = setTimeout(() => {
         dispatch({ type: MATCH_ACTIONS.CLEAR_WRONG_MATCH })
       }, WRONG_MATCH_DELAY_MS)
+
       return () => clearTimeout(timer)
     }
 
@@ -58,6 +59,7 @@ export function useMatch(
       const [id1, id2] = state.selectedTileIds
       const timer = setTimeout(() => {
         const cardId = state.tiles.find((tile) => tile.id === id1)?.cardId
+
         if (cardId)
           void onPairMatched(cardId).then((saved) => {
             if (saved) {
@@ -69,6 +71,7 @@ export function useMatch(
             } else setPairError(true)
           })
       }, MATCH_DELAY_MS)
+
       return () => clearTimeout(timer)
     }
   }, [onPairMatched, pairRetry, state])
@@ -84,6 +87,7 @@ export function useMatch(
         })
         onCompleteRef.current()
       }, MATCH_WIN_DELAY_MS)
+
       return () => clearTimeout(timer)
     }
   }, [state])

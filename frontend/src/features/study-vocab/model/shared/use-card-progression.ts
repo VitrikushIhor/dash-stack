@@ -29,6 +29,7 @@ export function useCardProgression(
         ...resultsRef.current,
         { flashcardId: currentCard.id, isCorrect },
       ]
+
       resultsRef.current = newResults
 
       onNext?.()

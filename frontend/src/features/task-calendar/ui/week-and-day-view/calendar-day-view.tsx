@@ -18,8 +18,10 @@ export function CalendarDayView({
   const dayEvents = singleDayTasks
     .filter((task) => {
       const anchor = getTaskCalendarAnchor(task)
+
       if (!anchor) return false
       const eventDate = parseISO(anchor)
+
       return (
         eventDate.getDate() === selectedDate.getDate() &&
         eventDate.getMonth() === selectedDate.getMonth() &&
@@ -29,7 +31,9 @@ export function CalendarDayView({
     .sort((a, b) => {
       const anchorA = getTaskCalendarAnchor(a)
       const anchorB = getTaskCalendarAnchor(b)
+
       if (!anchorA || !anchorB) return 0
+
       return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
     })
 

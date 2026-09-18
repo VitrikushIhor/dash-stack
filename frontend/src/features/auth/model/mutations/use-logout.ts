@@ -13,9 +13,11 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       const res = await logoutAction()
+
       if (!res.success) {
         throw new Error(res.error)
       }
+
       return res.data
     },
     onSuccess: () => {

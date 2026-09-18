@@ -14,7 +14,9 @@ export const oauthExchangeAction = createAction(
   OAuthExchangeInputSchema,
   async ({ token }): Promise<AuthTokens> => {
     const tokens = await authServerApi.oauthExchange(token)
+
     await setAuthCookies(tokens)
+
     return tokens
   }
 )

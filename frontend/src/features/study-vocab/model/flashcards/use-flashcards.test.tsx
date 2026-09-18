@@ -91,6 +91,7 @@ describe('useFlashcards', () => {
     act(() => result.current.handleAnswer(true))
     const beforeShuffleIds = result.current.allCards.map((card) => card.id)
     const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+
     act(() => result.current.shuffleCards())
     random.mockRestore()
 

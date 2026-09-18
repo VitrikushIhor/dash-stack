@@ -12,6 +12,7 @@ describe('Learn progress payload', () => {
       attemptId: 'session:1',
       results: [{ flashcardId: 'card', isCorrect: true }],
     }
+
     expect(SubmitProgressPayloadSchema.parse(payload)).toEqual(payload)
   })
   it('should_reject_multiple_answers_when_an_attempt_id_is_supplied', () => {

@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test'
 import { ResetPasswordForm } from './reset-password-form'
 
 const mockResetPasswordAction = vi.fn()
+
 vi.mock('../api/actions/reset-password.action', () => ({
   resetPasswordAction: (...args: unknown[]) => mockResetPasswordAction(...args),
 }))
@@ -25,6 +26,7 @@ describe('ResetPasswordForm Component', () => {
 
   it('displays validation errors when submitting empty form or mismatching passwords', async () => {
     const user = userEvent.setup()
+
     render(<ResetPasswordForm token='sample-token' />)
 
     await user.click(screen.getByRole('button', { name: /reset password/i }))
@@ -45,6 +47,7 @@ describe('ResetPasswordForm Component', () => {
 
   it('submits form with matching valid passwords and displays success view', async () => {
     const user = userEvent.setup()
+
     mockResetPasswordAction.mockResolvedValueOnce({ success: true })
 
     render(<ResetPasswordForm token='valid-token-xyz' />)

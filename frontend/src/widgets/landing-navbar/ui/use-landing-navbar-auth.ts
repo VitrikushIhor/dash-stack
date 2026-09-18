@@ -4,7 +4,7 @@ import { getUserDisplayName, getUserInitials } from '@/shared/lib/utils'
 import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
 
-export interface NavbarAuthViewModel {
+interface NavbarAuthViewModel {
   isAuthenticated: boolean
   isLoading: boolean
   displayName: string

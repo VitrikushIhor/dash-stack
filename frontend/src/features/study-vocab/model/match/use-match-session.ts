@@ -82,6 +82,7 @@ export function useMatchSession(
     completionStarted.current = true
     setError(null)
     const result = await completeSession({ deckId, sessionId: session.id })
+
     if (result) await refetchLeaderboard()
   }, [completeSession, deckId, refetchLeaderboard, session])
 
@@ -89,6 +90,7 @@ export function useMatchSession(
     async (cardId: string) => {
       if (!session) return false
       const result = await savePair({ deckId, sessionId: session.id, cardId })
+
       return result !== undefined
     },
     [deckId, savePair, session]
@@ -109,6 +111,7 @@ export function useMatchSession(
   }, [complete, restart, session])
 
   let status: MatchSessionStatus = MatchSessionStatus.AUTH_LOADING
+
   if (user === null) status = MatchSessionStatus.GUEST
   else if (user && isCreating) status = MatchSessionStatus.LOADING
   else if (error) status = MatchSessionStatus.ERROR

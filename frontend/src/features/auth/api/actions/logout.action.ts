@@ -21,6 +21,7 @@ export const logoutAction = createAction(
     }
 
     await clearAuthCookies()
+
     return { message: 'Logged out successfully' }
   }
 )

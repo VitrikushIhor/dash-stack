@@ -14,7 +14,9 @@ export const verifyEmailAction = createAction(
   VerifyEmailInputSchema,
   async ({ token }): Promise<AuthTokens> => {
     const tokens = await authServerApi.verifyEmail(token)
+
     await setAuthCookies(tokens)
+
     return tokens
   }
 )

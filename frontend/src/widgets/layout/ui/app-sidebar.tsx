@@ -31,7 +31,7 @@ export function AppSidebar({
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter />
       <SidebarRail />
     </Sidebar>
   )

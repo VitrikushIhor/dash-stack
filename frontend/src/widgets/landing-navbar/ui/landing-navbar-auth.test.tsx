@@ -79,6 +79,7 @@ describe('LandingNavbarAuth', () => {
     expect(screen.getByRole('link', { name: /go to app/i })).toBeInTheDocument()
 
     const signOutButton = screen.getByRole('button', { name: /sign out/i })
+
     expect(signOutButton).toBeInTheDocument()
 
     fireEvent.click(signOutButton)
@@ -89,6 +90,7 @@ describe('LandingNavbarAuth', () => {
     const userEvent = (
       await import('@testing-library/user-event')
     ).default.setup()
+
     vi.mocked(useCurrentUser).mockReturnValue({
       data: {
         id: 'usr-1',
@@ -103,11 +105,13 @@ describe('LandingNavbarAuth', () => {
     render(<LandingNavbarAuth variant='desktop' />)
 
     const avatarButton = screen.getByRole('button', { expanded: false })
+
     await userEvent.click(avatarButton)
 
     const signOutMenuItem = await screen.findByRole('menuitem', {
       name: /sign out/i,
     })
+
     await userEvent.click(signOutMenuItem)
 
     expect(mockLogoutMutate).toHaveBeenCalledTimes(1)

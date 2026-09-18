@@ -68,6 +68,7 @@ export const dateRangeFilterFn: FilterFn<any> = (
   filterValue: unknown
 ): boolean => {
   const cellValue = row.getValue(columnId)
+
   if (!cellValue) return false
 
   const cellDate = new Date(cellValue as Date).getTime()

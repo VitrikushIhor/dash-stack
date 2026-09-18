@@ -61,6 +61,7 @@ describe('DeckBoard', () => {
   afterEach(() => vi.restoreAllMocks())
   it('should_select_due_cards_before_launching_flashcards', async () => {
     const client = new QueryClient()
+
     client.setQueryData(userKeys.me(), {
       id: 'owner-1',
       firstName: 'Owner',
@@ -114,6 +115,7 @@ describe('DeckBoard', () => {
 
   it('should_ignore_personalized_url_filters_for_guest_launch_links', () => {
     const client = new QueryClient()
+
     render(
       <QueryClientProvider client={client}>
         <NuqsTestingAdapter searchParams='?onlyDue=true&onlyStarred=true'>
@@ -148,6 +150,7 @@ describe('DeckBoard', () => {
 
   it('should_load_the_next_page_before_advancing_preview', async () => {
     const client = new QueryClient()
+
     vi.spyOn(vocabApi, 'browseDeckCards').mockResolvedValue({
       data: [card('2', null)],
       meta: {

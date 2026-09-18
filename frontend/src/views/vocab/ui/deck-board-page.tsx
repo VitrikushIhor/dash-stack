@@ -19,6 +19,7 @@ export async function DeckBoardPage({ params }: DeckBoardPageProps) {
   }
 
   const user = result.currentUser.data ?? null
+
   return (
     <DeckBoard
       deck={result.deck.data}

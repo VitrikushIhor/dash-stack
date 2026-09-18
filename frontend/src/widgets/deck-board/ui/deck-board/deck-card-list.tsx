@@ -114,6 +114,7 @@ export function DeckCardList({
           >
             {virtualizer.getVirtualItems().map((virtualCard) => {
               const card = cards[virtualCard.index]
+
               if (!card) return null
 
               return (

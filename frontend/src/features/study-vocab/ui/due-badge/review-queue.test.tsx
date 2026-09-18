@@ -12,6 +12,7 @@ describe('ReviewQueue', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity } },
     })
+
     client.setQueryData(userKeys.me(), {
       id: 'learner',
       email: 'learner@example.test',
@@ -44,6 +45,7 @@ describe('ReviewQueue', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity } },
     })
+
     client.setQueryData(userKeys.me(), null)
     render(
       <QueryClientProvider client={client}>
@@ -61,6 +63,7 @@ describe('ReviewQueue', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity } },
     })
+
     client.setQueryData(userKeys.me(), {
       id: 'learner',
       email: 'learner@example.test',

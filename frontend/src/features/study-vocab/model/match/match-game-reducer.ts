@@ -50,7 +50,7 @@ export type GameFinished = {
 
 export type GameState = GamePlaying | GameFinished
 
-export type GameAction =
+type GameAction =
   | { type: typeof MATCH_ACTIONS.SELECT_TILE; payload: string }
   | {
       type: typeof MATCH_ACTIONS.MATCH_SUCCESS
@@ -73,6 +73,7 @@ export function createInitialTiles(cards: MatchCard[]): MatchTile[] {
     )
   }
   const tiles: MatchTile[] = []
+
   cards.forEach((card) => {
     tiles.push({
       id: `term-${card.id}`,
@@ -89,6 +90,7 @@ export function createInitialTiles(cards: MatchCard[]): MatchTile[] {
       isMatched: false,
     })
   })
+
   return shuffle(tiles)
 }
 
@@ -111,6 +113,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (state.selectedTileIds.length >= 2) return state
 
       const clickedTile = state.tiles.find((t) => t.id === action.payload)
+
       if (!clickedTile || clickedTile.isMatched) return state
 
       if (state.selectedTileIds.length === 0) {
@@ -171,6 +174,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case MATCH_ACTIONS.MATCH_FAIL: {
       const { id1, id2 } = action.payload
+
       return {
         ...state,
         selectedTileIds: [id1, id2],

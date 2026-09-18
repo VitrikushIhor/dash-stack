@@ -16,6 +16,7 @@ export const getOrganizationBySlug = cache(
       const validSlug = OrganizationSlugSchema.parse(slug)
 
       const orgResult = await getOrganization(validSlug)
+
       if (orgResult.error || !orgResult.data) {
         return {
           data: null,

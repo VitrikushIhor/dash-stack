@@ -40,6 +40,7 @@ export function useDeckEditor(
     setLevel,
     setVisibility,
   } = metadata
+
   const { setCards, setDeletedCardIds } = flashcards
 
   const applyState = useCallback(
@@ -149,6 +150,7 @@ export function useDeckEditor(
     if (savingRef.current) return
     if (!savePayload.metadata.title) {
       toast.error('Deck title cannot be empty')
+
       return
     }
 
@@ -163,12 +165,15 @@ export function useDeckEditor(
 
         if (!deckRes.success) {
           handleServerError(deckRes.validationMessages ?? deckRes.error)
+
           return
         }
 
         const saved = deckRes.data
+
         if (!Array.isArray(saved.flashcards)) {
           toast.error('Deck was saved, but cards could not be refreshed')
+
           return
         }
         const savedState: DeckEditorDraftState = {
@@ -183,6 +188,7 @@ export function useDeckEditor(
           cards: saved.flashcards,
           deletedCardIds: [],
         }
+
         markSaved(savedState, saved.updatedAt)
         applyState(savedState)
         router.refresh()

@@ -63,12 +63,14 @@ describe('InvitationsTable', () => {
 
   it('calls revokeInvite when the revoke button is clicked', async () => {
     const user = userEvent.setup()
+
     render(<InvitationsTable slug='org-1' invitations={defaultInvitations} />)
 
     // Find all revoke buttons
     const revokeButtons = screen.getAllByRole('button', {
       name: /revoke invitation/i,
     })
+
     expect(revokeButtons).toHaveLength(2)
 
     // Click the first one (invite-1)
@@ -90,6 +92,7 @@ describe('InvitationsTable', () => {
     const revokeButtons = screen.getAllByRole('button', {
       name: /revoke invitation/i,
     })
+
     expect(revokeButtons[0]).not.toBeDisabled()
     expect(revokeButtons[1]).not.toBeDisabled()
 
@@ -127,6 +130,7 @@ describe('InvitationsTable', () => {
     const revokeButtons = screen.getAllByRole('button', {
       name: /revoke invitation/i,
     })
+
     await user.click(revokeButtons[0])
 
     // Simulate pending state
@@ -152,6 +156,7 @@ describe('InvitationsTable', () => {
     const finalButtons = screen.getAllByRole('button', {
       name: /revoke invitation/i,
     })
+
     expect(finalButtons[0]).not.toBeDisabled()
     expect(finalButtons[1]).not.toBeDisabled()
   })

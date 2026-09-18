@@ -39,6 +39,7 @@ const DirectionContext = React.createContext<Direction | undefined>(undefined)
 
 function useDirection(dirProp?: Direction): Direction {
   const contextDir = React.useContext(DirectionContext)
+
   return dirProp ?? contextDir ?? 'ltr'
 }
 
@@ -94,13 +95,16 @@ function createStore(
           const fileList = Array.from(files.values()).map(
             (fileState) => fileState.file
           )
+
           onValueChange(fileList)
         }
+
         return { ...state, files }
       }
 
       case 'SET_FILES': {
         const newFileSet = new Set(action.files)
+
         for (const existingFile of files.keys()) {
           if (!newFileSet.has(existingFile)) {
             files.delete(existingFile)
@@ -109,6 +113,7 @@ function createStore(
 
         for (const file of action.files) {
           const existingState = files.get(file)
+
           if (!existingState) {
             files.set(file, {
               file,
@@ -117,11 +122,13 @@ function createStore(
             })
           }
         }
+
         return { ...state, files }
       }
 
       case 'SET_PROGRESS': {
         const fileState = files.get(action.file)
+
         if (fileState) {
           files.set(action.file, {
             ...fileState,
@@ -129,11 +136,13 @@ function createStore(
             status: 'uploading',
           })
         }
+
         return { ...state, files }
       }
 
       case 'SET_SUCCESS': {
         const fileState = files.get(action.file)
+
         if (fileState) {
           files.set(action.file, {
             ...fileState,
@@ -141,11 +150,13 @@ function createStore(
             status: 'success',
           })
         }
+
         return { ...state, files }
       }
 
       case 'SET_ERROR': {
         const fileState = files.get(action.file)
+
         if (fileState) {
           files.set(action.file, {
             ...fileState,
@@ -153,12 +164,14 @@ function createStore(
             status: 'error',
           })
         }
+
         return { ...state, files }
       }
 
       case 'REMOVE_FILE': {
         if (urlCache) {
           const cachedUrl = urlCache.get(action.file)
+
           if (cachedUrl) {
             URL.revokeObjectURL(cachedUrl)
             urlCache.delete(action.file)
@@ -171,8 +184,10 @@ function createStore(
           const fileList = Array.from(files.values()).map(
             (fileState) => fileState.file
           )
+
           onValueChange(fileList)
         }
+
         return { ...state, files }
       }
 
@@ -188,6 +203,7 @@ function createStore(
         if (urlCache) {
           for (const file of files.keys()) {
             const cachedUrl = urlCache.get(file)
+
             if (cachedUrl) {
               URL.revokeObjectURL(cachedUrl)
               urlCache.delete(file)
@@ -199,6 +215,7 @@ function createStore(
         if (onValueChange) {
           onValueChange([])
         }
+
         return { ...state, files, invalid: false }
       }
 
@@ -220,6 +237,7 @@ function createStore(
 
   function subscribe(listener: () => void) {
     listeners.add(listener)
+
     return () => listeners.delete(listener)
   }
 
@@ -232,9 +250,11 @@ const StoreContext = React.createContext<ReturnType<typeof createStore> | null>(
 
 function useStoreContext(consumerName: string) {
   const context = React.useContext(StoreContext)
+
   if (!context) {
     throw new Error(`\`${consumerName}\` must be used within \`${ROOT_NAME}\``)
   }
+
   return context
 }
 
@@ -254,7 +274,9 @@ function useStore<T>(selector: (state: StoreState) => T): T {
     }
 
     const nextValue = selector(state)
+
     lastValueRef.current = { value: nextValue, state }
+
     return nextValue
   }, [store, selector, lastValueRef])
 
@@ -278,9 +300,11 @@ const FileUploadContext = React.createContext<FileUploadContextValue | null>(
 
 function useFileUploadContext(consumerName: string) {
   const context = React.useContext(FileUploadContext)
+
   if (!context) {
     throw new Error(`\`${consumerName}\` must be used within \`${ROOT_NAME}\``)
   }
+
   return context
 }
 
@@ -366,6 +390,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
 
   const onProgress = useLazyRef(() => {
     let frame = 0
+
     return (file: File, progress: number) => {
       if (frame) return
       frame = requestAnimationFrame(() => {
@@ -395,6 +420,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
     return () => {
       for (const file of files.keys()) {
         const cachedUrl = urlCache.get(file)
+
         if (cachedUrl) {
           URL.revokeObjectURL(cachedUrl)
         }
@@ -431,6 +457,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Upload failed'
+
         for (const file of files) {
           store.dispatch({
             type: 'SET_ERROR',
@@ -456,6 +483,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
 
         if (remainingSlotCount < filesToProcess.length) {
           const rejectedFiles = filesToProcess.slice(remainingSlotCount)
+
           invalid = true
 
           filesToProcess = filesToProcess.slice(0, remainingSlotCount)
@@ -465,6 +493,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
 
             if (onFileValidate) {
               const validationMessage = onFileValidate(file)
+
               if (validationMessage) {
                 rejectionMessage = validationMessage
               }
@@ -484,6 +513,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
 
         if (onFileValidate) {
           const validationMessage = onFileValidate(file)
+
           if (validationMessage) {
             rejectionMessage = validationMessage
             onFileReject?.(file, rejectionMessage)
@@ -541,6 +571,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
           const currentFiles = Array.from(store.getState().files.values()).map(
             (f) => f.file
           )
+
           onValueChange([...currentFiles])
         }
 
@@ -579,6 +610,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
   const onInputChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files ?? [])
+
       onFilesChange(files)
       event.target.value = ''
     },
@@ -709,6 +741,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
       if (event.defaultPrevented) return
 
       const relatedTarget = event.relatedTarget
+
       if (
         relatedTarget &&
         relatedTarget instanceof Node &&
@@ -734,9 +767,11 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
 
       const files = Array.from(event.dataTransfer.files)
       const inputElement = context.inputRef.current
+
       if (!inputElement) return
 
       const dataTransfer = new DataTransfer()
+
       for (const file of files) {
         dataTransfer.items.add(file)
       }
@@ -758,13 +793,17 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
       store.dispatch({ type: 'SET_DRAG_OVER', dragOver: false })
 
       const items = event.clipboardData?.items
+
       if (!items) return
 
       const files: File[] = []
+
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
+
         if (item?.kind === 'file') {
           const file = item.getAsFile()
+
           if (file) {
             files.push(file)
           }
@@ -774,9 +813,11 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
       if (files.length === 0) return
 
       const inputElement = context.inputRef.current
+
       if (!inputElement) return
 
       const dataTransfer = new DataTransfer()
+
       for (const file of files) {
         dataTransfer.items.add(file)
       }
@@ -924,9 +965,11 @@ const FileUploadItemContext =
 
 function useFileUploadItemContext(consumerName: string) {
   const context = React.useContext(FileUploadItemContext)
+
   if (!context) {
     throw new Error(`\`${consumerName}\` must be used within \`${ITEM_NAME}\``)
   }
+
   return context
 }
 
@@ -949,6 +992,7 @@ function FileUploadItem(props: FileUploadItemProps) {
   const fileCount = useStore((state) => state.files.size)
   const fileIndex = useStore((state) => {
     const files = Array.from(state.files.keys())
+
     return files.indexOf(value) + 1
   })
 
@@ -1008,6 +1052,7 @@ function formatBytes(bytes: number) {
   if (bytes === 0) return '0 B'
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
+
   return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${sizes[i]}`
 }
 
@@ -1081,6 +1126,7 @@ function FileUploadItemPreview(props: FileUploadItemPreviewProps) {
     (file: File) => {
       if (itemContext.fileState?.file.type.startsWith('image/')) {
         let url = context.urlCache.get(file)
+
         if (!url) {
           url = URL.createObjectURL(file)
           context.urlCache.set(file, url)
@@ -1189,6 +1235,7 @@ function FileUploadItemMetadata(props: FileUploadItemMetadataProps) {
     </ItemMetadataPrimitive>
   )
 }
+
 interface FileUploadItemProgressProps extends React.ComponentProps<'div'> {
   variant?: 'linear' | 'circular' | 'fill'
   size?: number

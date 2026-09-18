@@ -15,15 +15,13 @@ import {
   ImportSource,
 } from './import.types'
 
-export { IMPORT_MAX_BYTES, IMPORT_MAX_ROWS } from './import.constants'
+export { IMPORT_MAX_BYTES } from './import.constants'
 export { ImportSource } from './import.types'
 export type {
   ImportCard,
-  ImportError,
   ImportMapping,
   ImportOptions,
   ImportPreview,
-  ImportPreviewRow,
 } from './import.types'
 
 const DashStackJsonBackupSchema = z
@@ -53,6 +51,7 @@ export const validateImportCard = (card: ImportCard): ImportError[] => {
     : parsed.error.issues.map(
         (issue) => `${issue.path.join('.')}: ${issue.message}`
       )
+
   if (!card.term.trim()) errors.push('Term must contain text')
   if (!card.definition.trim()) errors.push('Definition must contain text')
   if (
@@ -60,11 +59,13 @@ export const validateImportCard = (card: ImportCard): ImportError[] => {
     (card.imageUrl.length > 2048 || !/^https?:\/\//i.test(card.imageUrl))
   )
     errors.push('Image URL must be HTTP(S) and at most 2048 characters')
+
   return errors.map((message) => ({ kind: 'validation', message }))
 }
 
 export const contentWarnings = (card: ImportCard): string[] => {
   const text = [card.term, card.definition, card.example].join('\n')
+
   return /<\/?[a-z][^>]*>|&(?:[a-z]+|#\d+);|\{\{c\d+::|\[sound:/i.test(text)
     ? [
         'HTML, cloze or media content is imported as literal text; formatting and media are unsupported.',
@@ -87,20 +88,24 @@ export const prepareImport = (
   let offset = 0
   let declared: Delimiter | null = null
   const warnings: string[] = []
+
   if (options.source === ImportSource.ANKI) {
     let header = readAnkiDirective(text)
+
     while (header) {
       const directive = header[0].trimEnd()
       const separator = /^#separator:(.*)$/i
         .exec(directive)?.[1]
         ?.trim()
         .toLowerCase()
+
       if (separator) {
         const supported: Record<string, Delimiter> = {
           tab: '\t',
           comma: ',',
           semicolon: ';',
         }
+
         declared = supported[separator] ?? null
         if (!declared)
           warnings.push(
@@ -119,6 +124,7 @@ export const prepareImport = (
     options.delimiter === 'auto'
       ? (declared ?? detectDelimiter(text))
       : options.delimiter
+
   if (!delimiter)
     return {
       delimiter,
@@ -130,11 +136,13 @@ export const prepareImport = (
     }
   const parsed = parseDelimitedText(text, delimiter)
   const data = options.hasHeader ? parsed.slice(1) : parsed
+
   if (data.length > IMPORT_MAX_ROWS) throw new Error('Import exceeds 2000 rows')
   const mapping = options.mapping
   const selected = Object.values(mapping).filter(
     (value): value is number => value !== null
   )
+
   if (new Set(selected).size !== selected.length)
     throw new Error('Map each field to a different column')
   const rows = data.map((row): ImportPreviewRow => {
@@ -149,6 +157,7 @@ export const prepareImport = (
     const unmapped = row.fields.flatMap((field, index) =>
       !selected.includes(index) && field !== '' ? [index + 1] : []
     )
+
     return {
       sourceRow: row.sourceRow + offset,
       card,
@@ -168,11 +177,13 @@ export const prepareImport = (
       ],
     }
   })
+
   return { delimiter, rows, warnings }
 }
 
 function readAnkiDirective(text: string): RegExpExecArray | null {
   const header = /^#[^\r\n]*(?:\r\n|\r|\n|$)/.exec(text)
+
   if (!header) return null
 
   return /^#(?:separator|html|columns|tags):/i.test(header[0]) ? header : null
@@ -180,6 +191,7 @@ function readAnkiDirective(text: string): RegExpExecArray | null {
 
 const prepareDashStackJsonImport = (input: string): ImportPreview => {
   let raw: unknown
+
   try {
     raw = JSON.parse(input.replace(/^\uFEFF/, ''))
   } catch {
@@ -187,6 +199,7 @@ const prepareDashStackJsonImport = (input: string): ImportPreview => {
   }
 
   const parsed = DashStackJsonBackupSchema.safeParse(raw)
+
   if (!parsed.success) {
     throw new Error(
       'Dash Stack JSON must use schemaVersion 1 with a cards array'

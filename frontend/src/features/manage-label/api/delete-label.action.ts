@@ -16,6 +16,7 @@ export const deleteLabelAction = createAction(
   async ({ slug, id }) => {
     await labelServerApi.delete(slug, id)
     revalidateTag(SERVER_CACHE_TAGS.labels(slug))
+
     return true
   }
 )

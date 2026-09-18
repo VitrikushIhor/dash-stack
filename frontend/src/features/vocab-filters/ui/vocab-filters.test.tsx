@@ -15,6 +15,7 @@ vi.mock('../model/use-search-params', () => ({
 describe('VocabFilters', () => {
   it('stores language and tags in catalog URL state', async () => {
     const user = userEvent.setup()
+
     render(<VocabFilters />)
 
     await user.type(screen.getByLabelText('Language'), 'u')

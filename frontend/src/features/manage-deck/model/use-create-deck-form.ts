@@ -36,8 +36,10 @@ export function useCreateDeckForm() {
   const onSubmit = (values: CreateDeckFormValues) => {
     startTransition(async () => {
       const res = await createDeckAction(values)
+
       if (!res.success) {
         handleServerError(res.error)
+
         return
       }
 

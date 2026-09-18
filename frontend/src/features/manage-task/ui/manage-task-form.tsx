@@ -52,10 +52,12 @@ export function ManageTaskForm({
     try {
       if (mode === ManageTaskMode.CREATE) {
         const createData = mapTaskFormToDto(values, ManageTaskMode.CREATE)
+
         await executeCreate({ slug, data: createData })
       } else {
         if (!selectedTask) return
         const updateData = mapTaskFormToDto(values, ManageTaskMode.EDIT)
+
         await executeUpdate({
           slug,
           id: selectedTask.id,
@@ -66,6 +68,7 @@ export function ManageTaskForm({
       logger.error(error)
       const message =
         error instanceof Error ? error.message : 'Failed to save task'
+
       toast.error(message)
     }
   }

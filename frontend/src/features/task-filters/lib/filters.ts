@@ -8,6 +8,7 @@ export function generateFilterOptions(
 ) {
   const memberOptions = members.map((m) => {
     const name = m.user.firstName || m.user.email
+
     return { label: name, value: m.user.id }
   })
 

@@ -33,6 +33,7 @@ export function DeckBoardHeader({
         ROUTES.vocabDeck(deck.id),
         window.location.origin
       )
+
       await navigator.clipboard.writeText(shareUrl.toString())
       toast.success('Deck link copied')
     } catch {
@@ -106,6 +107,7 @@ export function DeckBoardHeader({
                   importId,
                   cards,
                 })
+
                 return true
               }}
             />

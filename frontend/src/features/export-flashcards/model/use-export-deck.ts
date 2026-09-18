@@ -17,6 +17,7 @@ const getFilename = (
   format: ExportFormat
 ): string => {
   const filenameMatch = /filename="?([^";]+)"?/i.exec(contentDisposition ?? '')
+
   return filenameMatch?.[1] ?? fallbackFilename(format)
 }
 
@@ -38,6 +39,7 @@ export const useExportDeck = (deckId: string) => {
 
         const url = URL.createObjectURL(await response.blob())
         const link = document.createElement('a')
+
         link.href = url
         link.download = getFilename(
           response.headers.get('Content-Disposition'),
