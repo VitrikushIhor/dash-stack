@@ -1,3 +1,4 @@
+import { SetCardStarUseCase } from './application/use-cases/set-card-star.use-case';
 import { PrismaStudyProgressTransaction } from './infrastructure/persistence/prisma-study-progress-transaction';
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -39,6 +40,11 @@ import { FlashcardController } from './presentation/controllers/flashcard.contro
 import { UnsplashController } from './presentation/controllers/unsplash.controller';
 import { VocabProgressController } from './presentation/controllers/vocab-progress.controller';
 import { DeckStudyController } from './presentation/controllers/deck-study.controller';
+import { DeckImportController } from './presentation/controllers/deck-import.controller';
+import { DeckExportController } from './presentation/controllers/deck-export.controller';
+import { ImportFlashcardsUseCase } from './application/use-cases/import-flashcards.use-case';
+import { ExportFlashcardsUseCase } from './application/use-cases/export-flashcards.use-case';
+import { PrismaDeckImportTransaction } from './infrastructure/persistence/prisma-deck-import-transaction';
 
 @Module({
   imports: [ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }])],
@@ -49,6 +55,8 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     UnsplashController,
     VocabProgressController,
     DeckStudyController,
+    DeckImportController,
+    DeckExportController,
   ],
   providers: [
     CreateMatchSessionUseCase,
@@ -87,9 +95,14 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     BrowseDeckCardsUseCase,
     SubmitStudyProgressUseCase,
     ToggleCardStarUseCase,
+    SetCardStarUseCase,
+    ImportFlashcardsUseCase,
+    ExportFlashcardsUseCase,
 
     PrismaStudyProgressTransaction,
     { provide: 'StudyProgressTransactionPort', useExisting: PrismaStudyProgressTransaction },
+    PrismaDeckImportTransaction,
+    { provide: 'DeckImportTransactionPort', useExisting: PrismaDeckImportTransaction },
     // Repositories, Adapters & Ports
     PrismaDeckRepository,
     {
@@ -126,6 +139,7 @@ import { DeckStudyController } from './presentation/controllers/deck-study.contr
     GetStudyCardsUseCase,
     SubmitStudyProgressUseCase,
     ToggleCardStarUseCase,
+    SetCardStarUseCase,
     'DeckRepositoryPort',
     'FlashcardRepositoryPort',
     'VocabProgressRepositoryPort',

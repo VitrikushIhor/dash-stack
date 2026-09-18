@@ -1,3 +1,4 @@
+import { SetCardStarUseCase } from '../../../application/use-cases/set-card-star.use-case';
 import { VocabProgressController } from '../../../presentation/controllers/vocab-progress.controller';
 import { GetDueReviewsUseCase } from '../../../application/use-cases/get-due-reviews.use-case';
 import { ToggleCardStarUseCase } from '../../../application/use-cases/toggle-card-star.use-case';
@@ -7,7 +8,7 @@ describe('VocabProgressController', () => {
   let controller: VocabProgressController;
   let mockGetDueReviewsUseCase: jest.Mocked<GetDueReviewsUseCase>;
   let mockToggleCardStarUseCase: jest.Mocked<ToggleCardStarUseCase>;
-
+  let mockSetCardStarUseCase: jest.Mocked<SetCardStarUseCase>;
   const mockUser: AuthUser = {
     id: 'user-1',
     email: 'user1@example.com',
@@ -22,7 +23,15 @@ describe('VocabProgressController', () => {
       execute: jest.fn(),
     } as unknown as jest.Mocked<ToggleCardStarUseCase>;
 
-    controller = new VocabProgressController(mockGetDueReviewsUseCase, mockToggleCardStarUseCase);
+    mockSetCardStarUseCase = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<SetCardStarUseCase>;
+
+    controller = new VocabProgressController(
+      mockGetDueReviewsUseCase,
+      mockToggleCardStarUseCase,
+      mockSetCardStarUseCase,
+    );
   });
 
   it('should call GetDueReviewsUseCase and return mapped response', async () => {
@@ -71,5 +80,23 @@ describe('VocabProgressController', () => {
       flashcardId: 'card-1',
       isStarred: true,
     });
+  });
+
+  it('should call SetCardStarUseCase with the requested state', async () => {
+    mockSetCardStarUseCase.execute.mockResolvedValue({
+      flashcardId: 'card-1',
+      isStarred: false,
+    });
+
+    const response = await controller.setCardStar(mockUser, 'card-1', {
+      isStarred: false,
+    });
+
+    expect(mockSetCardStarUseCase.execute).toHaveBeenCalledWith({
+      userId: 'user-1',
+      flashcardId: 'card-1',
+      isStarred: false,
+    });
+    expect(response).toEqual({ flashcardId: 'card-1', isStarred: false });
   });
 });

@@ -1,0 +1,3 @@
+export const IMPORT_MAX_CARDS = 2000;
+export const IMPORT_MAX_PAYLOAD_BYTES = 4 * 1024 * 1024;
+export const IMPORT_TRANSPORT_HEADROOM_BYTES = 512;

@@ -90,3 +90,33 @@ export class StudyAttemptConflictException extends ConflictException {
     super(VOCAB_ERRORS.STUDY_ATTEMPT_CONFLICT);
   }
 }
+
+export class ImportReceiptConflictException extends ConflictException {
+  constructor() {
+    super(VOCAB_ERRORS.IMPORT_RECEIPT_CONFLICT);
+  }
+}
+
+export class VocabImportConflictException extends ConflictException {
+  constructor() {
+    super(VOCAB_ERRORS.IMPORT_WRITE_CONFLICT);
+  }
+}
+
+export class DeckExportLimitExceededException extends BadRequestException {
+  constructor() {
+    super(VOCAB_ERRORS.EXPORT_LIMIT_EXCEEDED);
+  }
+}
+
+export class VocabImportPayloadTooLargeException extends BadRequestException {
+  constructor() {
+    super(VOCAB_ERRORS.IMPORT_PAYLOAD_TOO_LARGE);
+  }
+}
+
+export class VocabImportCardLimitExceededException extends BadRequestException {
+  constructor() {
+    super(VOCAB_ERRORS.IMPORT_CARD_LIMIT_EXCEEDED);
+  }
+}

@@ -27,6 +27,7 @@ model User {
   deckLeaderboardEntries DeckLeaderboard[] @relation("UserDeckLeaderboard")
   matchSessions          MatchSession[]
   vocabStudyAttempts     VocabStudyAttempt[]
+  vocabImportReceipts    VocabImportReceipt[]
 }
 
 model Account {
@@ -234,6 +235,7 @@ model Deck {
   leaderboard      DeckLeaderboard[]
   matchSessions     MatchSession[]
   studyAttempts    VocabStudyAttempt[]
+  importReceipts   VocabImportReceipt[]
   forkedFrom       Deck?             @relation("DeckForks", fields: [forkedFromDeckId], references: [id], onDelete: SetNull)
   forks            Deck[]            @relation("DeckForks")
 
@@ -305,6 +307,22 @@ model VocabStudyAttempt {
   @@index([deckId])
   @@index([flashcardId])
   @@map("vocab_study_attempts")
+}
+
+model VocabImportReceipt {
+  userId      String
+  importId    String   @db.VarChar(100)
+  deckId      String
+  payloadHash String   @db.VarChar(64)
+  cardIds     String[]
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@id([userId, importId])
+  @@index([deckId])
+  @@map("vocab_import_receipts")
 }
 
 model MatchSession {

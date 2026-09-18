@@ -1,7 +1,11 @@
+import { SetCardStarUseCase } from '../../application/use-cases/set-card-star.use-case';
+import { SetCardStarDto } from '../dtos/set-card-star.dto';
 import {
   Controller,
   Get,
   Post,
+  Put,
+  Body,
   Param,
   Query,
   UseGuards,
@@ -26,6 +30,7 @@ export class VocabProgressController {
   constructor(
     private readonly getDueReviewsUseCase: GetDueReviewsUseCase,
     private readonly toggleCardStarUseCase: ToggleCardStarUseCase,
+    private readonly setCardStarUseCase: SetCardStarUseCase,
   ) {}
 
   @Get('reviews/due')
@@ -51,6 +56,27 @@ export class VocabProgressController {
     return VocabProgressPresentationMapper.toDueReviewsResponse(result);
   }
 
+  @Put('cards/:cardId/star')
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000, getTracker: getAuthenticatedUserTracker } })
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Set personal flashcard star state idempotently' })
+  @ApiResponse({ status: HttpStatus.OK, type: ToggleStarResponseDto })
+  public async setCardStar(
+    @UserEntity() user: AuthUser,
+    @Param('cardId') cardId: string,
+    @Body() body: SetCardStarDto,
+  ): Promise<ToggleStarResponseDto> {
+    const result = await this.setCardStarUseCase.execute({
+      userId: user.id,
+      flashcardId: cardId,
+      isStarred: body.isStarred,
+    });
+
+    return VocabProgressPresentationMapper.toToggleStarResponse(result);
+  }
+
   @Post('cards/:cardId/star')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({
@@ -63,6 +89,7 @@ export class VocabProgressController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
+    deprecated: true,
     summary: 'Toggle star state on a flashcard for focused practice',
   })
   @ApiResponse({

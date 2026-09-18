@@ -1,3 +1,4 @@
+import { SetCardStarUseCase } from '../../application/use-cases/set-card-star.use-case';
 import { Prisma, DeckStatus, DeckVisibility } from '@prisma/client';
 import {
   VocabProgressConflictException,
@@ -20,6 +21,7 @@ import { VOCAB_ERRORS } from '../../domain/constants/vocab-errors';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
+
 if (!databaseUrl) throw new Error('DATABASE_URL is required for Vocabulary integration tests');
 
 describe('Vocabulary progress integration', () => {
@@ -28,7 +30,6 @@ describe('Vocabulary progress integration', () => {
   let repository: PrismaVocabProgressRepository;
   let submit: SubmitStudyProgressUseCase;
   let userId: string;
-
   const createDeck = (count = 2) =>
     prisma.deck.create({
       data: {
@@ -63,6 +64,25 @@ describe('Vocabulary progress integration', () => {
     await pool.end();
   });
 
+  it.each([true, false])('should_preserve_requested_star_%s_when_retried', async (isStarred) => {
+    const deck = await createDeck();
+    const star = new SetCardStarUseCase(new PrismaStudyProgressTransaction(prisma));
+    const command = { userId, flashcardId: deck.flashcards[0].id, isStarred };
+
+    await Promise.all([star.execute(command), star.execute(command)]);
+    expect(await star.execute(command)).toEqual({ flashcardId: command.flashcardId, isStarred });
+    const rows = await prisma.vocabProgress.findMany({ where: { deckId: deck.id } });
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      isStarred,
+      correctCount: 0,
+      incorrectCount: 0,
+      box: 1,
+      nextReviewAt: null,
+    });
+  });
+
   it('should_preserve_every_review_when_first_submissions_run_concurrently', async () => {
     const deck = await createDeck();
     const command = {
@@ -74,6 +94,7 @@ describe('Vocabulary progress integration', () => {
     await Promise.all([submit.execute(command), submit.execute(command), submit.execute(command)]);
 
     const rows = await prisma.vocabProgress.findMany({ where: { deckId: deck.id, userId } });
+
     expect(rows).toHaveLength(2);
     for (const row of rows) {
       expect(row).toMatchObject({ box: 4, correctCount: 3, correctStreak: 3, incorrectCount: 0 });
@@ -95,6 +116,7 @@ describe('Vocabulary progress integration', () => {
     const progress = await prisma.vocabProgress.findFirstOrThrow({
       where: { userId, deckId: deck.id },
     });
+
     expect(progress).toMatchObject({ box: 2, correctCount: 1, correctStreak: 1 });
   });
 
@@ -106,12 +128,14 @@ describe('Vocabulary progress integration', () => {
       attemptId: randomUUID(),
       results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
     };
+
     await submit.execute(command);
     await submit.execute({ ...command, attemptId: randomUUID() });
 
     const progress = await prisma.vocabProgress.findFirstOrThrow({
       where: { userId, deckId: deck.id },
     });
+
     expect(progress).toMatchObject({ box: 3, correctCount: 2, correctStreak: 2 });
   });
 
@@ -123,6 +147,7 @@ describe('Vocabulary progress integration', () => {
       attemptId: randomUUID(),
       results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
     };
+
     await submit.execute(command);
 
     await expect(
@@ -141,6 +166,7 @@ describe('Vocabulary progress integration', () => {
     const progress = deck.flashcards.map((card) =>
       VocabProgress.createNew(userId, deck.id, card.id),
     );
+
     progress.push(VocabProgress.createNew(userId, deck.id, randomUUID()));
     progress.forEach((item) => item.recordReview(true));
 
@@ -151,8 +177,10 @@ describe('Vocabulary progress integration', () => {
   it('should_not_schedule_reviews_when_an_unseen_card_is_starred', async () => {
     const deck = await createDeck();
     const star = new ToggleCardStarUseCase(new PrismaStudyProgressTransaction(prisma));
+
     await star.execute({ userId, flashcardId: deck.flashcards[0].id });
     const progress = await prisma.vocabProgress.findFirstOrThrow({ where: { deckId: deck.id } });
+
     expect(progress).toMatchObject({
       isStarred: true,
       nextReviewAt: null,
@@ -174,6 +202,7 @@ describe('Vocabulary progress integration', () => {
     async (instant) => {
       const deck = await createDeck(5);
       const now = new Date(instant);
+
       await prisma.vocabProgress.createMany({
         data: [
           {
@@ -222,6 +251,7 @@ describe('Vocabulary progress integration', () => {
       });
       try {
         const due = await repository.getStudyCards(userId, deck.id, { onlyDue: true });
+
         expect(due.map((card) => card.id)).toEqual([deck.flashcards[0].id, deck.flashcards[1].id]);
         expect(await repository.getDueReviews(userId, deck.id)).toMatchObject({
           totalDue: due.length,
@@ -231,6 +261,7 @@ describe('Vocabulary progress integration', () => {
           onlyDue: true,
           onlyStarred: true,
         });
+
         expect(starredDue.map((card) => card.id)).toEqual([deck.flashcards[1].id]);
       } finally {
         jest.useRealTimers();
@@ -245,22 +276,29 @@ describe('Vocabulary progress integration', () => {
       deckId: deck.id,
       results: [{ flashcardId: cardId, isCorrect: true }],
     };
-    await submit.execute(command);
-    const star = new ToggleCardStarUseCase(new PrismaStudyProgressTransaction(prisma));
 
-    await Promise.all([submit.execute(command), star.execute({ userId, flashcardId: cardId })]);
+    await submit.execute(command);
+    const star = new SetCardStarUseCase(new PrismaStudyProgressTransaction(prisma));
+
+    await Promise.all([
+      submit.execute(command),
+      star.execute({ userId, flashcardId: cardId, isStarred: true }),
+    ]);
 
     const progress = await prisma.vocabProgress.findFirstOrThrow({ where: { deckId: deck.id } });
+
     expect(progress).toMatchObject({ isStarred: true, box: 3, correctCount: 2, correctStreak: 2 });
   });
   it('should_hide_other_users_progress_when_guest_reads_a_deck', async () => {
     const deck = await createDeck();
+
     await submit.execute({
       userId,
       deckId: deck.id,
       results: [{ flashcardId: deck.flashcards[0].id, isCorrect: true }],
     });
     const cards = await repository.getStudyCards(null, deck.id);
+
     expect(
       cards.every(
         (card) =>
@@ -272,6 +310,7 @@ describe('Vocabulary progress integration', () => {
   it('should_reject_the_entire_batch_when_a_card_belongs_to_another_deck', async () => {
     const deck = await createDeck();
     const otherDeck = await createDeck();
+
     await expect(
       submit.execute({
         userId,
@@ -287,6 +326,7 @@ describe('Vocabulary progress integration', () => {
 
   it('should_reject_duplicates_without_writes_when_the_same_card_is_submitted_twice', async () => {
     const deck = await createDeck();
+
     await expect(
       submit.execute({
         userId,
@@ -308,6 +348,7 @@ describe('Vocabulary progress integration', () => {
     'should_deny_progress_without_writes_when_non_owner_accesses_%s_%s',
     async (status, visibility) => {
       const deck = await createDeck();
+
       await prisma.deck.update({ where: { id: deck.id }, data: { status, visibility } });
       await expect(
         submit.execute({
@@ -324,10 +365,12 @@ describe('Vocabulary progress integration', () => {
     const deck = await createDeck();
     const transaction = new PrismaStudyProgressTransaction(prisma);
     let attempts = 0;
+
     await expect(
       transaction.run(async (context) => {
         attempts += 1;
         const progress = VocabProgress.createNew(userId, deck.id, deck.flashcards[0].id);
+
         progress.recordReview(true);
         await context.vocabProgressRepository.save(progress);
         throw new Prisma.PrismaClientKnownRequestError('Write conflict', {
@@ -343,6 +386,7 @@ describe('Vocabulary progress integration', () => {
   it('should_not_retry_or_persist_when_the_callback_raises_a_domain_error', async () => {
     const deck = await createDeck();
     let attempts = 0;
+
     await expect(
       new PrismaStudyProgressTransaction(prisma).run(async (context) => {
         attempts += 1;
