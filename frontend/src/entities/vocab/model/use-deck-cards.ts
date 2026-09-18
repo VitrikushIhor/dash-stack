@@ -1,11 +1,15 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useDebounce } from '@/shared/lib'
 import { vocabApi } from '../api/vocab-api'
 import { vocabKeys } from '../api/vocab-query-keys'
 import { type DeckCardsPage } from './types'
+import { useDeckCardStarCache } from './use-deck-card-star-cache'
 
 const SEARCH_DEBOUNCE_MS = 300
 const CARDS_PER_PAGE = 50
@@ -53,6 +57,9 @@ export function useDeckCards(
       }),
     [deckId, queryClient]
   )
+
+  const setCardStarred = useDeckCardStarCache(deckId)
+
   const pages = query.data?.pages
   const cards = useMemo(
     () => pages?.flatMap((page) => page.data) ?? [],
@@ -74,6 +81,7 @@ export function useDeckCards(
     retrySearch: query.refetch,
     retryNextPage: query.fetchNextPage,
     invalidateDeckCards,
+    setCardStarred,
     isSearchPending: search.trim() !== debouncedSearch || query.isPending,
   }
 }

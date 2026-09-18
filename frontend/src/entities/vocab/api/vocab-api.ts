@@ -3,6 +3,8 @@ import { SERVER_CACHE_TAGS } from '@/shared/config/constants/cache-tags'
 import {
   type DeckCardsPage,
   type DueReviewsResponse,
+  type ImportFlashcard,
+  type ImportFlashcardsResponse,
   type MatchCompletion,
   type MatchLeaderboard,
   type MatchSession,
@@ -65,14 +67,22 @@ export function createVocabApi(client: HttpClient) {
       })
     },
 
-    toggleStar: (
+    setStar: (
       cardId: string,
       dto: { isStarred: boolean }
     ): Promise<ToggleStarResponse> =>
-      client.post<ToggleStarResponse>(`/v1/vocab/cards/${cardId}/star`, {
-        flashcardId: cardId,
+      client.put<ToggleStarResponse>(`/v1/vocab/cards/${cardId}/star`, {
         isStarred: dto.isStarred,
       }),
+
+    importFlashcards: (
+      deckId: string,
+      dto: { importId: string; cards: ImportFlashcard[] }
+    ): Promise<ImportFlashcardsResponse> =>
+      client.post<ImportFlashcardsResponse>(
+        `/v1/vocab/decks/${deckId}/import`,
+        dto
+      ),
 
     getLeaderboard: (
       deckId: string,

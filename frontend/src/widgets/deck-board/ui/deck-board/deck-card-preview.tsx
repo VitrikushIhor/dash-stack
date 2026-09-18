@@ -9,6 +9,7 @@ import { type StudyCard } from '@/entities/vocab'
 import { StarButton } from '@/features/study-vocab'
 
 type DeckCardPreviewProps = {
+  isStarPending?: boolean
   card: StudyCard | null
   cardCount: number
   currentIndex: number
@@ -57,6 +58,7 @@ export function DeckCardPreview({
   onMove,
   onPronounce,
   onToggleStar,
+  isStarPending = false,
 }: DeckCardPreviewProps) {
   return (
     <div className='bg-card rounded-2xl border p-4 shadow-sm sm:p-6'>
@@ -129,6 +131,8 @@ export function DeckCardPreview({
           ) : null}
           {isAuthenticated && card ? (
             <StarButton
+              isPending={isStarPending}
+              disabled={isStarPending}
               isStarred={card.progress.isStarred}
               onClick={() => onToggleStar(card.id, card.progress.isStarred)}
             />

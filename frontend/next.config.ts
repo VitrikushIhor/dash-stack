@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: resolve(__dirname, '../'),
   experimental: {
     authInterrupts: true,
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',

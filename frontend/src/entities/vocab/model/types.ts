@@ -91,6 +91,20 @@ export type ToggleStarResponse = {
   isStarred: boolean
 }
 
+export type ImportFlashcard = {
+  term: string
+  definition: string
+  example?: string | null
+  imageUrl?: string | null
+}
+
+export type ImportFlashcardsResponse = {
+  importId: string
+  cardIds: string[]
+  importedCount: number
+  idempotent: boolean
+}
+
 export type StudySessionQuery = {
   deckId: string
   mode?: StudyMode

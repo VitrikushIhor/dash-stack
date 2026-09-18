@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  ImportFlashcardsPayloadSchema,
   RecordMatchPairPayloadSchema,
   SubmitProgressPayloadSchema,
 } from './vocab.schema'
@@ -45,5 +46,38 @@ describe('RecordMatchPairPayloadSchema', () => {
         cardId: 'card-1',
       }).success
     ).toBe(false)
+  })
+})
+describe('ImportFlashcardsPayloadSchema', () => {
+  it('should_preserve_whitespace_and_normalize_an_empty_image_url', () => {
+    const parsed = ImportFlashcardsPayloadSchema.parse({
+      deckId: 'deck-1',
+      importId: 'import-1',
+      cards: [
+        {
+          term: ' word ',
+          definition: ' definition\n',
+          example: '',
+          imageUrl: '',
+        },
+      ],
+    })
+
+    expect(parsed.cards[0]).toEqual({
+      term: ' word ',
+      definition: ' definition\n',
+      example: '',
+      imageUrl: null,
+    })
+  })
+
+  it('should_reject_whitespace_only_required_content_without_transforming_it', () => {
+    const result = ImportFlashcardsPayloadSchema.safeParse({
+      deckId: 'deck-1',
+      importId: 'import-1',
+      cards: [{ term: ' ', definition: '\n', imageUrl: null }],
+    })
+
+    expect(result.success).toBe(false)
   })
 })

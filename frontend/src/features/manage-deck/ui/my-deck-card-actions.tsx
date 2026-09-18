@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/shared/ui/core/dropdown-menu'
+import { ExportDeckMenuItems } from '@/features/export-flashcards'
 import { type Deck, DeckStatusEnum } from '@/entities/deck'
 import { useDeckSearchParams } from '../model/deck-search-params'
 import { useDeckActions } from '../model/use-deck-actions'
@@ -54,6 +55,8 @@ export function MyDeckCardActions({ deck }: MyDeckCardActionsProps) {
         </Link>
       </DropdownMenuItem>
 
+
+      <ExportDeckMenuItems deckId={deck.id} />
       <DropdownMenuSeparator />
 
       {deck.status === DeckStatusEnum.DRAFT && (

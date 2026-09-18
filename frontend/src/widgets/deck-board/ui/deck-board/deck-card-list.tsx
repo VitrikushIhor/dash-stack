@@ -10,6 +10,7 @@ import { DeckCardListSkeleton } from './deck-card-list-skeleton'
 import { DeckCardRow } from './deck-card-row'
 
 type DeckCardListProps = {
+  pendingStars?: ReadonlySet<string>
   cardCount: number
   cards: StudyCard[]
   filteredCardCount: number
@@ -28,6 +29,7 @@ type DeckCardListProps = {
 }
 
 export function DeckCardList({
+  pendingStars,
   cardCount,
   cards,
   filteredCardCount,
@@ -59,11 +61,12 @@ export function DeckCardList({
       <DeckCardRow
         key={card.id}
         card={card}
+        isStarPending={pendingStars?.has(card.id)}
         isAuthenticated={isAuthenticated}
         onToggleStar={onToggleStar}
       />
     ),
-    [isAuthenticated, onToggleStar]
+    [isAuthenticated, onToggleStar, pendingStars]
   )
 
   return (

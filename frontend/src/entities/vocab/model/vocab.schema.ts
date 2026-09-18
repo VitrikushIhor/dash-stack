@@ -1,6 +1,12 @@
 import { z } from 'zod'
+import { StudyMode } from './types'
 
-export const StudyModeSchema = z.enum(['flashcards', 'learn', 'test', 'match'])
+export const StudyModeSchema = z.enum([
+  StudyMode.FLASHCARDS,
+  StudyMode.LEARN,
+  StudyMode.TEST,
+  StudyMode.MATCH,
+])
 
 export const StudyCardSchema = z.object({
   id: z.string().min(1),
@@ -25,7 +31,7 @@ export const StudyCardSchema = z.object({
 
 export const StudySessionQuerySchema = z.object({
   deckId: z.string().min(1),
-  mode: StudyModeSchema.optional().default('flashcards'),
+  mode: StudyModeSchema.optional().default(StudyMode.FLASHCARDS),
   onlyStarred: z.boolean().optional(),
   onlyDue: z.boolean().optional(),
 })
@@ -52,9 +58,39 @@ export const SubmitProgressPayloadSchema = z
   })
 
 export const ToggleStarPayloadSchema = z.object({
-  deckId: z.string().min(1),
   cardId: z.string().min(1),
   isStarred: z.boolean(),
+})
+
+export const ImportFlashcardsPayloadSchema = z.object({
+  deckId: z.string().min(1),
+  importId: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/),
+  cards: z
+    .array(
+      z.object({
+        term: z
+          .string()
+          .min(1)
+          .max(255)
+          .refine((value) => value.trim().length > 0, 'Term must contain text'),
+        definition: z
+          .string()
+          .min(1)
+          .max(1000)
+          .refine(
+            (value) => value.trim().length > 0,
+            'Definition must contain text'
+          ),
+        example: z.string().max(500).nullable().optional(),
+        imageUrl: z
+          .union([z.string().url().max(2048), z.literal('')])
+          .nullable()
+          .optional()
+          .transform((value) => (value === '' ? null : value)),
+      })
+    )
+    .min(1)
+    .max(2000),
 })
 
 export const DueReviewsQuerySchema = z

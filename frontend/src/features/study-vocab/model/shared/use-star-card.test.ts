@@ -30,7 +30,7 @@ describe('useStarCard', () => {
   it('should_ignore_rapid_toggles_after_a_fast_response', async () => {
     vi.useFakeTimers()
     mockExecute.mockResolvedValue({ isStarred: true })
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
     await act(async () => {
       await result.current.toggleStar()
     })
@@ -56,7 +56,7 @@ describe('useStarCard', () => {
           finish = resolve
         })
     )
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
     let submission: Promise<void>
     act(() => {
       submission = result.current.toggleStar()
@@ -82,7 +82,7 @@ describe('useStarCard', () => {
     mockExecute
       .mockResolvedValueOnce({ isStarred: true })
       .mockResolvedValueOnce(undefined)
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
     await act(async () => {
       await result.current.toggleStar()
     })
@@ -105,10 +105,19 @@ describe('useStarCard', () => {
     >)
   })
 
+  it('should_reconcile_with_server_state_when_response_differs', async () => {
+    mockExecute.mockResolvedValueOnce({ isStarred: false })
+    const { result } = renderHook(() => useStarCard('card-1', false))
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+    expect(result.current.isStarred).toBe(false)
+  })
+
   it('toggles star optimistically on success', async () => {
     mockExecute.mockResolvedValueOnce({ isStarred: true })
 
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
 
     expect(result.current.isStarred).toBe(false)
 
@@ -118,7 +127,6 @@ describe('useStarCard', () => {
 
     expect(result.current.isStarred).toBe(true)
     expect(mockExecute).toHaveBeenCalledWith({
-      deckId: 'deck-1',
       cardId: 'card-1',
       isStarred: true,
     })
@@ -127,7 +135,7 @@ describe('useStarCard', () => {
   it('rolls back to previous state if action fails', async () => {
     mockExecute.mockResolvedValueOnce(undefined)
 
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
 
     expect(result.current.isStarred).toBe(false)
 
@@ -140,7 +148,7 @@ describe('useStarCard', () => {
 
   it('syncs state when initialIsStarred prop changes', () => {
     const { result, rerender } = renderHook(
-      ({ initialStarred }) => useStarCard('deck-1', 'card-1', initialStarred),
+      ({ initialStarred }) => useStarCard('card-1', initialStarred),
       {
         initialProps: { initialStarred: false },
       }
@@ -158,7 +166,7 @@ describe('useStarCard', () => {
     mockExecute.mockResolvedValue({ isStarred: true })
     const { result, rerender } = renderHook(
       ({ cardId, initialStarred }) =>
-        useStarCard('deck-1', cardId, initialStarred),
+        useStarCard(cardId, initialStarred),
       { initialProps: { cardId: 'card-1', initialStarred: false } }
     )
 
@@ -174,7 +182,6 @@ describe('useStarCard', () => {
       await result.current.toggleStar()
     })
     expect(mockExecute).toHaveBeenLastCalledWith({
-      deckId: 'deck-1',
       cardId: 'card-1',
       isStarred: false,
     })
@@ -186,7 +193,7 @@ describe('useStarCard', () => {
       refetch: refetchMock,
     } as unknown as ReturnType<typeof useCurrentUser>)
 
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
 
     await act(async () => {
       await result.current.toggleStar()
@@ -206,7 +213,7 @@ describe('useStarCard', () => {
     >)
     mockExecute.mockResolvedValueOnce({ isStarred: true })
 
-    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+    const { result } = renderHook(() => useStarCard('card-1', false))
 
     await act(async () => {
       const submission = result.current.toggleStar()
@@ -215,7 +222,6 @@ describe('useStarCard', () => {
     })
 
     expect(mockExecute).toHaveBeenCalledWith({
-      deckId: 'deck-1',
       cardId: 'card-1',
       isStarred: true,
     })

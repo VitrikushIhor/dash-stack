@@ -190,4 +190,129 @@ describe('useDeckCards', () => {
 
     expect(result.current.cards).toBe(cards)
   })
+
+  it('should_update_a_starred_card_in_cached_pages_without_invalidating_pagination', () => {
+    const client = new QueryClient()
+    const pageOne: DeckCardsPage = {
+      ...initialPage,
+      data: [
+        {
+          id: 'card-1',
+          deckId: 'deck-1',
+          term: 'First',
+          definition: 'First definition',
+          example: null,
+          imageUrl: null,
+          position: 0,
+          progress: {
+            id: 'progress-1',
+            status: 'NEW',
+            box: 1,
+            isStarred: false,
+            correctStreak: 0,
+            correctCount: 0,
+            incorrectCount: 0,
+            lastReviewedAt: null,
+            nextReviewAt: null,
+          },
+        },
+      ],
+      meta: { ...initialPage.meta, total: 2, next: 2 },
+      summary: { total: 2, due: 0, starred: 0, dueAndStarred: 0 },
+    }
+    const pageTwo: DeckCardsPage = {
+      ...pageOne,
+      data: [{ ...pageOne.data[0], id: 'card-2', position: 1 }],
+      meta: { ...pageOne.meta, currentPage: 2, next: null, prev: 1 },
+    }
+    const invalidate = vi.spyOn(client, 'invalidateQueries')
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+    const { result } = renderHook(
+      () => useDeckCards('deck-1', '', pageOne),
+      { wrapper }
+    )
+
+    act(() => {
+      client.setQueryData(vocabKeys.deckCards('deck-1', ''), {
+        pages: [pageOne, pageTwo],
+        pageParams: [1, 2],
+      })
+      result.current.setCardStarred('card-2', true)
+    })
+
+    const cached = client.getQueryData<{ pages: DeckCardsPage[] }>(
+      vocabKeys.deckCards('deck-1', '')
+    )
+
+    expect(cached?.pages.flatMap((page) => page.data).map((card) => card.id)).toEqual([
+      'card-1',
+      'card-2',
+    ])
+    expect(cached?.pages[1]?.data[0]?.progress.isStarred).toBe(true)
+    expect(cached?.pages[0]?.summary.starred).toBe(1)
+    expect(invalidate).not.toHaveBeenCalled()
+  })
+
+  it('should_update_deck_summary_in_every_search_cache_when_the_card_is_only_in_one_cache', () => {
+    const client = new QueryClient()
+    const searchPage: DeckCardsPage = {
+      ...initialPage,
+      data: [
+        {
+          id: 'card-140',
+          deckId: 'deck-1',
+          term: 'Search only',
+          definition: 'Definition',
+          example: null,
+          imageUrl: null,
+          position: 139,
+          progress: {
+            id: 'progress-140',
+            status: 'NEW',
+            box: 1,
+            isStarred: false,
+            correctStreak: 0,
+            correctCount: 0,
+            incorrectCount: 0,
+            lastReviewedAt: null,
+            nextReviewAt: null,
+          },
+        },
+      ],
+      summary: { total: 140, due: 0, starred: 4, dueAndStarred: 0 },
+    }
+    const unfilteredPage: DeckCardsPage = {
+      ...initialPage,
+      summary: { total: 140, due: 0, starred: 4, dueAndStarred: 0 },
+    }
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+    const { result } = renderHook(
+      () => useDeckCards('deck-1', '', unfilteredPage),
+      { wrapper }
+    )
+
+    act(() => {
+      client.setQueryData(vocabKeys.deckCards('deck-1', 'search-only'), {
+        pages: [searchPage],
+        pageParams: [1],
+      })
+      result.current.setCardStarred('card-140', true)
+    })
+
+    const unfiltered = client.getQueryData<{ pages: DeckCardsPage[] }>(
+      vocabKeys.deckCards('deck-1', '')
+    )
+    const searched = client.getQueryData<{ pages: DeckCardsPage[] }>(
+      vocabKeys.deckCards('deck-1', 'search-only')
+    )
+
+    expect(unfiltered?.pages[0]?.summary.starred).toBe(5)
+    expect(searched?.pages[0]?.summary.starred).toBe(5)
+    expect(searched?.pages[0]?.data[0]?.progress.isStarred).toBe(true)
+  })
+
 })

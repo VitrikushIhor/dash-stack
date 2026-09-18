@@ -7,10 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getDeckQuery } from '@/entities/deck/server'
 import { userKeys } from '@/entities/user'
 import { getCurrentUser } from '@/entities/user/server'
+import { StudyMode } from '@/entities/vocab'
 import { getStudyCardsQuery } from '@/entities/vocab/server'
 import { VocabFlashcards } from '@/widgets/vocab-flashcards'
 import { getStudyRouteData } from '@/views/vocab/server'
 import FlashcardsPage from '@/app/(vocab)/vocab/decks/[id]/flashcards/page'
+import MatchPage from '@/app/(vocab)/vocab/decks/[id]/match/page'
 
 vi.mock('server-only', () => ({}))
 vi.mock('next/navigation', async (importOriginal) => ({
@@ -63,7 +65,7 @@ beforeEach(() => {
 })
 
 describe('study route composition', () => {
-  it.each(['flashcards', 'learn', 'match'] as const)(
+  it.each([StudyMode.FLASHCARDS, StudyMode.LEARN, StudyMode.MATCH] as const)(
     'should_load_personalized_filters_when_mode_is_%s',
     async (mode) => {
       await getStudyRouteData({
@@ -81,7 +83,7 @@ describe('study route composition', () => {
     }
   )
 
-  it('should_render_flashcards_session_without_deck_navigation_or_filters', async () => {
+  it('should_render_study_navigation_and_starred_filter_for_empty_selection', async () => {
     vi.mocked(getCurrentUser).mockClear()
     render(
       withQueryClient(
@@ -95,12 +97,32 @@ describe('study route composition', () => {
     )
 
     expect(
-      screen.queryByRole('navigation', { name: 'Study modes' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('navigation', { name: 'Study modes' })
+    ).toBeInTheDocument()
     expect(
-      screen.queryByRole('checkbox', { name: 'Due only' })
-    ).not.toBeInTheDocument()
+      screen.getByRole('checkbox', { name: 'Starred only' })
+    ).toBeInTheDocument()
     expect(getCurrentUser).not.toHaveBeenCalled()
+  })
+
+  it('should_render_filtered_empty_state_in_match_before_minimum_card_state', async () => {
+    render(
+      withQueryClient(
+        <NuqsTestingAdapter>
+          {await MatchPage({
+            params: Promise.resolve({ id: 'deck' }),
+            searchParams: Promise.resolve({ onlyStarred: 'true' }),
+          })}
+        </NuqsTestingAdapter>
+      )
+    )
+
+    expect(
+      screen.getByRole('heading', { name: 'No cards match these filters' })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Not enough cards for Match' })
+    ).not.toBeInTheDocument()
   })
 
   it('should_keep_completion_summary_when_cards_are_removed_after_review', async () => {

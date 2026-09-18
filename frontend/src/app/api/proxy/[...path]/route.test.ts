@@ -98,6 +98,30 @@ describe('Proxy API Route (/api/proxy/[...path])', () => {
     expect(body).toEqual({ key: 'img.webp', url: 'http://localhost/img.webp' })
   })
 
+  it('forwards Content-Disposition for download responses', async () => {
+    setupCookieMock({ access_token: 'token' })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response('export body', {
+        status: 200,
+        headers: {
+          'Content-Disposition': 'attachment; filename="vocabulary-deck.json"',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      })
+    )
+
+    const req = new NextRequest('http://localhost:3000/api/proxy/v1/vocab/decks/deck-id/export?format=json')
+    const params = Promise.resolve({
+      path: ['v1', 'vocab', 'decks', 'deck-id', 'export'],
+    })
+
+    const res = await GET(req, { params })
+
+    expect(res.headers.get('Content-Disposition')).toBe(
+      'attachment; filename="vocabulary-deck.json"'
+    )
+  })
+
   it('sets Cache-Control: no-store on all responses', async () => {
     setupCookieMock({ access_token: 'token' })
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(

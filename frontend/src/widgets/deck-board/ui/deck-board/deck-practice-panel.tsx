@@ -5,6 +5,7 @@ import { BookOpen, Check, Sparkles } from 'lucide-react'
 import { Alert, AlertDescription } from '@/shared/ui/core/alert'
 import { Button } from '@/shared/ui/core/button'
 import { Checkbox } from '@/shared/ui/core/checkbox'
+import { StudyMode } from '@/entities/vocab'
 import { MIN_MATCH_CARDS } from '@/features/study-vocab'
 import { getStudySessionHref } from '@/widgets/deck-board/lib/get-study-session-href'
 
@@ -111,12 +112,20 @@ export function DeckPracticePanel({
         {selectedCount > 0 ? (
           <>
             <Button asChild>
-              <Link href={getStudySessionHref(deckId, 'flashcards', filters)}>
+              <Link
+                href={getStudySessionHref(
+                  deckId,
+                  StudyMode.FLASHCARDS,
+                  filters
+                )}
+              >
                 <BookOpen /> Flashcards
               </Link>
             </Button>
             <Button asChild variant='secondary'>
-              <Link href={getStudySessionHref(deckId, 'learn', filters)}>
+              <Link
+                href={getStudySessionHref(deckId, StudyMode.LEARN, filters)}
+              >
                 <Check /> Learn
               </Link>
             </Button>
@@ -131,7 +140,7 @@ export function DeckPracticePanel({
         )}
         {selectedCount >= MIN_MATCH_CARDS ? (
           <Button asChild variant='outline'>
-            <Link href={getStudySessionHref(deckId, 'match', filters)}>
+            <Link href={getStudySessionHref(deckId, StudyMode.MATCH, filters)}>
               Match
             </Link>
           </Button>

@@ -2,7 +2,11 @@
 
 import { useCallback, useMemo } from 'react'
 import { useSpeech } from '@/shared/lib/hooks/use-speech'
-import { type DeckCardsPage, useDeckCards } from '@/entities/vocab'
+import {
+  type DeckCardsPage,
+  type StudyCard,
+  useDeckCards,
+} from '@/entities/vocab'
 import { useStudySearchParams } from '@/features/study-vocab'
 import { useDeckBoard } from './use-deck-board'
 
@@ -32,7 +36,7 @@ export function useDeckBoardViewModel({
   const fetchNextPreviewPage = previewCards.fetchNextPage
   const movePreview = board.movePreview
   const toggleStar = board.toggleStar
-  const invalidateDeckCards = deckCards.invalidateDeckCards
+  const setCardStarred = deckCards.setCardStarred
   const fetchNextDeckPage = deckCards.fetchNextPage
   const retrySearch = deckCards.retrySearch
   const retryNextPage = deckCards.retryNextPage
@@ -46,6 +50,7 @@ export function useDeckBoardViewModel({
     }
     if (effectiveFilters.onlyDue) return deckCards.summary.due
     if (effectiveFilters.onlyStarred) return deckCards.summary.starred
+
     return deckCards.summary.total
   }, [
     deckCards.summary,
@@ -67,7 +72,9 @@ export function useDeckBoardViewModel({
             (total, page) => total + page.data.length,
             0
           ) ?? previewCardItems.length
+
         movePreview(direction, loadedCardCount)
+
         return
       }
 
@@ -86,9 +93,10 @@ export function useDeckBoardViewModel({
     async (cardId: string, isStarred: boolean) => {
       const result = await toggleStar(cardId, isStarred)
       if (result === undefined) return
-      await invalidateDeckCards()
+      setCardStarred(cardId, result.isStarred)
+      board.clearStarOverride(cardId)
     },
-    [invalidateDeckCards, toggleStar]
+    [board, setCardStarred, toggleStar]
   )
 
   const handleLoadMore = useCallback(() => {
@@ -103,10 +111,23 @@ export function useDeckBoardViewModel({
     void retryNextPage()
   }, [retryNextPage])
 
+  const withStarOverride = (card: StudyCard): StudyCard => ({
+    ...card,
+    progress: {
+      ...card.progress,
+      isStarred: board.starOverrides[card.id] ?? card.progress.isStarred,
+    },
+  })
+
+  const previewCard = previewCardItems[normalizedPreviewIndex]
+
   return {
     cardCount: initialCardCount ?? deckCards.summary.total,
     preview: {
-      card: previewCardItems[normalizedPreviewIndex] ?? null,
+      card: previewCard ? withStarOverride(previewCard) : null,
+      isStarPending: previewCard
+        ? board.pendingStars.has(previewCard.id)
+        : false,
       cardCount: previewCards.summary.total,
       currentIndex: normalizedPreviewIndex,
       isFlipped: board.isFlipped,
@@ -124,7 +145,8 @@ export function useDeckBoardViewModel({
       starredCount: deckCards.summary.starred,
     },
     cardList: {
-      cards: deckCards.cards,
+      cards: deckCards.cards.map(withStarOverride),
+      pendingStars: board.pendingStars,
       filteredCardCount: deckCards.meta.total,
       hasNextPage: deckCards.hasNextPage,
       isFetchingNextPage: deckCards.isFetchingNextPage,

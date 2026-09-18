@@ -7,6 +7,11 @@ import { ROUTES } from '@/shared/config'
 import { Badge } from '@/shared/ui/core/badge'
 import { Button } from '@/shared/ui/core/button'
 import { type Deck } from '@/entities/deck'
+import { ExportDeckButton } from '@/features/export-flashcards'
+import {
+  ImportDialog,
+  importFlashcardsAction,
+} from '@/features/import-flashcards'
 import { ForkDeckButton } from '@/features/manage-deck'
 
 type DeckBoardHeaderProps = {
@@ -86,15 +91,31 @@ export function DeckBoardHeader({
           size='sm'
           onClick={copyLink}
           aria-label='Copy deck link'
+          className='gap-1.5'
         >
-          <Copy /> Share
+          <Copy className='h-3.5 w-3.5' />
+          <span>Share</span>
         </Button>
         {isOwner ? (
-          <Button asChild size='sm'>
-            <Link href={ROUTES.vocabDeckEdit(deck.id)}>
-              <Pencil /> Edit deck
-            </Link>
-          </Button>
+          <>
+            <ExportDeckButton deckId={deck.id} />
+            <ImportDialog
+              onConfirm={async (importId, cards) => {
+                await importFlashcardsAction({
+                  deckId: deck.id,
+                  importId,
+                  cards,
+                })
+                return true
+              }}
+            />
+            <Button asChild size='sm' className='gap-1.5'>
+              <Link href={ROUTES.vocabDeckEdit(deck.id)}>
+                <Pencil className='h-3.5 w-3.5' />
+                <span>Edit deck</span>
+              </Link>
+            </Button>
+          </>
         ) : isAuthenticated ? (
           <ForkDeckButton deckId={deck.id} deckTitle={deck.title} />
         ) : (

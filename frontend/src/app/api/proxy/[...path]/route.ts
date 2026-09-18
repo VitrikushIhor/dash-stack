@@ -231,6 +231,12 @@ async function forward(req: NextRequest, path: string[]) {
   if (resContentType) {
     resHeaders.set('Content-Type', resContentType)
   }
+
+  const resContentDisposition = res.headers.get('content-disposition')
+  if (resContentDisposition) {
+    resHeaders.set('Content-Disposition', resContentDisposition)
+  }
+
   resHeaders.set('Cache-Control', 'no-store')
 
   // Forward non-auth upstream Set-Cookie headers individually.
