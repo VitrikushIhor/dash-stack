@@ -6,9 +6,9 @@ import {
   MatchSessionNotFoundException,
 } from '../exceptions/match-domain.exceptions';
 
-export const MATCH_MIN_CARDS = 6;
+const MATCH_MIN_CARDS = 6;
 export const MATCH_MAX_CARDS = 12;
-export const MATCH_SESSION_TTL_MS = 30 * 60 * 1000;
+const MATCH_SESSION_TTL_MS = 30 * 60 * 1000;
 
 export type MatchResult = {
   deckId: string;
@@ -18,7 +18,7 @@ export type MatchResult = {
   createdAt: Date;
 };
 
-export type MatchSessionSnapshot = {
+type MatchSessionSnapshot = {
   id: string;
   deckId: string;
   userId: string;

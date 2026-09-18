@@ -13,7 +13,7 @@ import {
 import { Deck } from '../../domain/entities/deck.entity';
 import { Flashcard } from '../../domain/entities/flashcard.entity';
 
-export interface SaveDeckEditorCommand {
+interface SaveDeckEditorCommand {
   deckId: string;
   userId: string;
   metadata: DeckEditorMetadataInput;

@@ -21,7 +21,6 @@ export const VOCAB_ERRORS = {
     'Flashcard order must contain every card in the deck exactly once',
   FLASHCARD_EDITOR_INVALID_SNAPSHOT:
     'Deck editor changes must account for every existing flashcard exactly once',
-  VOCAB_PROGRESS_NOT_FOUND: (id: string) => `Vocab progress not found: ${id}`,
   VOCAB_PROGRESS_USER_REQUIRED: 'User ID is required',
   VOCAB_PROGRESS_DECK_REQUIRED: 'Deck ID is required',
   VOCAB_PROGRESS_FLASHCARD_REQUIRED: 'Flashcard ID is required',

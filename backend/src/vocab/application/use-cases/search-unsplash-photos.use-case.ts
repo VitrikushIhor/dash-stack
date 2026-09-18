@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { UnsplashSearchResult, UnsplashServicePort } from '../ports/unsplash-service.port';
 
-export interface SearchUnsplashPhotosQuery {
+interface SearchUnsplashPhotosQuery {
   query: string;
   page?: number;
   perPage?: number;

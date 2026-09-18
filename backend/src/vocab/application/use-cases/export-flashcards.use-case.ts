@@ -24,7 +24,7 @@ interface ExportFlashcardReader {
   findByDeckId(deckId: string): Promise<Flashcard[]>;
 }
 
-export interface ExportResult {
+interface ExportResult {
   data: string;
   contentType: string;
   filename: string;

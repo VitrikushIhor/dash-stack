@@ -3,7 +3,7 @@ import { LeitnerSrsEngine } from '../services/leitner-srs.service';
 import { InvalidVocabProgressDataException } from '../exceptions/vocab-domain.exceptions';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
 
-export interface VocabProgressProps {
+interface VocabProgressProps {
   id: string;
   userId: string;
   deckId: string;

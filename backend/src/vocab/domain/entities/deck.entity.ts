@@ -10,7 +10,7 @@ import { DeckLifecyclePolicy } from '../policies/deck-lifecycle.policy';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
 import { Flashcard } from './flashcard.entity';
 
-export interface DeckProps {
+interface DeckProps {
   id: string;
   ownerUserId: string;
   title: string;

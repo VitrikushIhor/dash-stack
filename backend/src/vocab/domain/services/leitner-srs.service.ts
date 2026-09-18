@@ -6,7 +6,7 @@ import {
 } from '../constants/srs.constants';
 import { VocabProgressStatus } from '../enums/vocab.enums';
 
-export interface SrsCalculationInput {
+interface SrsCalculationInput {
   currentBox: number;
   isCorrect: boolean;
   currentStreak?: number;
@@ -15,7 +15,7 @@ export interface SrsCalculationInput {
   now?: Date;
 }
 
-export interface SrsCalculationResult {
+interface SrsCalculationResult {
   nextBox: number;
   nextReviewAt: Date;
   status: VocabProgressStatus;

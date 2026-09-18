@@ -6,7 +6,7 @@ import { DeckNotFoundException } from '../../domain/exceptions/vocab-domain.exce
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
-export interface ForkDeckCommand {
+interface ForkDeckCommand {
   deckId: string;
   targetUserId: string;
 }

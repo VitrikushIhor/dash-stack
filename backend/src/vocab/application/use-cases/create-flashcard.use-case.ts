@@ -8,14 +8,14 @@ import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
-export interface CreateFlashcardItem {
+interface CreateFlashcardItem {
   term: string;
   definition: string;
   example?: string | null;
   imageUrl?: string | null;
 }
 
-export interface CreateFlashcardCommand {
+interface CreateFlashcardCommand {
   deckId: string;
   userId: string;
   cards: CreateFlashcardItem[];

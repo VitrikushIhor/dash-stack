@@ -9,7 +9,7 @@ import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
-export interface UpdateFlashcardCommand {
+interface UpdateFlashcardCommand {
   deckId: string;
   cardId: string;
   userId: string;

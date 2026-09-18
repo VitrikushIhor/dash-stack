@@ -13,7 +13,7 @@ interface UnsplashPhoto {
   };
 }
 
-export interface UnsplashSearchResponse {
+interface UnsplashSearchResponse {
   results: UnsplashPhoto[];
   total: number;
   totalPages: number;

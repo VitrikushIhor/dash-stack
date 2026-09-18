@@ -20,7 +20,7 @@ import {
   ImportedFlashcardInput,
 } from '../ports/deck-import-transaction.port';
 
-export interface ImportFlashcardsResult {
+interface ImportFlashcardsResult {
   importId: string;
   cardIds: string[];
   importedCount: number;

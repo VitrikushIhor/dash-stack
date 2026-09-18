@@ -7,7 +7,7 @@ import {
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 
-export interface PublishDeckCommand {
+interface PublishDeckCommand {
   deckId: string;
   userId: string;
 }

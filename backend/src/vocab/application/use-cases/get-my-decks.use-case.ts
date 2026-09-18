@@ -3,7 +3,7 @@ import { Deck } from '../../domain/entities/deck.entity';
 import { DeckStatus } from '../../domain/enums/vocab.enums';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
-export interface GetMyDecksQuery {
+interface GetMyDecksQuery {
   userId: string;
   status?: DeckStatus;
 }

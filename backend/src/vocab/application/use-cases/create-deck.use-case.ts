@@ -4,7 +4,7 @@ import { CEFRLevel, DeckVisibility } from '../../domain/enums/vocab.enums';
 import { DeckSlug } from '../../domain/value-objects/deck-slug.vo';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
-export interface CreateDeckCommand {
+interface CreateDeckCommand {
   ownerUserId: string;
   title: string;
   description?: string;

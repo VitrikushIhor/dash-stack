@@ -4,7 +4,7 @@ import { DeckNotFoundException } from '../../domain/exceptions/vocab-domain.exce
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 
-export interface GetDeckByIdQuery {
+interface GetDeckByIdQuery {
   deckId: string;
   userId?: string | null;
 }

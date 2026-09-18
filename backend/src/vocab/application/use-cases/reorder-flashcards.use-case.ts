@@ -9,7 +9,7 @@ import { FlashcardRepositoryPort } from '../ports/flashcard-repository.port';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
 import { VOCAB_ERRORS } from '../../domain/constants/vocab-errors';
 
-export interface ReorderFlashcardsCommand {
+interface ReorderFlashcardsCommand {
   deckId: string;
   userId: string;
   orderedCardIds: string[];

@@ -1,7 +1,7 @@
 import { InvalidFlashcardDataException } from '../exceptions/vocab-domain.exceptions';
 import { VOCAB_ERRORS } from '../constants/vocab-errors';
 
-export interface FlashcardProps {
+interface FlashcardProps {
   id: string;
   deckId: string;
   term: string;
