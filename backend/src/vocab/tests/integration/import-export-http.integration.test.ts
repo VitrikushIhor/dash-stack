@@ -187,6 +187,34 @@ describe('Vocabulary import/export HTTP integration', () => {
     expect(await prisma.flashcard.count({ where: { deckId } })).toBe(1);
   });
 
+  it('should_accept_2000_cards_and_reject_2001_without_partial_writes', async () => {
+    const maximumCards = Array.from({ length: 2000 }, (_, position) => ({
+      term: `term ${position}`,
+      definition: `definition ${position}`,
+    }));
+    const accepted = await request(`${deckId}/import`, 'POST', {
+      importId: `maximum-${randomUUID()}`,
+      cards: maximumCards,
+    });
+
+    expect(accepted.status).toBe(201);
+    expect(expectImportResponse(await accepted.json())).toMatchObject({
+      importedCount: 2000,
+    });
+    expect(await prisma.flashcard.count({ where: { deckId } })).toBe(2000);
+
+    const rejectionDeck = await prisma.deck.create({
+      data: { ownerUserId: userId, title: 'Over import limit' },
+    });
+    const rejected = await request(`${rejectionDeck.id}/import`, 'POST', {
+      importId: `over-maximum-${randomUUID()}`,
+      cards: [...maximumCards, { term: 'term 2000', definition: 'definition 2000' }],
+    });
+
+    expect(rejected.status).toBe(400);
+    expect(await prisma.flashcard.count({ where: { deckId: rejectionDeck.id } })).toBe(0);
+  });
+
   it('should_require_the_owner_to_import_or_export', async () => {
     const stranger = await prisma.user.create({
       data: { email: `import-export-stranger-${randomUUID()}@example.test` },

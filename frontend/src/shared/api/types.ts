@@ -32,6 +32,7 @@ export interface RequestOptions<TBody = unknown> {
   params?: Record<string, string | number | boolean | undefined>
   headers?: Record<string, string>
   skipAuth?: boolean
+  suppressUnauthorizedHandler?: boolean
   cache?: RequestCache
   next?: NextFetchRequestConfig
   signal?: AbortSignal

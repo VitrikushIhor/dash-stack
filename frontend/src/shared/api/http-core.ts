@@ -46,6 +46,7 @@ export function createHttpClient(config: HttpClientConfig) {
       params,
       headers: customHeaders,
       skipAuth,
+      suppressUnauthorizedHandler,
       cache,
       next,
       signal,
@@ -82,7 +83,7 @@ export function createHttpClient(config: HttpClientConfig) {
       }
     )
 
-    if (response.status === 401) {
+    if (response.status === 401 && !suppressUnauthorizedHandler) {
       config.onUnauthorized?.()
     }
 

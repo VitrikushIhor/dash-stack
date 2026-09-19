@@ -39,6 +39,8 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - '.npmrc'
+              - 'lint-staged.config.mjs'
+              - '.github/workflows/ci.yml'
 
   # ============================================
   # LINT AND TYPE CHECK - FRONTEND
@@ -227,9 +229,57 @@ jobs:
       - name: Run unit tests
         run: pnpm --filter backend run test
 
-      - name: Run e2e tests
-        run: pnpm --filter backend run test:e2e
-        continue-on-error: true
+  # ============================================
+  # VOCABULARY DATABASE/HTTP INTEGRATION
+  # ============================================
+  test-vocab-integration:
+    name: Vocabulary Integration
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: phase10
+          POSTGRES_PASSWORD: phase10
+          POSTGRES_DB: phase10
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U phase10 -d phase10"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://phase10:phase10@localhost:5432/phase10
+      JWT_ACCESS_SECRET: phase10-ci-access-secret
+      JWT_REFRESH_SECRET: phase10-ci-refresh-secret
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0c17529a66aca453f9227af23103ed11469b1e47
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        run: pnpm --filter backend run migrate:deploy
+
+      - name: Run Vocabulary integration tests
+        run: pnpm --filter backend run test:integration
 
   # ============================================
   # SECURITY AUDIT
@@ -296,7 +346,82 @@ jobs:
 
       - name: Run tests with coverage
         run: pnpm --filter frontend run test:coverage
-        continue-on-error: true
+
+  # ============================================
+  # VOCABULARY BROWSER E2E
+  # ============================================
+  test-vocab-e2e:
+    name: Vocabulary Browser E2E
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.root == 'true' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: phase10
+          POSTGRES_PASSWORD: phase10
+          POSTGRES_DB: phase10
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U phase10 -d phase10"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://phase10:phase10@localhost:5432/phase10
+      JWT_ACCESS_SECRET: phase10-ci-access-secret
+      JWT_REFRESH_SECRET: phase10-ci-refresh-secret
+      PORT: '8000'
+      CORS_ORIGINS: http://127.0.0.1:3000
+      API_URL: http://127.0.0.1:8000
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+      E2E_FRONTEND_URL: http://127.0.0.1:3000
+      E2E_BACKEND_URL: http://127.0.0.1:8000/api
+      STORAGE_PROVIDER: local
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0c17529a66aca453f9227af23103ed11469b1e47
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        run: pnpm --filter backend run migrate:deploy
+
+      - name: Seed browser E2E data
+        run: pnpm --filter backend run seed
+
+      - name: Install Chromium
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
+
+      - name: Run Vocabulary browser E2E
+        run: pnpm --filter frontend run test:e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: vocabulary-playwright-artifacts
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          if-no-files-found: ignore
+          retention-days: 7
 
   # ============================================
   # DOCKER BUILD - FRONTEND

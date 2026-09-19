@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test -c playwright.config.ts",
     "test:related": "vitest related --run --passWithNoTests",
     "knip": "pnpm --filter dash-stack exec knip --workspace frontend",
     "audit": "pnpm audit --audit-level=moderate",
@@ -58,7 +59,7 @@
     "framer-motion": "^13.1.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.545.0",
-    "next": "^15.1.7",
+    "next": "^15.5.24",
     "next-themes": "^0.4.6",
     "postcss": "^8.4.49",
     "react": "^19.2.0",
@@ -76,7 +77,8 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@feature-sliced/steiger-plugin": "^0.7.0",
-    "@next/eslint-plugin-next": "^15.1.7",
+    "@next/eslint-plugin-next": "^15.5.24",
+    "@playwright/test": "1.63.0",
     "@tanstack/eslint-plugin-query": "^5.91.0",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -87,9 +89,9 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.2.0",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^9.37.0",
-    "eslint-config-next": "^15.1.7",
+    "eslint-config-next": "^15.5.24",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.0.0",
     "globals": "^16.4.0",
@@ -101,7 +103,7 @@
     "steiger": "^0.6.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.0",
-    "vitest": "^4.0.17"
+    "vitest": "^4.1.11"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

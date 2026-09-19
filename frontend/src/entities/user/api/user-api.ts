@@ -4,7 +4,7 @@ import { type User } from '../model/types'
 
 export const createUserApi = (client: HttpClient) => ({
   getMe: (): Promise<User> => {
-    return client.get<User>('/me')
+    return client.get<User>('/me', { suppressUnauthorizedHandler: true })
   },
   updateMe: (dto: UpdateUserDto): Promise<User> => {
     return client.patch<User>('/me', dto)
