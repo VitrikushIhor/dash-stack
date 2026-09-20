@@ -32,7 +32,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
 
       const targetPath = sanitizeRedirectUrl(
         options?.redirectTo,
-        ROUTES.organizations
+        ROUTES.vocabDecks
       )
 
       router.replace(targetPath)

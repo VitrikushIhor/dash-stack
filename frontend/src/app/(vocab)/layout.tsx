@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { getCurrentUser } from '@/entities/user/server'
+import { VocabularyHeader } from '@/widgets/vocabulary-header'
 
 export const metadata: Metadata = {
   title: {
@@ -25,10 +27,17 @@ export const metadata: Metadata = {
   },
 }
 
-export default function VocabularyLayout({
+export default async function VocabularyLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <main id='main-content'>{children}</main>
+  const { data: user } = await getCurrentUser()
+
+  return (
+    <div className='bg-background text-foreground min-h-svh'>
+      <VocabularyHeader user={user} />
+      <main id='main-content'>{children}</main>
+    </div>
+  )
 }

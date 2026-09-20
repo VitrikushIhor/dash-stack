@@ -52,7 +52,7 @@ describe('SignInForm Component', () => {
     expect(mockSignInAction).not.toHaveBeenCalled()
   })
 
-  it('submits form with valid user credentials and redirects to create-organization by default', async () => {
+  it('submits valid credentials and redirects to vocabulary decks by default', async () => {
     const user = userEvent.setup()
 
     mockSignInAction.mockResolvedValueOnce({ success: true })
@@ -71,7 +71,7 @@ describe('SignInForm Component', () => {
     })
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(ROUTES.organizations)
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
     })
   })
 

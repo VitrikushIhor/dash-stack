@@ -1,7 +1,7 @@
 'use client'
 
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
-import { useLogout } from '../model/mutations/use-logout'
+import { useLogout } from '../model/mutations/use-logout-hook'
 
 interface SignOutDialogProps {
   open: boolean
@@ -9,11 +9,7 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
-  const { mutate: logout } = useLogout()
-
-  const handleSignOut = () => {
-    logout()
-  }
+  const { handleLogout } = useLogout()
 
   return (
     <ConfirmDialog
@@ -23,7 +19,7 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
       desc='Are you sure you want to sign out? You will need to sign in again to access your account.'
       confirmText='Sign out'
       destructive
-      handleConfirm={handleSignOut}
+      handleConfirm={handleLogout}
       className='sm:max-w-sm'
     />
   )

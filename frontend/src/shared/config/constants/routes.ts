@@ -37,6 +37,7 @@ export const ROUTES = {
   vocabDeck: (id: string) => `/vocab/decks/${id}`,
   vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
   vocabCatalog: '/vocab/catalog',
+  vocabSettings: '/vocab/settings',
   vocabDeckStudy: (id: string) => `/vocab/decks/${id}/flashcards`,
   vocabDeckLearn: (id: string) => `/vocab/decks/${id}/learn`,
   vocabMatch: (id: string) => `/vocab/decks/${id}/match`,

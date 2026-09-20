@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@/shared/lib/test'
+import { ROUTES } from '@/shared/config'
+import { render, screen, waitFor } from '@/shared/lib/test'
 import { OAuthCallbackCard } from './oauth-callback-card'
 
 const mockOAuthExchangeAction = vi.fn()
@@ -28,5 +29,15 @@ describe('OAuthCallbackCard Component', () => {
     expect(
       screen.getByText('Completing sign in, please wait.')
     ).toBeInTheDocument()
+  })
+
+  it('redirects to vocabulary decks after a successful OAuth login', async () => {
+    mockOAuthExchangeAction.mockResolvedValueOnce({ success: true })
+
+    render(<OAuthCallbackCard code='valid-code' />)
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
+    })
   })
 })

@@ -20,7 +20,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
   const { execute: exchangeToken } = useAction(oauthExchangeAction, {
     successMessage: 'Successfully signed in!',
     onSuccess: () => {
-      router.replace(ROUTES.organizations)
+      router.replace(ROUTES.vocabDecks)
     },
   })
 

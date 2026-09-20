@@ -13,14 +13,14 @@ vi.mock('@/features/auth', () => ({
 }))
 
 describe('LandingNavbarAuth', () => {
-  const mockLogoutMutate = vi.fn()
+  const handleLogout = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useLogout).mockReturnValue({
-      mutate: mockLogoutMutate,
+      handleLogout,
       isPending: false,
-    } as Partial<ReturnType<typeof useLogout>> as ReturnType<typeof useLogout>)
+    })
   })
 
   it('displays "Sign In" and "Start Free" buttons in desktop mode when unauthenticated', () => {
@@ -83,7 +83,7 @@ describe('LandingNavbarAuth', () => {
     expect(signOutButton).toBeInTheDocument()
 
     fireEvent.click(signOutButton)
-    expect(mockLogoutMutate).toHaveBeenCalledTimes(1)
+    expect(handleLogout).toHaveBeenCalledTimes(1)
   })
 
   it('triggers the logout mutation when clicking "Sign out" in the dropdown', async () => {
@@ -114,6 +114,6 @@ describe('LandingNavbarAuth', () => {
 
     await userEvent.click(signOutMenuItem)
 
-    expect(mockLogoutMutate).toHaveBeenCalledTimes(1)
+    expect(handleLogout).toHaveBeenCalledTimes(1)
   })
 })
