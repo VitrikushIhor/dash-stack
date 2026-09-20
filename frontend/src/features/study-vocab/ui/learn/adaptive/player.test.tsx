@@ -56,14 +56,22 @@ beforeEach(() => {
 })
 
 describe('AdaptiveLearnPlayer', () => {
-  it('should_start_in_mcq_and_show_four_unique_definition_choices', async () => {
+  it('should_start_a_new_session_without_an_intermediate_start_screen', async () => {
     render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
 
     expect(
-      screen.getByText('Multiple choice · streak 0 / 2')
+      await screen.findByText('Multiple choice · streak 0 / 2')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Start adaptive session' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('should_start_in_mcq_and_show_four_unique_definition_choices', async () => {
+    render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
+
+    expect(
+      await screen.findByText('Multiple choice · streak 0 / 2')
     ).toBeInTheDocument()
     const choices = screen
       .getAllByRole('button')
@@ -75,12 +83,11 @@ describe('AdaptiveLearnPlayer', () => {
 
   it('should_show_answer_feedback_on_choices_and_advance_session_progress', async () => {
     render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
 
     await userEvent.click(
-      screen.getByRole('button', { name: new RegExp(learnCards[0].definition) })
+      await screen.findByRole('button', {
+        name: new RegExp(learnCards[0].definition),
+      })
     )
 
     expect(await screen.findByRole('status')).toHaveClass('text-emerald-700')
@@ -98,11 +105,8 @@ describe('AdaptiveLearnPlayer', () => {
 
   it('should_mark_the_wrong_choice_red_and_reveal_the_correct_choice_green', async () => {
     render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
 
-    const correctChoice = screen.getByRole('button', {
+    const correctChoice = await screen.findByRole('button', {
       name: new RegExp(learnCards[0].definition),
     })
     const wrongChoice = screen
@@ -120,27 +124,19 @@ describe('AdaptiveLearnPlayer', () => {
     expect(correctChoice).toHaveClass('border-emerald-500')
   })
 
-  it('should_show_almost_correct_feedback_play_tts_and_continue_after_save', async () => {
+  it('should_show_exact_feedback_play_tts_and_continue_after_save', async () => {
     render(
       wrapper(
         <AdaptiveLearnPlayer deckId='deck' cards={learnCards.slice(0, 1)} />
       )
     )
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
     await userEvent.type(
-      screen.getByRole('textbox', { name: 'Type the term' }),
-      'aple'
+      await screen.findByRole('textbox', { name: 'Type the term' }),
+      'apple'
     )
     await userEvent.click(screen.getByRole('button', { name: 'Check' }))
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Almost correct!'
-    )
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Correct answer: apple'
-    )
+    expect(await screen.findByRole('status')).toHaveTextContent('Correct!')
     await waitFor(() =>
       expect(speak).toHaveBeenCalledWith(
         'apple',
@@ -160,11 +156,8 @@ describe('AdaptiveLearnPlayer', () => {
         <AdaptiveLearnPlayer deckId='deck' cards={learnCards.slice(0, 1)} />
       )
     )
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
     await userEvent.type(
-      screen.getByRole('textbox', { name: 'Type the term' }),
+      await screen.findByRole('textbox', { name: 'Type the term' }),
       'apple'
     )
     await userEvent.click(screen.getByRole('button', { name: 'Check' }))
@@ -187,13 +180,10 @@ describe('AdaptiveLearnPlayer', () => {
         <AdaptiveLearnPlayer deckId='deck' cards={learnCards.slice(0, 1)} />
       )
     )
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
 
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await userEvent.type(
-        screen.getByRole('textbox', { name: 'Type the term' }),
+        await screen.findByRole('textbox', { name: 'Type the term' }),
         'apple'
       )
       await userEvent.click(screen.getByRole('button', { name: 'Check' }))
@@ -215,10 +205,7 @@ describe('AdaptiveLearnPlayer', () => {
     render(<AdaptiveLearnPlayer deckId='deck' cards={closeChoices} />, {
       wrapper: ({ children }) => wrapper(children),
     })
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
-    await userEvent.click(screen.getByRole('button', { name: /cats/ }))
+    await userEvent.click(await screen.findByRole('button', { name: /cats/ }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Incorrect')
     expect(submitProgressAction).toHaveBeenCalledWith(
@@ -241,13 +228,10 @@ describe('AdaptiveLearnPlayer', () => {
     const user = userEvent.setup()
 
     render(wrapper(<AdaptiveLearnPlayer deckId='deck' cards={learnCards} />))
-    await user.click(
-      await screen.findByRole('button', { name: 'Start adaptive session' })
-    )
 
     for (const [index, card] of learnCards.entries()) {
       await user.click(
-        screen.getByRole('button', {
+        await screen.findByRole('button', {
           name: new RegExp(`${card.definition}$`),
         })
       )

@@ -33,9 +33,7 @@ export type AdaptiveLearnFeedbackProps = {
 }
 
 export type AdaptiveLearnIdleProps = {
-  hasCards: boolean
   error: string | null
-  onStart: () => void
   onRetry: () => void
 }
 

@@ -38,4 +38,10 @@ describe('isTermMatch', () => {
     expect(isTermMatch('ran', term)).toBe(true)
     expect(isTermMatch('running', term)).toBe(false)
   })
+
+  it('accepts an exact comma-separated variant without accepting a prefix', () => {
+    expect(isTermMatch('thought', 'thought, thought')).toBe(true)
+    expect(isTermMatch('written', 'write, wrote, written')).toBe(true)
+    expect(isTermMatch('wri', 'write, wrote, written')).toBe(false)
+  })
 })

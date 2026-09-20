@@ -1,14 +1,6 @@
-import Link from 'next/link'
-import { createSerializer } from 'nuqs/server'
-import { ROUTES } from '@/shared/config'
 import { PageErrorHandler } from '@/shared/ui/error-state'
 import { StudyMode } from '@/entities/vocab'
-import {
-  MIN_MATCH_CARDS,
-  StudyEmptyState,
-  StudyFilters,
-} from '@/features/study-vocab'
-import { studySearchParams } from '@/features/study-vocab/server'
+import { MIN_MATCH_CARDS, StudyEmptyState } from '@/features/study-vocab'
 import { VocabFlashcards } from '@/widgets/vocab-flashcards'
 import { VocabLearn } from '@/widgets/vocab-learn'
 import { VocabMatch } from '@/widgets/vocab-match'
@@ -18,8 +10,6 @@ import {
   type StudyRouteProps,
   getStudySessionKey,
 } from '../model/study-route'
-
-const serializeFilters = createSerializer(studySearchParams)
 
 export async function StudyPage(
   props: StudyRouteProps & { mode: StudyRouteMode }
@@ -78,40 +68,5 @@ export async function StudyPage(
     return <VocabMatch key={sessionKey} deck={deck} filters={route.filters} />
   }
 
-  return (
-    <>
-      <div className='mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-3'>
-        <nav aria-label='Study modes' className='flex gap-4 text-sm'>
-          <Link
-            href={serializeFilters(
-              ROUTES.vocabDeckStudy(deck.id),
-              route.filters
-            )}
-            aria-current={
-              route.mode === StudyMode.FLASHCARDS ? 'page' : undefined
-            }
-          >
-            Flashcards
-          </Link>
-          <Link
-            href={serializeFilters(
-              ROUTES.vocabDeckLearn(deck.id),
-              route.filters
-            )}
-            aria-current={route.mode === StudyMode.LEARN ? 'page' : undefined}
-          >
-            Learn
-          </Link>
-          <Link
-            href={serializeFilters(ROUTES.vocabMatch(deck.id), route.filters)}
-            aria-current={route.mode === StudyMode.MATCH ? 'page' : undefined}
-          >
-            Match
-          </Link>
-        </nav>
-        <StudyFilters />
-      </div>
-      {content()}
-    </>
-  )
+  return content()
 }

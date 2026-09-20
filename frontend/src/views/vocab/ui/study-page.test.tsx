@@ -83,7 +83,7 @@ describe('study route composition', () => {
     }
   )
 
-  it('should_render_study_navigation_and_starred_filter_for_empty_selection', async () => {
+  it('should_not_render_a_study_header_for_empty_selection', async () => {
     vi.mocked(getCurrentUser).mockClear()
     render(
       withQueryClient(
@@ -97,11 +97,11 @@ describe('study route composition', () => {
     )
 
     expect(
-      screen.getByRole('navigation', { name: 'Study modes' })
-    ).toBeInTheDocument()
+      screen.queryByRole('navigation', { name: 'Study modes' })
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('checkbox', { name: 'Starred only' })
-    ).toBeInTheDocument()
+      screen.queryByRole('checkbox', { name: 'Starred only' })
+    ).not.toBeInTheDocument()
     expect(getCurrentUser).not.toHaveBeenCalled()
   })
 

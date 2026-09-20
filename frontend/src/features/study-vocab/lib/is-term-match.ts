@@ -24,10 +24,13 @@ export function isTermMatch(answer: string, term: string): boolean {
 
   if (!match) return false
 
-  const baseTerm = normalize(match[1])
+  const baseTerms = match[1]
+    .split(',')
+    .map((value) => normalize(value))
+    .filter(Boolean)
   const forms = match[2] ? match[2].split(',').map((f) => normalize(f)) : []
 
-  const allAcceptable = [baseTerm, ...forms]
+  const allAcceptable = [...baseTerms, ...forms]
 
   return allAcceptable.some((form) => form === normalizedAnswer)
 }

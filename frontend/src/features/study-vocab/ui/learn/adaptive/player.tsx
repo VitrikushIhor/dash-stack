@@ -24,6 +24,7 @@ export function AdaptiveLearnPlayer({
   sessionKey,
 }: AdaptiveLearnPlayerProps) {
   const learn = useAdaptiveLearn(deckId, cards, sessionKey)
+  const { error, isLoading, start } = learn
   const snapshot = learn.snapshot
   const card = snapshot?.cards[snapshot.session.currentIndex]
   const mastery =
@@ -37,21 +38,22 @@ export function AdaptiveLearnPlayer({
   const { speak } = useSpeech({ lang: 'en-US' })
 
   useEffect(() => {
+    if (isLoading || snapshot || !cards.length || error) return
+
+    start()
+  }, [cards.length, error, isLoading, snapshot, start])
+
+  useEffect(() => {
     if (!feedback || !snapshot?.session.questionId || !card?.term) return
     speak(card.term, { eventKey: snapshot.session.questionId })
   }, [card?.term, feedback, snapshot?.session.questionId, speak])
 
-  if (learn.isLoading) return <StudySessionSkeleton />
+  if (isLoading || (!snapshot && cards.length > 0 && !error)) {
+    return <StudySessionSkeleton />
+  }
 
   if (!snapshot) {
-    return (
-      <AdaptiveLearnIdle
-        hasCards={cards.length > 0}
-        error={learn.error}
-        onStart={learn.start}
-        onRetry={learn.restart}
-      />
-    )
+    return <AdaptiveLearnIdle error={error} onRetry={learn.restart} />
   }
 
   if (snapshot.session.phase === LearnPhase.Complete) {

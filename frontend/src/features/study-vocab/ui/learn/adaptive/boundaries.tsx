@@ -1,4 +1,4 @@
-import { CheckCircle2, RotateCcw, Sparkles } from 'lucide-react'
+import { CheckCircle2, RotateCcw } from 'lucide-react'
 import { Button } from '@/shared/ui/core/button'
 import { WidgetErrorState } from '@/shared/ui/feedback'
 import {
@@ -8,43 +8,22 @@ import {
 import { StudyEmptyState } from '../../shared/study-empty-state'
 import { GuestStudySaveProgressCta } from '../../summary/guest-study-save-progress-cta'
 
-export function AdaptiveLearnIdle({
-  hasCards,
-  error,
-  onStart,
-  onRetry,
-}: AdaptiveLearnIdleProps) {
-  if (!error && !hasCards) {
+export function AdaptiveLearnIdle({ error, onRetry }: AdaptiveLearnIdleProps) {
+  if (error) {
     return (
-      <StudyEmptyState
-        title='No cards match these filters'
-        description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
+      <WidgetErrorState
+        title='Unable to restore Learn session'
+        description={error}
+        onRetry={onRetry}
       />
     )
   }
 
   return (
-    <div className='mx-auto flex min-h-150 max-w-xl flex-col items-center justify-center px-6 text-center'>
-      {error ? (
-        <WidgetErrorState
-          title='Unable to restore Learn session'
-          description={error}
-          onRetry={onRetry}
-        />
-      ) : (
-        <>
-          <Sparkles className='text-primary mb-4 h-10 w-10' />
-          <h1 className='text-3xl font-bold'>Adaptive Learn</h1>
-          <p className='text-muted-foreground mt-3'>
-            Each card moves from recognition to typing after two correct
-            answers.
-          </p>
-          <Button className='mt-6' onClick={onStart}>
-            Start adaptive session
-          </Button>
-        </>
-      )}
-    </div>
+    <StudyEmptyState
+      title='No cards match these filters'
+      description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
+    />
   )
 }
 
