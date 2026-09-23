@@ -22,6 +22,11 @@
     "docker:dev:down": "docker compose --env-file backend/.env --env-file frontend/.env -f docker-compose.dev.yml down",
     "docker:logs": "docker compose logs -f",
     "docker:ps": "docker compose ps",
+    "sonar:up": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml up -d sonarqube",
+    "sonar:down": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml down",
+    "sonar:logs": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml logs -f sonarqube",
+    "sonar:status": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml ps",
+    "sonar:scan": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml --profile scan run --rm sonar-scanner",
     "knip": "knip"
   },
   "devDependencies": {

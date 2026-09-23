@@ -29,5 +29,9 @@
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "sonarlint.connectedMode.project": {
+    "connectionId": "vitrikushihor",
+    "projectKey": "VitrikushIhor_dash-stack"
   }
 }
