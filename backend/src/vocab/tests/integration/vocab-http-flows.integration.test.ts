@@ -198,6 +198,8 @@ describe('Vocabulary critical HTTP flows integration', () => {
         method: 'PUT',
         bearer: learnerToken,
         body: {
+          operationId: randomUUID(),
+          expectedUpdatedAt: createdFork.updatedAt.toISOString(),
           metadata: { title: 'Independent fork edit' },
           cards: createdFork.flashcards.map((card, index) => ({
             id: card.id,

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DeckRepositoryPort } from '../ports/deck-repository.port';
 import { VocabProgressRepositoryPort } from '../ports/vocab-progress-repository.port';
-import { GetStudyCardsQuery } from '../queries/get-study-cards.query';
+import { GetStudyCardsQuery, StudyMode } from '../queries/get-study-cards.query';
 import { StudyCardReadModel } from '../read-models/study-card.read-model';
 import {
   DeckNotFoundException,
@@ -9,6 +9,7 @@ import {
   PersonalizedStudyFilterAuthRequiredException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { DeckAccessAction, DeckAccessPolicy } from '../../domain/policies/deck-access.policy';
+import { LEARN_SESSION_MAX_CARDS } from '../constants/import-limits';
 
 @Injectable()
 export class GetStudyCardsUseCase {
@@ -22,7 +23,8 @@ export class GetStudyCardsUseCase {
   public async execute(query: GetStudyCardsQuery): Promise<StudyCardReadModel[]> {
     const { userId, deckId, onlyStarred, onlyDue } = query;
 
-    const deck = await this.deckRepository.findById(deckId);
+    const deck = await this.deckRepository.findForAccess(deckId);
+
     if (!deck) {
       throw new DeckNotFoundException(deckId);
     }
@@ -38,6 +40,7 @@ export class GetStudyCardsUseCase {
     return this.vocabProgressRepository.getStudyCards(userId, deckId, {
       onlyStarred: !!onlyStarred,
       onlyDue: !!onlyDue,
+      ...(query.mode === StudyMode.LEARN ? { limit: LEARN_SESSION_MAX_CARDS } : {}),
     });
   }
 }

@@ -19,6 +19,7 @@ export interface VocabImportReceipt {
 export interface DeckImportTransactionContext {
   deckRepository: {
     findByIdForUpdate(deckId: string): Promise<Deck | null>;
+    touchUpdatedAt(deckId: string): Promise<void>;
   };
   receiptRepository: {
     findByUserAndImportId(userId: string, importId: string): Promise<VocabImportReceipt | null>;

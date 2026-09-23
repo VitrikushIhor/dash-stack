@@ -9,6 +9,7 @@ import {
 const MATCH_MIN_CARDS = 6;
 export const MATCH_MAX_CARDS = 12;
 const MATCH_SESSION_TTL_MS = 30 * 60 * 1000;
+export const MATCH_PENALTY_MS = 2000;
 
 export type MatchResult = {
   deckId: string;
@@ -27,11 +28,13 @@ type MatchSessionSnapshot = {
   startedAt: Date;
   expiresAt: Date;
   completedAt: Date | null;
+  penaltyCount?: number;
 };
 
 export class MatchSession {
   private constructor(private readonly props: MatchSessionSnapshot) {
     const { selectedCardIds, matchedCardIds = [], startedAt, expiresAt, completedAt } = props;
+
     if (
       !props.deckId.trim() ||
       !props.userId.trim() ||
@@ -41,6 +44,8 @@ export class MatchSession {
       new Set(selectedCardIds).size !== selectedCardIds.length ||
       new Set(matchedCardIds).size !== matchedCardIds.length ||
       matchedCardIds.some((id) => !selectedCardIds.includes(id)) ||
+      !Number.isInteger(props.penaltyCount ?? 0) ||
+      (props.penaltyCount ?? 0) < 0 ||
       !Number.isFinite(startedAt.getTime()) ||
       expiresAt.getTime() - startedAt.getTime() !== MATCH_SESSION_TTL_MS ||
       (completedAt !== null &&
@@ -62,6 +67,7 @@ export class MatchSession {
       expiresAt: new Date(now.getTime() + MATCH_SESSION_TTL_MS),
       completedAt: null,
       matchedCardIds: [],
+      penaltyCount: 0,
     });
   }
 
@@ -84,15 +90,38 @@ export class MatchSession {
     if ((this.props.matchedCardIds?.length ?? 0) !== this.props.selectedCardIds.length) {
       throw new MatchSessionIncompleteException();
     }
-    const durationMs = now.getTime() - this.props.startedAt.getTime();
+    const durationMs =
+      now.getTime() -
+      this.props.startedAt.getTime() +
+      (this.props.penaltyCount ?? 0) * MATCH_PENALTY_MS;
+
     if (!Number.isFinite(durationMs) || durationMs < 0) throw new InvalidMatchSessionException();
     this.props.completedAt = new Date(now);
+
     return {
       deckId: this.props.deckId,
       userId: this.props.userId,
       durationMs,
       cardCount: this.props.selectedCardIds.length,
       createdAt: new Date(now),
+    };
+  }
+
+  completedResult(deckId: string, userId: string): MatchResult | null {
+    if (deckId !== this.props.deckId || userId !== this.props.userId) {
+      throw new MatchSessionNotFoundException();
+    }
+    if (this.props.completedAt === null) return null;
+
+    return {
+      deckId: this.props.deckId,
+      userId: this.props.userId,
+      durationMs:
+        this.props.completedAt.getTime() -
+        this.props.startedAt.getTime() +
+        (this.props.penaltyCount ?? 0) * MATCH_PENALTY_MS,
+      cardCount: this.props.selectedCardIds.length,
+      createdAt: new Date(this.props.completedAt),
     };
   }
 

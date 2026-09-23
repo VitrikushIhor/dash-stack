@@ -25,6 +25,26 @@ describe('Deck Use Cases', () => {
   beforeEach(() => {
     mockDeckRepository = {
       save: jest.fn((deck: Deck) => Promise.resolve(deck)),
+      updateMetadata: jest.fn((_, metadata) => {
+        const deck = Deck.create({
+          id: 'deck-1',
+          ownerUserId: 'user-1',
+          title: metadata.title ?? 'Old Title',
+        });
+
+        return Promise.resolve(deck);
+      }),
+      publish: jest.fn((deckId: string) =>
+        Promise.resolve(
+          Deck.create({
+            id: deckId,
+            ownerUserId: 'user-1',
+            title: 'Ready Deck',
+            status: DeckStatus.PUBLISHED,
+          }),
+        ),
+      ),
+      findForAccess: jest.fn(),
       findById: jest.fn(),
       findBySlug: jest.fn(),
       findMyDecks: jest.fn(),
@@ -144,7 +164,14 @@ describe('Deck Use Cases', () => {
       });
 
       expect(result.title).toBe('New Title');
-      expect(mockDeckRepository.save).toHaveBeenCalled();
+      expect(mockDeckRepository.updateMetadata).toHaveBeenCalledWith('deck-1', {
+        title: 'New Title',
+        description: undefined,
+        language: undefined,
+        level: undefined,
+        tags: undefined,
+        visibility: undefined,
+      });
     });
 
     it('should throw ForbiddenException if user is not the owner', async () => {
@@ -184,18 +211,16 @@ describe('Deck Use Cases', () => {
     it('should publish when deck has at least 2 cards', async () => {
       const deck = Deck.create({ id: 'deck-1', ownerUserId: 'user-1', title: 'Ready Deck' });
       mockDeckRepository.findById.mockResolvedValueOnce(deck);
-      mockDeckRepository.countFlashcardsByDeckId.mockResolvedValueOnce(5);
-
       const result = await publishDeckUseCase.execute({ deckId: 'deck-1', userId: 'user-1' });
 
       expect(result.status).toBe(DeckStatus.PUBLISHED);
-      expect(mockDeckRepository.save).toHaveBeenCalled();
+      expect(mockDeckRepository.publish).toHaveBeenCalledWith('deck-1');
     });
 
     it('should throw DeckPublishInvalidException when deck has fewer than 2 cards', async () => {
       const deck = Deck.create({ id: 'deck-1', ownerUserId: 'user-1', title: 'Empty Deck' });
       mockDeckRepository.findById.mockResolvedValueOnce(deck);
-      mockDeckRepository.countFlashcardsByDeckId.mockResolvedValueOnce(1);
+      mockDeckRepository.publish.mockRejectedValueOnce(new DeckPublishInvalidException(1));
 
       await expect(
         publishDeckUseCase.execute({ deckId: 'deck-1', userId: 'user-1' }),

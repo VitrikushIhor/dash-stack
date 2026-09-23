@@ -11,4 +11,15 @@ export type CompleteMatchSessionCommand = {
   sessionId: string;
 };
 
-export type RecordMatchPairCommand = CompleteMatchSessionCommand & { cardId: string };
+export const MatchTileSide = {
+  TERM: 'TERM',
+  DEFINITION: 'DEFINITION',
+} as const;
+
+export type MatchTileSide = (typeof MatchTileSide)[keyof typeof MatchTileSide];
+
+export type RecordMatchPairCommand = CompleteMatchSessionCommand & {
+  attemptId: string;
+  first: { cardId: string; side: MatchTileSide };
+  second: { cardId: string; side: MatchTileSide };
+};

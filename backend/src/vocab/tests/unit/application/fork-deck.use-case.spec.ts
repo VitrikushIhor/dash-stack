@@ -24,8 +24,12 @@ describe('ForkDeckUseCase', () => {
   beforeEach(() => {
     mockDeckRepository = {
       save: jest.fn(),
+      updateMetadata: jest.fn(),
+      publish: jest.fn(),
+      findForAccess: jest.fn(),
       findById: jest.fn().mockImplementation((id: string) => {
         if (id === 'orig-deck-1') return Promise.resolve(originalDeck);
+
         return Promise.resolve(null);
       }),
       findBySlug: jest.fn().mockResolvedValue(null),

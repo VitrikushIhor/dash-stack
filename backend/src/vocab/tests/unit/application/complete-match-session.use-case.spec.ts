@@ -6,7 +6,6 @@ import { Deck } from '../../../domain/entities/deck.entity';
 import { DeckStatus, DeckVisibility } from '../../../domain/enums/vocab.enums';
 import {
   MatchAuthenticationRequiredException,
-  MatchSessionAlreadyCompletedException,
   MatchSessionExpiredException,
   MatchSessionNotFoundException,
 } from '../../../domain/exceptions/match-domain.exceptions';
@@ -129,15 +128,46 @@ describe('CompleteMatchSessionUseCase', () => {
     expect(repository.completeSession).not.toHaveBeenCalled();
   });
 
-  it('should_reject_completion_when_session_is_already_completed', async () => {
+  it('should_return_the_persisted_completion_when_the_same_session_is_retried', async () => {
     session.complete(command.deckId, command.userId, completedAt);
-    await expect(useCase.execute(command)).rejects.toThrow(MatchSessionAlreadyCompletedException);
+    repository.findBest.mockResolvedValue({
+      id: 'best-1',
+      deckId: 'deck-1',
+      userId: 'owner',
+      durationMs: 14500,
+      cardCount: 6,
+      createdAt: completedAt,
+      user,
+    });
+
+    await expect(useCase.execute(command)).resolves.toMatchObject({
+      sessionId: 'session-1',
+      durationMs: 14500,
+      cardCount: 6,
+      completedAt,
+    });
+    expect(repository.completeSession).not.toHaveBeenCalled();
     expect(repository.saveBest).not.toHaveBeenCalled();
   });
 
-  it('should_reject_completion_when_another_request_claimed_the_session', async () => {
+  it('should_reconcile_when_another_request_claimed_the_session', async () => {
     repository.completeSession.mockResolvedValue(false);
-    await expect(useCase.execute(command)).rejects.toThrow(MatchSessionAlreadyCompletedException);
+    const completed = MatchSession.reconstitute(session.toSnapshot());
+    completed.complete(command.deckId, command.userId, completedAt);
+    repository.findSession
+      .mockResolvedValueOnce(MatchSession.reconstitute(session.toSnapshot()))
+      .mockResolvedValueOnce(completed);
+    repository.findBest.mockResolvedValue({
+      id: 'best-1',
+      deckId: 'deck-1',
+      userId: 'owner',
+      durationMs: 14500,
+      cardCount: 6,
+      createdAt: completedAt,
+      user,
+    });
+
+    await expect(useCase.execute(command)).resolves.toMatchObject({ durationMs: 14500 });
     expect(repository.saveBest).not.toHaveBeenCalled();
   });
 

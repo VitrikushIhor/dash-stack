@@ -26,7 +26,10 @@ export interface MatchRepositoryPort {
     sessionId: string;
     deckId: string;
     userId: string;
-    cardId: string;
+    attemptId: string;
+    payloadHash: string;
+    cardId: string | null;
+    isCorrect: boolean;
     matchedAt: Date;
   }): Promise<boolean>;
   findBest(deckId: string, userId: string): Promise<MatchLeaderboardEntryReadModel | null>;

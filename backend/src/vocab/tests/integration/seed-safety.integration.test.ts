@@ -74,4 +74,56 @@ describe('Database seed safety integration', () => {
       await prisma.user.delete({ where: { id: protectedUserId } });
     }
   });
+
+  it('should_reject_a_system_slug_collision_without_mutating_a_user_deck', async () => {
+    const backendRoot = resolve(__dirname, '../../../../');
+    const protectedUserId = `seed-collision-${randomUUID()}`;
+    const systemDeck = systemDecks[0];
+
+    if (!systemDeck) throw new Error('System seed data is required for this test');
+
+    await prisma.deck.delete({ where: { slug: systemDeck.slug } });
+
+    const user = await prisma.user.create({
+      data: {
+        id: protectedUserId,
+        email: `${protectedUserId}@example.test`,
+        decks: {
+          create: {
+            title: 'Private user deck with a colliding slug',
+            slug: systemDeck.slug,
+            visibility: 'PRIVATE',
+            flashcards: {
+              create: { term: 'private term', definition: 'private definition', position: 0 },
+            },
+          },
+        },
+      },
+      include: { decks: { include: { flashcards: true } } },
+    });
+
+    try {
+      expect(() =>
+        execFileSync(process.execPath, ['-r', 'ts-node/register', 'prisma/seed.ts'], {
+          cwd: backendRoot,
+          env: process.env,
+          encoding: 'utf8',
+          stdio: 'pipe',
+        }),
+      ).toThrow();
+
+      const persisted = await prisma.deck.findUniqueOrThrow({
+        where: { id: user.decks[0].id },
+        include: { flashcards: true },
+      });
+      expect(persisted).toMatchObject({
+        title: 'Private user deck with a colliding slug',
+        visibility: 'PRIVATE',
+        type: 'USER_GENERATED',
+      });
+      expect(persisted.flashcards).toHaveLength(1);
+    } finally {
+      await prisma.user.delete({ where: { id: protectedUserId } });
+    }
+  });
 });

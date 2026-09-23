@@ -21,7 +21,7 @@ export interface VocabProgressRepositoryPort {
   getStudyCards(
     userId: string | null,
     deckId: string,
-    options?: { onlyStarred?: boolean; onlyDue?: boolean },
+    options?: { onlyStarred?: boolean; onlyDue?: boolean; limit?: number },
   ): Promise<StudyCardReadModel[]>;
 
   browseDeckCards(

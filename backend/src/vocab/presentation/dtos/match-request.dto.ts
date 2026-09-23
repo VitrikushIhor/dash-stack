@@ -6,15 +6,44 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
+  IsIn,
+  ValidateNested,
   Max,
   Min,
   ValidateIf,
   validateSync,
 } from 'class-validator';
+import { MatchTileSide } from '../../application/commands/match-session.command';
 
-export class RecordMatchPairDto {
+const MATCH_TILE_SIDES = Object.values(MatchTileSide);
+
+export class MatchTileDto {
   @IsString()
   cardId: string;
+
+  @IsIn(MATCH_TILE_SIDES)
+  side: MatchTileSide;
+}
+
+export class RecordMatchPairDto {
+  @ValidateIf((object: RecordMatchPairDto) => object.attemptId === undefined)
+  @IsString()
+  cardId?: string;
+
+  @ValidateIf((object: RecordMatchPairDto) => object.cardId === undefined)
+  @IsUUID()
+  attemptId?: string;
+
+  @ValidateIf((object: RecordMatchPairDto) => object.cardId === undefined)
+  @ValidateNested()
+  @Type(() => MatchTileDto)
+  first?: MatchTileDto;
+
+  @ValidateIf((object: RecordMatchPairDto) => object.cardId === undefined)
+  @ValidateNested()
+  @Type(() => MatchTileDto)
+  second?: MatchTileDto;
 }
 
 export class CreateMatchSessionDto {
@@ -47,6 +76,7 @@ export class MatchLeaderboardQueryDto {
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
   const prototype = Object.getPrototypeOf(value);
+
   return prototype === Object.prototype || prototype === null;
 }
 
@@ -58,9 +88,11 @@ function parseMatchRequestBody(body: unknown): Record<string, unknown> {
 
 export function parseCreateMatchBody(body: unknown): CreateMatchSessionDto {
   const dto = plainToInstance(CreateMatchSessionDto, parseMatchRequestBody(body));
+
   if (validateSync(dto, { whitelist: true, forbidNonWhitelisted: true }).length > 0) {
     throw new BadRequestException('Only boolean onlyDue and onlyStarred filters are accepted');
   }
+
   return dto;
 }
 

@@ -6,6 +6,7 @@ import {
   DeckRepositoryPort,
   FindMyDecksFilter,
   SearchPublicDecksFilter,
+  UpdateDeckMetadata,
 } from '../../application/ports/deck-repository.port';
 import { PrismaDeckMapper, PrismaDeckWithRelations } from './mappers/prisma-deck.mapper';
 import { DeckStatus, DeckVisibility } from '../../domain/enums/vocab.enums';
@@ -55,6 +56,48 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
     return PrismaDeckMapper.toDomain(saved);
   }
 
+  async updateMetadata(deckId: string, metadata: UpdateDeckMetadata): Promise<Deck> {
+    const data: Prisma.DeckUpdateInput = { updatedAt: new Date() };
+
+    if (metadata.title !== undefined) data.title = metadata.title;
+    if (metadata.description !== undefined) data.description = metadata.description;
+    if (metadata.language !== undefined) data.language = metadata.language;
+    if (metadata.level !== undefined) data.level = metadata.level;
+    if (metadata.tags !== undefined) data.tags = metadata.tags;
+    if (metadata.visibility !== undefined) data.visibility = metadata.visibility;
+
+    const saved = await this.prisma.deck.update({
+      where: { id: deckId },
+      data,
+      include: { _count: { select: { flashcards: true } } },
+    });
+
+    return PrismaDeckMapper.toDomain(saved);
+  }
+
+  async publish(deckId: string): Promise<Deck> {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        SELECT 1 FROM "decks" WHERE "id" = ${deckId} FOR UPDATE
+      `;
+
+      const current = await tx.deck.findUniqueOrThrow({
+        where: { id: deckId },
+        include: { _count: { select: { flashcards: true } } },
+      });
+      const deck = PrismaDeckMapper.toDomain(current);
+      deck.publish(current._count.flashcards);
+
+      const saved = await tx.deck.update({
+        where: { id: deckId },
+        data: { status: deck.status, updatedAt: new Date() },
+        include: { _count: { select: { flashcards: true } } },
+      });
+
+      return PrismaDeckMapper.toDomain(saved);
+    });
+  }
+
   async findById(id: string): Promise<Deck | null> {
     const raw = await this.prisma.deck.findUnique({
       where: { id },
@@ -68,6 +111,12 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
         },
       },
     });
+
+    return raw ? PrismaDeckMapper.toDomain(raw) : null;
+  }
+
+  async findForAccess(id: string): Promise<Deck | null> {
+    const raw = await this.prisma.deck.findUnique({ where: { id } });
 
     return raw ? PrismaDeckMapper.toDomain(raw) : null;
   }
@@ -116,8 +165,8 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
     if (filter.query && filter.query.trim().length > 0) {
       const q = filter.query.trim();
       where.OR = [
-        { title: { contains: q, mode: 'insensitive' } },
-        { description: { contains: q, mode: 'insensitive' } },
+        { title: { contains: q, mode: Prisma.QueryMode.insensitive } },
+        { description: { contains: q, mode: Prisma.QueryMode.insensitive } },
         { tags: { has: q.toLowerCase() } },
       ];
     }

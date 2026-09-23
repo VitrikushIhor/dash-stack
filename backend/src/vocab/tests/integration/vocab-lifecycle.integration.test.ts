@@ -15,9 +15,12 @@ import { ReorderFlashcardsUseCase } from '../../application/use-cases/reorder-fl
 import { RestoreDeckUseCase } from '../../application/use-cases/restore-deck.use-case';
 import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
 import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
+import { UpdateDeckUseCase } from '../../application/use-cases/update-deck.use-case';
 import {
   DeckAccessForbiddenException,
+  DeckEditorStaleRevisionException,
   DeckLifecycleInvalidTransitionException,
+  DeckPublishInvalidException,
   InvalidFlashcardDataException,
 } from '../../domain/exceptions/vocab-domain.exceptions';
 import { PrismaDeckRepository } from '../../infrastructure/persistence/prisma-deck.repository';
@@ -61,11 +64,13 @@ describe('Vocabulary lifecycle integration', () => {
   const createUser = async () => {
     const id = `vocab-lifecycle-${randomUUID()}`;
     await prisma.user.create({ data: { id, email: `${id}@example.test` } });
+
     return id;
   };
 
   const createForkableDeck = async () => {
     const deck = await createDeck(2);
+
     return prisma.deck.update({
       where: { id: deck.id },
       data: { visibility: 'PUBLIC', status: 'PUBLISHED' },
@@ -137,6 +142,38 @@ describe('Vocabulary lifecycle integration', () => {
     );
   });
 
+  it('does not restore stale visibility when a metadata save races with a privacy change', async () => {
+    const deck = await createDeck(2);
+    const updateDeck = new UpdateDeckUseCase(deckRepository);
+    const findById = deckRepository.findById.bind(deckRepository);
+    const findByIdSpy = jest
+      .spyOn(deckRepository, 'findById')
+      .mockImplementation(async (deckId) => {
+        const loaded = await findById(deckId);
+        await prisma.deck.update({
+          where: { id: deck.id },
+          data: { visibility: 'PRIVATE' },
+        });
+
+        return loaded;
+      });
+
+    try {
+      await updateDeck.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        title: 'Renamed after privacy change',
+      });
+
+      expect(await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).toMatchObject({
+        title: 'Renamed after privacy change',
+        visibility: 'PRIVATE',
+      });
+    } finally {
+      findByIdSpy.mockRestore();
+    }
+  });
+
   it('atomically deletes a card and demotes a published deck below the publish minimum', async () => {
     const deck = await createDeck(2);
     const publishDeck = new PublishDeckUseCase(deckRepository);
@@ -153,6 +190,31 @@ describe('Vocabulary lifecycle integration', () => {
     const remainingCards = await prisma.flashcard.count({ where: { deckId: deck.id } });
     expect(persistedDeck.status).toBe(DeckStatus.DRAFT);
     expect(remainingCards).toBe(1);
+  });
+
+  it('never leaves a published deck below the minimum when publish and delete overlap', async () => {
+    const deck = await createDeck(2);
+    const publishDeck = new PublishDeckUseCase(deckRepository);
+    const deleteFlashcard = new DeleteFlashcardUseCase(deckRepository, flashcardRepository);
+
+    const [publishResult, deleteResult] = await Promise.allSettled([
+      publishDeck.execute({ deckId: deck.id, userId: ownerUserId }),
+      deleteFlashcard.execute({
+        deckId: deck.id,
+        cardId: deck.flashcards[0].id,
+        userId: ownerUserId,
+      }),
+    ]);
+
+    expect(deleteResult.status).toBe('fulfilled');
+    if (publishResult.status === 'rejected') {
+      expect(publishResult.reason).toBeInstanceOf(DeckPublishInvalidException);
+    }
+
+    const persisted = await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } });
+    const remainingCards = await prisma.flashcard.count({ where: { deckId: deck.id } });
+    expect(remainingCards).toBe(1);
+    expect(persisted.status).toBe(DeckStatus.DRAFT);
   });
 
   it('persists only an exact, zero-based reorder permutation', async () => {
@@ -195,6 +257,8 @@ describe('Vocabulary lifecycle integration', () => {
     await saveEditor.execute({
       deckId: deck.id,
       userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
       metadata: { title: 'Updated atomically', description: 'Saved with cards' },
       cards: [
         {
@@ -227,6 +291,138 @@ describe('Vocabulary lifecycle integration', () => {
     expect(saved.flashcards.some((card) => card.id === deck.flashcards[2].id)).toBe(false);
   });
 
+  it('saves a complete editor snapshot with more than 500 imported cards', async () => {
+    const deck = await createDeck(501);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Large editable deck' },
+      cards: deck.flashcards.map((card, position) => ({
+        id: card.id,
+        term: position === 500 ? 'Updated final term' : card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    const saved = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(saved.title).toBe('Large editable deck');
+    expect(saved.flashcards).toHaveLength(501);
+    expect(saved.flashcards[500]?.term).toBe('Updated final term');
+  });
+
+  it('saves the maximum 2000-card editor snapshot within one transaction', async () => {
+    const deck = await createDeck(2000);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Maximum editable deck' },
+      cards: deck.flashcards.map((card) => ({
+        id: card.id,
+        term: card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    expect(await prisma.flashcard.count({ where: { deckId: deck.id } })).toBe(2000);
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).title).toBe(
+      'Maximum editable deck',
+    );
+  });
+
+  it('rejects a stale editor snapshot without partially applying its changes', async () => {
+    const deck = await createDeck(2);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+    const revision = deck.updatedAt.toISOString();
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: revision,
+      metadata: { title: 'First editor save' },
+      cards: deck.flashcards.map((card) => ({
+        id: card.id,
+        term: card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    await expect(
+      saveEditor.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        operationId: randomUUID(),
+        expectedUpdatedAt: revision,
+        metadata: { title: 'Stale editor save' },
+        cards: deck.flashcards.map((card) => ({
+          id: card.id,
+          term: 'Stale term',
+          definition: card.definition,
+        })),
+        deletedCardIds: [],
+      }),
+    ).rejects.toThrow(DeckEditorStaleRevisionException);
+
+    const persisted = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(persisted.title).toBe('First editor save');
+    expect(persisted.flashcards.map((card) => card.term)).toEqual(
+      deck.flashcards.map((card) => card.term),
+    );
+  });
+
+  it('returns the committed editor result when the same operation is retried after response loss', async () => {
+    const deck = await createDeck(1);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+    const command = {
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Committed once' },
+      cards: [
+        {
+          id: deck.flashcards[0].id,
+          term: deck.flashcards[0].term,
+          definition: deck.flashcards[0].definition,
+        },
+        { term: 'Created once', definition: 'No duplicate on retry' },
+      ],
+      deletedCardIds: [],
+    };
+
+    const first = await saveEditor.execute(command);
+    const replay = await saveEditor.execute(command);
+
+    expect(replay.updatedAt).toEqual(first.updatedAt);
+    expect(replay.flashcards?.map((card) => card.term)).toEqual([
+      deck.flashcards[0].term,
+      'Created once',
+    ]);
+    expect(await prisma.flashcard.count({ where: { deckId: deck.id } })).toBe(2);
+    expect(
+      await prisma.deckEditorReceipt.count({
+        where: { userId: ownerUserId, operationId: command.operationId },
+      }),
+    ).toBe(1);
+  });
+
   it('does not persist editor metadata when the card snapshot is invalid', async () => {
     const deck = await createDeck(2);
     const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
@@ -235,6 +431,8 @@ describe('Vocabulary lifecycle integration', () => {
       saveEditor.execute({
         deckId: deck.id,
         userId: ownerUserId,
+        operationId: randomUUID(),
+        expectedUpdatedAt: deck.updatedAt.toISOString(),
         metadata: { title: 'Must not persist' },
         cards: [
           {

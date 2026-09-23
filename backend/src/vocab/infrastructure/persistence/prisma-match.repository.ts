@@ -42,18 +42,21 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
     input: Parameters<MatchRepositoryPort['selectCards']>[0],
   ): Promise<MatchCardReadModel[]> {
     const { deckId, userId, onlyDue, onlyStarred, now, limit } = input;
+    const dueFilter = onlyDue ? Prisma.sql`AND p."nextReviewAt" <= ${now}` : Prisma.empty;
+    const starredFilter = onlyStarred ? Prisma.sql`AND p."isStarred" = true` : Prisma.empty;
     const progressFilter =
       onlyDue || onlyStarred
         ? Prisma.sql`AND EXISTS (
       SELECT 1 FROM "vocab_progress" p WHERE p."flashcardId" = f.id AND p."deckId" = ${deckId}
       AND p."userId" = ${userId}
-      ${onlyDue ? Prisma.sql`AND p."nextReviewAt" <= ${now}` : Prisma.empty}
-      ${onlyStarred ? Prisma.sql`AND p."isStarred" = true` : Prisma.empty}
+      ${dueFilter}
+      ${starredFilter}
     )`
         : Prisma.empty;
     const rows: unknown = await this.tx.$queryRaw`SELECT f.id, f."deckId", f.term, f.definition
       FROM "flashcards" f WHERE f."deckId" = ${deckId} ${progressFilter}
       ORDER BY random() LIMIT ${limit}`;
+
     return mapMatchCardQueryRows(rows);
   }
 
@@ -69,8 +72,9 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
           create: selectedCardIds.map((flashcardId, position) => ({ flashcardId, position })),
         },
       },
-      include: { cards: { orderBy: { position: 'asc' } } },
+      include: { cards: { orderBy: { position: OrderDirection.asc } } },
     });
+
     return MatchSession.reconstitute({
       ...row,
       selectedCardIds: row.cards.map((card) => card.flashcardId),
@@ -83,8 +87,9 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
   ): Promise<MatchSession | null> {
     const row = await this.tx.matchSession.findFirst({
       where: { id: input.sessionId, deckId: input.deckId, userId: input.userId },
-      include: { cards: { orderBy: { position: 'asc' } } },
+      include: { cards: { orderBy: { position: OrderDirection.asc } } },
     });
+
     return row
       ? MatchSession.reconstitute({
           ...row,
@@ -99,6 +104,41 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
   async recordMatchedPair(
     input: Parameters<MatchRepositoryPort['recordMatchedPair']>[0],
   ): Promise<boolean> {
+    const inserted = await this.tx.matchSessionAttempt.createMany({
+      data: {
+        sessionId: input.sessionId,
+        attemptId: input.attemptId,
+        payloadHash: input.payloadHash,
+        isCorrect: input.isCorrect,
+        createdAt: input.matchedAt,
+      },
+      skipDuplicates: true,
+    });
+
+    if (inserted.count === 0) {
+      const existing = await this.tx.matchSessionAttempt.findUnique({
+        where: {
+          sessionId_attemptId: { sessionId: input.sessionId, attemptId: input.attemptId },
+        },
+      });
+
+      return existing?.payloadHash === input.payloadHash;
+    }
+    if (!input.isCorrect) {
+      const penalized = await this.tx.matchSession.updateMany({
+        where: {
+          id: input.sessionId,
+          deckId: input.deckId,
+          userId: input.userId,
+          completedAt: null,
+          expiresAt: { gt: input.matchedAt },
+        },
+        data: { penaltyCount: { increment: 1 } },
+      });
+
+      return penalized.count === 1;
+    }
+    if (!input.cardId) return false;
     const updated = await this.tx.matchSessionCard.updateMany({
       where: {
         sessionId: input.sessionId,
@@ -113,26 +153,19 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
       },
       data: { matchedAt: input.matchedAt },
     });
-    if (updated.count === 1) return true;
-    return (
-      (await this.tx.matchSessionCard.count({
-        where: {
-          sessionId: input.sessionId,
-          flashcardId: input.cardId,
-          matchedAt: { not: null },
-          session: { deckId: input.deckId, userId: input.userId, completedAt: null },
-        },
-      })) === 1
-    );
+
+    return updated.count === 1;
   }
 
   async completeSession(session: MatchSession): Promise<boolean> {
     const { id, deckId, userId, completedAt } = session.toSnapshot();
+
     if (completedAt === null) throw new InvalidMatchSessionException();
     const claimed = await this.tx.matchSession.updateMany({
       where: { id, deckId, userId, completedAt: null, expiresAt: { gt: completedAt } },
       data: { completedAt },
     });
+
     return claimed.count === 1;
   }
 
@@ -141,6 +174,7 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
       where: { deckId_userId: { deckId, userId } },
       include: { user: { select: userSelect } },
     });
+
     return row ? toEntry(row) : null;
   }
 
@@ -172,6 +206,7 @@ export class PrismaMatchRepository implements MatchRepositoryPort {
       ),
       query.userId ? this.findBest(query.deckId, query.userId) : Promise.resolve(null),
     ]);
+
     return { ...page, data: page.data.map(toEntry), currentUserBest };
   }
 }

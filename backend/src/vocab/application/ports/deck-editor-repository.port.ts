@@ -20,6 +20,10 @@ export interface DeckEditorMetadataInput {
 
 export interface SaveDeckEditorCommand {
   deck: Deck;
+  userId: string;
+  operationId: string;
+  payloadHash: string;
+  expectedUpdatedAt: Date;
   cards: DeckEditorCardInput[];
   deletedCardIds: string[];
 }

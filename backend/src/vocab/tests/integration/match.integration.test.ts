@@ -8,13 +8,12 @@ import { PrismaMatchTransaction } from '../../infrastructure/persistence/prisma-
 import { CreateMatchSessionUseCase } from '../../application/use-cases/create-match-session.use-case';
 import { CompleteMatchSessionUseCase } from '../../application/use-cases/complete-match-session.use-case';
 import { GetMatchLeaderboardUseCase } from '../../application/use-cases/get-match-leaderboard.use-case';
-import {
-  InvalidMatchSessionException,
-  MatchSessionAlreadyCompletedException,
-} from '../../domain/exceptions/match-domain.exceptions';
+import { RecordMatchPairUseCase } from '../../application/use-cases/record-match-pair.use-case';
+import { InvalidMatchSessionException } from '../../domain/exceptions/match-domain.exceptions';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
+
 if (!databaseUrl) throw new Error('DATABASE_URL is required for Match integration tests');
 
 describe('Match persistence integration', () => {
@@ -23,6 +22,7 @@ describe('Match persistence integration', () => {
   let create: CreateMatchSessionUseCase;
   let complete: CompleteMatchSessionUseCase;
   let leaderboard: GetMatchLeaderboardUseCase;
+  let recordPair: RecordMatchPairUseCase;
   let userId: string;
   let extraUserIds: string[];
   let now: Date;
@@ -49,6 +49,7 @@ describe('Match persistence integration', () => {
     const clock = { now: () => new Date(now) };
     create = new CreateMatchSessionUseCase(transaction, clock);
     complete = new CompleteMatchSessionUseCase(transaction, clock);
+    recordPair = new RecordMatchPairUseCase(transaction, clock);
     leaderboard = new GetMatchLeaderboardUseCase(transaction);
   });
   beforeEach(async () => {
@@ -72,6 +73,7 @@ describe('Match persistence integration', () => {
     async (count) => {
       const deck = await createDeck(count);
       const pending = create.execute({ deckId: deck.id, userId });
+
       if (count < 6) {
         await expect(pending).rejects.toThrow(InvalidMatchSessionException);
         expect(await prisma.matchSession.count({ where: { deckId: deck.id } })).toBe(0);
@@ -91,7 +93,7 @@ describe('Match persistence integration', () => {
     },
   );
 
-  it('should_accept_one_completion_when_requests_run_concurrently', async () => {
+  it('should_return_one_persisted_completion_when_requests_run_concurrently', async () => {
     const deck = await createDeck(12);
     const session = await create.execute({ deckId: deck.id, userId });
     await prisma.matchSessionCard.updateMany({
@@ -107,15 +109,50 @@ describe('Match persistence integration', () => {
       complete.execute(command),
     ]);
 
-    expect(outcomes.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
-    for (const outcome of outcomes) {
-      if (outcome.status === 'rejected')
-        expect(outcome.reason).toBeInstanceOf(MatchSessionAlreadyCompletedException);
-    }
+    expect(outcomes.every((result) => result.status === 'fulfilled')).toBe(true);
+    expect(
+      outcomes.map((result) => (result.status === 'fulfilled' ? result.value.durationMs : null)),
+    ).toEqual([14500, 14500, 14500]);
     expect(await prisma.deckLeaderboard.count({ where: { deckId: deck.id } })).toBe(1);
     expect(
       await prisma.deckLeaderboard.findFirstOrThrow({ where: { deckId: deck.id } }),
     ).toMatchObject({ durationMs: 14500, cardCount: 12, createdAt: now });
+  });
+
+  it('should_apply_each_server_verified_wrong-pair_penalty_exactly_once', async () => {
+    const deck = await createDeck(6);
+    const session = await create.execute({ deckId: deck.id, userId });
+    const attemptId = randomUUID();
+    const wrongAttempt = {
+      deckId: deck.id,
+      userId,
+      sessionId: session.id,
+      attemptId,
+      first: { cardId: session.cards[0].id, side: 'TERM' as const },
+      second: { cardId: session.cards[1].id, side: 'DEFINITION' as const },
+    };
+
+    await recordPair.execute(wrongAttempt);
+    await recordPair.execute(wrongAttempt);
+    await expect(
+      recordPair.execute({
+        ...wrongAttempt,
+        second: { cardId: session.cards[2].id, side: 'DEFINITION' },
+      }),
+    ).rejects.toThrow();
+    await prisma.matchSessionCard.updateMany({
+      where: { sessionId: session.id },
+      data: { matchedAt: startedAt },
+    });
+    now = new Date(startedAt.getTime() + 10000);
+
+    const result = await complete.execute({ deckId: deck.id, userId, sessionId: session.id });
+
+    expect(result.durationMs).toBe(12000);
+    expect(await prisma.matchSessionAttempt.count({ where: { sessionId: session.id } })).toBe(1);
+    expect(
+      (await prisma.matchSession.findUniqueOrThrow({ where: { id: session.id } })).penaltyCount,
+    ).toBe(1);
   });
 
   it('should_keep_one_best_result_when_different_sessions_complete_concurrently', async () => {
@@ -164,6 +201,7 @@ describe('Match persistence integration', () => {
           deckId: deck.id,
           userId,
         });
+
         if (!session) throw new Error('Fixture session missing');
         const result = session.complete(deck.id, userId, new Date(startedAt.getTime() + 1000));
         await matchRepository.completeSession(session);

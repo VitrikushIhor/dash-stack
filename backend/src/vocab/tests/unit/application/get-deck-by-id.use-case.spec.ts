@@ -11,6 +11,9 @@ describe('GetDeckByIdUseCase', () => {
   beforeEach(() => {
     deckRepository = {
       save: jest.fn(),
+      updateMetadata: jest.fn(),
+      publish: jest.fn(),
+      findForAccess: jest.fn(),
       findById: jest.fn(),
       findBySlug: jest.fn(),
       findMyDecks: jest.fn(),

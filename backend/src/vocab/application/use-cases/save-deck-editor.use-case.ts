@@ -12,10 +12,14 @@ import {
 } from '../ports/deck-editor-repository.port';
 import { Deck } from '../../domain/entities/deck.entity';
 import { Flashcard } from '../../domain/entities/flashcard.entity';
+import { createHash } from 'node:crypto';
+import { PayloadHash } from '../constants/payload-hash.constants';
 
 interface SaveDeckEditorCommand {
   deckId: string;
   userId: string;
+  operationId: string;
+  expectedUpdatedAt: string;
   metadata: DeckEditorMetadataInput;
   cards: DeckEditorCardInput[];
   deletedCardIds: string[];
@@ -30,6 +34,7 @@ export class SaveDeckEditorUseCase {
 
   async execute(command: SaveDeckEditorCommand): Promise<Deck> {
     const deck = await this.deckRepository.findById(command.deckId);
+
     if (!deck) throw new DeckNotFoundException(command.deckId);
     if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.EDIT, command.userId)) {
       throw new DeckAccessForbiddenException();
@@ -50,6 +55,20 @@ export class SaveDeckEditorUseCase {
 
     return this.editorRepository.save({
       deck,
+      userId: command.userId,
+      operationId: command.operationId,
+      payloadHash: createHash(PayloadHash.algorithm)
+        .update(
+          JSON.stringify({
+            deckId: command.deckId,
+            expectedUpdatedAt: command.expectedUpdatedAt,
+            metadata: command.metadata,
+            cards: command.cards,
+            deletedCardIds: command.deletedCardIds,
+          }),
+        )
+        .digest(PayloadHash.encoding),
+      expectedUpdatedAt: new Date(command.expectedUpdatedAt),
       cards: command.cards,
       deletedCardIds: command.deletedCardIds,
     });

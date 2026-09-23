@@ -32,6 +32,12 @@ export class PrismaDeckImportTransaction implements DeckImportTransactionPort {
 
                   return PrismaDeckMapper.toDomain(deck);
                 },
+                touchUpdatedAt: async (deckId) => {
+                  await tx.deck.update({
+                    where: { id: deckId },
+                    data: { updatedAt: new Date() },
+                  });
+                },
               },
               receiptRepository: {
                 findByUserAndImportId: (userId, importId) =>

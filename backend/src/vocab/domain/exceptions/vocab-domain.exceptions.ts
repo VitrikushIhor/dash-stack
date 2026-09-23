@@ -73,6 +73,18 @@ export class DeckEditorFlashcardsMissingException extends InternalErrorException
   }
 }
 
+export class DeckEditorStaleRevisionException extends ConflictException {
+  constructor() {
+    super(VOCAB_ERRORS.DECK_EDITOR_STALE_REVISION);
+  }
+}
+
+export class DeckEditorOperationConflictException extends ConflictException {
+  constructor() {
+    super(VOCAB_ERRORS.DECK_EDITOR_OPERATION_CONFLICT);
+  }
+}
+
 export class VocabProgressConflictException extends ConflictException {
   constructor() {
     super(VOCAB_ERRORS.PROGRESS_WRITE_CONFLICT);

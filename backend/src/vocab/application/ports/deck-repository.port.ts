@@ -1,5 +1,5 @@
 import { Deck } from '../../domain/entities/deck.entity';
-import { DeckStatus } from '../../domain/enums/vocab.enums';
+import { CEFRLevel, DeckStatus, DeckVisibility } from '../../domain/enums/vocab.enums';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 import { PaginateOptions } from '../../../common/pagination/paginate';
 
@@ -16,8 +16,20 @@ export interface SearchPublicDecksFilter extends PaginateOptions {
   limit?: number;
 }
 
+export interface UpdateDeckMetadata {
+  title?: string;
+  description?: string | null;
+  language?: string;
+  level?: CEFRLevel | null;
+  tags?: string[];
+  visibility?: DeckVisibility;
+}
+
 export interface DeckRepositoryPort {
   save(deck: Deck): Promise<Deck>;
+  updateMetadata(deckId: string, metadata: UpdateDeckMetadata): Promise<Deck>;
+  publish(deckId: string): Promise<Deck>;
+  findForAccess(id: string): Promise<Deck | null>;
   findById(id: string): Promise<Deck | null>;
   findBySlug(slug: string): Promise<Deck | null>;
   findMyDecks(filter: FindMyDecksFilter): Promise<Deck[]>;

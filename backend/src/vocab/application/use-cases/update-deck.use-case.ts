@@ -46,6 +46,13 @@ export class UpdateDeckUseCase {
       visibility: command.visibility,
     });
 
-    return this.deckRepository.save(deck);
+    return this.deckRepository.updateMetadata(command.deckId, {
+      title: command.title,
+      description: command.description,
+      language: command.language,
+      level: command.level,
+      tags: command.tags,
+      visibility: command.visibility,
+    });
   }
 }

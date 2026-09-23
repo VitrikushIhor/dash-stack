@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient, TaskStatus, OrgRole } from '@prisma/client';
+import { DeckType, PrismaClient, TaskStatus, OrgRole } from '@prisma/client';
 import { addDays, startOfDay } from 'date-fns';
 import { systemDecks } from './seeds/vocabulary-data';
 
@@ -74,6 +74,7 @@ async function main() {
 
   // 4. Create Tasks only if none exist for the org
   const taskCount = await prisma.task.count({ where: { organizationId: org.id } });
+
   if (taskCount === 0) {
     console.log('Seeding demo tasks...');
     const today = startOfDay(new Date());
@@ -142,40 +143,57 @@ async function main() {
   // 5. Seed Vocabulary System Decks
   console.log('Seeding vocabulary starter decks...');
   for (const deckData of systemDecks) {
-    const deck = await prisma.deck.upsert({
+    const existingDeck = await prisma.deck.findUnique({
       where: { slug: deckData.slug },
-      update: {
-        title: deckData.title,
-        description: deckData.description,
-        language: deckData.language,
-        level: deckData.level,
-        tags: deckData.tags,
-        visibility: deckData.visibility,
-        status: deckData.status,
-        type: deckData.type,
-      },
-      create: {
-        ownerUserId: user1.id,
-        title: deckData.title,
-        slug: deckData.slug,
-        description: deckData.description,
-        language: deckData.language,
-        level: deckData.level,
-        tags: deckData.tags,
-        visibility: deckData.visibility,
-        status: deckData.status,
-        type: deckData.type,
-        flashcards: {
-          create: deckData.flashcards.map((card, index) => ({
-            term: card.term,
-            definition: card.definition,
-            example: card.example,
-            imageUrl: card.imageUrl,
-            position: index + 1,
-          })),
-        },
-      },
+      select: { id: true, ownerUserId: true, type: true },
     });
+
+    if (
+      existingDeck &&
+      (existingDeck.type !== DeckType.SYSTEM || existingDeck.ownerUserId !== user1.id)
+    ) {
+      throw new Error(
+        `Cannot seed system deck "${deckData.slug}": the slug belongs to a user-managed deck.`,
+      );
+    }
+
+    const deck = existingDeck
+      ? await prisma.deck.update({
+          where: { id: existingDeck.id },
+          data: {
+            title: deckData.title,
+            description: deckData.description,
+            language: deckData.language,
+            level: deckData.level,
+            tags: deckData.tags,
+            visibility: deckData.visibility,
+            status: deckData.status,
+            type: deckData.type,
+          },
+        })
+      : await prisma.deck.create({
+          data: {
+            ownerUserId: user1.id,
+            title: deckData.title,
+            slug: deckData.slug,
+            description: deckData.description,
+            language: deckData.language,
+            level: deckData.level,
+            tags: deckData.tags,
+            visibility: deckData.visibility,
+            status: deckData.status,
+            type: deckData.type,
+            flashcards: {
+              create: deckData.flashcards.map((card, index) => ({
+                term: card.term,
+                definition: card.definition,
+                example: card.example,
+                imageUrl: card.imageUrl,
+                position: index + 1,
+              })),
+            },
+          },
+        });
 
     console.log(
       `- Seeded deck: "${deck.title}" (${deck.slug}) with ${deckData.flashcards.length} cards`,

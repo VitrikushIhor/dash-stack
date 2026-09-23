@@ -69,7 +69,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
   public async getStudyCards(
     userId: string | null,
     deckId: string,
-    options?: { onlyStarred?: boolean; onlyDue?: boolean },
+    options?: { onlyStarred?: boolean; onlyDue?: boolean; limit?: number },
   ): Promise<StudyCardReadModel[]> {
     const now = new Date();
 
@@ -90,6 +90,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
 
     const flashcards: FlashcardWithProgress[] = await this.prisma.flashcard.findMany({
       where,
+      take: options?.limit,
       include: {
         progress: userId
           ? {
@@ -97,11 +98,12 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
             }
           : { where: { userId: { in: [] } } },
       },
-      orderBy: { position: 'asc' },
+      orderBy: { position: OrderDirection.asc },
     });
 
     return flashcards.map((card) => {
       const rawProgress = card.progress?.[0] ?? null;
+
       return PrismaVocabProgressMapper.toStudyCardReadModel(card, rawProgress);
     });
   }
@@ -117,8 +119,8 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
       ...(search
         ? {
             OR: [
-              { term: { contains: search, mode: 'insensitive' } },
-              { definition: { contains: search, mode: 'insensitive' } },
+              { term: { contains: search, mode: Prisma.QueryMode.insensitive } },
+              { definition: { contains: search, mode: Prisma.QueryMode.insensitive } },
             ],
           }
         : {}),
@@ -151,6 +153,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
           })
         : Promise.resolve(0),
     ]);
+
     return {
       data: page.data.map((card) =>
         PrismaVocabProgressMapper.toStudyCardReadModel(card, card.progress[0] ?? null),
@@ -250,6 +253,7 @@ export class PrismaVocabProgressRepository implements VocabProgressRepositoryPor
     const upsertArgs = this.buildUpsertArgs(raw);
 
     const saved = await this.prisma.vocabProgress.upsert(upsertArgs);
+
     return PrismaVocabProgressMapper.toDomain(saved);
   }
 

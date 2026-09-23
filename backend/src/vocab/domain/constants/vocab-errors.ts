@@ -21,6 +21,9 @@ export const VOCAB_ERRORS = {
     'Flashcard order must contain every card in the deck exactly once',
   FLASHCARD_EDITOR_INVALID_SNAPSHOT:
     'Deck editor changes must account for every existing flashcard exactly once',
+  DECK_EDITOR_STALE_REVISION: 'Deck was modified by another session. Refresh before saving again.',
+  DECK_EDITOR_OPERATION_CONFLICT:
+    'Editor operation ID was already used for different content or a superseded result.',
   VOCAB_PROGRESS_USER_REQUIRED: 'User ID is required',
   VOCAB_PROGRESS_DECK_REQUIRED: 'Deck ID is required',
   VOCAB_PROGRESS_FLASHCARD_REQUIRED: 'Flashcard ID is required',

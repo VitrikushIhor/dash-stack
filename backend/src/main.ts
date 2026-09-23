@@ -11,6 +11,7 @@ import { json, urlencoded } from 'express';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DomainExceptionFilter } from './common/filters/domain-exception.filter';
 import type { CorsConfig, NestConfig, SwaggerConfig } from './common/configs/config.interface';
+import { HttpBodyLimit } from './common/configs/http-body.constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -24,8 +25,8 @@ async function bootstrap() {
   // Security
   app.use(helmet());
   app.use(cookieParser());
-  app.use(json({ limit: '4mb' }));
-  app.use(urlencoded({ extended: true, limit: '1mb' }));
+  app.use(json({ limit: HttpBodyLimit.json }));
+  app.use(urlencoded({ extended: true, limit: HttpBodyLimit.urlEncoded }));
   app.setGlobalPrefix('api');
 
   // Validation

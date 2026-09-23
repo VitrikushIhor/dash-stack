@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   MatchAuthenticationRequiredException,
-  MatchSessionAlreadyCompletedException,
   MatchSessionNotFoundException,
 } from '../../domain/exceptions/match-domain.exceptions';
 import {
@@ -24,24 +23,57 @@ export class CompleteMatchSessionUseCase {
 
   async execute(command: CompleteMatchSessionCommand): Promise<MatchCompletionReadModel> {
     const { deckId, userId, sessionId } = command;
+
     if (!userId) throw new MatchAuthenticationRequiredException();
+
     return this.transaction.run(async ({ deckRepository, matchRepository }) => {
       const deck = await deckRepository.findById(deckId);
+
       if (!deck) throw new DeckNotFoundException(deckId);
       if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.STUDY, userId)) {
         throw new DeckAccessForbiddenException();
       }
       const session = await matchRepository.findSession({ sessionId, deckId, userId });
+
       if (!session) throw new MatchSessionNotFoundException();
+      const persistedResult = session.completedResult(deckId, userId);
+
+      if (persistedResult) {
+        const bestResult = await matchRepository.findBest(deckId, userId);
+
+        if (!bestResult) throw new MatchSessionNotFoundException();
+
+        return {
+          sessionId,
+          durationMs: persistedResult.durationMs,
+          cardCount: persistedResult.cardCount,
+          completedAt: persistedResult.createdAt,
+          bestResult,
+        };
+      }
       const result = session.complete(deckId, userId, this.clock.now());
+
       if (!(await matchRepository.completeSession(session))) {
-        throw new MatchSessionAlreadyCompletedException();
+        const committed = await matchRepository.findSession({ sessionId, deckId, userId });
+        const committedResult = committed?.completedResult(deckId, userId);
+        const bestResult = await matchRepository.findBest(deckId, userId);
+
+        if (!committedResult || !bestResult) throw new MatchSessionNotFoundException();
+
+        return {
+          sessionId,
+          durationMs: committedResult.durationMs,
+          cardCount: committedResult.cardCount,
+          completedAt: committedResult.createdAt,
+          bestResult,
+        };
       }
       const previous = await matchRepository.findBest(deckId, userId);
       const bestResult =
         previous !== null && !MatchResultPolicy.isBetter(result, previous)
           ? previous
           : await matchRepository.saveBest(result);
+
       return {
         sessionId,
         durationMs: result.durationMs,

@@ -29,6 +29,9 @@ describe('Flashcard Use Cases', () => {
   beforeEach(() => {
     mockDeckRepository = {
       save: jest.fn(),
+      updateMetadata: jest.fn(),
+      publish: jest.fn(),
+      findForAccess: jest.fn(),
       findById: jest.fn().mockResolvedValue(testDeck),
       findBySlug: jest.fn(),
       findMyDecks: jest.fn(),

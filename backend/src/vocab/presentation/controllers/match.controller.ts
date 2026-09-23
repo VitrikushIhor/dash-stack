@@ -22,6 +22,7 @@ import {
   parseCreateMatchBody,
   validateMatchCompletionBody,
 } from '../dtos/match-request.dto';
+import { normalizeRecordMatchPairDto } from '../mappers/match-request.mapper';
 import {
   MatchCompletionResponseDto,
   MatchLeaderboardEntryResponseDto,
@@ -58,7 +59,13 @@ export class MatchController {
     @UserEntity() user: AuthUser,
     @Body() body: RecordMatchPairDto,
   ): Promise<void> {
-    await this.recordPair.execute({ deckId, sessionId, userId: user.id, cardId: body.cardId });
+    const attempt = normalizeRecordMatchPairDto(sessionId, body);
+    await this.recordPair.execute({
+      deckId,
+      sessionId,
+      userId: user.id,
+      ...attempt,
+    });
   }
 
   @Post('match/sessions')
@@ -79,6 +86,7 @@ export class MatchController {
       onlyDue: dto.onlyDue,
       onlyStarred: dto.onlyStarred,
     });
+
     return {
       id: session.id,
       deckId: session.deckId,
@@ -102,6 +110,7 @@ export class MatchController {
   ): Promise<MatchCompletionResponseDto> {
     validateMatchCompletionBody(body);
     const result = await this.complete.execute({ deckId, sessionId, userId: user.id });
+
     return {
       sessionId: result.sessionId,
       durationMs: result.durationMs,
@@ -125,6 +134,7 @@ export class MatchController {
       page: query.page,
       perPage: query.perPage,
     });
+
     return {
       data: result.data.map(toEntry),
       meta: result.meta,

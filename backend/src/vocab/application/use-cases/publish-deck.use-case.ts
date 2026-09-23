@@ -30,9 +30,6 @@ export class PublishDeckUseCase {
       throw new DeckAccessForbiddenException();
     }
 
-    const cardCount = await this.deckRepository.countFlashcardsByDeckId(command.deckId);
-    deck.publish(cardCount);
-
-    return this.deckRepository.save(deck);
+    return this.deckRepository.publish(command.deckId);
   }
 }

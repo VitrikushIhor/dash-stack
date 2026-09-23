@@ -17,6 +17,7 @@ import { PrismaUserRepository } from '../../../auth/infrastructure/persistence/p
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
+
 if (!databaseUrl) throw new Error('DATABASE_URL required');
 
 describe('Match HTTP integration', () => {
@@ -42,8 +43,10 @@ describe('Match HTTP integration', () => {
     const response = await request(`${deckId}/match/sessions`, 'POST', {});
     expect(response.status).toBe(201);
     const body: unknown = await response.json();
+
     if (typeof body !== 'object' || body === null || !('id' in body) || typeof body.id !== 'string')
       throw new Error('Invalid session response');
+
     return body.id;
   };
   const recordAllPairs = async (sessionId: string) => {
@@ -146,7 +149,9 @@ describe('Match HTTP integration', () => {
     expect(response.status).toBe(200);
     const result: unknown = await response.json();
     expect(result).toMatchObject({ sessionId: id, cardCount: 6, durationMs: expect.any(Number) });
-    expect((await request(`${deckId}/match/sessions/${id}/complete`, 'POST')).status).toBe(409);
+    const replay = await request(`${deckId}/match/sessions/${id}/complete`, 'POST');
+    expect(replay.status).toBe(200);
+    await expect(replay.json()).resolves.toEqual(result);
     const board = await request(`${deckId}/leaderboard?page=1&perPage=1`, 'GET', undefined, '');
     expect(board.status).toBe(200);
     const body: unknown = await board.json();

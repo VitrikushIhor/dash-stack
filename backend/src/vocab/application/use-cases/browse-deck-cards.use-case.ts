@@ -19,7 +19,8 @@ export class BrowseDeckCardsUseCase {
   ) {}
 
   async execute(query: BrowseDeckCardsQuery): Promise<BrowsedDeckCardsReadModel> {
-    const deck = await this.deckRepository.findById(query.deckId);
+    const deck = await this.deckRepository.findForAccess(query.deckId);
+
     if (!deck) throw new DeckNotFoundException(query.deckId);
     if (!DeckAccessPolicy.canAccess(deck, DeckAccessAction.VIEW, query.userId)) {
       throw new DeckAccessForbiddenException();

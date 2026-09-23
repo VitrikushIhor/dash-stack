@@ -76,6 +76,8 @@ export class ImportFlashcardsUseCase {
       const cards = await context.flashcardRepository.append(command.deckId, command.cards);
       const cardIds = cards.map((card) => card.id);
 
+      await context.deckRepository.touchUpdatedAt(command.deckId);
+
       await context.receiptRepository.save({
         userId: command.userId,
         importId: command.importId,

@@ -6,7 +6,7 @@ import { DeckStatus, DeckVisibility } from '../../../domain/enums/vocab.enums';
 import { DeckAccessForbiddenException } from '../../../domain/exceptions/vocab-domain.exceptions';
 
 describe('BrowseDeckCardsUseCase', () => {
-  const deckRepository = { findById: jest.fn() } as unknown as jest.Mocked<DeckRepositoryPort>;
+  const deckRepository = { findForAccess: jest.fn() } as unknown as jest.Mocked<DeckRepositoryPort>;
   const progressRepository = {
     browseDeckCards: jest.fn(),
   } as unknown as jest.Mocked<VocabProgressRepositoryPort>;
@@ -15,7 +15,7 @@ describe('BrowseDeckCardsUseCase', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('should_search_paginated_cards_when_deck_is_accessible', async () => {
-    deckRepository.findById.mockResolvedValue(
+    deckRepository.findForAccess.mockResolvedValue(
       Deck.create({
         id: 'deck-1',
         ownerUserId: 'owner-1',
@@ -55,7 +55,7 @@ describe('BrowseDeckCardsUseCase', () => {
   });
 
   it('should_reject_non_owner_access_to_private_deck', async () => {
-    deckRepository.findById.mockResolvedValue(
+    deckRepository.findForAccess.mockResolvedValue(
       Deck.create({
         id: 'deck-1',
         ownerUserId: 'owner-1',

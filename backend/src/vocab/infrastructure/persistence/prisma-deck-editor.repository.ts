@@ -5,10 +5,15 @@ import {
   SaveDeckEditorCommand,
 } from '../../application/ports/deck-editor-repository.port';
 import { Deck } from '../../domain/entities/deck.entity';
-import { InvalidFlashcardDataException } from '../../domain/exceptions/vocab-domain.exceptions';
+import {
+  DeckEditorOperationConflictException,
+  DeckEditorStaleRevisionException,
+  InvalidFlashcardDataException,
+} from '../../domain/exceptions/vocab-domain.exceptions';
 import { VOCAB_ERRORS } from '../../domain/constants/vocab-errors';
 import { DeckStatus } from '../../domain/enums/vocab.enums';
 import { PrismaDeckMapper } from './mappers/prisma-deck.mapper';
+import { OrderDirection } from '../../../common/order/order-direction';
 
 @Injectable()
 export class PrismaDeckEditorRepository implements DeckEditorRepositoryPort {
@@ -21,6 +26,44 @@ export class PrismaDeckEditorRepository implements DeckEditorRepositoryPort {
       await tx.$executeRaw`
         SELECT 1 FROM "decks" WHERE "id" = ${command.deck.id} FOR UPDATE
       `;
+
+      const currentDeck = await tx.deck.findUniqueOrThrow({
+        where: { id: command.deck.id },
+        select: { status: true, updatedAt: true },
+      });
+
+      const receipt = await tx.deckEditorReceipt.findUnique({
+        where: {
+          userId_operationId: {
+            userId: command.userId,
+            operationId: command.operationId,
+          },
+        },
+      });
+
+      if (receipt) {
+        if (
+          receipt.deckId !== command.deck.id ||
+          receipt.payloadHash !== command.payloadHash ||
+          receipt.resultUpdatedAt.getTime() !== currentDeck.updatedAt.getTime()
+        ) {
+          throw new DeckEditorOperationConflictException();
+        }
+
+        const replayed = await tx.deck.findUniqueOrThrow({
+          where: { id: command.deck.id },
+          include: {
+            flashcards: { orderBy: { position: OrderDirection.asc } },
+            _count: { select: { flashcards: true } },
+          },
+        });
+
+        return PrismaDeckMapper.toDomain(replayed);
+      }
+
+      if (currentDeck.updatedAt.getTime() !== command.expectedUpdatedAt.getTime()) {
+        throw new DeckEditorStaleRevisionException();
+      }
 
       const existingCards = await tx.flashcard.findMany({
         where: { deckId: command.deck.id },
@@ -72,7 +115,7 @@ export class PrismaDeckEditorRepository implements DeckEditorRepositoryPort {
         }),
       );
 
-      if (command.deck.status === DeckStatus.PUBLISHED && command.cards.length < 2) {
+      if (currentDeck.status === DeckStatus.PUBLISHED && command.cards.length < 2) {
         await tx.deck.update({
           where: { id: command.deck.id },
           data: { status: DeckStatus.DRAFT, updatedAt: new Date() },
@@ -82,10 +125,20 @@ export class PrismaDeckEditorRepository implements DeckEditorRepositoryPort {
       const saved = await tx.deck.findUniqueOrThrow({
         where: { id: command.deck.id },
         include: {
-          flashcards: { orderBy: { position: 'asc' } },
+          flashcards: { orderBy: { position: OrderDirection.asc } },
           _count: { select: { flashcards: true } },
         },
       });
+      await tx.deckEditorReceipt.create({
+        data: {
+          userId: command.userId,
+          operationId: command.operationId,
+          deckId: command.deck.id,
+          payloadHash: command.payloadHash,
+          resultUpdatedAt: saved.updatedAt,
+        },
+      });
+
       return PrismaDeckMapper.toDomain(saved);
     });
   }

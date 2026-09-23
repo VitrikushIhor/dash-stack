@@ -17,14 +17,19 @@ describe('ImportFlashcardsUseCase', () => {
   let deck: Deck;
   let receipts: VocabImportReceipt[];
   let cards: Flashcard[];
+  let touchUpdatedAt: jest.Mock<Promise<void>, [string]>;
 
   beforeEach(() => {
     receipts = [];
     cards = [];
+    touchUpdatedAt = jest.fn<Promise<void>, [string]>().mockResolvedValue(undefined);
     deck = Deck.create({ id: 'deck-1', ownerUserId: 'owner-1', title: 'Deck' });
     let sequence = 0;
     const context: DeckImportTransactionContext = {
-      deckRepository: { findByIdForUpdate: async () => deck },
+      deckRepository: {
+        findByIdForUpdate: async () => deck,
+        touchUpdatedAt,
+      },
       receiptRepository: {
         findByUserAndImportId: async (userId, importId) =>
           receipts.find((receipt) => receipt.userId === userId && receipt.importId === importId) ??
@@ -79,6 +84,7 @@ describe('ImportFlashcardsUseCase', () => {
     expect(cards.map((card) => card.term)).toEqual(['One', 'Two']);
     expect(cards.map((card) => card.position)).toEqual([0, 1]);
     expect(receipts).toHaveLength(1);
+    expect(touchUpdatedAt).toHaveBeenCalledWith('deck-1');
   });
 
   it('should_reject_more_cards_than_the_import_limit_before_opening_a_transaction', async () => {
@@ -113,6 +119,7 @@ describe('ImportFlashcardsUseCase', () => {
       idempotent: true,
     });
     expect(cards).toHaveLength(1);
+    expect(touchUpdatedAt).toHaveBeenCalledTimes(1);
   });
 
   it('should_reject_reusing_an_import_id_for_different_content', async () => {

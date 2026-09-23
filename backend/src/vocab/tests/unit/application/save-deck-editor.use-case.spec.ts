@@ -21,6 +21,9 @@ describe('SaveDeckEditorUseCase', () => {
   beforeEach(() => {
     deckRepository = {
       save: jest.fn(),
+      updateMetadata: jest.fn(),
+      publish: jest.fn(),
+      findForAccess: jest.fn(),
       findById: jest.fn().mockResolvedValue(deck),
       findBySlug: jest.fn(),
       findMyDecks: jest.fn(),
@@ -34,9 +37,13 @@ describe('SaveDeckEditorUseCase', () => {
   });
 
   it('saves owner metadata and the complete editor snapshot through one repository command', async () => {
+    const expectedUpdatedAt = deck.updatedAt.toISOString();
+
     await useCase.execute({
       deckId: 'deck-1',
       userId: 'owner-1',
+      operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+      expectedUpdatedAt,
       metadata: { title: 'Updated title' },
       cards: [{ term: 'Term', definition: 'Definition' }],
       deletedCardIds: ['card-removed'],
@@ -44,6 +51,10 @@ describe('SaveDeckEditorUseCase', () => {
 
     expect(editorRepository.save).toHaveBeenCalledWith({
       deck: expect.objectContaining({ id: 'deck-1', title: 'Updated title' }),
+      userId: 'owner-1',
+      operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+      payloadHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+      expectedUpdatedAt: new Date(expectedUpdatedAt),
       cards: [{ term: 'Term', definition: 'Definition' }],
       deletedCardIds: ['card-removed'],
     });
@@ -54,6 +65,8 @@ describe('SaveDeckEditorUseCase', () => {
       useCase.execute({
         deckId: 'deck-1',
         userId: 'other-user',
+        operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+        expectedUpdatedAt: deck.updatedAt.toISOString(),
         metadata: {},
         cards: [],
         deletedCardIds: [],
@@ -69,6 +82,8 @@ describe('SaveDeckEditorUseCase', () => {
       useCase.execute({
         deckId: 'missing',
         userId: 'owner-1',
+        operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+        expectedUpdatedAt: deck.updatedAt.toISOString(),
         metadata: {},
         cards: [],
         deletedCardIds: [],
@@ -82,6 +97,8 @@ describe('SaveDeckEditorUseCase', () => {
       useCase.execute({
         deckId: 'deck-1',
         userId: 'owner-1',
+        operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+        expectedUpdatedAt: deck.updatedAt.toISOString(),
         metadata: {},
         cards: [{ term: '', definition: 'Definition' }],
         deletedCardIds: [],

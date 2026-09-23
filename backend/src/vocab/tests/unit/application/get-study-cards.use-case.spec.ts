@@ -22,6 +22,9 @@ describe('GetStudyCardsUseCase', () => {
   beforeEach(() => {
     mockDeckRepo = {
       save: jest.fn(),
+      updateMetadata: jest.fn(),
+      publish: jest.fn(),
+      findForAccess: jest.fn(),
       findById: jest.fn(),
       findBySlug: jest.fn(),
       findMyDecks: jest.fn(),
@@ -46,7 +49,7 @@ describe('GetStudyCardsUseCase', () => {
   });
 
   it('should throw DeckNotFoundException if deck does not exist', async () => {
-    mockDeckRepo.findById.mockResolvedValue(null);
+    mockDeckRepo.findForAccess.mockResolvedValue(null);
 
     await expect(useCase.execute({ userId: 'user-1', deckId: 'non-existent' })).rejects.toThrow(
       DeckNotFoundException,
@@ -71,7 +74,7 @@ describe('GetStudyCardsUseCase', () => {
       updatedAt: new Date(),
     });
 
-    mockDeckRepo.findById.mockResolvedValue(deck);
+    mockDeckRepo.findForAccess.mockResolvedValue(deck);
 
     await expect(useCase.execute({ userId: 'other-user', deckId: 'deck-1' })).rejects.toThrow(
       DeckAccessForbiddenException,
@@ -119,7 +122,7 @@ describe('GetStudyCardsUseCase', () => {
       },
     ];
 
-    mockDeckRepo.findById.mockResolvedValue(deck);
+    mockDeckRepo.findForAccess.mockResolvedValue(deck);
     mockVocabProgressRepo.getStudyCards.mockResolvedValue(expectedCards);
 
     const result = await useCase.execute({
@@ -135,8 +138,23 @@ describe('GetStudyCardsUseCase', () => {
     expect(result).toEqual(expectedCards);
   });
 
+  it('should_bound_learn_sessions_to_the_persisted_snapshot_limit', async () => {
+    mockDeckRepo.findForAccess.mockResolvedValue(
+      Deck.create({ id: 'deck-1', ownerUserId: 'owner-user', title: 'Deck' }),
+    );
+    mockVocabProgressRepo.getStudyCards.mockResolvedValue([]);
+
+    await useCase.execute({ userId: 'owner-user', deckId: 'deck-1', mode: 'learn' });
+
+    expect(mockVocabProgressRepo.getStudyCards).toHaveBeenCalledWith('owner-user', 'deck-1', {
+      onlyStarred: false,
+      onlyDue: false,
+      limit: 500,
+    });
+  });
+
   it('should reject a guest studying a public draft deck', async () => {
-    mockDeckRepo.findById.mockResolvedValue(
+    mockDeckRepo.findForAccess.mockResolvedValue(
       Deck.create({
         id: 'deck-1',
         ownerUserId: 'owner-user',
@@ -152,7 +170,7 @@ describe('GetStudyCardsUseCase', () => {
   });
 
   it('should reject a guest personalized due filter', async () => {
-    mockDeckRepo.findById.mockResolvedValue(
+    mockDeckRepo.findForAccess.mockResolvedValue(
       Deck.create({
         id: 'deck-1',
         ownerUserId: 'owner-user',
@@ -168,7 +186,7 @@ describe('GetStudyCardsUseCase', () => {
   });
 
   it('does not reveal a private deck through a guest personalized filter', async () => {
-    mockDeckRepo.findById.mockResolvedValue(
+    mockDeckRepo.findForAccess.mockResolvedValue(
       Deck.create({
         id: 'deck-1',
         ownerUserId: 'owner-user',

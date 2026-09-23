@@ -72,6 +72,7 @@ export class DeckController {
       ownerUserId: user.id,
       ...dto,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -88,6 +89,7 @@ export class DeckController {
       userId: user.id,
       status: query.status,
     });
+
     return DeckPresentationMapper.toResponseList(decks);
   }
 
@@ -103,6 +105,7 @@ export class DeckController {
       page: query.page,
       perPage: query.perPage ?? query.limit,
     });
+
     return DeckPresentationMapper.toPaginatedResponse(paginated);
   }
 
@@ -120,6 +123,7 @@ export class DeckController {
       deckId: id,
       userId: user?.id ?? null,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -136,10 +140,13 @@ export class DeckController {
     const deck = await this.saveDeckEditorUseCase.execute({
       deckId: id,
       userId: user.id,
+      operationId: dto.operationId,
+      expectedUpdatedAt: dto.expectedUpdatedAt,
       metadata: dto.metadata,
       cards: dto.cards,
       deletedCardIds: dto.deletedCardIds ?? [],
     });
+
     return DeckPresentationMapper.toEditorResponse(deck);
   }
 
@@ -158,6 +165,7 @@ export class DeckController {
       userId: user.id,
       ...dto,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -190,6 +198,7 @@ export class DeckController {
       deckId: id,
       userId: user.id,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -206,6 +215,7 @@ export class DeckController {
       deckId: id,
       userId: user.id,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -222,6 +232,7 @@ export class DeckController {
       deckId: id,
       userId: user.id,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -238,6 +249,7 @@ export class DeckController {
       deckId: id,
       userId: user.id,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 
@@ -254,6 +266,7 @@ export class DeckController {
       deckId: id,
       targetUserId: user.id,
     });
+
     return DeckPresentationMapper.toResponse(deck);
   }
 }

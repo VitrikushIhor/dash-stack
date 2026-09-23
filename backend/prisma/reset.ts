@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { isLocalDatabaseUrl } from './reset-safety';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -11,17 +12,14 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const env = process.env.NODE_ENV || 'development';
+
   if (['production', 'staging', 'preview'].includes(env)) {
     console.error(`FATAL: Running destructive reset in ${env} environment is strictly forbidden!`);
     process.exit(1);
   }
 
   const args = process.argv.slice(2);
-  const isLocalDb =
-    connectionString &&
-    (connectionString.includes('localhost') ||
-      connectionString.includes('127.0.0.1') ||
-      connectionString.includes('postgres:5432'));
+  const isLocalDb = isLocalDatabaseUrl(connectionString);
 
   if (!isLocalDb && !args.includes('--force-remote')) {
     console.error('ERROR: DATABASE_URL does not appear to be a local database.');
@@ -38,17 +36,24 @@ async function main() {
   }
 
   console.log('Cleaning up database...');
-  await prisma.deckLeaderboard.deleteMany();
-  await prisma.vocabProgress.deleteMany();
-  await prisma.flashcard.deleteMany();
-  await prisma.deck.deleteMany();
-  await prisma.organizationLabel.deleteMany();
-  await prisma.checklistItem.deleteMany();
-  await prisma.checklist.deleteMany();
-  await prisma.task.deleteMany();
-  await prisma.membership.deleteMany();
-  await prisma.organization.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.$transaction(async (tx) => {
+    await tx.deckLeaderboard.deleteMany();
+    await tx.vocabProgress.deleteMany();
+    await tx.matchSessionAttempt.deleteMany();
+    await tx.matchSessionCard.deleteMany();
+    await tx.matchSession.deleteMany();
+    await tx.deckEditorReceipt.deleteMany();
+    await tx.flashcard.deleteMany();
+    await tx.deck.deleteMany();
+    await tx.organizationLabel.deleteMany();
+    await tx.checklistItem.deleteMany();
+    await tx.checklist.deleteMany();
+    await tx.task.deleteMany();
+    await tx.membership.deleteMany();
+    await tx.organization.deleteMany();
+    await tx.verificationToken.deleteMany();
+    await tx.user.deleteMany();
+  });
 
   console.log('Database cleaned successfully!');
 }

@@ -25,6 +25,17 @@ describe('PrismaDeckRepository.searchPublicDecks', () => {
     );
   });
 
+  it('loads only deck columns for an access check', async () => {
+    const findUnique = jest.fn().mockResolvedValue(null);
+    const repository = new PrismaDeckRepository({
+      deck: { findUnique },
+    } as unknown as PrismaService);
+
+    await repository.findForAccess('deck-1');
+
+    expect(findUnique).toHaveBeenCalledWith({ where: { id: 'deck-1' } });
+  });
+
   it('loads_public_creator_card_and_fork_counts_in_one_query', async () => {
     jest.mocked(paginate).mockResolvedValueOnce({
       data: [],
