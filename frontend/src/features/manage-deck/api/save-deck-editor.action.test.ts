@@ -17,7 +17,13 @@ describe('saveDeckEditorAction', () => {
 
     const result = await saveDeckEditorAction({
       id: 'deck-1',
-      data: { metadata: {}, cards: [], deletedCardIds: [] },
+      data: {
+        operationId: '7d44c28b-e870-42c6-bd8f-70a702513d9c',
+        expectedUpdatedAt: '2026-09-20T12:00:00.000Z',
+        metadata: {},
+        cards: [],
+        deletedCardIds: [],
+      },
     })
 
     expect(result).toEqual({

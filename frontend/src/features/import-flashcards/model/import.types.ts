@@ -10,13 +10,20 @@ export const ImportSource = {
 } as const
 
 export type ImportSource = (typeof ImportSource)[keyof typeof ImportSource]
+
+export const ImportErrorKind = {
+  SYNTAX: 'syntax',
+  VALIDATION: 'validation',
+} as const
+export type ImportErrorKind =
+  (typeof ImportErrorKind)[keyof typeof ImportErrorKind]
 export type ImportCard = {
   term: string
   definition: string
   example: string | null
   imageUrl: string | null
 }
-export type ImportError = { kind: 'syntax' | 'validation'; message: string }
+export type ImportError = { kind: ImportErrorKind; message: string }
 export type ImportMapping = {
   term: number
   definition: number

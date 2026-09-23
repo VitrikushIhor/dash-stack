@@ -1,17 +1,24 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useCurrentUser } from '@/entities/user'
 import { type StudyCard } from '@/entities/vocab'
 import { answerAdaptiveLearnQuestion } from '../answer/adaptive-answer'
 import { createLearnChoices } from '../answer/answer-options'
 import { continueLearnSession } from './adaptive-session'
-import { LearnPhase, LearnStage } from './adaptive-session.constants'
+import {
+  LearnFeedbackSyncState,
+  LearnPhase,
+  LearnSnapshotRebuildReason,
+  LearnSnapshotReconciliationKind,
+  LearnStage,
+} from './adaptive-session.constants'
 import {
   type LearnAnswer,
   type LearnSnapshot,
 } from './adaptive-session.contract'
 import { createLearnSnapshot } from './adaptive-session.storage'
+import { reconcileLearnSnapshot } from './reconcile-learn-snapshot'
 import { useLearnProgressSync } from './use-adaptive-progress-sync'
 import { useAdaptiveLearnStore } from './use-adaptive-session-store'
 
@@ -37,6 +44,7 @@ export function useAdaptiveLearn(
     finishSync,
     consumeResumedAttempt,
   } = useAdaptiveLearnStore(storageKey, deckId)
+  const reconciledSessionKey = useRef<string | null>(null)
 
   const syncAttempt = useLearnProgressSync({
     deckId,
@@ -52,6 +60,34 @@ export function useAdaptiveLearn(
     consumeResumedAttempt,
   })
 
+  useEffect(() => {
+    if (
+      !snapshot ||
+      reconciledSessionKey.current === snapshot.session.sessionId
+    )
+      return
+
+    reconciledSessionKey.current = snapshot.session.sessionId
+    const reconciliation = reconcileLearnSnapshot(snapshot, initialCards)
+
+    try {
+      if (reconciliation.kind === LearnSnapshotReconciliationKind.Reconciled) {
+        persist(reconciliation.snapshot)
+
+        return
+      }
+
+      persist(createLearnSnapshot(initialCards))
+      setError(
+        reconciliation.reason === LearnSnapshotRebuildReason.PendingCardDeleted
+          ? 'The card awaiting sync was removed. A new Learn session was created.'
+          : 'This deck changed. A new Learn session was created from current cards.'
+      )
+    } catch (reconciliationError: unknown) {
+      setError(reconciliationError)
+    }
+  }, [initialCards, persist, setError, snapshot])
+
   const start = useCallback(() => {
     try {
       persist(createLearnSnapshot(initialCards))
@@ -63,7 +99,7 @@ export function useAdaptiveLearn(
 
   const answer = useCallback(
     async (answerValue: LearnAnswer) => {
-      if (!snapshot || snapshot.session.phase !== LearnPhase.Question) return
+      if (snapshot?.session.phase !== LearnPhase.Question) return
       const lease = beginAnswer()
 
       if (lease === null) return
@@ -71,7 +107,7 @@ export function useAdaptiveLearn(
         const answered = answerAdaptiveLearnQuestion(
           snapshot,
           answerValue,
-          user ? 'pending' : 'guest'
+          user ? LearnFeedbackSyncState.Pending : LearnFeedbackSyncState.Guest
         )
 
         if (!answered) return
@@ -88,7 +124,11 @@ export function useAdaptiveLearn(
   )
 
   const next = useCallback(() => {
-    if (!snapshot?.feedback || snapshot.feedback.sync === 'pending') return
+    if (
+      !snapshot?.feedback ||
+      snapshot.feedback.sync === LearnFeedbackSyncState.Pending
+    )
+      return
     const session = continueLearnSession(snapshot.session)
     const card = snapshot.cards[session.currentIndex]
     const mastery = session.cards[session.currentIndex]?.mastery
@@ -113,8 +153,14 @@ export function useAdaptiveLearn(
   }, [persist, setError, snapshot])
 
   const retry = useCallback(async () => {
-    if (snapshot) await syncAttempt(snapshot)
-  }, [snapshot, syncAttempt])
+    if (snapshot?.feedback?.sync === LearnFeedbackSyncState.Pending) {
+      await syncAttempt(snapshot)
+
+      return
+    }
+
+    setError(null)
+  }, [setError, snapshot, syncAttempt])
 
   const restart = useCallback(() => {
     try {

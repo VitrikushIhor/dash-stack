@@ -35,7 +35,9 @@ describe('RecordMatchPairPayloadSchema', () => {
       RecordMatchPairPayloadSchema.safeParse({
         deckId: 'deck-1',
         sessionId: 'session-1',
-        cardId: 'card-1',
+        attemptId: '00000000-0000-4000-8000-000000000001',
+        first: { cardId: 'card-1', side: 'TERM' },
+        second: { cardId: 'card-2', side: 'DEFINITION' },
       }).success
     ).toBe(true)
   })
@@ -44,7 +46,9 @@ describe('RecordMatchPairPayloadSchema', () => {
     expect(
       RecordMatchPairPayloadSchema.safeParse({
         deckId: 'deck-1',
-        cardId: 'card-1',
+        attemptId: '00000000-0000-4000-8000-000000000001',
+        first: { cardId: 'card-1', side: 'TERM' },
+        second: { cardId: 'card-2', side: 'DEFINITION' },
       }).success
     ).toBe(false)
   })

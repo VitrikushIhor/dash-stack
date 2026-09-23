@@ -86,6 +86,8 @@ export type UpdateDeckDto = {
 }
 
 export type SaveDeckEditorDto = {
+  operationId: string
+  expectedUpdatedAt: string
   metadata: UpdateDeckDto
   cards: Array<{
     id?: string

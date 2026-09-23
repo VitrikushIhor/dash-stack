@@ -4,6 +4,11 @@ import { useCallback, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { vocabKeys } from '@/entities/vocab'
 import { submitProgressAction } from '../../../server'
+import { canStartStudySync } from '../../shared/study-sync-guard'
+import {
+  LearnAnswerEvaluationKind,
+  LearnFeedbackSyncState,
+} from './adaptive-session.constants'
 import {
   type LearnProgressSyncParams,
   type LearnSnapshot,
@@ -31,7 +36,7 @@ export function useLearnProgressSync({
     ): Promise<boolean> => {
       const feedback = pending.feedback
 
-      if (!feedback || feedback.sync !== 'pending') return true
+      if (feedback?.sync !== LearnFeedbackSyncState.Pending) return true
       const current = pending.cards[pending.session.currentIndex]
 
       if (!current) return false
@@ -47,7 +52,7 @@ export function useLearnProgressSync({
           results: [
             {
               flashcardId: current.id,
-              isCorrect: feedback.kind !== 'incorrect',
+              isCorrect: feedback.kind !== LearnAnswerEvaluationKind.Incorrect,
             },
           ],
         })
@@ -62,7 +67,7 @@ export function useLearnProgressSync({
           attemptId,
           {
             ...pending,
-            feedback: { ...feedback, sync: 'saved' },
+            feedback: { ...feedback, sync: LearnFeedbackSyncState.Saved },
           },
           lease
         )
@@ -91,19 +96,20 @@ export function useLearnProgressSync({
   )
 
   useEffect(() => {
-    if (
-      !snapshot?.feedback ||
-      snapshot.feedback.sync !== 'pending' ||
-      snapshot.session.questionId !== resumedAttemptId ||
-      isIdentityLoading ||
-      !shouldSync ||
-      isSyncing
-    ) {
-      return
-    }
+    const isResumedPendingAttempt =
+      snapshot?.feedback?.sync === LearnFeedbackSyncState.Pending &&
+      snapshot.session.questionId === resumedAttemptId
+    const canResumeSync = canStartStudySync({
+      isPending: isResumedPendingAttempt,
+      isSyncing,
+      isIdentityLoading,
+      isEnabled: shouldSync,
+    })
+
+    if (!canResumeSync || !snapshot) return
+
     void syncAttempt(snapshot, true)
   }, [
-    consumeResumedAttempt,
     isIdentityLoading,
     isSyncing,
     resumedAttemptId,

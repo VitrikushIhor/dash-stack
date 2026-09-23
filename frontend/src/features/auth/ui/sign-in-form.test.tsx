@@ -1,7 +1,9 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ROUTES } from '@/shared/config'
 import { render, screen, waitFor } from '@/shared/lib/test'
+import { userKeys } from '@/entities/user'
 import { SignInForm } from './sign-in-form'
 
 const mockReplace = vi.fn()
@@ -14,6 +16,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const mockSignInAction = vi.fn()
+let queryClient: QueryClient
 
 vi.mock('../api/actions/sign-in.action', () => ({
   signInAction: (...args: unknown[]) => mockSignInAction(...args),
@@ -22,10 +25,17 @@ vi.mock('../api/actions/sign-in.action', () => ({
 describe('SignInForm Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
   })
 
   it('renders all form input fields, links, and buttons', () => {
-    render(<SignInForm />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SignInForm />
+      </QueryClientProvider>
+    )
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
@@ -39,7 +49,11 @@ describe('SignInForm Component', () => {
   it('displays validation errors when submitting empty form', async () => {
     const user = userEvent.setup()
 
-    render(<SignInForm />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SignInForm />
+      </QueryClientProvider>
+    )
 
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
@@ -56,8 +70,13 @@ describe('SignInForm Component', () => {
     const user = userEvent.setup()
 
     mockSignInAction.mockResolvedValueOnce({ success: true })
+    queryClient.setQueryData(userKeys.me(), { id: 'user-a' })
 
-    render(<SignInForm />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SignInForm />
+      </QueryClientProvider>
+    )
 
     await user.type(screen.getByLabelText(/email/i), 'user@example.com')
     await user.type(screen.getByLabelText(/password/i), 'Password123!')
@@ -73,6 +92,8 @@ describe('SignInForm Component', () => {
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
     })
+
+    expect(queryClient.getQueryData(userKeys.me())).toBeUndefined()
   })
 
   it('redirects to custom target URL when redirectTo prop is specified', async () => {
@@ -80,7 +101,11 @@ describe('SignInForm Component', () => {
 
     mockSignInAction.mockResolvedValueOnce({ success: true })
 
-    render(<SignInForm redirectTo='/analytics' />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SignInForm redirectTo='/analytics' />
+      </QueryClientProvider>
+    )
 
     await user.type(screen.getByLabelText(/email/i), 'user@example.com')
     await user.type(screen.getByLabelText(/password/i), 'Password123!')

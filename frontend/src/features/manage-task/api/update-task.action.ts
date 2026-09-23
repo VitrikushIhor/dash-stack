@@ -1,19 +1,13 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
-import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import { createAction } from '@/shared/lib'
-import { OrganizationSlugSchema } from '@/entities/organization'
-import { TaskIdSchema, UpdateTaskDtoSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
+import { UpdateTaskActionSchema } from '../model/manage-task-action.schema'
 
 export const updateTaskAction = createAction(
-  z.object({
-    slug: OrganizationSlugSchema,
-    id: TaskIdSchema,
-    data: UpdateTaskDtoSchema,
-  }),
+  UpdateTaskActionSchema,
   async ({ slug, id, data }) => {
     const res = await taskServerApi.update(slug, id, data)
 

@@ -1,7 +1,9 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ROUTES } from '@/shared/config'
 import { render, screen, waitFor } from '@/shared/lib/test'
+import { userKeys } from '@/entities/user'
 import { VerifyEmailCard } from './verify-email-card'
 
 const mockVerifyEmailAction = vi.fn()
@@ -24,7 +26,15 @@ describe('VerifyEmailCard Component', () => {
   })
 
   it('renders missing token error when no token is provided', () => {
-    render(<VerifyEmailCard />)
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <VerifyEmailCard />
+      </QueryClientProvider>
+    )
 
     expect(screen.getByText('Verification failed')).toBeInTheDocument()
     expect(
@@ -37,8 +47,16 @@ describe('VerifyEmailCard Component', () => {
 
   it('renders success state when email verification succeeds', async () => {
     mockVerifyEmailAction.mockResolvedValueOnce({ success: true })
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+    queryClient.setQueryData(userKeys.me(), { id: 'user-a' })
 
-    render(<VerifyEmailCard token='valid-email-token' />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <VerifyEmailCard token='valid-email-token' />
+      </QueryClientProvider>
+    )
 
     await waitFor(() => {
       expect(mockVerifyEmailAction).toHaveBeenCalledWith({
@@ -53,12 +71,20 @@ describe('VerifyEmailCard Component', () => {
     expect(
       screen.getByRole('button', { name: /continue now/i })
     ).toBeInTheDocument()
+    expect(queryClient.getQueryData(userKeys.me())).toBeUndefined()
   })
 
   it('redirects to sign-in when clicking continue or back to sign in button', async () => {
     const user = userEvent.setup()
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
 
-    render(<VerifyEmailCard />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <VerifyEmailCard />
+      </QueryClientProvider>
+    )
 
     await user.click(screen.getByRole('button', { name: /back to sign in/i }))
 

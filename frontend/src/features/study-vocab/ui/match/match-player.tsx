@@ -3,9 +3,9 @@
 import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { WidgetErrorState } from '@/shared/ui/feedback'
-import { type MatchCard } from '@/entities/vocab'
-import { GAME_STATUS } from '../../model/match/match-game-reducer'
-import { useMatch } from '../../model/match/use-match'
+import { type MatchAttempt, type MatchCard } from '@/entities/vocab'
+import { GAME_STATUS } from '../../model/match/game/match-game-reducer'
+import { useMatch } from '../../model/match/game/use-match'
 import { StudyEmptyState } from '../shared/study-empty-state'
 import { StudySavingState } from '../shared/study-saving-state'
 import { MatchTileButton } from './match-tile-button'
@@ -13,8 +13,8 @@ import { MatchTimer } from './match-timer'
 
 interface MatchPlayerProps {
   cards: MatchCard[]
-  onComplete: () => void
-  onPairMatched: (cardId: string) => Promise<boolean>
+  onComplete: (durationMs?: number) => void
+  onPairMatched: (attempt: MatchAttempt) => Promise<boolean>
 }
 
 export function MatchPlayer({
@@ -37,7 +37,10 @@ export function MatchPlayer({
     )
   }
 
-  if (gameState.type === GAME_STATUS.FINISHED) {
+  if (
+    gameState.type === GAME_STATUS.FINISHED ||
+    (gameState.type === GAME_STATUS.PLAYING && gameState.endTime)
+  ) {
     return (
       <StudySavingState
         title='Saving Result...'

@@ -21,11 +21,17 @@ type DeckCardPreviewProps = {
   onToggleStar: (cardId: string, isStarred: boolean) => void
 }
 
+const PreviewFaceSide = {
+  FRONT: 'front',
+  BACK: 'back',
+} as const
+type PreviewFaceSide = (typeof PreviewFaceSide)[keyof typeof PreviewFaceSide]
+
 type PreviewFaceProps = {
   children: ReactNode
   isHidden: boolean
   label: string
-  side: 'front' | 'back'
+  side: PreviewFaceSide
 }
 
 function PreviewFace({ children, isHidden, label, side }: PreviewFaceProps) {
@@ -34,7 +40,7 @@ function PreviewFace({ children, isHidden, label, side }: PreviewFaceProps) {
       aria-hidden={isHidden}
       className={cn(
         'bg-muted/40 absolute inset-0 flex flex-col items-center justify-center rounded-xl border p-8 backface-hidden',
-        side === 'back' && 'transform-[rotateY(180deg)]'
+        side === PreviewFaceSide.BACK && 'transform-[rotateY(180deg)]'
       )}
     >
       <span className='text-muted-foreground absolute top-5 left-5 text-xs font-medium tracking-wider uppercase'>
@@ -88,12 +94,20 @@ export function DeckCardPreview({
               isFlipped && 'transform-[rotateY(180deg)]'
             )}
           >
-            <PreviewFace label='Term' side='front' isHidden={isFlipped}>
+            <PreviewFace
+              label='Term'
+              side={PreviewFaceSide.FRONT}
+              isHidden={isFlipped}
+            >
               <span className='max-w-2xl text-2xl font-semibold sm:text-4xl'>
                 {card.term}
               </span>
             </PreviewFace>
-            <PreviewFace label='Definition' side='back' isHidden={!isFlipped}>
+            <PreviewFace
+              label='Definition'
+              side={PreviewFaceSide.BACK}
+              isHidden={!isFlipped}
+            >
               <span className='max-w-2xl text-2xl font-semibold sm:text-4xl'>
                 {card.definition}
               </span>

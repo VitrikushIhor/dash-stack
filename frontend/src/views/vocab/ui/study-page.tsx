@@ -23,50 +23,50 @@ export async function StudyPage(
   const deck = route.deck.data
   const sessionKey = getStudySessionKey(deck.id, route.mode, route.filters)
 
-  const content = () => {
-    if (!route.cards.ok)
-      return (
-        <PageErrorHandler error={route.cards.error} withContainer={false} />
-      )
+  if (!route.cards.ok)
+    return <PageErrorHandler error={route.cards.error} withContainer={false} />
 
-    if (route.mode === StudyMode.FLASHCARDS)
-      return (
-        <VocabFlashcards
-          key={sessionKey}
-          deck={deck}
-          initialCards={route.cards.data}
-        />
-      )
+  if (route.mode === StudyMode.FLASHCARDS)
+    return (
+      <VocabFlashcards
+        key={sessionKey}
+        deck={deck}
+        initialCards={route.cards.data}
+      />
+    )
 
-    if (route.mode === StudyMode.LEARN)
-      return (
-        <VocabLearn
-          key={sessionKey}
-          deck={deck}
-          initialCards={route.cards.data}
-          sessionKey={sessionKey}
-        />
-      )
+  if (route.mode === StudyMode.LEARN)
+    return (
+      <VocabLearn
+        key={sessionKey}
+        deck={deck}
+        initialCards={route.cards.data}
+        sessionKey={sessionKey}
+      />
+    )
 
-    if (route.cards.data.length === 0) {
-      return (
-        <StudyEmptyState
-          title='No cards match these filters'
-          description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
-        />
-      )
-    }
+  if (route.cards.data.length === 0)
+    return (
+      <StudyEmptyState
+        title='No cards match these filters'
+        description='Try All cards or change the study filters. Unseen cards are not due until you review them.'
+      />
+    )
 
-    if (route.cards.data.length < MIN_MATCH_CARDS)
-      return (
-        <StudyEmptyState
-          title='Not enough cards for Match'
-          description='Match needs at least six cards. Change the filters or use Flashcards to review this selection.'
-        />
-      )
+  if (route.cards.data.length < MIN_MATCH_CARDS)
+    return (
+      <StudyEmptyState
+        title='Not enough cards for Match'
+        description='Match needs at least six cards. Change the filters or use Flashcards to review this selection.'
+      />
+    )
 
-    return <VocabMatch key={sessionKey} deck={deck} filters={route.filters} />
-  }
-
-  return content()
+  return (
+    <VocabMatch
+      key={sessionKey}
+      deck={deck}
+      filters={route.filters}
+      initialCards={route.cards.data}
+    />
+  )
 }

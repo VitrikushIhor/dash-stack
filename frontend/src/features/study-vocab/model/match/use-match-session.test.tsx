@@ -1,15 +1,16 @@
-import { type ReactNode, StrictMode } from 'react'
+import { type ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { type User, userKeys } from '@/entities/user'
+import { ApiError } from '@/shared/api'
+import { type User, userApi, userKeys } from '@/entities/user'
 import { type MatchLeaderboard, vocabApi } from '@/entities/vocab'
 import {
   completeMatchSessionAction,
   createMatchSessionAction,
   recordMatchPairAction,
 } from '../../server'
-import { useMatchSession } from './use-match-session'
+import { useMatchSession } from './session/use-match-session'
 
 vi.mock('../../server', () => ({
   createMatchSessionAction: vi.fn(),
@@ -61,20 +62,24 @@ const board: MatchLeaderboard = {
   },
 }
 
-function renderSession(currentUser: User | null | undefined = user) {
+function renderSession(
+  currentUser: User | null | undefined = user,
+  seedCurrentUser = true
+) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
 
-  if (currentUser !== undefined) client.setQueryData(userKeys.me(), currentUser)
+  if (seedCurrentUser) client.setQueryData(userKeys.me(), currentUser)
 
   return renderHook(
-    () => useMatchSession('deck-1', { onlyDue: true, onlyStarred: false }),
+    ({ deckId }) =>
+      useMatchSession(deckId, { onlyDue: true, onlyStarred: false }),
     {
+      initialProps: { deckId: 'deck-1' },
+      reactStrictMode: true,
       wrapper: ({ children }: { children: ReactNode }) => (
-        <StrictMode>
-          <QueryClientProvider client={client}>{children}</QueryClientProvider>
-        </StrictMode>
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
       ),
     }
   )
@@ -100,7 +105,7 @@ describe('useMatchSession', () => {
     })
     vi.mocked(recordMatchPairAction).mockResolvedValue({
       success: true,
-      data: { cardId: 'card-1' },
+      data: { attemptId: '00000000-0000-4000-8000-000000000001' },
     })
   })
 
@@ -162,10 +167,58 @@ describe('useMatchSession', () => {
     expect(completeMatchSessionAction).toHaveBeenCalledTimes(2)
   })
 
+  it('should_ignore_previous_deck_response_when_session_scope_changes', async () => {
+    let resolvePrevious:
+      | ((value: Awaited<ReturnType<typeof createMatchSessionAction>>) => void)
+      | undefined
+    vi.mocked(createMatchSessionAction)
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePrevious = resolve
+          })
+      )
+      .mockResolvedValue({
+        success: true,
+        data: { ...session, id: 'session-2', deckId: 'deck-2' },
+      })
+    const view = renderSession()
+
+    await waitFor(() =>
+      expect(createMatchSessionAction).toHaveBeenCalledTimes(1)
+    )
+    view.rerender({ deckId: 'deck-2' })
+    await waitFor(() =>
+      expect(view.result.current.session?.id).toBe('session-2')
+    )
+    await act(async () => {
+      resolvePrevious?.({ success: true, data: session })
+    })
+
+    expect(view.result.current.session?.id).toBe('session-2')
+  })
+
   it('should_not_create_a_session_for_a_confirmed_guest', async () => {
     const { result } = renderSession(null)
 
     await waitFor(() => expect(result.current.status).toBe('guest'))
+    expect(createMatchSessionAction).not.toHaveBeenCalled()
+  })
+
+  it('should_expose_identity_failure_and_retry_until_guest_is_resolved', async () => {
+    vi.spyOn(userApi, 'getMe')
+      .mockRejectedValueOnce(new ApiError(500, 'Identity service unavailable'))
+      .mockRejectedValueOnce(new ApiError(401, 'Unauthorized'))
+    const { result } = renderSession(undefined, false)
+
+    await waitFor(() => expect(result.current.status).toBe('error'))
+    expect(result.current.error).toBe('Identity service unavailable')
+    expect(createMatchSessionAction).not.toHaveBeenCalled()
+
+    act(() => result.current.retry())
+
+    await waitFor(() => expect(result.current.status).toBe('guest'))
+    expect(userApi.getMe).toHaveBeenCalledTimes(2)
     expect(createMatchSessionAction).not.toHaveBeenCalled()
   })
 })

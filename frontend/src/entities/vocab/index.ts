@@ -16,11 +16,13 @@ export type {
   MatchLeaderboardEntry,
   MatchSession,
   MatchCard,
+  MatchAttempt,
+  MatchAttemptTile,
   MatchCompletion,
   MatchLeaderboard,
 } from './model/types'
 
-export { VocabProgressStatus, StudyMode } from './model/types'
+export { MatchTileSide, VocabProgressStatus, StudyMode } from './model/types'
 
 export {
   StudySessionQuerySchema,

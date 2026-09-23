@@ -1,13 +1,26 @@
 import { z } from 'zod'
 import { type DefaultValues } from 'react-hook-form'
 
+export const NotificationPreference = {
+  ALL: 'all',
+  MENTIONS: 'mentions',
+  NONE: 'none',
+} as const
+
 export const notificationsFormSchema = z.object({
-  type: z.enum(['all', 'mentions', 'none'], {
-    error: (iss) =>
-      iss.input === undefined
-        ? 'Please select a notification type.'
-        : undefined,
-  }),
+  type: z.enum(
+    [
+      NotificationPreference.ALL,
+      NotificationPreference.MENTIONS,
+      NotificationPreference.NONE,
+    ],
+    {
+      error: (iss) =>
+        iss.input === undefined
+          ? 'Please select a notification type.'
+          : undefined,
+    }
+  ),
   mobile: z.boolean().default(false),
   communication_emails: z.boolean().default(false),
   social_emails: z.boolean().default(false),

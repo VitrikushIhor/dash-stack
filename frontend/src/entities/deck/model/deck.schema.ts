@@ -44,7 +44,7 @@ export const FlashcardSchema = z.object({
     .string()
     .max(500, 'Example must not exceed 500 characters')
     .optional(),
-  imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  imageUrl: z.url('Must be a valid URL').optional().or(z.literal('')),
 })
 
 export const DeckEditorSaveResponseSchema = z.object({
@@ -92,8 +92,12 @@ export const UpdateDeckPayloadSchema = z.object({
 export const SaveDeckEditorPayloadSchema = z.object({
   id: DeckIdSchema,
   data: z.object({
+    operationId: z.uuid(),
+    expectedUpdatedAt: z.iso.datetime(),
     metadata: CreateDeckSchema.partial(),
-    cards: z.array(FlashcardSchema.extend({ id: z.string().optional() })),
+    cards: z
+      .array(FlashcardSchema.extend({ id: z.string().optional() }))
+      .max(2000),
     deletedCardIds: z.array(z.string()),
   }),
 })

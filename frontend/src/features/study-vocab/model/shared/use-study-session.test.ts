@@ -1,11 +1,14 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type StudyCard, VocabProgressStatus } from '@/entities/vocab'
+import { useFlashcardProgressSync } from '../flashcards/session/use-flashcard-progress-sync'
 import { useStudySession } from './use-study-session'
-import { useSubmitProgress } from './use-submit-progress'
 
-vi.mock('./use-submit-progress', () => ({
-  useSubmitProgress: vi.fn(),
+vi.mock('../flashcards/session/use-flashcard-progress-sync', () => ({
+  FlashcardProgressStatus: {
+    SAVED: 'saved',
+  },
+  useFlashcardProgressSync: vi.fn(),
 }))
 
 const mockCards: StudyCard[] = [
@@ -52,13 +55,17 @@ const mockCards: StudyCard[] = [
 ]
 
 describe('useStudySession', () => {
-  const submitProgressMock = vi.fn()
+  const completeMock = vi.fn()
 
   beforeEach(() => {
-    vi.mocked(useSubmitProgress).mockReturnValue({
-      submitProgress: submitProgressMock,
+    completeMock.mockClear()
+    vi.mocked(useFlashcardProgressSync).mockReturnValue({
+      complete: completeMock,
+      retry: vi.fn(),
       isSubmitting: false,
-    } as unknown as ReturnType<typeof useSubmitProgress>)
+      status: 'saved',
+      error: null,
+    })
   })
 
   it('handles completeSession, restart, and retryIncorrect flows', () => {
@@ -83,7 +90,7 @@ describe('useStudySession', () => {
     })
 
     expect(result.current.results).toEqual(sessionResults)
-    expect(submitProgressMock).toHaveBeenCalledWith('d1', sessionResults)
+    expect(completeMock).toHaveBeenCalledWith(sessionResults)
 
     act(() => {
       result.current.retryIncorrect()

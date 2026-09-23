@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleServerError } from '@/shared/api'
@@ -31,6 +31,8 @@ export function useDeckEditor(
   const { publishDeck, unpublishDeck } = useDeckActions()
   const [isSaving, startTransition] = useTransition()
   const savingRef = useRef(false)
+  const operationIdRef = useRef<string | null>(null)
+  const revisionRef = useRef(initialDeck.updatedAt)
   const { setIsImagePickerOpen } = imagePicker
   const {
     setTitle,
@@ -42,6 +44,10 @@ export function useDeckEditor(
   } = metadata
 
   const { setCards, setDeletedCardIds } = flashcards
+
+  useEffect(() => {
+    revisionRef.current = initialDeck.updatedAt
+  }, [initialDeck.updatedAt])
 
   const applyState = useCallback(
     (state: DeckEditorDraftState) => {
@@ -158,9 +164,14 @@ export function useDeckEditor(
     setIsImagePickerOpen(false)
     startTransition(async () => {
       try {
+        operationIdRef.current ??= crypto.randomUUID()
         const deckRes = await saveDeckEditorAction({
           id: deckId,
-          data: savePayload,
+          data: {
+            ...savePayload,
+            expectedUpdatedAt: revisionRef.current,
+            operationId: operationIdRef.current,
+          },
         })
 
         if (!deckRes.success) {
@@ -189,8 +200,10 @@ export function useDeckEditor(
           deletedCardIds: [],
         }
 
+        revisionRef.current = saved.updatedAt
         markSaved(savedState, saved.updatedAt)
         applyState(savedState)
+        operationIdRef.current = null
         router.refresh()
         toast.success('All changes saved successfully!')
       } catch (err: unknown) {

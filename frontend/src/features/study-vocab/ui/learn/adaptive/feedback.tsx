@@ -1,5 +1,10 @@
+import { cn } from '@/shared/lib/utils'
 import { WidgetErrorState } from '@/shared/ui/feedback'
 import { type AdaptiveLearnFeedbackProps } from '../../../model/learn/adaptive-player.contract'
+import {
+  LearnAnswerEvaluationKind,
+  LearnFeedbackSyncState,
+} from '../../../model/learn/session/adaptive-session.constants'
 
 export function AdaptiveLearnFeedback({
   feedback,
@@ -7,31 +12,29 @@ export function AdaptiveLearnFeedback({
   error,
   onRetry,
 }: AdaptiveLearnFeedbackProps) {
+  const isIncorrect = feedback?.kind === LearnAnswerEvaluationKind.Incorrect
+  const isAlmostCorrect = feedback?.kind === LearnAnswerEvaluationKind.Almost
+  const feedbackLabel = getFeedbackLabel(isAlmostCorrect, isIncorrect)
+
   return (
     <>
       {feedback && (
         <div
-          role={feedback.kind === 'incorrect' ? 'alert' : 'status'}
-          className={`mt-5 rounded-xl border p-4 text-center ${
-            feedback.kind === 'incorrect'
-              ? 'border-red-500 bg-red-500/10 text-red-700'
-              : 'border-emerald-500 bg-emerald-500/10 text-emerald-700'
-          }`}
+          role={isIncorrect ? 'alert' : 'status'}
+          className={cn('mt-5 rounded-xl border p-4 text-center', {
+            'border-red-500 bg-red-500/10 text-red-700': isIncorrect,
+            'border-emerald-500 bg-emerald-500/10 text-emerald-700':
+              !isIncorrect,
+          })}
         >
-          <p className='font-semibold'>
-            {feedback.kind === 'almost'
-              ? 'Almost correct!'
-              : feedback.kind === 'incorrect'
-                ? 'Incorrect'
-                : 'Correct!'}
-          </p>
-          {(feedback.kind === 'almost' || feedback.kind === 'incorrect') && (
+          <p className='font-semibold'>{feedbackLabel}</p>
+          {(isAlmostCorrect || isIncorrect) && (
             <p className='text-muted-foreground mt-1 text-sm'>
               Correct answer:{' '}
               <strong className='text-foreground'>{correctAnswer}</strong>
             </p>
           )}
-          {feedback.sync === 'pending' && (
+          {feedback.sync === LearnFeedbackSyncState.Pending && (
             <p className='text-muted-foreground mt-2 text-sm'>
               Saving progress…
             </p>
@@ -49,4 +52,14 @@ export function AdaptiveLearnFeedback({
       )}
     </>
   )
+}
+
+function getFeedbackLabel(
+  isAlmostCorrect: boolean,
+  isIncorrect: boolean
+): string {
+  if (isAlmostCorrect) return 'Almost correct!'
+  if (isIncorrect) return 'Incorrect'
+
+  return 'Correct!'
 }

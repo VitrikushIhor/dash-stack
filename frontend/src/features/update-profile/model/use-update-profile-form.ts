@@ -4,6 +4,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type User } from '@/entities/user'
 import {
+  AvatarValueKind,
   type UpdateProfileFormValues,
   UpdateProfileSchema,
 } from './update-profile.schema'
@@ -36,8 +37,8 @@ export const useUpdateProfileForm = (
     dob: parseDob(user?.dob),
     urls: user?.urls?.map((url) => ({ value: url })) ?? [],
     avatar: user?.avatar
-      ? { kind: 'key', value: user.avatar }
-      : { kind: 'none' },
+      ? { kind: AvatarValueKind.KEY, value: user.avatar }
+      : { kind: AvatarValueKind.NONE },
   }
 
   const form = useForm<UpdateProfileFormValues>({

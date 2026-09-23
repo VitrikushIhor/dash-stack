@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/utils'
 import {
   type MatchTile,
   TILE_TYPES,
-} from '../../model/match/match-game-reducer'
+} from '../../model/match/game/match-game-reducer'
 
 interface MatchTileButtonProps {
   tile: MatchTile

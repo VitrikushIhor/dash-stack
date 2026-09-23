@@ -6,9 +6,10 @@ import { toast } from 'sonner'
 import { handleServerError, useUploadImage } from '@/shared/api'
 import type { UpdateUserDto, User } from '@/entities/user'
 import { updateProfileAction } from '../api/update-profile.action'
-import type {
-  AvatarValue,
-  UpdateProfileFormValues,
+import {
+  type AvatarValue,
+  AvatarValueKind,
+  type UpdateProfileFormValues,
 } from './update-profile.schema'
 
 export const useUpdateProfile = () => {
@@ -19,14 +20,14 @@ export const useUpdateProfile = () => {
     avatar: AvatarValue
   ): Promise<string | null> => {
     switch (avatar.kind) {
-      case 'file': {
+      case AvatarValueKind.FILE: {
         const { key } = await avatarUpload.mutateAsync(avatar.value)
 
         return key
       }
-      case 'key':
+      case AvatarValueKind.KEY:
         return avatar.value
-      case 'none':
+      case AvatarValueKind.NONE:
         return null
     }
   }

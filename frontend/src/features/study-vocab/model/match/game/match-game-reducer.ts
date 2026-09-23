@@ -4,7 +4,7 @@ import {
   MAX_MATCH_CARDS,
   MIN_MATCH_CARDS,
   PENALTY_TIME_MS,
-} from '../shared/constants'
+} from '../../shared/constants'
 
 export const TILE_TYPES = {
   TERM: 'term',
@@ -72,26 +72,25 @@ export function createInitialTiles(cards: MatchCard[]): MatchTile[] {
       `Match game supports at most ${MAX_MATCH_CARDS} server-selected cards`
     )
   }
-  const tiles: MatchTile[] = []
 
-  cards.forEach((card) => {
-    tiles.push({
-      id: `term-${card.id}`,
-      cardId: card.id,
-      type: TILE_TYPES.TERM,
-      text: card.term,
-      isMatched: false,
-    })
-    tiles.push({
-      id: `def-${card.id}`,
-      cardId: card.id,
-      type: TILE_TYPES.DEFINITION,
-      text: card.definition,
-      isMatched: false,
-    })
-  })
-
-  return shuffle(tiles)
+  return shuffle(
+    cards.flatMap((card) => [
+      {
+        id: `term-${card.id}`,
+        cardId: card.id,
+        type: TILE_TYPES.TERM,
+        text: card.term,
+        isMatched: false,
+      },
+      {
+        id: `def-${card.id}`,
+        cardId: card.id,
+        type: TILE_TYPES.DEFINITION,
+        text: card.definition,
+        isMatched: false,
+      },
+    ])
+  )
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -101,50 +100,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
   switch (action.type) {
     case MATCH_ACTIONS.SELECT_TILE: {
-      if (state.wrongMatchIds.length > 0) return state
-      if (state.selectedTileIds.includes(action.payload)) {
-        return {
-          ...state,
-          selectedTileIds: state.selectedTileIds.filter(
-            (tileId) => tileId !== action.payload
-          ),
-        }
-      }
-      if (state.selectedTileIds.length >= 2) return state
-
-      const clickedTile = state.tiles.find((t) => t.id === action.payload)
-
-      if (!clickedTile || clickedTile.isMatched) return state
-
-      if (state.selectedTileIds.length === 0) {
-        return {
-          ...state,
-          selectedTileIds: [action.payload],
-        }
-      }
-
-      const id1 = state.selectedTileIds[0]
-      const id2 = action.payload
-      const t1 = state.tiles.find((t) => t.id === id1)
-      const t2 = clickedTile
-
-      const isMatch = Boolean(
-        t1 && t2 && t1.cardId === t2.cardId && t1.type !== t2.type
-      )
-
-      if (isMatch) {
-        return {
-          ...state,
-          selectedTileIds: [id1, id2],
-          wrongMatchIds: [],
-        }
-      }
-
-      return {
-        ...state,
-        selectedTileIds: [id1, id2],
-        wrongMatchIds: [id1, id2],
-      }
+      return selectTile(state, action.payload)
     }
     case MATCH_ACTIONS.MATCH_SUCCESS: {
       const { id1, id2 } = action.payload
@@ -198,5 +154,37 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     default:
       return state
+  }
+}
+
+function selectTile(state: GamePlaying, tileId: string): GamePlaying {
+  if (state.wrongMatchIds.length > 0) return state
+  if (state.selectedTileIds.includes(tileId)) {
+    return {
+      ...state,
+      selectedTileIds: state.selectedTileIds.filter(
+        (selectedTileId) => selectedTileId !== tileId
+      ),
+    }
+  }
+  if (state.selectedTileIds.length >= 2) return state
+
+  const clickedTile = state.tiles.find((tile) => tile.id === tileId)
+
+  if (!clickedTile || clickedTile.isMatched) return state
+  if (state.selectedTileIds.length === 0)
+    return { ...state, selectedTileIds: [tileId] }
+
+  const firstTileId = state.selectedTileIds[0]
+  const firstTile = state.tiles.find((tile) => tile.id === firstTileId)
+  const selectedTileIds = [firstTileId, tileId]
+  const isMatch =
+    firstTile?.cardId === clickedTile.cardId &&
+    firstTile.type !== clickedTile.type
+
+  return {
+    ...state,
+    selectedTileIds,
+    wrongMatchIds: isMatch ? [] : selectedTileIds,
   }
 }

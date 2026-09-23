@@ -3,20 +3,34 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowRight, Loader2, RotateCcw, Trophy } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  Loader2,
+  RotateCcw,
+  Trophy,
+} from 'lucide-react'
 import { ROUTES } from '@/shared/config/constants/routes'
 import { formatTime } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
+import { StudyMode } from '@/entities/vocab'
+import {
+  FlashcardProgressStatus,
+  type FlashcardProgressStatus as FlashcardProgressStatusValue,
+} from '../../model/flashcards/session/use-flashcard-progress-sync'
 import { GuestStudySaveProgressCta } from './guest-study-save-progress-cta'
 
 interface BaseSummaryProps {
   onRestart?: () => void
   isSubmitting?: boolean
+  progressStatus?: FlashcardProgressStatusValue
+  progressError?: string | null
+  onRetryProgress?: () => void
   deckId?: string
 }
 
 interface CardsSummaryProps extends BaseSummaryProps {
-  kind?: 'cards'
+  kind?: typeof StudyMode.FLASHCARDS
   results: { flashcardId: string; isCorrect: boolean }[]
   onRetryIncorrect?: () => void
   isMatchGame?: false
@@ -24,7 +38,7 @@ interface CardsSummaryProps extends BaseSummaryProps {
 }
 
 interface MatchSummaryProps extends BaseSummaryProps {
-  kind: 'match'
+  kind: typeof StudyMode.MATCH
   matchDurationMs: number
   isMatchGame?: true
   results?: never
@@ -34,10 +48,16 @@ interface MatchSummaryProps extends BaseSummaryProps {
 type StudySummaryProps = CardsSummaryProps | MatchSummaryProps
 
 export function StudySummary(props: StudySummaryProps) {
-  const { onRestart, isSubmitting = false } = props
+  const {
+    onRestart,
+    isSubmitting = false,
+    progressStatus,
+    progressError,
+    onRetryProgress,
+  } = props
   const router = useRouter()
 
-  const isMatch = props.kind === 'match' || Boolean(props.isMatchGame)
+  const isMatch = props.kind === StudyMode.MATCH || Boolean(props.isMatchGame)
   const matchDurationMs =
     isMatch &&
     'matchDurationMs' in props &&
@@ -102,6 +122,48 @@ export function StudySummary(props: StudySummaryProps) {
         )}
 
         <GuestStudySaveProgressCta />
+
+        {!isMatch && progressStatus === FlashcardProgressStatus.SAVING && (
+          <output className='text-muted-foreground mb-6 flex items-center gap-2 text-sm'>
+            <Loader2 className='h-4 w-4 animate-spin' />
+            Saving each answer securely…
+          </output>
+        )}
+
+        {!isMatch &&
+          progressStatus === FlashcardProgressStatus.WAITING_FOR_IDENTITY && (
+            <output className='text-muted-foreground mb-6 flex items-center gap-2 text-sm'>
+              <Loader2 className='h-4 w-4 animate-spin' />
+              Checking whether this progress can be saved…
+            </output>
+          )}
+
+        {!isMatch && progressStatus === FlashcardProgressStatus.ERROR && (
+          <div
+            className='border-destructive/30 bg-destructive/10 mb-6 w-full rounded-lg border p-4 text-left'
+            role='alert'
+          >
+            <div className='text-destructive flex gap-2 text-sm font-medium'>
+              <AlertCircle className='mt-0.5 h-4 w-4 shrink-0' />
+              Your answers are saved on this device but could not be synced.
+            </div>
+            {progressError && (
+              <p className='text-muted-foreground mt-2 text-sm'>
+                {progressError}
+              </p>
+            )}
+            {onRetryProgress && (
+              <Button
+                className='mt-3'
+                variant='outline'
+                size='sm'
+                onClick={onRetryProgress}
+              >
+                Retry saving
+              </Button>
+            )}
+          </div>
+        )}
 
         <div className='flex w-full flex-col gap-3 sm:flex-row'>
           {hasIncorrect && onRetryIncorrect && (

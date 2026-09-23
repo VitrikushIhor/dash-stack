@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAction } from '@/shared/lib'
 import { useCurrentUser } from '@/entities/user'
 import { toggleStarAction } from '../../server'
@@ -35,8 +36,15 @@ export function useStarCard(cardId: string, initialIsStarred: boolean) {
       e?.preventDefault()
       e?.stopPropagation()
 
+      // TODO(auth-refactor): keep this guard only until the auth hook exposes
+      // a stable guest state and a dedicated sign-in action for protected mutations.
+      if (user === null) {
+        toast.info('Sign in to save starred cards.')
+
+        return
+      }
       if (
-        user === null ||
+        user === undefined ||
         pendingCardsRef.current.has(cardId) ||
         Date.now() < nextAllowedAtRef.current
       )
@@ -76,6 +84,6 @@ export function useStarCard(cardId: string, initialIsStarred: boolean) {
     isStarred,
     toggleStar,
     isPending: pendingCards.has(cardId),
-    isDisabled: pendingCards.has(cardId) || isCoolingDown,
+    isDisabled: user === undefined || pendingCards.has(cardId) || isCoolingDown,
   }
 }

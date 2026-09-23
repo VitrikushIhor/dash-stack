@@ -1,4 +1,4 @@
-import { type ReactNode, StrictMode } from 'react'
+import { type ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -351,11 +351,8 @@ describe('useAdaptiveLearn', () => {
   it('should_keep_the_store_active_after_the_strict_mode_effect_cycle', async () => {
     const StrictWrapper = wrapper()
     const view = renderHook(() => useAdaptiveLearn('deck', cards), {
-      wrapper: ({ children }) => (
-        <StrictMode>
-          <StrictWrapper>{children}</StrictWrapper>
-        </StrictMode>
-      ),
+      reactStrictMode: true,
+      wrapper: StrictWrapper,
     })
 
     await waitFor(() => expect(view.result.current.isLoading).toBe(false))

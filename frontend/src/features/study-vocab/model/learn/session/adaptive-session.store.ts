@@ -1,5 +1,7 @@
-import { createStore } from 'zustand/vanilla'
 import { getErrorMessage } from '@/shared/api'
+import { createControllerStore } from '../../shared/controller-store'
+import { createSessionLifecycle } from '../../shared/session-lifecycle'
+import { LearnFeedbackSyncState } from './adaptive-session.constants'
 import {
   type AdaptiveLearnStore,
   type CreateAdaptiveLearnStoreParams,
@@ -14,8 +16,7 @@ export function createAdaptiveLearnStore({
   storageKey,
   deckId,
 }: CreateAdaptiveLearnStoreParams) {
-  let leaseSequence = 0
-  let activeLease: number | null = null
+  const lifecycle = createSessionLifecycle()
   let answeringLease: number | null = null
   let syncingLease: number | null = null
   let snapshot: LearnSnapshot | null = null
@@ -27,22 +28,22 @@ export function createAdaptiveLearnStore({
     error = getErrorMessage(storageError)
   }
 
-  return createStore<AdaptiveLearnStore>((set, get) => ({
+  return createControllerStore<AdaptiveLearnStore>((set, get) => ({
     snapshot,
     error,
     isSyncing: false,
     syncingAttemptId: null,
     resumedAttemptId:
-      snapshot?.feedback?.sync === 'pending'
+      snapshot?.feedback?.sync === LearnFeedbackSyncState.Pending
         ? snapshot.session.questionId
         : null,
     persist: (next) => {
-      if (activeLease === null) return
+      if (lifecycle.current() === null) return
       saveLearnSnapshot(storageKey, next)
       set({ snapshot: next })
     },
     persistIfCurrent: (attemptId, next, lease) => {
-      if (activeLease !== lease) return false
+      if (!lifecycle.isActive(lease)) return false
       if (get().snapshot?.session.questionId !== attemptId) return false
       saveLearnSnapshot(storageKey, next)
       set({ snapshot: next })
@@ -52,46 +53,42 @@ export function createAdaptiveLearnStore({
     setError: (nextError) =>
       set({ error: nextError === null ? null : getErrorMessage(nextError) }),
     setErrorIfActive: (nextError, lease) => {
-      if (activeLease !== lease) return false
+      if (!lifecycle.isActive(lease)) return false
       set({ error: nextError === null ? null : getErrorMessage(nextError) })
 
       return true
     },
     beginAnswer: () => {
-      if (activeLease === null || answeringLease !== null) return null
-      answeringLease = activeLease
+      if (lifecycle.current() === null || answeringLease !== null) return null
+      answeringLease = lifecycle.current()
 
-      return activeLease
+      return lifecycle.current()
     },
     finishAnswer: (lease) => {
       if (answeringLease === lease) answeringLease = null
     },
     beginSync: (attemptId) => {
-      if (activeLease === null || syncingLease !== null) return null
-      syncingLease = activeLease
+      if (lifecycle.current() === null || syncingLease !== null) return null
+      syncingLease = lifecycle.current()
       set({ isSyncing: true, syncingAttemptId: attemptId })
 
-      return activeLease
+      return lifecycle.current()
     },
     finishSync: (attemptId, lease) => {
-      if (activeLease !== lease || syncingLease !== lease) return
+      if (!lifecycle.isActive(lease) || syncingLease !== lease) return
       if (get().syncingAttemptId !== attemptId) return
       syncingLease = null
       set({ isSyncing: false, syncingAttemptId: null })
     },
     consumeResumedAttempt: (attemptId, lease) => {
-      if (activeLease !== lease || get().resumedAttemptId !== attemptId) return
+      if (!lifecycle.isActive(lease) || get().resumedAttemptId !== attemptId)
+        return
       set({ resumedAttemptId: null })
     },
-    activate: () => {
-      leaseSequence += 1
-      activeLease = leaseSequence
-
-      return activeLease
-    },
+    activate: lifecycle.activate,
     deactivate: (lease) => {
-      if (activeLease !== lease) return
-      activeLease = null
+      if (!lifecycle.isActive(lease)) return
+      lifecycle.deactivate(lease)
       if (answeringLease === lease) answeringLease = null
       if (syncingLease === lease) syncingLease = null
       set({ isSyncing: false, syncingAttemptId: null })

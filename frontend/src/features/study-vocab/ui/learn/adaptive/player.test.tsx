@@ -147,6 +147,37 @@ describe('AdaptiveLearnPlayer', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
+  it('should_restore_the_submitted_typing_answer_with_saved_feedback', async () => {
+    const storageKey = 'vocab-learn:user:deck'
+    const initial = learnCards[0]
+
+    const initialView = render(
+      wrapper(
+        <AdaptiveLearnPlayer deckId='deck' cards={learnCards.slice(0, 1)} />
+      )
+    )
+    await userEvent.type(
+      await screen.findByRole('textbox', { name: 'Type the term' }),
+      initial.term
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Check' }))
+    await screen.findByText('Correct!')
+
+    const savedSnapshot = localStorage.getItem(storageKey)
+    expect(savedSnapshot).not.toBeNull()
+    initialView.unmount()
+
+    const view = render(
+      wrapper(
+        <AdaptiveLearnPlayer deckId='deck' cards={learnCards.slice(0, 1)} />
+      )
+    )
+
+    expect(
+      await view.findByRole('textbox', { name: 'Type the term' })
+    ).toHaveValue(initial.term)
+  })
+
   it('should_surface_progress_failure_and_retry_the_same_attempt', async () => {
     vi.mocked(submitProgressAction)
       .mockResolvedValueOnce({ success: false, error: 'Connection lost' })

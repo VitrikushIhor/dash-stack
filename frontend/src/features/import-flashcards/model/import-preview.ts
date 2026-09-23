@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { FlashcardSchema } from '@/entities/deck'
+import { DashStackJsonBackupSchema } from './dash-stack-json-backup.schema'
 import {
   type Delimiter,
   detectDelimiter,
@@ -9,6 +9,7 @@ import { IMPORT_MAX_BYTES, IMPORT_MAX_ROWS } from './import.constants'
 import {
   type ImportCard,
   type ImportError,
+  ImportErrorKind,
   type ImportOptions,
   type ImportPreview,
   type ImportPreviewRow,
@@ -23,22 +24,6 @@ export type {
   ImportOptions,
   ImportPreview,
 } from './import.types'
-
-const DashStackJsonBackupSchema = z
-  .object({
-    schemaVersion: z.literal(1),
-    cards: z.array(
-      z
-        .object({
-          term: z.string(),
-          definition: z.string(),
-          example: z.string().nullable(),
-          imageUrl: z.string().nullable(),
-        })
-        .strict()
-    ),
-  })
-  .strict()
 
 export const validateImportCard = (card: ImportCard): ImportError[] => {
   const parsed = FlashcardSchema.safeParse({
@@ -60,7 +45,10 @@ export const validateImportCard = (card: ImportCard): ImportError[] => {
   )
     errors.push('Image URL must be HTTP(S) and at most 2048 characters')
 
-  return errors.map((message) => ({ kind: 'validation', message }))
+  return errors.map((message) => ({
+    kind: ImportErrorKind.VALIDATION,
+    message,
+  }))
 }
 
 export const contentWarnings = (card: ImportCard): string[] => {
@@ -84,42 +72,8 @@ export const prepareImport = (
     return prepareDashStackJsonImport(input)
   }
 
-  let text = input.replace(/^\uFEFF/, '')
-  let offset = 0
-  let declared: Delimiter | null = null
-  const warnings: string[] = []
-
-  if (options.source === ImportSource.ANKI) {
-    let header = readAnkiDirective(text)
-
-    while (header) {
-      const directive = header[0].trimEnd()
-      const separator = /^#separator:(.*)$/i
-        .exec(directive)?.[1]
-        ?.trim()
-        .toLowerCase()
-
-      if (separator) {
-        const supported: Record<string, Delimiter> = {
-          tab: '\t',
-          comma: ',',
-          semicolon: ';',
-        }
-
-        declared = supported[separator] ?? null
-        if (!declared)
-          warnings.push(
-            `Unsupported Anki separator: ${separator}. Choose a supported separator manually.`
-          )
-      } else
-        warnings.push(
-          `Anki directive retained here for review, not imported as a card: ${directive}`
-        )
-      text = text.slice(header[0].length)
-      offset += 1
-      header = readAnkiDirective(text)
-    }
-  }
+  const ankiDirectives = readAnkiDirectives(input, options.source)
+  const { text, offset, declared, warnings } = ankiDirectives
   const delimiter =
     options.delimiter === 'auto'
       ? (declared ?? detectDelimiter(text))
@@ -164,7 +118,7 @@ export const prepareImport = (
       excluded: false,
       errors: [
         ...row.errors.map((message): ImportError => ({
-          kind: 'syntax',
+          kind: ImportErrorKind.SYNTAX,
           message,
         })),
         ...validateImportCard(card),
@@ -179,6 +133,53 @@ export const prepareImport = (
   })
 
   return { delimiter, rows, warnings }
+}
+
+function readAnkiDirectives(input: string, source: ImportSource) {
+  let text = input.replace(/^\uFEFF/, '')
+  let offset = 0
+  let declared: Delimiter | null = null
+  const warnings: string[] = []
+
+  if (source !== ImportSource.ANKI) return { text, offset, declared, warnings }
+
+  let header = readAnkiDirective(text)
+  while (header) {
+    const directive = header[0].trimEnd()
+    const separator = /^#separator:(.*)$/i
+      .exec(directive)?.[1]
+      ?.trim()
+      .toLowerCase()
+
+    if (separator) {
+      const delimiter = getAnkiDelimiter(separator)
+
+      if (delimiter) declared = delimiter
+      else
+        warnings.push(
+          `Unsupported Anki separator: ${separator}. Choose a supported separator manually.`
+        )
+    } else
+      warnings.push(
+        `Anki directive retained here for review, not imported as a card: ${directive}`
+      )
+
+    text = text.slice(header[0].length)
+    offset += 1
+    header = readAnkiDirective(text)
+  }
+
+  return { text, offset, declared, warnings }
+}
+
+function getAnkiDelimiter(separator: string): Delimiter | null {
+  const delimiters: Record<string, Delimiter> = {
+    tab: '\t',
+    comma: ',',
+    semicolon: ';',
+  }
+
+  return delimiters[separator] ?? null
 }
 
 function readAnkiDirective(text: string): RegExpExecArray | null {

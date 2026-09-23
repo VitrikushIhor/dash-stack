@@ -1,6 +1,8 @@
 import { type StudyCard } from '@/entities/vocab'
 import type {
+  LearnAnswerEvaluationKind,
   LearnAnswerKind,
+  LearnFeedbackSyncState,
   LearnPhase,
   LearnStage,
 } from './adaptive-session.constants'
@@ -35,13 +37,19 @@ export type LearnAnswer =
   | { kind: typeof LearnAnswerKind.Typing; value: string }
 
 export type LearnAnswerEvaluation =
-  | { kind: 'exact' | 'normalized' | 'almost'; isCorrect: true }
-  | { kind: 'incorrect'; isCorrect: false }
+  | {
+      kind:
+        | typeof LearnAnswerEvaluationKind.Exact
+        | typeof LearnAnswerEvaluationKind.Normalized
+        | typeof LearnAnswerEvaluationKind.Almost
+      isCorrect: true
+    }
+  | { kind: typeof LearnAnswerEvaluationKind.Incorrect; isCorrect: false }
 
 export type LearnFeedback = {
   answer: string
   kind: LearnAnswerEvaluation['kind']
-  sync: 'pending' | 'saved' | 'guest'
+  sync: (typeof LearnFeedbackSyncState)[keyof typeof LearnFeedbackSyncState]
 }
 
 export type LearnFeedbackSync = LearnFeedback['sync']
@@ -66,8 +74,8 @@ export type AdaptiveLearnStore = {
     snapshot: LearnSnapshot,
     lease: number
   ) => boolean
-  setError: (error: unknown | null) => void
-  setErrorIfActive: (error: unknown | null, lease: number) => boolean
+  setError: (error: unknown) => void
+  setErrorIfActive: (error: unknown, lease: number) => boolean
   beginAnswer: () => number | null
   finishAnswer: (lease: number) => void
   beginSync: (attemptId: string) => number | null

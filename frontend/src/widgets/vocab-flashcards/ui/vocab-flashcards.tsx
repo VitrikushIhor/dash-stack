@@ -1,13 +1,13 @@
 'use client'
 
 import { type Deck } from '@/entities/deck'
-import { type StudyCard } from '@/entities/vocab'
+import { type StudyCard, StudyMode } from '@/entities/vocab'
 import {
   FlashcardPlayer,
   StudyEmptyState,
   StudySessionContainer,
   StudySummary,
-  useStudySession,
+  useFlashcardSession,
 } from '@/features/study-vocab'
 
 interface VocabFlashcardsProps {
@@ -24,7 +24,10 @@ export function VocabFlashcards({ deck, initialCards }: VocabFlashcardsProps) {
     retryIncorrect,
     restart,
     isSubmitting,
-  } = useStudySession({
+    progressStatus,
+    progressError,
+    retryProgress,
+  } = useFlashcardSession({
     deckId: deck.id,
     initialCards,
   })
@@ -32,11 +35,14 @@ export function VocabFlashcards({ deck, initialCards }: VocabFlashcardsProps) {
   if (results) {
     return (
       <StudySummary
-        kind='cards'
+        kind={StudyMode.FLASHCARDS}
         results={results}
         onRetryIncorrect={retryIncorrect}
         onRestart={restart}
         isSubmitting={isSubmitting}
+        progressStatus={progressStatus}
+        progressError={progressError}
+        onRetryProgress={retryProgress}
       />
     )
   }

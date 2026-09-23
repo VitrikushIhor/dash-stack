@@ -5,6 +5,7 @@ import {
   type DueReviewsResponse,
   type ImportFlashcard,
   type ImportFlashcardsResponse,
+  type MatchAttempt,
   type MatchCompletion,
   type MatchLeaderboard,
   type MatchSession,
@@ -113,11 +114,11 @@ export function createVocabApi(client: HttpClient) {
     recordMatchPair: (
       deckId: string,
       sessionId: string,
-      cardId: string
+      attempt: MatchAttempt
     ): Promise<void> =>
       client.post<void>(
         `/v1/vocab/decks/${deckId}/match/sessions/${sessionId}/pairs`,
-        { cardId }
+        attempt
       ),
   }
 }

@@ -13,7 +13,7 @@ import {
   TILE_TYPES,
   createInitialTiles,
   gameReducer,
-} from './match-game-reducer'
+} from './game/match-game-reducer'
 
 const mockCards: StudyCard[] = Array.from({ length: 15 }, (_, i) => ({
   id: `card-${i + 1}`,

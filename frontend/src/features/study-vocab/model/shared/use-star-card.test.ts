@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
+import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { type User, useCurrentUser } from '@/entities/user'
 import { useStarCard } from './use-star-card'
@@ -25,8 +26,20 @@ vi.mock('@/shared/lib', async (importOriginal) => {
 vi.mock('@/entities/user', () => ({
   useCurrentUser: vi.fn(),
 }))
+vi.mock('sonner', () => ({ toast: { info: vi.fn() } }))
 
 describe('useStarCard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    refetchMock.mockResolvedValue({ data: undefined })
+    vi.mocked(useCurrentUser).mockReturnValue({
+      data: mockUser,
+      refetch: refetchMock,
+    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
+      typeof useCurrentUser
+    >)
+  })
+
   afterEach(() => vi.useRealTimers())
   it('should_ignore_rapid_toggles_after_a_fast_response', async () => {
     vi.useFakeTimers()
@@ -99,17 +112,6 @@ describe('useStarCard', () => {
     expect(result.current.isPending).toBe(false)
     expect(mockExecute).toHaveBeenCalledTimes(2)
   })
-  beforeEach(() => {
-    vi.clearAllMocks()
-    refetchMock.mockResolvedValue({ data: undefined })
-    vi.mocked(useCurrentUser).mockReturnValue({
-      data: mockUser,
-      refetch: refetchMock,
-    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
-      typeof useCurrentUser
-    >)
-  })
-
   it('should_reconcile_with_server_state_when_response_differs', async () => {
     mockExecute.mockResolvedValueOnce({ isStarred: false })
     const { result } = renderHook(() => useStarCard('card-1', false))
@@ -207,30 +209,24 @@ describe('useStarCard', () => {
     expect(result.current.isStarred).toBe(false)
     expect(mockExecute).not.toHaveBeenCalled()
     expect(refetchMock).not.toHaveBeenCalled()
+    expect(toast.info).toHaveBeenCalledWith('Sign in to save starred cards.')
   })
 
-  it('delegates authentication to the action immediately when user state is unknown', async () => {
+  it('waits for identity resolution instead of sending an unauthenticated action', async () => {
     vi.mocked(useCurrentUser).mockReturnValue({
       data: undefined,
       refetch: refetchMock,
     } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
       typeof useCurrentUser
     >)
-    mockExecute.mockResolvedValueOnce({ isStarred: true })
-
     const { result } = renderHook(() => useStarCard('card-1', false))
 
     await act(async () => {
-      const submission = result.current.toggleStar()
-
-      expect(mockExecute).toHaveBeenCalled()
-      await submission
+      await result.current.toggleStar()
     })
 
-    expect(mockExecute).toHaveBeenCalledWith({
-      cardId: 'card-1',
-      isStarred: true,
-    })
+    expect(mockExecute).not.toHaveBeenCalled()
     expect(refetchMock).not.toHaveBeenCalled()
+    expect(toast.info).not.toHaveBeenCalled()
   })
 })

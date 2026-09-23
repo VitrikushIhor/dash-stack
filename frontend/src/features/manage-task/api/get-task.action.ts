@@ -1,16 +1,11 @@
 'use server'
 
-import { z } from 'zod'
 import { createAction } from '@/shared/lib'
-import { OrganizationSlugSchema } from '@/entities/organization'
-import { TaskIdSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
+import { TaskByIdActionSchema } from '../model/manage-task-action.schema'
 
 export const getTaskAction = createAction(
-  z.object({
-    slug: OrganizationSlugSchema,
-    id: TaskIdSchema,
-  }),
+  TaskByIdActionSchema,
   async ({ slug, id }) => {
     return taskServerApi.findById(slug, id)
   }

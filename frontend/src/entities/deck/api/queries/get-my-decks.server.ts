@@ -1,17 +1,8 @@
 import { cache } from 'react'
-import { z } from 'zod'
 import 'server-only'
 import { createServerQuery } from '@/shared/lib/server'
-import { DeckStatusEnum } from '../../model/types'
 import { deckServerApi } from '../deck-api.server'
-
-const GetMyDecksSchema = z
-  .enum([
-    DeckStatusEnum.DRAFT,
-    DeckStatusEnum.PUBLISHED,
-    DeckStatusEnum.ARCHIVED,
-  ])
-  .optional()
+import { GetMyDecksSchema } from './get-my-decks.schema'
 
 export const getMyDecksQuery = cache(
   createServerQuery('getMyDecksQuery', GetMyDecksSchema, (status) =>

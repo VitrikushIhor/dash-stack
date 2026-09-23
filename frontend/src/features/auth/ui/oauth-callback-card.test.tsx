@@ -1,6 +1,8 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ROUTES } from '@/shared/config'
 import { render, screen, waitFor } from '@/shared/lib/test'
+import { userKeys } from '@/entities/user'
 import { OAuthCallbackCard } from './oauth-callback-card'
 
 const mockOAuthExchangeAction = vi.fn()
@@ -23,7 +25,15 @@ describe('OAuthCallbackCard Component', () => {
   })
 
   it('renders authenticating card UI', () => {
-    render(<OAuthCallbackCard code='valid-code' />)
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <OAuthCallbackCard code='valid-code' />
+      </QueryClientProvider>
+    )
 
     expect(screen.getByText('Authenticating...')).toBeInTheDocument()
     expect(
@@ -33,11 +43,21 @@ describe('OAuthCallbackCard Component', () => {
 
   it('redirects to vocabulary decks after a successful OAuth login', async () => {
     mockOAuthExchangeAction.mockResolvedValueOnce({ success: true })
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+    queryClient.setQueryData(userKeys.me(), { id: 'user-a' })
 
-    render(<OAuthCallbackCard code='valid-code' />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <OAuthCallbackCard code='valid-code' />
+      </QueryClientProvider>
+    )
 
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
     })
+
+    expect(queryClient.getQueryData(userKeys.me())).toBeUndefined()
   })
 })

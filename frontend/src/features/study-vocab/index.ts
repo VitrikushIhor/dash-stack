@@ -20,7 +20,7 @@ export {
   useDueCount,
 } from './ui/due-badge/due-reviews-provider'
 
-export { useFlashcards } from './model/flashcards/use-flashcards'
+export { useFlashcards } from './model/flashcards/game/use-flashcards'
 export { useCardProgression } from './model/shared/use-card-progression'
 export { useMultipleChoiceShortcuts } from './model/learn/interaction/use-multiple-choice-shortcuts'
 export {
@@ -29,14 +29,14 @@ export {
   MIN_MATCH_CARDS,
   MAX_MATCH_CARDS,
 } from './model/shared/constants'
-export { useMatch } from './model/match/use-match'
-export { type MatchTile } from './model/match/match-game-reducer'
+export { useMatch } from './model/match/game/use-match'
+export { type MatchTile } from './model/match/game/match-game-reducer'
 export { useStarCard } from './model/shared/use-star-card'
 export { useSubmitProgress } from './model/shared/use-submit-progress'
 export {
   MatchSessionStatus,
   useMatchSession,
-} from './model/match/use-match-session'
+} from './model/match/session/use-match-session'
 export { useStudySession } from './model/shared/use-study-session'
 export { isInputActive } from './lib/is-input-active'
 export { isTermMatch } from './lib/is-term-match'
@@ -50,3 +50,9 @@ export { StudyFilters } from './ui/filters/study-filters'
 export { GuestStudySaveProgressCta } from './ui/summary/guest-study-save-progress-cta'
 export { useStudySearchParams } from './model/filters/use-search-params'
 export { GlobalDueCount, ReviewQueue } from './ui/due-badge/review-queue'
+
+export { useFlashcardSession } from './model/flashcards/session/use-flashcard-session'
+export {
+  StudyControllersProvider,
+  type StudyControllerFactories,
+} from './model/study-controllers-provider'

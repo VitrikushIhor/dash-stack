@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { getCurrentUser } from '@/entities/user/server'
 import { VocabularyHeader } from '@/widgets/vocabulary-header'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: {
     default: 'Vocabulary | Dash English',

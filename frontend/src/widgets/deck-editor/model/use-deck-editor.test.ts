@@ -89,6 +89,34 @@ describe('useDeckEditor save', () => {
     )
   })
 
+  it('uses_the_latest_server_revision_for_a_save_before_router_refresh', async () => {
+    const firstSaved: DeckEditorSaveResponse = {
+      ...deck,
+      updatedAt: 'revision-2',
+      flashcards: [],
+    }
+    const secondSaved: DeckEditorSaveResponse = {
+      ...firstSaved,
+      updatedAt: 'revision-3',
+    }
+    vi.mocked(saveDeckEditorAction)
+      .mockResolvedValueOnce({ success: true, data: firstSaved })
+      .mockResolvedValueOnce({ success: true, data: secondSaved })
+
+    const { result } = renderHook(() => useDeckEditor(deck))
+
+    await act(async () => result.current.handleSaveChanges())
+    act(() => result.current.metadata.setTitle('Updated twice'))
+    await act(async () => result.current.handleSaveChanges())
+
+    expect(saveDeckEditorAction).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: expect.objectContaining({ expectedUpdatedAt: 'revision-2' }),
+      })
+    )
+  })
+
   it('keeps edits after a failed save and allows retry', async () => {
     vi.mocked(saveDeckEditorAction).mockResolvedValue({
       success: false,
@@ -101,6 +129,14 @@ describe('useDeckEditor save', () => {
     expect(result.current.metadata.title).toBe('Unsaved title')
     await act(async () => result.current.handleSaveChanges())
     expect(saveDeckEditorAction).toHaveBeenCalledTimes(2)
+    const [firstAttempt, retryAttempt] =
+      vi.mocked(saveDeckEditorAction).mock.calls
+    expect(firstAttempt?.[0].data.operationId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f-]{27}$/i
+    )
+    expect(firstAttempt?.[0].data.operationId).toBe(
+      retryAttempt?.[0].data.operationId
+    )
   })
 
   it('keeps editor cards when the save response is missing them', async () => {

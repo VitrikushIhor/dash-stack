@@ -5,7 +5,7 @@ import { formatTime } from '@/shared/lib/utils'
 import {
   GAME_STATUS,
   type GameState,
-} from '../../model/match/match-game-reducer'
+} from '../../model/match/game/match-game-reducer'
 
 export const MatchTimer = React.memo(function MatchTimer({
   gameState,
@@ -29,12 +29,7 @@ export const MatchTimer = React.memo(function MatchTimer({
     return () => clearInterval(timer)
   }, [type, startTime, penaltyTime, endTime])
 
-  const displayTime =
-    gameState.type === GAME_STATUS.FINISHED
-      ? gameState.finalDuration
-      : endTime
-        ? endTime - startTime + penaltyTime
-        : elapsedMs
+  const displayTime = getDisplayTime(gameState, elapsedMs)
 
   return (
     <div className='bg-card rounded-lg border px-4 py-2 font-mono text-2xl shadow-sm'>
@@ -42,3 +37,11 @@ export const MatchTimer = React.memo(function MatchTimer({
     </div>
   )
 })
+
+function getDisplayTime(gameState: GameState, elapsedMs: number): number {
+  if (gameState.type === GAME_STATUS.FINISHED) return gameState.finalDuration
+  if (gameState.endTime)
+    return gameState.endTime - gameState.startTime + gameState.penaltyTime
+
+  return elapsedMs
+}

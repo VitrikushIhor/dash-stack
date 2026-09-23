@@ -154,6 +154,23 @@ export type MatchSession = {
   cards: MatchCard[]
 }
 
+export const MatchTileSide = {
+  TERM: 'TERM',
+  DEFINITION: 'DEFINITION',
+} as const
+export type MatchTileSide = (typeof MatchTileSide)[keyof typeof MatchTileSide]
+
+export type MatchAttemptTile = {
+  cardId: string
+  side: MatchTileSide
+}
+
+export type MatchAttempt = {
+  attemptId: string
+  first: MatchAttemptTile
+  second: MatchAttemptTile
+}
+
 export type MatchCompletion = {
   sessionId: string
   durationMs: number

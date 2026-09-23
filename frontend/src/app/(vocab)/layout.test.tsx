@@ -5,7 +5,7 @@ import {
   getCurrentUser,
   requireAuthenticatedUser,
 } from '@/entities/user/server'
-import VocabularyLayout from './layout'
+import VocabularyLayout, * as vocabularyLayout from './layout'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/entities/organization/server', () => ({
@@ -39,6 +39,12 @@ describe('VocabularyLayout', () => {
     expect(screen.getByText('Guest vocabulary header')).toBeInTheDocument()
     expect(requireAuthenticatedUser).not.toHaveBeenCalled()
     expect(ensureHasOrganization).not.toHaveBeenCalled()
+  })
+
+  it('should_render_dynamically_when_the_header_depends_on_session_cookies', () => {
+    expect((vocabularyLayout as { dynamic?: unknown }).dynamic).toBe(
+      'force-dynamic'
+    )
   })
 
   it('should_expose_owner_navigation_to_an_authenticated_user', async () => {

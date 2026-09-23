@@ -79,4 +79,16 @@ describe('Learn session storage', () => {
     )
     expect(() => loadLearnSnapshot('learn', 'deck')).toThrow()
   })
+
+  it('should_reject_a_session_that_exceeds_the_persisted_limit_before_writing_it', () => {
+    expect(() =>
+      createLearnSnapshot(
+        Array.from({ length: 501 }, (_, position) => ({
+          ...learnCards[0]!,
+          id: `card-${position}`,
+          position,
+        }))
+      )
+    ).toThrow('Learn sessions support at most 500 cards')
+  })
 })

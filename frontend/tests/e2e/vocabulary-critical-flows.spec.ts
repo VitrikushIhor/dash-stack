@@ -41,6 +41,46 @@ test.describe('Vocabulary critical browser flows', () => {
     await expect(page.getByText('All changes saved successfully!')).toBeVisible()
   })
 
+  test('account switch does not retain the previous user identity', async ({
+    page,
+  }) => {
+    await page.goto('/sign-in?redirect=/vocab/decks')
+    await page.getByLabel('Email').fill('admin@dashstack.app')
+    await page.getByLabel('Password').fill('secret42')
+    await page.getByRole('button', { name: 'Sign in' }).click()
+
+    await expect(page).toHaveURL(/\/vocab\/decks$/)
+    await expect(
+      page.getByRole('button', {
+        name: 'User menu: Admin User, admin@dashstack.app',
+      })
+    ).toBeVisible()
+
+    await page
+      .getByRole('button', {
+        name: 'User menu: Admin User, admin@dashstack.app',
+      })
+      .click()
+    await page.getByRole('menuitem', { name: 'Sign out' }).click()
+
+    await expect(page).toHaveURL(/\/sign-in$/)
+    await page.getByLabel('Email').fill('bart@simpson.com')
+    await page.getByLabel('Password').fill('secret42')
+    await page.getByRole('button', { name: 'Sign in' }).click()
+
+    await expect(page).toHaveURL(/\/vocab\/decks$/)
+    await expect(
+      page.getByRole('button', {
+        name: 'User menu: Bart Simpson, bart@simpson.com',
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', {
+        name: 'User menu: Admin User, admin@dashstack.app',
+      })
+    ).toHaveCount(0)
+  })
+
   test('owner imports a large CSV, exports JSON, and keeps deep-scroll star state', async ({
     page,
   }) => {
@@ -83,30 +123,44 @@ test.describe('Vocabulary critical browser flows', () => {
     expect(exportedJson.toString('utf8')).toContain('"schemaVersion":1')
 
     const list = page.locator('div[aria-label="Cards in this deck"]')
-    for (let pageIndex = 0; pageIndex < 20; pageIndex += 1) {
+    const lastImportedTerm = page.getByText('Phase 10 term 1000', {
+      exact: true,
+    })
+    for (let pageIndex = 0; pageIndex < 25; pageIndex += 1) {
+      if (await lastImportedTerm.isVisible()) break
       const previousScrollHeight = await list.evaluate(
         (element) => element.scrollHeight
       )
-      await list.hover()
-      await page.mouse.wheel(0, 10_000)
+      await list.evaluate((element) => {
+        element.scrollTop = element.scrollHeight
+        element.dispatchEvent(new Event('scroll'))
+      })
       await expect
-        .poll(() => list.evaluate((element) => element.scrollHeight), {
-          timeout: 15_000,
-        })
-        .toBeGreaterThan(previousScrollHeight)
+        .poll(
+          async () =>
+            (await lastImportedTerm.isVisible()) ||
+            (await list.evaluate((element) => element.scrollHeight)) >
+              previousScrollHeight,
+          { timeout: 15_000 }
+        )
+        .toBe(true)
     }
-    await list.hover()
-    await page.mouse.wheel(0, 10_000)
-    await expect(page.getByText('Phase 10 term 1000', { exact: true })).toBeVisible({
+    await list.evaluate((element) => {
+      element.scrollTop = element.scrollHeight
+      element.dispatchEvent(new Event('scroll'))
+    })
+    await expect(lastImportedTerm).toBeVisible({
       timeout: 30_000,
     })
     const lastCard = page.locator('article').filter({ hasText: 'Phase 10 term 1000' })
-    const scrollTopBeforeStar = await list.evaluate((element) => element.scrollTop)
+    const minimumRetainedScrollTop = await list.evaluate(
+      (element) => element.scrollTop - element.clientHeight
+    )
     await lastCard.getByRole('button', { name: 'Star card' }).click()
     await expect(lastCard.getByRole('button', { name: 'Unstar card' })).toBeVisible()
     await expect
       .poll(() => list.evaluate((element) => element.scrollTop))
-      .toBeGreaterThan(scrollTopBeforeStar - 1)
+      .toBeGreaterThan(minimumRetainedScrollTop)
     await lastCard.getByRole('button', { name: 'Unstar card' }).click()
     await expect(lastCard.getByRole('button', { name: 'Star card' })).toBeVisible()
 

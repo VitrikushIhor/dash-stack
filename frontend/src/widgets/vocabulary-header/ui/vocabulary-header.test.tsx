@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type User } from '@/entities/user'
 import { VocabularyHeader } from './vocabulary-header'
 
@@ -28,11 +29,39 @@ const owner = {
   email: 'admin@example.test',
 } satisfies User
 
+const navigationState = vi.hoisted(() => ({
+  shouldSuspend: false,
+}))
+
+vi.mock('./vocabulary-navigation', () => ({
+  VocabularyNavigation: ({ user }: { user: User | null }) => {
+    if (navigationState.shouldSuspend) {
+      throw new Promise<never>(() => undefined)
+    }
+
+    return (
+      <nav aria-label='Vocabulary navigation'>
+        <Link href='/vocab/catalog'>Catalog</Link>
+        {user && (
+          <>
+            <Link href='/vocab/decks'>My decks</Link>
+            <Link href='/vocab/decks?create-deck=true'>Create deck</Link>
+          </>
+        )}
+      </nav>
+    )
+  },
+}))
+
 function renderHeader(user: User | null) {
   return render(<VocabularyHeader user={user} />)
 }
 
 describe('VocabularyHeader', () => {
+  beforeEach(() => {
+    navigationState.shouldSuspend = false
+  })
+
   it('should_place_the_user_menu_before_vocabulary_navigation', () => {
     renderHeader(owner)
 
@@ -71,5 +100,20 @@ describe('VocabularyHeader', () => {
       '/sign-in'
     )
     expect(screen.queryByRole('link', { name: 'Create deck' })).toBeNull()
+  })
+
+  it('should_keep_guest_identity_actions_available_when_navigation_suspends', () => {
+    navigationState.shouldSuspend = true
+
+    renderHeader(null)
+
+    expect(screen.getByRole('link', { name: 'Vocabulary' })).toHaveAttribute(
+      'href',
+      '/vocab/catalog'
+    )
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
+      'href',
+      '/sign-in'
+    )
   })
 })

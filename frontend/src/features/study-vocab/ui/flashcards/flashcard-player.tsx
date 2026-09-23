@@ -12,8 +12,8 @@ import {
 } from '@/shared/ui/core/tooltip'
 import { type StudyCard } from '@/entities/vocab'
 import { useStarCard } from '@/features/study-vocab/model/shared/use-star-card'
+import { useFlashcards } from '../../model/flashcards/game/use-flashcards'
 import { useFlashcardShortcuts } from '../../model/flashcards/use-flashcard-shortcuts'
-import { useFlashcards } from '../../model/flashcards/use-flashcards'
 import { StudyEmptyState } from '../shared/study-empty-state'
 import { StudySavingState } from '../shared/study-saving-state'
 import { StudySessionView } from '../shared/study-session-view'
@@ -92,7 +92,10 @@ export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
             <Button
               variant='outline'
               size='sm'
-              onClick={shuffleCards}
+              onClick={(event) => {
+                shuffleCards()
+                event.currentTarget.blur()
+              }}
               aria-label='Shuffle flashcards'
             >
               <Shuffle className='h-4 w-4' />

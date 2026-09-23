@@ -6,9 +6,13 @@ import { vocabServerApi } from '@/entities/vocab/server'
 
 export const recordMatchPairAction = createAction(
   RecordMatchPairPayloadSchema,
-  async ({ deckId, sessionId, cardId }) => {
-    await vocabServerApi.recordMatchPair(deckId, sessionId, cardId)
+  async ({ deckId, sessionId, attemptId, first, second }) => {
+    await vocabServerApi.recordMatchPair(deckId, sessionId, {
+      attemptId,
+      first,
+      second,
+    })
 
-    return { cardId }
+    return { attemptId }
   }
 )

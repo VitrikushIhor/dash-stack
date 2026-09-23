@@ -1,9 +1,11 @@
-import { type FormEvent, useState } from 'react'
+import { type SyntheticEvent, useState } from 'react'
+import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/core/button'
 import { Input } from '@/shared/ui/core/input'
 import { type AdaptiveLearnQuestionProps } from '../../../model/learn/adaptive-player.contract'
 import { useMultipleChoiceShortcuts } from '../../../model/learn/interaction/use-multiple-choice-shortcuts'
 import {
+  LearnAnswerEvaluationKind,
   LearnPhase,
   LearnStage,
 } from '../../../model/learn/session/adaptive-session.constants'
@@ -20,6 +22,7 @@ export function AdaptiveLearnQuestion({
 }: AdaptiveLearnQuestionProps) {
   const [input, setInput] = useState('')
   const isQuestion = phase === LearnPhase.Question
+  const displayedInput = feedback?.answer ?? input
 
   useMultipleChoiceShortcuts({
     optionsCount: choices.length,
@@ -31,7 +34,7 @@ export function AdaptiveLearnQuestion({
     },
   })
 
-  const submitTyping = (event: FormEvent) => {
+  const submitTyping = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (input.trim()) onSubmitTyping(input)
   }
@@ -56,32 +59,41 @@ export function AdaptiveLearnQuestion({
 
       {stage === LearnStage.Mcq ? (
         <div className='grid gap-3 sm:grid-cols-2'>
-          {choices.map((choice, index) => (
-            <Button
-              key={choice.id}
-              variant='outline'
-              className={`h-auto min-h-16 justify-start p-4 text-left whitespace-normal ${
-                feedback && choice.id === card.id
-                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15'
-                  : feedback?.kind === 'incorrect' &&
-                      choice.definition === feedback.answer
-                    ? 'border-red-500 bg-red-500/10 text-red-700 hover:bg-red-500/15'
-                    : ''
-              }`}
-              disabled={!isQuestion}
-              onClick={() => onSelectChoice(choice.id)}
-            >
-              <span className='mr-2 text-xs'>{index + 1}</span>
-              {choice.definition}
-            </Button>
-          ))}
+          {choices.map((choice, index) => {
+            const isCorrectChoice = Boolean(feedback) && choice.id === card.id
+            const isIncorrectChoice =
+              !isCorrectChoice &&
+              feedback?.kind === LearnAnswerEvaluationKind.Incorrect &&
+              choice.definition === feedback.answer
+
+            return (
+              <Button
+                key={choice.id}
+                variant='outline'
+                className={cn(
+                  'h-auto min-h-16 justify-start p-4 text-left whitespace-normal',
+                  {
+                    'border-emerald-500 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15':
+                      isCorrectChoice,
+                    'border-red-500 bg-red-500/10 text-red-700 hover:bg-red-500/15':
+                      isIncorrectChoice,
+                  }
+                )}
+                disabled={!isQuestion}
+                onClick={() => onSelectChoice(choice.id)}
+              >
+                <span className='mr-2 text-xs'>{index + 1}</span>
+                {choice.definition}
+              </Button>
+            )
+          })}
         </div>
       ) : (
         <form onSubmit={submitTyping} className='flex gap-3'>
           <Input
             aria-label='Type the term'
             autoFocus
-            value={input}
+            value={displayedInput}
             onChange={(event) => setInput(event.target.value)}
             disabled={!isQuestion}
           />

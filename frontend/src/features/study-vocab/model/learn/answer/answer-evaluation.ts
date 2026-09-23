@@ -1,4 +1,5 @@
 import { isTermMatch } from '../../../lib/is-term-match'
+import { LearnAnswerEvaluationKind } from '../session/adaptive-session.constants'
 import { type LearnAnswerEvaluation } from '../session/adaptive-session.contract'
 
 export function normalizeLearnAnswer(value: string): string {
@@ -13,15 +14,16 @@ export function evaluateLearnAnswer(
   const normalizedExpected = normalizeLearnAnswer(expected)
 
   if (!normalizedAnswer || !normalizedExpected) {
-    return { kind: 'incorrect', isCorrect: false }
+    return { kind: LearnAnswerEvaluationKind.Incorrect, isCorrect: false }
   }
-  if (answer === expected) return { kind: 'exact', isCorrect: true }
+  if (answer === expected)
+    return { kind: LearnAnswerEvaluationKind.Exact, isCorrect: true }
   if (normalizedAnswer === normalizedExpected) {
-    return { kind: 'normalized', isCorrect: true }
+    return { kind: LearnAnswerEvaluationKind.Normalized, isCorrect: true }
   }
   if (isTermMatch(normalizedAnswer, normalizedExpected)) {
-    return { kind: 'normalized', isCorrect: true }
+    return { kind: LearnAnswerEvaluationKind.Normalized, isCorrect: true }
   }
 
-  return { kind: 'incorrect', isCorrect: false }
+  return { kind: LearnAnswerEvaluationKind.Incorrect, isCorrect: false }
 }

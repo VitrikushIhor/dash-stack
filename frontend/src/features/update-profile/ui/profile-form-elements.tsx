@@ -15,7 +15,10 @@ import {
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
 import { DatePicker } from '@/shared/ui/date-picker'
-import type { UpdateProfileFormValues } from '../model/update-profile.schema'
+import {
+  AvatarValueKind,
+  type UpdateProfileFormValues,
+} from '../model/update-profile.schema'
 
 interface ProfileFormElementsProps {
   form: UseFormReturn<UpdateProfileFormValues>
@@ -47,17 +50,21 @@ export function ProfileFormElements({
                 <FormControl>
                   <AvatarUpload
                     value={
-                      field.value.kind === 'file' ? field.value.value : null
+                      field.value.kind === AvatarValueKind.FILE
+                        ? field.value.value
+                        : null
                     }
                     defaultPreview={
-                      field.value.kind === 'key'
+                      field.value.kind === AvatarValueKind.KEY
                         ? getFileUrl(field.value.value)
                         : undefined
                     }
                     onValueChange={(f) => {
                       form.clearErrors('avatar')
                       field.onChange(
-                        f ? { kind: 'file', value: f } : { kind: 'none' }
+                        f
+                          ? { kind: AvatarValueKind.FILE, value: f }
+                          : { kind: AvatarValueKind.NONE }
                       )
                     }}
                     onFileReject={(_, message) => {

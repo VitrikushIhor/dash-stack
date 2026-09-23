@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { type StudyCard, VocabProgressStatus } from '@/entities/vocab'
-import { useFlashcards } from './use-flashcards'
+import { useFlashcards } from './game/use-flashcards'
 
 const cards: StudyCard[] = ['one', 'two', 'three'].map((term, position) => ({
   id: `card-${position + 1}`,

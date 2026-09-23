@@ -1,22 +1,15 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { useStore } from 'zustand'
-import { createAdaptiveLearnStore } from './adaptive-session.store'
+import { useMemo } from 'react'
+import { useSessionStore } from '../../shared/use-session-store'
+import { useStudyControllerFactories } from '../../study-controllers-provider'
 
 export function useAdaptiveLearnStore(storageKey: string, deckId: string) {
+  const { learnSession } = useStudyControllerFactories()
   const store = useMemo(
-    () => createAdaptiveLearnStore({ storageKey, deckId }),
-    [deckId, storageKey]
+    () => learnSession({ storageKey, deckId }),
+    [deckId, learnSession, storageKey]
   )
 
-  useEffect(() => {
-    const lease = store.getState().activate()
-
-    return () => {
-      store.getState().deactivate(lease)
-    }
-  }, [store])
-
-  return useStore(store)
+  return useSessionStore(store)
 }

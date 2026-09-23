@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { StudyMode } from './types'
+import { MatchTileSide, StudyMode, VocabProgressStatus } from './types'
 
 const StudyModeSchema = z.enum([
   StudyMode.FLASHCARDS,
@@ -18,7 +18,13 @@ export const StudyCardSchema = z.object({
   position: z.number().int().nonnegative(),
   progress: z.object({
     id: z.string().nullable(),
-    status: z.enum(['NEW', 'LEARNING', 'KNOWN', 'MASTERED', 'FORGOTTEN']),
+    status: z.enum([
+      VocabProgressStatus.NEW,
+      VocabProgressStatus.LEARNING,
+      VocabProgressStatus.KNOWN,
+      VocabProgressStatus.MASTERED,
+      VocabProgressStatus.FORGOTTEN,
+    ]),
     box: z.number().int().min(1).max(5),
     isStarred: z.boolean(),
     correctStreak: z.number().int().nonnegative(),
@@ -83,7 +89,7 @@ export const ImportFlashcardsPayloadSchema = z.object({
           ),
         example: z.string().max(500).nullable().optional(),
         imageUrl: z
-          .union([z.string().url().max(2048), z.literal('')])
+          .union([z.url().max(2048), z.literal('')])
           .nullable()
           .optional()
           .transform((value) => (value === '' ? null : value)),
@@ -119,5 +125,13 @@ export const CompleteMatchSessionPayloadSchema = z.object({
 export const RecordMatchPairPayloadSchema = z.object({
   deckId: z.string().min(1),
   sessionId: z.string().min(1),
-  cardId: z.string().min(1),
+  attemptId: z.uuid(),
+  first: z.object({
+    cardId: z.string().min(1),
+    side: z.enum([MatchTileSide.TERM, MatchTileSide.DEFINITION]),
+  }),
+  second: z.object({
+    cardId: z.string().min(1),
+    side: z.enum([MatchTileSide.TERM, MatchTileSide.DEFINITION]),
+  }),
 })

@@ -8,6 +8,7 @@ import { type AdaptiveLearnPlayerProps } from '../../../model/learn/adaptive-pla
 import { getLearnSessionProgress } from '../../../model/learn/session/adaptive-session'
 import {
   LearnAnswerKind,
+  LearnFeedbackSyncState,
   LearnPhase,
   LearnStage,
 } from '../../../model/learn/session/adaptive-session.constants'
@@ -122,7 +123,10 @@ export function AdaptiveLearnPlayer({
         {feedback && (
           <Button
             onClick={learn.next}
-            disabled={feedback.sync === 'pending' || learn.isSyncing}
+            disabled={
+              feedback.sync === LearnFeedbackSyncState.Pending ||
+              learn.isSyncing
+            }
           >
             {learn.isSyncing && <Loader2 className='h-4 w-4 animate-spin' />}{' '}
             Continue

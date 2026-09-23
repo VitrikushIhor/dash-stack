@@ -19,12 +19,13 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import {
   type AppearanceFormValues,
+  AppearanceTheme,
   appearanceFormSchema,
 } from '../model/appearance.schema'
 
 const themes = [
   {
-    value: 'light',
+    value: AppearanceTheme.LIGHT,
     label: 'Light',
     preview: (
       <div className='space-y-2 rounded-sm bg-[#ecedef] p-2'>
@@ -44,7 +45,7 @@ const themes = [
     ),
   },
   {
-    value: 'dark',
+    value: AppearanceTheme.DARK,
     label: 'Dark',
     preview: (
       <div className='space-y-2 rounded-sm bg-slate-950 p-2'>
@@ -64,7 +65,7 @@ const themes = [
     ),
   },
   {
-    value: 'system',
+    value: AppearanceTheme.SYSTEM,
     label: 'System',
     preview: (
       <div className='space-y-2 rounded-sm bg-slate-900 p-2'>
