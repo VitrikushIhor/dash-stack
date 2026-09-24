@@ -124,14 +124,15 @@ export class ExportFlashcardsUseCase {
 
     const sanitized = /^[\t\r\n ]*[=+\-@]/.test(field) ? `'${field}` : field;
 
-    return /[",\r\n]/.test(sanitized) ? `"${sanitized.replace(/"/g, '""')}"` : sanitized;
+    return /[",\r\n]/.test(sanitized) ? `"${sanitized.replaceAll('"', '""')}"` : sanitized;
   }
 
   private sanitizeFilename(title: string): string {
     const normalized = title
       .normalize('NFKD')
-      .replace(/[^a-zA-Z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+      .split(/[^a-zA-Z0-9]+/)
+      .filter(Boolean)
+      .join('-')
       .toLowerCase();
 
     return normalized || 'vocabulary-deck';

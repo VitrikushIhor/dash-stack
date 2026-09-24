@@ -54,10 +54,14 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
     <div className='border-border/70 bg-card/60 rounded-2xl border p-6 shadow-sm backdrop-blur-sm'>
       <div className='space-y-4'>
         <div>
-          <label className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'>
+          <label
+            htmlFor='deck-title'
+            className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'
+          >
             Deck Title <span className='text-destructive'>*</span>
           </label>
           <Input
+            id='deck-title'
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder='e.g. Oxford 3000 Core Vocabulary'
@@ -66,10 +70,14 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
         </div>
 
         <div>
-          <label className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'>
+          <label
+            htmlFor='deck-description'
+            className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'
+          >
             Description
           </label>
           <Textarea
+            id='deck-description'
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder='Provide context or summary for this deck...'
@@ -80,14 +88,17 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
 
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
           <div>
-            <label className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'>
+            <label
+              htmlFor='deck-level'
+              className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'
+            >
               Proficiency Level
             </label>
             <Select
               value={level}
               onValueChange={(val) => setLevel(val as CEFRLevelEnum)}
             >
-              <SelectTrigger>
+              <SelectTrigger id='deck-level'>
                 <SelectValue placeholder='Select level' />
               </SelectTrigger>
               <SelectContent>
@@ -101,14 +112,17 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
           </div>
 
           <div>
-            <label className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'>
+            <label
+              htmlFor='deck-visibility'
+              className='text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase'
+            >
               Visibility
             </label>
             <Select
               value={visibility}
               onValueChange={(val) => setVisibility(val as DeckVisibilityEnum)}
             >
-              <SelectTrigger>
+              <SelectTrigger id='deck-visibility'>
                 <SelectValue placeholder='Select visibility' />
               </SelectTrigger>
               <SelectContent>

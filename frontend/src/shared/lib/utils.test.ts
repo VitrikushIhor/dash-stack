@@ -6,8 +6,19 @@ import {
   getInitials,
   getPageNumbers,
   sanitizeRedirectUrl,
+  shuffle,
   stringToColor,
 } from './utils'
+
+describe('shuffle', () => {
+  it('returns_a_new_array_with_the_same_values', () => {
+    const values = [1, 2, 3, 4]
+    const shuffled = shuffle(values)
+
+    expect(shuffled).not.toBe(values)
+    expect(shuffled.toSorted()).toEqual(values)
+  })
+})
 
 describe('cn (className merge utility)', () => {
   it('should merge class names', () => {

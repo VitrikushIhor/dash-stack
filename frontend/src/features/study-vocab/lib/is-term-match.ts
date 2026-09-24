@@ -1,5 +1,27 @@
 const normalize = (str: string) => str.replace(/\s+/g, ' ').trim().toLowerCase()
 
+function getTermVariants(term: string): string[] | null {
+  const openingParenthesis = term.indexOf('(')
+  const hasClosingParenthesis = term.includes(')')
+
+  if (openingParenthesis === -1) {
+    return hasClosingParenthesis ? null : term.split(',').map(normalize)
+  }
+
+  if (!term.endsWith(')')) return null
+
+  const baseTerm = term.slice(0, openingParenthesis).trim()
+  const parenthesizedForms = term.slice(openingParenthesis + 1, -1)
+
+  if (!baseTerm || !parenthesizedForms || parenthesizedForms.includes(')')) {
+    return null
+  }
+
+  return [...baseTerm.split(','), ...parenthesizedForms.split(',')].map(
+    normalize
+  )
+}
+
 /**
  * Checks if a user's answer matches the term.
  *
@@ -19,18 +41,7 @@ export function isTermMatch(answer: string, term: string): boolean {
   // Exact full match
   if (normalizedAnswer === normalizedTerm) return true
 
-  // Parse "baseTerm (form1, form2, ...)" pattern
-  const match = normalizedTerm.match(/^([^(]+?)(?:\s*\(([^)]+)\))?\s*$/)
+  const variants = getTermVariants(normalizedTerm)
 
-  if (!match) return false
-
-  const baseTerms = match[1]
-    .split(',')
-    .map((value) => normalize(value))
-    .filter(Boolean)
-  const forms = match[2] ? match[2].split(',').map((f) => normalize(f)) : []
-
-  const allAcceptable = [...baseTerms, ...forms]
-
-  return allAcceptable.some((form) => form === normalizedAnswer)
+  return variants?.filter(Boolean).includes(normalizedAnswer) ?? false
 }

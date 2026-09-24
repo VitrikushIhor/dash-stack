@@ -38,4 +38,15 @@ describe('DeckMetadataForm', () => {
     expect(screen.getByText('#verbs')).toBeInTheDocument()
     expect(screen.getByText('#daily use')).toBeInTheDocument()
   })
+
+  it('associates_every_visible_label_with_its_control', () => {
+    render(<MetadataFormHarness />)
+
+    expect(screen.getByLabelText(/Deck Title/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Description')).toBeInTheDocument()
+    expect(screen.getByLabelText('Proficiency Level')).toBeInTheDocument()
+    expect(screen.getByLabelText('Visibility')).toBeInTheDocument()
+    expect(screen.getByLabelText('Language')).toBeInTheDocument()
+    expect(screen.getByLabelText('Tags')).toBeInTheDocument()
+  })
 })

@@ -90,10 +90,17 @@ describe('useFlashcards', () => {
 
     act(() => result.current.handleAnswer(true))
     const beforeShuffleIds = result.current.allCards.map((card) => card.id)
-    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+    const getRandomValues = vi
+      .spyOn(globalThis.crypto, 'getRandomValues')
+      .mockImplementation(<T extends ArrayBufferView | null>(array: T): T => {
+        if (array && 'BYTES_PER_ELEMENT' in array) {
+          ;(array as unknown as Uint32Array)[0] = 0
+        }
+        return array
+      })
 
     act(() => result.current.shuffleCards())
-    random.mockRestore()
+    getRandomValues.mockRestore()
 
     expect(result.current.allCards.map((card) => card.id)).not.toEqual(
       beforeShuffleIds

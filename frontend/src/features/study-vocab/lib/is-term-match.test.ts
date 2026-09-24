@@ -44,4 +44,10 @@ describe('isTermMatch', () => {
     expect(isTermMatch('written', 'write, wrote, written')).toBe(true)
     expect(isTermMatch('wri', 'write, wrote, written')).toBe(false)
   })
+
+  it('rejects_malformed_parenthesized_variants', () => {
+    expect(isTermMatch('buy', 'buy (bought')).toBe(false)
+    expect(isTermMatch('bought', 'buy (bought))')).toBe(false)
+    expect(isTermMatch('buy', '(bought)')).toBe(false)
+  })
 })

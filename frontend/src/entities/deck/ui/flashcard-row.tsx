@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import Image from 'next/image'
 import {
   GripVertical,
@@ -32,6 +32,7 @@ export function FlashcardRow({
   onOpenImagePicker,
 }: FlashcardRowProps) {
   const [showExample, setShowExample] = useState(!!card.example)
+  const fieldId = useId()
 
   return (
     <div className='group border-border/70 bg-card/70 hover:border-border relative rounded-xl border p-4 shadow-sm backdrop-blur-sm transition-all hover:shadow-md'>
@@ -80,10 +81,14 @@ export function FlashcardRow({
         {/* Term & Definition */}
         <div className='space-y-3 md:col-span-8'>
           <div>
-            <label className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'>
+            <label
+              htmlFor={`${fieldId}-term`}
+              className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'
+            >
               Term / Word <span className='text-destructive'>*</span>
             </label>
             <Input
+              id={`${fieldId}-term`}
               value={card.term || ''}
               onChange={(e) => onChange('term', e.target.value)}
               placeholder='e.g. Serendipity'
@@ -92,11 +97,15 @@ export function FlashcardRow({
           </div>
 
           <div>
-            <label className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'>
+            <label
+              htmlFor={`${fieldId}-definition`}
+              className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'
+            >
               Definition / Translation{' '}
               <span className='text-destructive'>*</span>
             </label>
             <Textarea
+              id={`${fieldId}-definition`}
               value={card.definition || ''}
               onChange={(e) => onChange('definition', e.target.value)}
               placeholder='e.g. Finding good things without looking for them'
@@ -107,10 +116,14 @@ export function FlashcardRow({
 
           {(showExample || card.example) && (
             <div>
-              <label className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'>
+              <label
+                htmlFor={`${fieldId}-example`}
+                className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'
+              >
                 Example Sentence (Optional)
               </label>
               <Input
+                id={`${fieldId}-example`}
                 value={card.example || ''}
                 onChange={(e) => onChange('example', e.target.value || null)}
                 placeholder='e.g. Finding my favorite book at the thrift shop was pure serendipity.'
@@ -122,9 +135,9 @@ export function FlashcardRow({
 
         {/* Image Attachment / Picker */}
         <div className='flex flex-col justify-start md:col-span-4'>
-          <label className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'>
+          <span className='text-muted-foreground mb-1 block text-xs font-medium tracking-wider uppercase'>
             Visual Aid
-          </label>
+          </span>
 
           {card.imageUrl ? (
             <div className='border-border/80 bg-muted/30 relative aspect-video w-full overflow-hidden rounded-lg border'>

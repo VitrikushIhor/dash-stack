@@ -242,7 +242,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: phase10
-          POSTGRES_PASSWORD: phase10
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: phase10
         ports:
           - 5432:5432
@@ -252,7 +252,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://phase10:phase10@localhost:5432/phase10
+      DATABASE_URL: postgresql://phase10@localhost:5432/phase10
       JWT_ACCESS_SECRET: phase10-ci-access-secret
       JWT_REFRESH_SECRET: phase10-ci-refresh-secret
 
@@ -360,7 +360,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: phase10
-          POSTGRES_PASSWORD: phase10
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: phase10
         ports:
           - 5432:5432
@@ -370,7 +370,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://phase10:phase10@localhost:5432/phase10
+      DATABASE_URL: postgresql://phase10@localhost:5432/phase10
       JWT_ACCESS_SECRET: phase10-ci-access-secret
       JWT_REFRESH_SECRET: phase10-ci-refresh-secret
       PORT: '8000'

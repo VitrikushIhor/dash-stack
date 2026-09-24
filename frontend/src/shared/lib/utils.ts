@@ -13,9 +13,17 @@ export function sleep(ms: number = 1000) {
 
 export function shuffle<T>(array: T[]): T[] {
   const newArr = [...array]
+  const randomValue = new Uint32Array(1)
 
   for (let i = newArr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
+    const upperBound = i + 1
+    const unbiasedLimit = Math.floor((2 ** 32 - 1) / upperBound) * upperBound
+
+    do {
+      globalThis.crypto.getRandomValues(randomValue)
+    } while (randomValue[0] >= unbiasedLimit)
+
+    const j = randomValue[0] % upperBound
 
     ;[newArr[i], newArr[j]] = [newArr[j], newArr[i]]
   }
@@ -95,8 +103,8 @@ export function getInitials(name: string): string {
 export function stringToColor(str: string): string {
   let hash = 0
 
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+  for (const character of str) {
+    hash = (character.codePointAt(0) ?? 0) + ((hash << 5) - hash)
   }
   const hue = hash % 360
 
