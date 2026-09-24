@@ -13,12 +13,19 @@
         "src/shared/ui/**/*.{ts,tsx}",
         "steiger.config.ts"
       ],
-      "project": ["src/**/*.{ts,tsx}"],
+      "project": [
+        "src/**/*.{ts,tsx}"
+      ],
       "ignore": [
         "src/features/manage-label/model/label-search-params.ts",
         "src/features/manage-task/model/create-task-schema.ts"
       ],
-      "ignoreDependencies": ["tailwindcss", "tw-animate-css", "eslint-config-next", "@dnd-kit/modifiers"]
+      "ignoreDependencies": [
+        "tailwindcss",
+        "tw-animate-css",
+        "eslint-config-next",
+        "@dnd-kit/modifiers"
+      ]
     },
     "backend": {
       "entry": [
@@ -27,7 +34,9 @@
         "src/**/*.dto.ts",
         "test-db.ts"
       ],
-      "project": ["src/**/*.ts"],
+      "project": [
+        "src/**/*.ts"
+      ],
       "ignore": [
         "src/common/order/**",
         "src/auth/domain/constants/auth.constants.ts"
@@ -56,5 +65,10 @@
         "ts-node"
       ]
     }
-  }
+  },
+  "ignoreBinaries": [
+    "eslint",
+    "prettier",
+    "vitest"
+  ]
 }

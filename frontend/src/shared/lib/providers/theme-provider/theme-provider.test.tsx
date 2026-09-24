@@ -49,11 +49,13 @@ describe('ThemeProvider & useTheme', () => {
     )
 
     const setDarkBtn = screen.getByTestId('set-dark')
+
     await user.click(setDarkBtn)
 
     expect(screen.getByTestId('theme').textContent).toBe('dark')
 
     const setLightBtn = screen.getByTestId('set-light')
+
     await user.click(setLightBtn)
 
     expect(screen.getByTestId('theme').textContent).toBe('light')
@@ -69,10 +71,12 @@ describe('ThemeProvider & useTheme', () => {
     )
 
     const setDarkBtn = screen.getByTestId('set-dark')
+
     await user.click(setDarkBtn)
     expect(screen.getByTestId('theme').textContent).toBe('dark')
 
     const resetBtn = screen.getByTestId('reset')
+
     await user.click(resetBtn)
     expect(screen.getByTestId('theme').textContent).toBe('system')
   })

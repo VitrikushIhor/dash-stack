@@ -13,6 +13,7 @@ export const getUserOrganizations = cache(
   async (): Promise<GetOrganizationsResponse> => {
     try {
       const data = await organizationServerApi.getMyMemberships()
+
       return { data, error: null }
     } catch (error) {
       return { data: null, error: getErrorMessage(error) }

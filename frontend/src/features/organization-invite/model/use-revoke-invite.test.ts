@@ -23,6 +23,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     handleServerError: vi.fn(),
@@ -77,6 +78,7 @@ describe('useRevokeInvite', () => {
 
   it('handles server errors correctly without crashing', async () => {
     const errorResponse = { success: false as const, error: 'Failed to revoke' }
+
     vi.mocked(revokeInviteAction).mockResolvedValue(errorResponse)
 
     const { result } = renderHook(() => useRevokeInvite())

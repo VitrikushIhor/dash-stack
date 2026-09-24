@@ -4,6 +4,7 @@ export function parseDateSafe(val: string | undefined): string | undefined {
   if (!val) return undefined
   const num = Number(val)
   const date = !isNaN(num) ? new Date(num) : new Date(val)
+
   return isNaN(date.getTime()) ? undefined : date.toISOString()
 }
 
@@ -14,6 +15,7 @@ export function mapSearchParamsToColumnFilters(searchParams: {
   dueDate: string[]
 }): ColumnFiltersState {
   const filters: ColumnFiltersState = []
+
   if (searchParams.status.length > 0) {
     filters.push({ id: 'status', value: searchParams.status })
   }
@@ -28,6 +30,7 @@ export function mapSearchParamsToColumnFilters(searchParams: {
       .map((d) => {
         const num = Number(d)
         const date = !isNaN(num) ? new Date(num) : new Date(d)
+
         return isNaN(date.getTime()) ? null : date
       })
       .filter((d) => d !== null)
@@ -36,6 +39,7 @@ export function mapSearchParamsToColumnFilters(searchParams: {
       filters.push({ id: 'dueDate', value: dates })
     }
   }
+
   return filters
 }
 
@@ -55,6 +59,7 @@ export function mapColumnFiltersToSearchParams(filters: ColumnFiltersState): {
     Date[] | undefined
 
   let dueDateStrings: string[] = []
+
   if (Array.isArray(dueDateFilter)) {
     dueDateStrings = dueDateFilter
       .filter((d) => d instanceof Date && !isNaN(d.getTime()))

@@ -173,9 +173,11 @@ const KanbanContext = React.createContext<KanbanContextValue<unknown> | null>(
 
 function useKanbanContext(consumerName: string) {
   const context = React.useContext(KanbanContext)
+
   if (!context) {
     throw new Error(`\`${consumerName}\` must be used within \`${ROOT_NAME}\``)
   }
+
   return context
 }
 
@@ -230,6 +232,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
       if (typeof item === 'object' && !getItemValueProp) {
         throw new Error('getItemValue is required when using array of objects')
       }
+
       return getItemValueProp
         ? getItemValueProp(item)
         : (item as UniqueIdentifier)
@@ -274,11 +277,13 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
         if (hasMovedRef.current) {
           lastOverIdRef.current = activeId
         }
+
         return lastOverIdRef.current ? [{ id: lastOverIdRef.current }] : []
       }
 
       if (overId in value) {
         const containerItems = value[overId]
+
         if (containerItems && containerItems.length > 0) {
           const closestItem = closestCenter({
             ...args,
@@ -298,6 +303,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
       }
 
       lastOverIdRef.current = overId
+
       return [{ id: overId }]
     },
     [activeId, value, getItemValue]
@@ -316,6 +322,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
     if (event.activatorEvent.defaultPrevented) return
 
     const { active, over } = event
+
     if (!over) return
 
     const activeColumn = getColumn(active.id)
@@ -325,6 +332,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
     if (activeColumn === overColumn) {
       const items = value[activeColumn]
+
       if (!items) return
 
       const activeIndex = items.findIndex(
@@ -336,6 +344,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
       if (activeIndex !== overIndex) {
         const newColumns = { ...value }
+
         newColumns[activeColumn] = arrayMove(items, activeIndex, overIndex)
         onValueChange?.(newColumns)
       }
@@ -352,6 +361,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
       if (activeIndex === -1) return
 
       const activeItem = activeItems[activeIndex]
+
       if (!activeItem) return
 
       const updatedItems = {
@@ -376,6 +386,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
     if (!over) {
       setActiveId(null)
+
       return
     }
 
@@ -388,8 +399,10 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
         const newOrder = arrayMove(orderedColumns, activeIndex, overIndex)
 
         const newColumns: Record<UniqueIdentifier, T[]> = {}
+
         for (const key of newOrder) {
           const items = value[key]
+
           if (items) {
             newColumns[key] = items
           }
@@ -407,13 +420,16 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
       if (!activeColumn || !overColumn) {
         setActiveId(null)
+
         return
       }
 
       if (activeColumn === overColumn) {
         const items = value[activeColumn]
+
         if (!items) {
           setActiveId(null)
+
           return
         }
 
@@ -426,6 +442,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
 
         if (activeIndex !== overIndex) {
           const newColumns = { ...value }
+
           newColumns[activeColumn] = arrayMove(items, activeIndex, overIndex)
           if (onMove) {
             onMove({
@@ -462,7 +479,9 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).indexOf(active.id as string) + 1
           : (() => {
               const column = getColumn(active.id)
+
               if (!column || !value[column]) return 1
+
               return (
                 value[column].findIndex(
                   (item) => getItemValue(item) === active.id
@@ -473,6 +492,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).length
           : (() => {
               const column = getColumn(active.id)
+
               return column ? (value[column]?.length ?? 0) : 0
             })()
 
@@ -487,7 +507,9 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).indexOf(over.id as string) + 1
           : (() => {
               const column = getColumn(over.id)
+
               if (!column || !value[column]) return 1
+
               return (
                 value[column].findIndex(
                   (item) => getItemValue(item) === over.id
@@ -498,6 +520,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).length
           : (() => {
               const column = getColumn(over.id)
+
               return column ? (value[column]?.length ?? 0) : 0
             })()
 
@@ -523,7 +546,9 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).indexOf(over.id as string) + 1
           : (() => {
               const column = getColumn(over.id)
+
               if (!column || !value[column]) return 1
+
               return (
                 value[column].findIndex(
                   (item) => getItemValue(item) === over.id
@@ -534,6 +559,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
           ? Object.keys(value).length
           : (() => {
               const column = getColumn(over.id)
+
               return column ? (value[column]?.length ?? 0) : 0
             })()
 
@@ -553,6 +579,7 @@ function KanbanRoot<T>(props: KanbanRootProps<T>) {
       onDragCancel({ active }) {
         const isColumn = active.id in value
         const itemType = isColumn ? 'column' : 'item'
+
         return `Dragging was cancelled. ${itemType} was dropped.`
       },
     }),
@@ -675,11 +702,13 @@ const KanbanColumnContext =
 
 function useKanbanColumnContext(consumerName: string) {
   const context = React.useContext(KanbanColumnContext)
+
   if (!context) {
     throw new Error(
       `\`${consumerName}\` must be used within \`${COLUMN_NAME}\``
     )
   }
+
   return context
 }
 
@@ -750,6 +779,7 @@ function KanbanColumn(props: KanbanColumnProps) {
 
   const items = React.useMemo(() => {
     const items = context.items[value] ?? []
+
     return items.map((item) => context.getItemValue(item))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.items, value, context.getItemValue])
@@ -863,9 +893,11 @@ const KanbanItemContext = React.createContext<KanbanItemContextValue | null>(
 
 function useKanbanItemContext(consumerName: string) {
   const context = React.useContext(KanbanItemContext)
+
   if (!context) {
     throw new Error(`\`${consumerName}\` must be used within \`${ITEM_NAME}\``)
   }
+
   return context
 }
 

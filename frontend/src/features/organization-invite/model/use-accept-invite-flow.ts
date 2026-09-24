@@ -15,9 +15,11 @@ export function useAcceptInviteFlow(token: string | null) {
   const [status, setStatus] = useState<AcceptInviteFlowStatus>(
     token ? 'loading' : 'error'
   )
+
   const [errorMessage, setErrorMessage] = useState(
     !token ? 'No invitation token provided' : ''
   )
+
   const hasTriedRef = useRef<string | null>(null)
 
   const fetchInvite = useCallback(() => {
@@ -25,9 +27,11 @@ export function useAcceptInviteFlow(token: string | null) {
 
     startTransition(async () => {
       const result = await acceptInviteAction(token)
+
       if (!result.success) {
         setStatus('error')
         setErrorMessage(result.error ?? 'Unknown error occurred')
+
         return
       }
       setStatus('success')
@@ -45,6 +49,7 @@ export function useAcceptInviteFlow(token: string | null) {
     const timeoutId = setTimeout(() => {
       router.replace(ROUTES.organizations)
     }, REDIRECT_DELAY_MS)
+
     return () => clearTimeout(timeoutId)
   }, [status, router])
 

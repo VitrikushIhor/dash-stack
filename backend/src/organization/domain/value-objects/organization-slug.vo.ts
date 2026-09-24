@@ -1,13 +1,10 @@
+import { slugify } from '../../../common/utils/slugify.util';
+
 export class OrganizationSlug {
   private constructor(public readonly value: string) {}
 
   static fromName(name: string): OrganizationSlug {
-    const slug = name
-      .toLowerCase()
-      .replace(/[^\w ]+/g, '')
-      .replace(/ +/g, '-');
-
-    return new OrganizationSlug(slug);
+    return new OrganizationSlug(slugify(name));
   }
 
   static from(value: string): OrganizationSlug {

@@ -94,6 +94,7 @@ export function getEventsCount(
 
   return tasks.filter((task) => {
     const anchor = getTaskCalendarAnchor(task)
+
     return anchor && compareFns[view](new Date(anchor), date)
   }).length
 }
@@ -157,15 +158,19 @@ export function calculateMonthEventPositions(
   })
 
   const sortedEvents = [...singleDayTasks]
+
   sortedEvents.sort((a, b) => {
     const anchorA = getTaskCalendarAnchor(a)
     const anchorB = getTaskCalendarAnchor(b)
+
     if (!anchorA || !anchorB) return 0
+
     return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
   })
 
   sortedEvents.forEach((task) => {
     const anchor = getTaskCalendarAnchor(task)
+
     if (!anchor) return
     const eventStart = parseISO(anchor)
     const eventEnd = parseISO(anchor)
@@ -180,6 +185,7 @@ export function calculateMonthEventPositions(
       if (
         eventDays.every((day) => {
           const dayPositions = occupiedPositions[startOfDay(day).toISOString()]
+
           return dayPositions && !dayPositions[i]
         })
       ) {
@@ -191,6 +197,7 @@ export function calculateMonthEventPositions(
     if (position !== -1) {
       eventDays.forEach((day) => {
         const dayKey = startOfDay(day).toISOString()
+
         occupiedPositions[dayKey][position] = true
       })
       eventPositions[task.id] = position
@@ -207,9 +214,11 @@ export function getMonthCellEvents(
 ) {
   const eventsForDate = tasks.filter((task) => {
     const anchor = getTaskCalendarAnchor(task)
+
     if (!anchor) return false
     const eventStart = parseISO(anchor)
     const eventEnd = parseISO(anchor)
+
     return (
       (date >= eventStart && date <= eventEnd) ||
       isSameDay(date, eventStart) ||

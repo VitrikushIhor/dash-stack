@@ -4,6 +4,8 @@ export type {
   ActionState,
   HttpMethod,
   RequestOptions,
+  QueryResult,
+  QueryErrorCode,
 } from './types'
 export { ApiError, extractErrorMessage } from './api-error'
 export {
@@ -11,6 +13,7 @@ export {
   type HttpClient,
   createHttpClient,
 } from './http-core'
+export { handleQueryError } from './query-helpers'
 export { api } from './api-client'
 export { getErrorMessage, handleServerError, getFileUrl } from './api-helpers'
 export { QUERY_KEYS } from './query-keys'

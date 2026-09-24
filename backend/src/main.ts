@@ -7,12 +7,17 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
+import { json, urlencoded } from 'express';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DomainExceptionFilter } from './common/filters/domain-exception.filter';
 import type { CorsConfig, NestConfig, SwaggerConfig } from './common/configs/config.interface';
+import { HttpBodyLimit } from './common/configs/http-body.constants';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    bodyParser: false,
+  });
 
   // Logger
   app.useLogger(app.get(Logger));
@@ -20,6 +25,8 @@ async function bootstrap() {
   // Security
   app.use(helmet());
   app.use(cookieParser());
+  app.use(json({ limit: HttpBodyLimit.json }));
+  app.use(urlencoded({ extended: true, limit: HttpBodyLimit.urlEncoded }));
   app.setGlobalPrefix('api');
 
   // Validation
@@ -39,6 +46,7 @@ async function bootstrap() {
 
   // Prisma Client Exception Filter for unhandled exceptions
   const { httpAdapter } = app.get(HttpAdapterHost);
+
   app.useGlobalFilters(
     new PrismaClientExceptionFilter(httpAdapter),
     new DomainExceptionFilter(),
@@ -74,8 +82,10 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT || nestConfig.port || 3000;
+
   await app.listen(port);
   app.get(Logger).log(`🚀 Application is running on: http://localhost:${port}/api`);
   app.get(Logger).log(`🚀 Swagger is running on: http://localhost:${port}/${swaggerConfig.path}`);
 }
+
 bootstrap();

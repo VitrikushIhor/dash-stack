@@ -1,9 +1,9 @@
 # 🏔️ Vocabulary & SRS — Full Scrum Decomposition
 
-> **Source Spec:** [FEATURE-SPEC-vocabulary.md](file:///Users/ihor/Desktop/dash-stack/docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md) (v1.4)  
+> **Source Spec:** [FEATURE-SPEC-vocabulary.md](file:///Users/ihor/Desktop/dash-stack/docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md) (v1.5)
 > **Architecture Decision:** [ADR-001](file:///Users/ihor/Desktop/dash-stack/docs/specs/vocabulary/decisions/ADR-001-vocabulary-architecture.md)  
 > **Created:** 2026-08-21  
-> **Total Estimated Effort:** ~48 SP across 4 sprints
+> **Total Estimated Effort:** 62 SP across 4 sprints
 
 ---
 
@@ -125,7 +125,6 @@ impacts daily active retention, the core engagement metric.
 - FSRS-5 / SM-2 advanced algorithms (Phase 2)
 - Audio file hosting on backend (Web Speech API only)
 - LMS integration (CourseDeck / Task.deckId — separate spec)
-- Practice Test Mode (Phase 1.5 — after core modes are stable)
 
 ---
 
@@ -149,6 +148,8 @@ impacts daily active retention, the core engagement metric.
 - [ ] `[TECH] T-03: 5-Box Leitner SRS Calculation Engine (3SP)`
 - [ ] `[FEAT] F-08: Flashcards Study Mode with Web Speech TTS (5SP)`
 - [ ] `[FEAT] F-09: Learn / Adaptive Study Mode with MCQ Distractors (5SP)`
+- [ ] `[FEAT] F-13: Practice Test Mode with Graded Results (5SP)`
+- [ ] `[FEAT] F-14: Match Session API & Leaderboard (8SP)`
 - [ ] `[FEAT] F-10: SRS Due Reviews Counter & Progress Submission API (3SP)`
 
 **Sprint 4 — Star System, Import/Export & Polish:**
@@ -158,7 +159,7 @@ impacts daily active retention, the core engagement metric.
 ---
 
 ### 📚 Specifications & Architecture References
-- **Feature Spec:** `docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md` (v1.4)
+- **Feature Spec:** `docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md` (v1.5)
 - **ADR:** `docs/specs/vocabulary/decisions/ADR-001-vocabulary-architecture.md`
 - **FUNCTIONAL-SPEC:** `docs/FUNCTIONAL-SPEC.md` (§3)
 ```
@@ -194,7 +195,7 @@ Enums to create: `DeckVisibility`, `DeckStatus`, `DeckType`, `CEFRLevel`,
 ---
 
 ### 📌 Prerequisites
-- [x] Feature Spec approved (`docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md` v1.4)
+- [x] Feature Spec approved (`docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md` v1.5)
 - [x] ADR-001 accepted (decoupled architecture)
 
 ---
@@ -370,7 +371,9 @@ before the UI is built**.
 - [ ] `PATCH /decks/:id` by non-owner returns `403 Forbidden`.
 - [ ] `DELETE /decks/:id` cascades and removes all child records (verified in DB).
 - [ ] `slug` is unique; duplicate titles get a numeric suffix (e.g. `my-deck-2`).
-- [ ] Unauthenticated requests to all endpoints return `401 Unauthorized`.
+- [ ] Unauthenticated requests to private and personalized endpoints return `401 Unauthorized`.
+- [ ] Guests can read and study eligible published public or unlisted decks;
+      guest study never persists progress.
 
 ---
 
@@ -623,7 +626,7 @@ format for the frontend.
 
 ### ⚙️ Requirements & API Contracts
 
-**GET /api/v1/vocab/images/search**
+**GET /api/v1/vocab/unsplash/search**
 - Auth: Required (deck owner context)
 - Query: `?q=butterfly&page=1&perPage=12`
 - Response `200 OK`:
@@ -648,7 +651,7 @@ format for the frontend.
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] `GET /images/search?q=cat` returns 12 image results with valid URLs.
+- [ ] `GET /unsplash/search?q=cat` returns 12 image results with valid URLs.
 - [ ] Query with empty `q` returns `400 Bad Request`.
 - [ ] Unsplash API key is NEVER exposed in the response or frontend bundle.
 - [ ] Response includes `authorName` and `authorUrl` (Unsplash attribution requirement).
@@ -665,7 +668,7 @@ format for the frontend.
   - HTTP client (Axios/fetch) with 5s timeout
   - Response mapping to normalized `ImageSearchResult` type
   - Error handling for 429, 500, network failures
-- [ ] Create `presentation/image-search.controller.ts` with `GET /images/search`
+- [ ] Create `presentation/image-search.controller.ts` with `GET /unsplash/search`
 - [ ] Create `presentation/dto/image-search.dto.ts` (query validation)
 - [ ] Integration test with mocked Unsplash responses
 
@@ -701,7 +704,7 @@ so that **I can manage my flashcard collections at a glance**.
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] `/vocabulary` route displays a grid/list of user's decks.
+- [ ] `/vocab` route displays a grid/list of user's decks.
 - [ ] Each deck card shows: title, description snippet, cardCount, CEFR level
       badge, visibility icon, status badge (Draft/Published/Archived).
 - [ ] "Create Deck" button opens a modal with fields: Title (required), Description,
@@ -712,14 +715,14 @@ so that **I can manage my flashcard collections at a glance**.
 - [ ] Empty state: when user has 0 decks, display an illustration with CTA
       "Create your first deck".
 - [ ] Skeleton loading state shown while deck list is fetching.
-- [ ] Deck cards are clickable — navigate to `/vocabulary/:id` (deck detail).
+- [ ] Deck cards are clickable — navigate to `/vocab/:id` (deck detail).
 
 ---
 
 ### 🛠️ Technical Tasks
 - [ ] **App Router:**
-  - [ ] Create route `frontend/src/app/(dashboard)/vocabulary/page.tsx`
-  - [ ] Create route `frontend/src/app/(dashboard)/vocabulary/[id]/page.tsx` (placeholder)
+  - [ ] Create route `frontend/src/app/(dashboard)/vocab/page.tsx`
+  - [ ] Create route `frontend/src/app/(dashboard)/vocab/[id]/page.tsx` (placeholder)
 - [ ] **FSD Entities Layer:**
   - [ ] `frontend/src/entities/deck/model/types.ts` — Deck TypeScript type
   - [ ] `frontend/src/entities/deck/api/queries.ts` — `useMyDecks()` React Query hook
@@ -766,7 +769,7 @@ so that **I can efficiently build rich study material with visual associations**
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] `/vocabulary/:id` shows a deck header (title, description, metadata) and
+- [ ] `/vocab/:id` shows a deck header (title, description, metadata) and
       a scrollable list of flashcard rows in position order.
 - [ ] Each card row has inline editable fields: Term, Definition, Example.
 - [ ] Clicking the image icon on a card row opens an Unsplash search popover
@@ -804,7 +807,7 @@ so that **I can efficiently build rich study material with visual associations**
 ---
 
 ### 📚 Tech Details & References
-- **API:** `POST/PATCH/DELETE /decks/:id/cards/...`, `PUT /cards/order`, `GET /images/search`
+- **API:** `POST/PATCH/DELETE /decks/:id/cards/...`, `PUT /cards/order`, `GET /unsplash/search`
 - **Virtualization:** Consider `@tanstack/react-virtual` for large decks
 - **Spec Reference:** FR-VOCAB-002, FR-VOCAB-006
 ```
@@ -865,7 +868,7 @@ so that **I can find existing study material without creating my own**.
 - [ ] Level filter returns only decks with matching CEFR level.
 - [ ] Pagination works correctly: `page=2, limit=12` returns items 13–24.
 - [ ] Response includes `cardCount` and owner avatar/name.
-- [ ] Browse page at `/vocabulary/explore` shows a search bar, level filter chips,
+- [ ] Browse page at `/vocab/explore` shows a search bar, level filter chips,
       and a responsive grid of deck preview cards.
 - [ ] Empty results show a "No decks found" illustration.
 
@@ -879,7 +882,7 @@ so that **I can find existing study material without creating my own**.
   - [ ] `presentation/dto/search-public-decks.dto.ts` — query params validation
   - [ ] Add endpoint to `deck.controller.ts`
 - [ ] **Frontend:**
-  - [ ] Route: `frontend/src/app/(dashboard)/vocabulary/explore/page.tsx`
+  - [ ] Route: `frontend/src/app/(dashboard)/vocab/explore/page.tsx`
   - [ ] `frontend/src/features/explore-decks/ui/ExploreDecksView.tsx`
   - [ ] `frontend/src/features/explore-decks/ui/DeckSearchBar.tsx`
   - [ ] `frontend/src/features/explore-decks/ui/LevelFilterChips.tsx`
@@ -1007,7 +1010,8 @@ the entire SRS review system.
 ### 📋 Acceptance Criteria
 - [ ] Pure function `calculateNextReview(currentProgress, isCorrect) -> UpdatedProgress`.
 - [ ] Correct answer: box increments by 1 (capped at 5), `correctStreak += 1`.
-- [ ] Incorrect answer: box resets to 1, `correctStreak = 0`, `status = FORGOTTEN`.
+- [ ] Incorrect answer: box resets to 1 and `correctStreak = 0`; status is
+      `LEARNING` from boxes 1-2 and `FORGOTTEN` from boxes 3-5.
 - [ ] Interval mapping is exact:
   - Box 1 -> +1 day, Box 2 -> +3 days, Box 3 -> +7 days,
     Box 4 -> +14 days, Box 5 -> +30 days.
@@ -1107,7 +1111,7 @@ so that **I can efficiently review vocabulary with visual and auditory cues**.
 - [ ] **Shared Utils:**
   - [ ] `frontend/src/shared/lib/hooks/useSpeechSynthesis.ts` — Web Speech API wrapper
 - [ ] **App Router:**
-  - [ ] Route: `frontend/src/app/(dashboard)/vocabulary/[id]/study/page.tsx`
+  - [ ] Route: `frontend/src/app/(dashboard)/vocab/[id]/study/page.tsx`
 - [ ] **CSS:**
   - [ ] 3D flip animation keyframes (perspective, rotateY, backface-visibility)
 
@@ -1191,6 +1195,64 @@ and use Written mode only for all cards.
 - **Spec Reference:** FR-VOCAB-007 mode 2 (Learn / Adaptive)
 - **Distractor Logic:** Fisher-Yates shuffle to select 3 random non-correct cards
 - **Fuzzy Match:** Levenshtein distance <= 2 = "close enough"
+```
+
+---
+
+## F-13: Practice Test Mode with Graded Results
+
+**Card Title:** `[FEAT] Build Practice Test Mode with Mixed Questions and Results (5SP)`
+**Labels:** `✨ Feature`, `🎨 Frontend`, `🛠️ Backend`
+**List:** `📋 To Do` (Sprint 3)
+
+```markdown
+### User Story / Goal
+As a learner, I want a graded mixed-format practice test so that I can assess
+my recall after studying a deck.
+
+### Acceptance Criteria
+- [ ] A deck with at least 4 cards can start a test with True/False, multiple
+      choice, and written questions drawn from that deck.
+- [ ] The test returns a final percentage and per-question answer breakdown.
+- [ ] Multiple-choice distractors are distinct cards from the same deck.
+- [ ] A guest may take an eligible published deck's test read-only; authenticated
+      users may save study progress through the existing progress contract.
+- [ ] Question generation and score calculation have deterministic unit tests.
+
+### Technical Tasks
+- [ ] Add a test-session state machine in `features/study-test`.
+- [ ] Reuse the authorized study-cards contract; do not duplicate deck access rules.
+- [ ] Add frontend tests for grading and accessible keyboard interaction.
+```
+
+---
+
+## F-14: Match Session API & Leaderboard
+
+**Card Title:** `[FEAT] Implement Protected Match Session API and Deck Leaderboard (8SP)`
+**Labels:** `✨ Feature`, `🛠️ Backend`, `🎨 Frontend`, `🔒 Security`
+**List:** `📋 To Do` (Sprint 3)
+
+```markdown
+### User Story / Goal
+As an authenticated learner, I want a trusted Match result and leaderboard so
+that rankings cannot be forged by a client-supplied duration.
+
+### API Contract
+- [ ] `POST /api/v1/vocab/decks/:deckId/match/sessions` creates a 30-minute
+      server-persisted session after access and six-card validation.
+- [ ] `POST /api/v1/vocab/decks/:deckId/match/sessions/:sessionId/complete`
+      completes that session exactly once; the server derives `durationMs`.
+- [ ] `GET /api/v1/vocab/decks/:deckId/leaderboard` returns each user's best
+      result, ordered by `durationMs`, then `createdAt`.
+
+### Acceptance Criteria
+- [ ] A deck with fewer than six cards returns `400` before the Match reducer
+      or a server session is created.
+- [ ] Expired, duplicate, cross-user, cross-deck, and forged sessions are rejected.
+- [ ] A valid completion is stored transactionally and appears in the leaderboard.
+- [ ] The UI displays the leaderboard and the current user's best result.
+- [ ] Integration tests cover authorization, session integrity, ordering, and ties.
 ```
 
 ---
@@ -1328,10 +1390,11 @@ so that **I focus my time on the terms I find most challenging**.
 
 ### ⚙️ Requirements & API Contracts
 
-**POST /api/v1/vocab/cards/:cardId/star**
+**PUT /api/v1/vocab/cards/:cardId/star**
 - Auth: Required
-- No body. Toggles `isStarred` on the user's `VocabProgress` record.
-- If no `VocabProgress` record exists, creates one with `isStarred = true`.
+- Body: `{ "isStarred": boolean }`.
+- Idempotently sets `isStarred` on the user's `VocabProgress` record.
+- If no `VocabProgress` record exists, creates one with the requested state.
 - Response `200 OK`: `{ "flashcardId": "...", "isStarred": true }`.
 
 **Study Filter:**
@@ -1342,11 +1405,12 @@ so that **I focus my time on the terms I find most challenging**.
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] Toggling star on an unstarred card sets `isStarred = true`.
-- [ ] Toggling star on a starred card sets `isStarred = false`.
+- [ ] Setting an unstarred card to `true` sets `isStarred = true`.
+- [ ] Setting a starred card to `false` sets `isStarred = false`.
+- [ ] Repeating a request with the same `isStarred` value does not change it.
 - [ ] Star state is user-specific: User A starring card does not affect User B.
 - [ ] `?onlyStarred=true` with 10 cards (3 starred) returns exactly 3 cards.
-- [ ] `?onlyStarred=true` with 0 starred cards returns `400` or empty set with
+- [ ] `?onlyStarred=true` with 0 starred cards returns an empty set with a
       client-side prompt to star cards first.
 - [ ] Star icon in Flashcards mode reflects current star state (filled/outlined).
 - [ ] Star toggle is instant (optimistic update) with background API sync.
@@ -1379,8 +1443,8 @@ so that **I focus my time on the terms I find most challenging**.
 
 ```markdown
 ### 🎯 User Story / Goal
-As a **deck owner migrating from Quizlet**,  
-I want to **paste Tab-separated terms and definitions to bulk-create cards,
+As a **deck owner migrating from Quizlet, Anki, Quenti, or a spreadsheet**,
+I want to **import pasted text or CSV, TSV, and TXT files to bulk-create cards,
 and export my deck as CSV/JSON**,  
 so that **I can quickly import existing study material and back up my data**.
 
@@ -1394,24 +1458,29 @@ so that **I can quickly import existing study material and back up my data**.
 ### ⚙️ Requirements
 
 **Import (Frontend-heavy):**
-- Modal/drawer with a large textarea for pasting.
-- Parser supports: Tab-separated (`term\tdefinition`), Comma-separated (`term,definition`).
-- Auto-detect separator (Tab vs Comma) from first line.
-- Preview: parsed results shown in a table before confirming.
-- Validation: highlight rows with missing definition or empty term.
+- Modal/drawer accepts pasted text and `.csv`, `.tsv`, or `.txt` files.
+- Parser supports quoted CSV plus tab, comma, and semicolon delimiters.
+- Auto-detect separator and offer presets for Quizlet, Anki text export, Quenti,
+  and generic delimited input.
+- Preview: parsed results shown in a table with editable mapping for term,
+  definition, and optional example columns before confirming.
+- Validation: highlight rows with missing definition or empty term; allow the
+  owner to correct or exclude invalid rows.
 - On confirm: calls `POST /decks/:id/cards` with bulk body.
 
 **Export (Backend endpoint):**
-- `GET /api/v1/vocab/decks/:id/export?format=csv|tsv|json`
-- Auth: Deck owner or public/unlisted deck viewer.
+- `GET /api/v1/vocab/decks/:id/export?format=csv|json`
+- Auth: Deck owner only.
 - Response: File download with appropriate `Content-Type` and `Content-Disposition` headers.
 
 ---
 
 ### 📋 Acceptance Criteria
-- [ ] Pasting 10 lines of `term\tdefinition` parses into 10 rows in preview table.
+- [ ] Quizlet TSV, Anki text export, Quenti output, and generic CSV/TSV parse
+      into correctly mapped preview rows.
 - [ ] Empty lines are silently ignored.
-- [ ] Lines without a separator are highlighted red with "Missing definition" message.
+- [ ] Invalid rows are highlighted with actionable validation messages and can
+      be corrected or excluded before import.
 - [ ] Confirming import creates 10 flashcards in the correct deck.
 - [ ] `GET /export?format=csv` returns a downloadable `.csv` file with headers
       `term,definition,example`.
@@ -1427,11 +1496,12 @@ so that **I can quickly import existing study material and back up my data**.
   - [ ] Support `Content-Disposition: attachment; filename="deck-slug.csv"`
 - [ ] **Frontend:**
   - [ ] `frontend/src/features/import-flashcards/ui/ImportDialog.tsx`
-  - [ ] `frontend/src/features/import-flashcards/model/tsv-parser.ts` — parser logic
+- [ ] `frontend/src/features/import-flashcards/model/delimited-text-parser.ts` — parser and mapping logic
   - [ ] `frontend/src/features/import-flashcards/ui/ImportPreviewTable.tsx`
   - [ ] "Import" and "Export" buttons on deck detail page
 - [ ] **Tests:**
-  - [ ] Unit test: TSV parser with valid, empty, and malformed input
+- [ ] Unit tests: Quizlet TSV, Anki text export, Quenti output, CSV quoting,
+      mapping, empty rows, and malformed input
   - [ ] Unit test: CSV export formatting with special characters (commas, quotes)
 
 ---
@@ -1462,10 +1532,12 @@ so that **I can quickly import existing study material and back up my data**.
 | **T-03** | 5-Box Leitner SRS Engine | `[TECH]` | `⚙️ 🛠️` | 3 | Sprint 3 | — |
 | **F-08** | Flashcards Study Mode + TTS | `[FEAT]` | `✨ 🎨` | 5 | Sprint 3 | F-03, T-03 |
 | **F-09** | Learn / Adaptive Mode | `[FEAT]` | `✨ 🎨 🛠️` | 5 | Sprint 3 | F-08 |
+| **F-13** | Practice Test Mode with Graded Results | `[FEAT]` | `✨ 🎨 🛠️` | 5 | Sprint 3 | F-08 |
+| **F-14** | Match Session API & Leaderboard | `[FEAT]` | `✨ 🛠️ 🎨 🔒` | 8 | Sprint 3 | F-03, F-08 |
 | **F-10** | Due Reviews Counter & Progress API | `[FEAT]` | `✨ 🛠️ 🎨` | 3 | Sprint 3 | T-03 |
 | **F-11** | Star Cards & Targeted Study | `[FEAT]` | `✨ 🎨 🛠️` | 2 | Sprint 4 | F-08 |
 | **F-12** | Bulk Import & Export | `[FEAT]` | `✨ 🎨 🛠️` | 3 | Sprint 4 | F-03 |
-| | | | **TOTAL:** | **48** | | |
+| | | | **TOTAL:** | **62** | | |
 
 ---
 
@@ -1474,8 +1546,8 @@ so that **I can quickly import existing study material and back up my data**.
 | Sprint | Focus Area | Cards | Total SP |
 |---|---|---|---|
 | **Sprint 1** | Data Layer + Backend APIs | 5 | 13 SP |
-| **Sprint 2** | Frontend UI + Catalog + Images | 4 | 13 SP |
-| **Sprint 3** | Study Modes + SRS Engine | 4 | 16 SP |
+| **Sprint 2** | Frontend UI + Catalog + Images | 5 | 15 SP |
+| **Sprint 3** | Study Modes + SRS Engine | 6 | 29 SP |
 | **Sprint 4** | Star System + Import/Export | 2 | 5 SP |
 
 > Sprint 4 is intentionally lighter to allow for bug fixes, polish, and

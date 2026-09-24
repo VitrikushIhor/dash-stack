@@ -33,6 +33,7 @@ export async function revokeInviteAction(
         validationMessages: error.validationMessages,
       }
     }
+
     return { success: false, error: getErrorMessage(error) }
   }
 }

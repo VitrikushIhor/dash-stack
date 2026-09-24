@@ -15,6 +15,7 @@ export const getOrganization = cache(
     try {
       const validSlug = OrganizationSlugSchema.parse(slug)
       const data = await organizationServerApi.getBySlug(validSlug)
+
       return { data, error: null }
     } catch (error) {
       return { data: null, error: getErrorMessage(error) }

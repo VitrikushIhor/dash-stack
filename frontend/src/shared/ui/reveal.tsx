@@ -10,6 +10,7 @@ interface RevealProps {
 
 export function Reveal({ children, delay = 0, className = '' }: RevealProps) {
   const { ref, visible } = useReveal()
+
   return (
     <div
       ref={ref}

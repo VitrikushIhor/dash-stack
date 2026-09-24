@@ -7,6 +7,7 @@ export { useAction } from './hooks/use-action'
 export { useAttachments } from './hooks/use-attachments'
 export { default as useDialogState } from './hooks/use-dialog-state'
 export { useIsMobile } from './hooks/use-mobile'
+export { useDebounce } from './hooks/use-debounce'
 export { logger } from './logger'
 export {
   cn,

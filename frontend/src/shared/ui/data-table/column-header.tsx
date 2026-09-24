@@ -42,8 +42,10 @@ export function DataTableColumnHeader<TData, TValue>({
         {column.getCanSort() &&
           (() => {
             const sorted = column.getIsSorted()
+
             if (sorted === 'desc') return <ChevronDown />
             if (sorted === 'asc') return <ChevronUp />
+
             return <ChevronsUpDown />
           })()}
       </DropdownMenuTrigger>

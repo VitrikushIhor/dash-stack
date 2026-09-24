@@ -25,6 +25,7 @@ export async function getMember(params: Params): Promise<GetMemberResponse> {
       slug: validSlug,
       userId: validUserId,
     })
+
     return { data, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

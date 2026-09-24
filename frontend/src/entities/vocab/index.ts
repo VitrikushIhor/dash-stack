@@ -1,0 +1,45 @@
+export type {
+  StudyCardProgress,
+  StudyCard,
+  DeckCardsPage,
+  DeckCardSelectionSummary,
+  SubmitProgressItem,
+  SubmitProgressPayload,
+  DeckDueReviews,
+  DueReviewsResponse,
+  ToggleStarPayload,
+  ToggleStarResponse,
+  ImportFlashcard,
+  ImportFlashcardsResponse,
+  StudySessionQuery,
+  VocabProgressResponse,
+  MatchLeaderboardEntry,
+  MatchSession,
+  MatchCard,
+  MatchAttempt,
+  MatchAttemptTile,
+  MatchCompletion,
+  MatchLeaderboard,
+} from './model/types'
+
+export { MatchTileSide, VocabProgressStatus, StudyMode } from './model/types'
+
+export {
+  StudySessionQuerySchema,
+  StudyCardSchema,
+  SubmitProgressItemSchema,
+  SubmitProgressPayloadSchema,
+  ToggleStarPayloadSchema,
+  ImportFlashcardsPayloadSchema,
+  DueReviewsQuerySchema,
+  MatchLeaderboardQuerySchema,
+  CreateMatchSessionPayloadSchema,
+  CompleteMatchSessionPayloadSchema,
+  RecordMatchPairPayloadSchema,
+} from './model/vocab.schema'
+
+export { createVocabApi, vocabApi } from './api/vocab-api'
+export { vocabKeys } from './api/vocab-query-keys'
+export { useDueReviews } from './model/use-due-reviews'
+export { useDeckCards } from './model/use-deck-cards'
+export { useMatchLeaderboard } from './model/use-match-leaderboard'

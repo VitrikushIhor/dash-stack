@@ -15,6 +15,7 @@ export const serverApi = createHttpClient({
   getHeaders: async (): Promise<Record<string, string>> => {
     const store = await cookies()
     const token = store.get('access_token')?.value
+
     return token ? { Authorization: `Bearer ${token}` } : {}
   },
   onUnauthorized: () => {

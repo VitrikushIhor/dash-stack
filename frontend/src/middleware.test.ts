@@ -8,9 +8,11 @@ function createNextRequest(
   cookiesRecord: Record<string, string> = {}
 ): NextRequest {
   const request = new NextRequest(new URL(url, 'http://localhost:3000'))
+
   Object.entries(cookiesRecord).forEach(([name, value]) => {
     request.cookies.set(name, value)
   })
+
   return request
 }
 

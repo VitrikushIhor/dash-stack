@@ -18,9 +18,11 @@ export function createAction<TInput, TOutput>(
 ) {
   if (typeof schemaOrHandler === 'function') {
     const handler = schemaOrHandler
+
     return async (): Promise<ActionState<TOutput>> => {
       try {
         const res = await handler()
+
         return { success: true, data: res }
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -37,6 +39,7 @@ export function createAction<TInput, TOutput>(
             validationMessages: error.validationMessages,
           }
         }
+
         return { success: false, error: getErrorMessage(error) }
       }
     }
@@ -66,6 +69,7 @@ export function createAction<TInput, TOutput>(
           validationMessages: error.validationMessages,
         }
       }
+
       return { success: false, error: getErrorMessage(error) }
     }
   }

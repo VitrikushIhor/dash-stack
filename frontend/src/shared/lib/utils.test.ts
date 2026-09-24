@@ -6,8 +6,19 @@ import {
   getInitials,
   getPageNumbers,
   sanitizeRedirectUrl,
+  shuffle,
   stringToColor,
 } from './utils'
+
+describe('shuffle', () => {
+  it('returns_a_new_array_with_the_same_values', () => {
+    const values = [1, 2, 3, 4]
+    const shuffled = shuffle(values)
+
+    expect(shuffled).not.toBe(values)
+    expect(shuffled.toSorted()).toEqual(values)
+  })
+})
 
 describe('cn (className merge utility)', () => {
   it('should merge class names', () => {
@@ -17,6 +28,7 @@ describe('cn (className merge utility)', () => {
   it('should handle conditional classes', () => {
     const isActive = true
     const isInactive = false
+
     expect(cn('base', isActive && 'active', isInactive && 'inactive')).toBe(
       'base active'
     )
@@ -52,18 +64,21 @@ describe('getInitials', () => {
 describe('stringToColor', () => {
   it('should return HSL color string', () => {
     const color = stringToColor('test')
+
     expect(color).toMatch(/^hsl\(\d+, 65%, 50%\)$/)
   })
 
   it('should return consistent color for same string', () => {
     const color1 = stringToColor('hello')
     const color2 = stringToColor('hello')
+
     expect(color1).toBe(color2)
   })
 
   it('should return different colors for different strings', () => {
     const color1 = stringToColor('hello')
     const color2 = stringToColor('world')
+
     expect(color1).not.toBe(color2)
   })
 })
@@ -76,21 +91,25 @@ describe('getPageNumbers', () => {
 
   it('should show ellipsis at end when near beginning', () => {
     const result = getPageNumbers(2, 10)
+
     expect(result).toEqual([1, 2, 3, 4, '...', 10])
   })
 
   it('should show ellipsis at beginning when near end', () => {
     const result = getPageNumbers(9, 10)
+
     expect(result).toEqual([1, '...', 7, 8, 9, 10])
   })
 
   it('should show ellipsis on both sides when in middle', () => {
     const result = getPageNumbers(5, 10)
+
     expect(result).toEqual([1, '...', 4, 5, 6, '...', 10])
   })
 
   it('should always include first and last page', () => {
     const result = getPageNumbers(5, 20)
+
     expect(result[0]).toBe(1)
     expect(result[result.length - 1]).toBe(20)
   })
@@ -104,6 +123,7 @@ describe('sanitizeRedirectUrl', () => {
 
   it('defaults to fallback for absolute URLs or invalid paths', () => {
     const defaultValue = ROUTES.organizations
+
     expect(
       sanitizeRedirectUrl('https://evil-phishing-site.com', defaultValue)
     ).toBe(defaultValue)
@@ -116,6 +136,7 @@ describe('sanitizeRedirectUrl', () => {
 
   it('defaults to fallback when URL is empty/null/undefined', () => {
     const defaultValue = ROUTES.organizations
+
     expect(sanitizeRedirectUrl(undefined, defaultValue)).toBe(defaultValue)
     expect(sanitizeRedirectUrl(null, defaultValue)).toBe(defaultValue)
     expect(sanitizeRedirectUrl('', defaultValue)).toBe(defaultValue)
@@ -129,16 +150,19 @@ describe('sanitizeRedirectUrl', () => {
 describe('formatDate', () => {
   it('returns formatted date string for valid ISO date string', () => {
     const result = formatDate('2026-08-02T12:00:00Z')
+
     expect(result).toBe('Aug 2, 2026')
   })
 
   it('supports custom date-fns format string', () => {
     const result = formatDate('2026-08-02T12:00:00Z', 'yyyy-MM-dd')
+
     expect(result).toBe('2026-08-02')
   })
 
   it('supports Date instance input', () => {
     const date = new Date('2026-08-02T12:00:00Z')
+
     expect(formatDate(date)).toBe('Aug 2, 2026')
   })
 

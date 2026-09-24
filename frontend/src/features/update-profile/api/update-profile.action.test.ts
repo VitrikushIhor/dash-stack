@@ -31,6 +31,7 @@ describe('updateProfileAction', () => {
       avatar: 'avatars/avatar.webp',
       urls: ['https://example.com'],
     }
+
     vi.mocked(userServerApi.updateMe).mockResolvedValue(mockUpdatedUser)
 
     const result = await updateProfileAction({
@@ -70,6 +71,7 @@ describe('updateProfileAction', () => {
       avatar: null,
       urls: [],
     }
+
     vi.mocked(userServerApi.updateMe).mockResolvedValue(mockUpdatedUser)
 
     const result = await updateProfileAction({

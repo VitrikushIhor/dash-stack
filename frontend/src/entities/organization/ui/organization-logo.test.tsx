@@ -13,6 +13,7 @@ describe('OrganizationLogo', () => {
     )
 
     const image = screen.getByRole('img', { name: 'Stark Industries' })
+
     expect(image).toBeInTheDocument()
     expect(image).toHaveAttribute('src')
     expect(image.getAttribute('src')).toContain('stark.png')

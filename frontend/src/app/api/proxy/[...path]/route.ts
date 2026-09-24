@@ -45,6 +45,7 @@ function isValidRefreshResponse(data: unknown): data is RefreshResponse {
     return false
   }
   const value = data as Record<string, unknown>
+
   return (
     isNonEmptyString(value.accessToken) && isNonEmptyString(value.refreshToken)
   )
@@ -56,6 +57,7 @@ async function fetchUpstream(
   requestSignal?: AbortSignal
 ): Promise<Response> {
   const timeoutSignal = AbortSignal.timeout(UPSTREAM_TIMEOUT_MS)
+
   return fetch(url, {
     ...init,
     signal: requestSignal
@@ -94,14 +96,17 @@ async function forward(req: NextRequest, path: string[]) {
   }
 
   let body: ArrayBuffer | undefined = undefined
+
   if (!['GET', 'HEAD'].includes(req.method)) {
     const buffer = await req.arrayBuffer()
+
     if (buffer.byteLength > 0) {
       body = buffer
     }
   }
 
   let res: Response
+
   try {
     res = await fetchUpstream(
       buildUpstreamUrl(path, search),
@@ -143,6 +148,7 @@ async function forward(req: NextRequest, path: string[]) {
 
         if (refreshRes.ok) {
           let refreshData: unknown
+
           try {
             refreshData = await refreshRes.json()
           } catch {
@@ -228,21 +234,30 @@ async function forward(req: NextRequest, path: string[]) {
 
   const resHeaders = new Headers()
   const resContentType = res.headers.get('content-type')
+
   if (resContentType) {
     resHeaders.set('Content-Type', resContentType)
   }
+
+  const resContentDisposition = res.headers.get('content-disposition')
+
+  if (resContentDisposition) {
+    resHeaders.set('Content-Disposition', resContentDisposition)
+  }
+
   resHeaders.set('Cache-Control', 'no-store')
 
   // Forward non-auth upstream Set-Cookie headers individually.
   // Auth cookies are exclusively owned by this proxy layer.
   for (const cookie of res.headers.getSetCookie()) {
     const cookieName = cookie.split('=', 1)[0]
+
     if (!AUTH_COOKIE_NAMES.has(cookieName)) {
       resHeaders.append('set-cookie', cookie)
     }
   }
 
-  const data = await res.arrayBuffer()
+  const data = res.status === 204 ? null : await res.arrayBuffer()
   const response = new NextResponse(data, {
     status: res.status,
     headers: resHeaders,
@@ -264,6 +279,7 @@ async function handle(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const { path = [] } = await params
+
   return forward(req, path)
 }
 

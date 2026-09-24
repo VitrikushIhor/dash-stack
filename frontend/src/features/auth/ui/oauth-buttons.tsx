@@ -21,6 +21,7 @@ export function OAuthButtons({
     const authUrl = `https://${domain}/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&connection=${connection}&scope=openid%20profile%20email`
+
     window.location.href = authUrl
   }
 

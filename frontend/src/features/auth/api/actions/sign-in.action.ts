@@ -10,7 +10,9 @@ export const signInAction = createAction(
   signInSchema,
   async (dto): Promise<AuthTokens> => {
     const tokens = await authServerApi.login(dto)
+
     await setAuthCookies(tokens)
+
     return tokens
   }
 )

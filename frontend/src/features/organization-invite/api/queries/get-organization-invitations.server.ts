@@ -17,6 +17,7 @@ export async function getOrganizationInvitations(
   try {
     const validSlug = OrganizationSlugSchema.parse(slug)
     const data = await invitationServerApi.listPending(validSlug)
+
     return { data, error: null }
   } catch (error) {
     return { data: null, error: getErrorMessage(error) }

@@ -81,6 +81,7 @@ describe('useAcceptInviteFlow', () => {
     })
 
     const { rerender } = renderHook(() => useAcceptInviteFlow('token-1'))
+
     rerender()
 
     await waitFor(() => {

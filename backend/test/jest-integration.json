@@ -1,0 +1,15 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../src",
+  "testRegex": ".*\\.integration\\.test\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@common/(.*)$": "<rootDir>/common/$1",
+    "^@task/(.*)$": "<rootDir>/task/$1",
+    "^@organization/(.*)$": "<rootDir>/organization/$1",
+    "^@auth/(.*)$": "<rootDir>/auth/$1"
+  },
+  "testEnvironment": "node"
+}

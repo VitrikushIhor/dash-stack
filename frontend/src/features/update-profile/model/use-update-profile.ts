@@ -6,9 +6,10 @@ import { toast } from 'sonner'
 import { handleServerError, useUploadImage } from '@/shared/api'
 import type { UpdateUserDto, User } from '@/entities/user'
 import { updateProfileAction } from '../api/update-profile.action'
-import type {
-  AvatarValue,
-  UpdateProfileFormValues,
+import {
+  type AvatarValue,
+  AvatarValueKind,
+  type UpdateProfileFormValues,
 } from './update-profile.schema'
 
 export const useUpdateProfile = () => {
@@ -19,13 +20,14 @@ export const useUpdateProfile = () => {
     avatar: AvatarValue
   ): Promise<string | null> => {
     switch (avatar.kind) {
-      case 'file': {
+      case AvatarValueKind.FILE: {
         const { key } = await avatarUpload.mutateAsync(avatar.value)
+
         return key
       }
-      case 'key':
+      case AvatarValueKind.KEY:
         return avatar.value
-      case 'none':
+      case AvatarValueKind.NONE:
         return null
     }
   }
@@ -43,6 +45,7 @@ export const useUpdateProfile = () => {
         avatarKey = await resolveAvatarKey(values.avatar)
       } catch (err) {
         handleServerError(err)
+
         return false
       }
 
@@ -53,6 +56,7 @@ export const useUpdateProfile = () => {
       }
 
       const userLastName = user.lastName ?? ''
+
       if (values.lastName !== userLastName) {
         dto.lastName = values.lastName
       }
@@ -63,17 +67,20 @@ export const useUpdateProfile = () => {
 
       const bioVal = values.bio?.trim() ? values.bio.trim() : null
       const userBio = user.bio ?? null
+
       if (bioVal !== userBio) {
         dto.bio = bioVal
       }
 
       const dobVal = values.dob ? format(values.dob, 'yyyy-MM-dd') : null
       const userDob = user.dob ?? null
+
       if (dobVal !== userDob) {
         dto.dob = dobVal
       }
 
       const userAvatar = user.avatar ?? null
+
       if (avatarKey !== userAvatar) {
         dto.avatar = avatarKey
       }
@@ -83,6 +90,7 @@ export const useUpdateProfile = () => {
       const urlsChanged =
         newUrls.length !== userUrls.length ||
         newUrls.some((u, i) => u !== userUrls[i])
+
       if (urlsChanged) {
         dto.urls = newUrls
       }
@@ -90,6 +98,7 @@ export const useUpdateProfile = () => {
       if (Object.keys(dto).length === 0) {
         toast.success('Profile updated successfully.')
         options?.onSuccess?.()
+
         return true
       }
 
@@ -101,11 +110,13 @@ export const useUpdateProfile = () => {
             ? result.validationMessages
             : result.error
         )
+
         return false
       }
 
       toast.success('Profile updated successfully.')
       options?.onSuccess?.()
+
       return true
     } finally {
       setIsSubmitting(false)

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
 import { verifyEmailAction } from '../../api/actions/verify-email.action'
@@ -11,6 +12,7 @@ const REDIRECT_DELAY_MS = 3000
 
 export function useVerifyEmail(token: string | null) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [status, setStatus] = useState<VerificationStatus>(
     !token ? VerificationStatus.MISSING_TOKEN : VerificationStatus.LOADING
   )
@@ -21,6 +23,7 @@ export function useVerifyEmail(token: string | null) {
 
   const { execute: verifyEmail, isPending } = useAction(verifyEmailAction, {
     onSuccess: () => {
+      queryClient.clear()
       setStatus(VerificationStatus.SUCCESS)
     },
     onError: (error) => {
@@ -41,6 +44,7 @@ export function useVerifyEmail(token: string | null) {
     const timeoutId = setTimeout(() => {
       router.replace(ROUTES.signIn)
     }, REDIRECT_DELAY_MS)
+
     return () => clearTimeout(timeoutId)
   }, [status, router])
 

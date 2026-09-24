@@ -32,6 +32,7 @@ export const useUpdateOrganization = () => {
         )
       } catch (err) {
         handleServerError(err)
+
         return false
       }
 
@@ -43,7 +44,9 @@ export const useUpdateOrganization = () => {
 
       const descValue =
         values.description === '' ? null : (values.description ?? null)
+
       const orgDesc = organization.description ?? null
+
       if (descValue !== orgDesc) {
         dto.description = descValue
       }
@@ -55,6 +58,7 @@ export const useUpdateOrganization = () => {
       if (Object.keys(dto).length === 0) {
         toast.success('Organization updated successfully!')
         options?.onSuccess?.()
+
         return true
       }
 
@@ -66,11 +70,13 @@ export const useUpdateOrganization = () => {
             ? result.validationMessages
             : result.error
         )
+
         return false
       }
 
       toast.success('Organization updated successfully!')
       options?.onSuccess?.()
+
       return true
     } finally {
       setIsSubmitting(false)

@@ -85,6 +85,7 @@ function CommandMenuNavItem({
   onSelect: (command: () => unknown) => void
 }) {
   const router = useRouter()
+
   return (
     <CommandItem
       value={item.title}
@@ -108,6 +109,7 @@ function CommandMenuSubItems({
   onSelect: (command: () => unknown) => void
 }) {
   const router = useRouter()
+
   return (
     <>
       {item.items.map((subItem, i) => (

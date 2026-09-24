@@ -13,6 +13,7 @@ export const getOrganizationLabels = cache(
   async (slug: string): Promise<GetOrganizationLabelsResponse> => {
     try {
       const data = await labelServerApi.findAll(slug)
+
       return { data, error: null }
     } catch (error) {
       return { data: null, error: getErrorMessage(error) }

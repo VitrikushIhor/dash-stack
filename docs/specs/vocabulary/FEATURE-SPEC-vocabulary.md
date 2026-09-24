@@ -1,7 +1,7 @@
 # Vocabulary & SRS – Feature Specification
 
-> Version: v1.4  
-> Last Updated: 2026-08-21  
+> Version: v1.5
+> Last Updated: 2026-09-04
 > Status: Approved  
 > Owner: Igor (Product / Engineering)  
 > Reviewers: Architecture Team  
@@ -21,7 +21,7 @@ Classroom and LMS modules (Courses, Tasks/Assignments) interact with this module
 **Key User Personas:**
 - **Learner / Creator (Any User):** Creates personal decks, attaches images, forks shared decks, practices via various study modes, stars difficult cards, and completes daily SRS reviews.
 - **Teacher (via LMS modules):** Uses personal or public decks to attach to courses (`CourseDeck`) or assign as homework assignments (`Task`).
-- **Platform Admin:** Curates official starter system decks and moderates public catalog content.
+- **Platform Admin:** Platform-wide moderation is deferred until the application has a platform-wide role model. Organization roles must not be used as a substitute.
 
 ### 1.2. Out of Scope
 
@@ -151,6 +151,10 @@ Classroom and LMS modules (Courses, Tasks/Assignments) interact with this module
 
 - **Rules:**
   - `DRAFT → PUBLISHED`: Requires a minimum of 2 flashcards.
+  - `PUBLISHED → DRAFT`: Is performed by `unpublish`.
+  - `PUBLISHED → ARCHIVED`: Is performed by `archive`.
+  - `ARCHIVED → DRAFT`: Is performed by `restore`.
+  - All other transitions, including repeated transitions, fail with `409 Conflict` and a stable domain error code.
   - `DELETE Deck`: Permanently cascades and deletes all child `Flashcard` records, associated `VocabProgress`, and `DeckLeaderboard` entries.
 
 ### 5.2. Leitner Box SRS Algorithm
@@ -176,8 +180,41 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 [Incorrect Answer] -> Box = 1 (reset to Box 1)
                       nextReviewAt = now() + 1 day
                       correctStreak = 0
-                      Status: FORGOTTEN / LEARNING
+                      Status: LEARNING when the previous box was 1 or 2;
+                              FORGOTTEN when the previous box was 3, 4, or 5
 ```
+
+### Progress submission consistency
+
+- A batch contains 1–100 results with unique `flashcardId` values. Repeated IDs
+  and cards outside the requested deck return `400` without persisting any result.
+- `isCorrect` must be a JSON boolean. Boolean query filters accept `true`/`false`
+  (also `1`/`0`); invalid values return `400`.
+- Access, membership checks, reading progress, calculating reviews and persisting
+  the full batch execute in one serializable transaction. Conflicting writes are
+  retried with fresh state up to four attempts; exhaustion returns `409`.
+- Star writes participate in the same transaction protocol and never replace a
+  concurrent review with stale counters. See [ADR-002](./decisions/ADR-002-vocabulary-progress-transactions.md).
+
+### 5.3. Deck Access and Personalized Study Filters
+
+- `DRAFT` and `ARCHIVED` decks are accessible only to their owner. They are not
+  readable, studyable, forkable, or eligible for progress or star writes by a
+  guest or another authenticated user.
+- A `PUBLISHED` `PUBLIC` deck is catalog-visible and can be read or studied by
+  guests. A `PUBLISHED` `UNLISTED` deck has the same direct-link access but is
+  excluded from the catalog.
+- A `PRIVATE` deck is accessible only to its owner.
+- Forking, storing progress, toggling a star, creating or completing a Match
+  session, and personalized filters require authentication. A guest may study
+  an eligible public or unlisted deck without persisting progress.
+- `onlyDue=true` means only cards with an existing progress record whose
+  `nextReviewAt <= now()`. Cards without progress are not due.
+- `onlyDue=true` and `onlyStarred=true` are personalized filters. A guest
+  request using either returns `400 Bad Request`; it must never silently return
+  unfiltered cards.
+- Toggling a star must not schedule a review or make an otherwise unseen card
+  due. A star-only persistence record, if needed, has no `nextReviewAt` value.
 
 ---
 
@@ -199,7 +236,7 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 
 **Rules:**
 - Decks initialize in `DRAFT` status.
-- Only the deck owner or platform Admin can edit deck metadata or delete the deck.
+- Only the deck owner can edit deck metadata or delete the deck in this release.
 
 **Acceptance Criteria:**
 - **AC-1 (Success):** Given I am logged in, when I submit a valid title and visibility, then a new Deck is created in `DRAFT` state with `ownerUserId` set to my ID.
@@ -266,13 +303,15 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 - As a student, I want to star difficult words during a session so that I can restart practice with only the starred cards.
 
 **Processing:**
-- Toggling star updates `isStarred` boolean in the user's `VocabProgress` record.
+- Setting star state updates `isStarred` boolean in the user's `VocabProgress` record.
+- The client sends the desired boolean state, so repeated requests cannot invert
+  a user's intended selection.
 - Every study mode supports an optional filter: `onlyStarred=true`.
 
 **Acceptance Criteria:**
-- **AC-1 (Toggle Star):** Given I am studying a deck, when I click the star button on Card 1, then a `VocabProgress` record is upserted with `isStarred = true`.
+- **AC-1 (Set Star):** Given I am studying a deck, when I set the star button on Card 1, then a `VocabProgress` record is upserted with `isStarred = true`.
 - **AC-2 (Filter Starred):** Given a deck with 10 cards where I starred 3, when I request `/study?onlyStarred=true`, then exactly those 3 cards are returned for the session.
-- **AC-3 (Empty Starred Guard):** Given a deck with 0 starred cards, when requesting `/study?onlyStarred=true`, then the client receives `400 Bad Request` or an empty study state prompting the user to star words first.
+- **AC-3 (Empty Starred State):** Given a deck with 0 starred cards, when requesting `/study?onlyStarred=true`, then the client receives an empty study state prompting the user to star words first.
 
 ---
 
@@ -312,7 +351,7 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 5. **Study Mode Rendering:** Flashcards display the image on the card face alongside the definition or term.
 
 **Acceptance Criteria:**
-- **AC-1 (Search Suggestions):** Given I am editing a card with term "Butterfly", when I click the "Search Image" button, then `GET /api/v1/vocab/images/search?q=Butterfly` returns 12 image results with thumbnail and preview URLs.
+- **AC-1 (Search Suggestions):** Given I am editing a card with term "Butterfly", when I click the "Search Image" button, then `GET /api/v1/vocab/unsplash/search?q=Butterfly` returns 12 image results with thumbnail and preview URLs.
 - **AC-2 (Attach Image):** Given search results, when I click image thumbnail #2, then `imageUrl` is populated and saved on the flashcard.
 - **AC-3 (Study Mode Display):** Given a card with an attached `imageUrl`, when viewed in Flashcards or Learn mode, then the image renders cleanly with aspect-ratio preservation and lazy loading.
 
@@ -393,19 +432,39 @@ The SRS uses a 5-box Leitner scheduling system with fixed interval multipliers:
 
 ---
 
+The authenticated Vocabulary sidebar displays the global due count. My Decks
+includes a due-review queue for every accessible deck with due cards, including
+shared decks. Each entry opens Flashcards with `onlyDue=true`.
+
+Flashcards, Learn and Match expose `Due only` and `Starred only` URL filters, an
+`All cards` reset, and mode links preserving the selection. An empty selection
+shows an empty state; Match requires six selected cards before initializing the
+game. A completed Flashcards/Learn summary remains visible when the saved review
+removes the last card from the due selection.
+
 ### FR-VOCAB-010 – Import & Export Flashcards
 
 **Priority:** Should  
 **Role(s):** Deck Owner  
 
 **Features:**
-- **Import:** Fast bulk paste dialog supporting Tab/Comma-separated text (Quizlet format).
-- **Export:** Instant download of deck content as CSV, TSV, or JSON.
+- **Import:** Preview-first import from pasted text or `.csv`, `.tsv`, and
+  `.txt` files. It supports Quizlet, Anki text export, Quenti, spreadsheets,
+  and generic delimited text through separator detection and column mapping.
+- **Export:** Instant owner download of deck content as CSV or JSON.
 
 **Acceptance Criteria:**
-- **AC-1 (TSV Import):** Given 10 lines of `term\tdefinition` pasted in the import box, when submitted, then 10 new `Flashcard` records are created in the deck with matching positions.
-- **AC-2 (Malformed Input Handling):** Given empty lines or lines without a separator, then the parser ignores empty rows and highlights rows lacking a definition with validation messages.
-- **AC-3 (Export):** Given a deck with 20 cards, when clicking "Export CSV", then a properly escaped `.csv` file download begins immediately.
+- **AC-1 (Import Preview):** Given an owner supplies Quizlet TSV, Anki text
+  export, Quenti output, or generic CSV/TSV, when the input is parsed, then the
+  preview maps term, definition, and optional example columns before import.
+- **AC-2 (Malformed Input Handling):** Given empty lines or invalid rows, then
+  the parser ignores empty rows and highlights invalid rows with actionable
+  validation messages; the owner can correct or exclude them.
+- **AC-3 (Atomic Import):** Given valid selected preview rows, when the owner
+  confirms import, then all rows are created in deterministic order or none are
+  persisted.
+- **AC-4 (Export):** Given a deck with 20 cards, when the owner clicks Export
+  CSV or Export JSON, then a properly escaped download begins immediately.
 
 ---
 
@@ -422,22 +481,41 @@ GET    /api/v1/vocab/decks/:id                  # Get deck details & cards
 PATCH  /api/v1/vocab/decks/:id                  # Update deck metadata (Owner/Admin)
 DELETE /api/v1/vocab/decks/:id                  # Cascade delete deck (Owner/Admin)
 POST   /api/v1/vocab/decks/:id/fork             # Fork deck to personal library
+GET    /api/v1/vocab/decks/:id/export            # Owner export (format: csv or json)
+POST   /api/v1/vocab/decks/:id/publish          # Publish a draft deck
+POST   /api/v1/vocab/decks/:id/unpublish        # Return a published deck to draft
+POST   /api/v1/vocab/decks/:id/archive          # Archive a published deck
+POST   /api/v1/vocab/decks/:id/restore          # Restore an archived deck to draft
 
 # Flashcards & Images
 POST   /api/v1/vocab/decks/:id/cards            # Add card(s) (bulk supported)
 PATCH  /api/v1/vocab/decks/:id/cards/:cardId    # Update card (Owner only)
 DELETE /api/v1/vocab/decks/:id/cards/:cardId    # Delete card (Owner only)
 PUT    /api/v1/vocab/decks/:id/cards/order      # Reorder cards (array of card IDs)
-GET    /api/v1/vocab/images/search?q=:term      # Search Unsplash images for term
+GET    /api/v1/vocab/unsplash/search?q=:term    # Search Unsplash images for term
 
 # Study, SRS & Progress
 GET    /api/v1/vocab/reviews/due                # Get all due cards across decks (or counts per deck)
 GET    /api/v1/vocab/decks/:id/study            # Get cards for study session (params: mode, onlyStarred, onlyDue)
 POST   /api/v1/vocab/decks/:id/progress         # Submit study results (updates box, streak, nextReviewAt)
-POST   /api/v1/vocab/cards/:cardId/star         # Toggle star on a card
+PUT    /api/v1/vocab/cards/:cardId/star         # Set star state ({ isStarred: boolean })
+POST   /api/v1/vocab/decks/:id/match/sessions   # Create an authenticated Match session
+POST   /api/v1/vocab/decks/:id/match/sessions/:sessionId/complete # Complete a Match session
 GET    /api/v1/vocab/decks/:id/leaderboard      # Get top Match game scores
-POST   /api/v1/vocab/decks/:id/leaderboard      # Submit Match score (duration in ms)
 ```
+
+#### Match Session Contract
+
+- Creating a session requires authenticated study access to a `PUBLISHED`
+  public or unlisted deck (or owner access), and at least six cards. Otherwise
+  it returns `400 Bad Request`.
+- The server persists the deck, selected card IDs, user ID, and start time. A
+  session expires after 30 minutes.
+- Completion accepts the session ID only. The server derives `durationMs` from
+  the stored start time, accepts one completion per session, and rejects
+  expired, duplicate, cross-user, and cross-deck sessions.
+- The leaderboard retains each user's best completion per deck, ordered by
+  ascending `durationMs`, then ascending `createdAt` for deterministic ties.
 
 ---
 
@@ -446,9 +524,11 @@ POST   /api/v1/vocab/decks/:id/leaderboard      # Submit Match score (duration i
 ### 8.1. Error States
 
 - **400 Bad Request:** Insufficient cards for requested study mode (e.g. attempting Match mode with 3 cards).
+- **400 Bad Request:** A guest supplies `onlyDue` or `onlyStarred`, which are personalized filters.
+- **401 Unauthorized:** A guest attempts a personalized write action.
 - **403 Forbidden:** Attempting to edit or delete a deck owned by another user.
 - **404 Not Found:** Deck does not exist or is marked `PRIVATE` while requested by a non-owner.
-- **409 Conflict:** Duplicate slug or import format parsing error.
+- **409 Conflict:** Duplicate slug or exhausted transactional write retry.
 - **502 Bad Gateway:** External Image Search provider rate limit / downtime (client gracefully falls back to text-only mode).
 
 ### 8.2. UX Flow Notes
@@ -462,17 +542,15 @@ POST   /api/v1/vocab/decks/:id/leaderboard      # Submit Match score (duration i
 
 ## 9. Permissions & Visibility Matrix
 
-| Capability | PRIVATE Deck | UNLISTED Deck | PUBLIC Deck |
-|---|---|---|---|
-| Visible in Global Search | Owner only | ❌ No | ✅ Yes |
-| Access via Direct Link | Owner only | ✅ Anyone with link | ✅ Yes |
-| Attach to Course / Task | Owner only | ✅ Owner / Link holder | ✅ Yes |
-| Study & Save Progress | Owner only | ✅ Any logged-in user | ✅ Any logged-in user |
-| Toggle Starred Cards | Owner only | ✅ Any studying user | ✅ Any studying user |
-| Search & Attach Images | Owner only | Owner only | Owner only |
-| Edit Cards / Metadata | Owner only | Owner only | Owner only |
-| Fork Deck | Owner only | ✅ Anyone with access | ✅ Anyone |
-| Permanent Delete | Owner / Admin | Owner / Admin | Owner / Admin |
+| Capability | Owner | Guest / authenticated non-owner |
+|---|---|---|
+| `DRAFT` or `ARCHIVED` access | Full owner access | No access |
+| `PRIVATE` access | Full owner access | No access |
+| `PUBLISHED` `UNLISTED` direct-link read/study | Yes | Yes; guest study is read-only |
+| `PUBLISHED` `PUBLIC` catalog read/study | Yes | Yes; guest study is read-only |
+| Fork, progress, star, Match session | Yes | Authenticated user only on accessible published decks |
+| Personalized filters (`onlyDue`, `onlyStarred`) | Yes | Authenticated user only; guest receives `400` |
+| Edit, lifecycle change, image search, delete | Yes | No access |
 
 ---
 

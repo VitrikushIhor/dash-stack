@@ -15,6 +15,7 @@ if (typeof window !== 'undefined') {
 }
 
 const mockRefresh = vi.fn()
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     refresh: mockRefresh,
@@ -69,6 +70,7 @@ describe('LabelForm', () => {
             isPending: false,
           }
         }
+
         return {
           execute: vi.fn() as (input: TInput) => Promise<TOutput | undefined>,
           isPending: false,
@@ -81,9 +83,11 @@ describe('LabelForm', () => {
     render(<LabelForm slug='org-1' />)
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
+
     expect(nameInput).toHaveValue('')
 
     const submitButton = screen.getByRole('button', { name: /save/i })
+
     expect(submitButton).toBeDisabled()
   })
 
@@ -94,25 +98,31 @@ describe('LabelForm', () => {
       color: 'red',
       organizationId: 'org-1',
     }
+
     render(
       <LabelForm slug='org-1' initialData={initialData} submitLabel='Update' />
     )
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
+
     expect(nameInput).toHaveValue('Bug')
 
     const submitButton = screen.getByRole('button', { name: /update/i })
+
     expect(submitButton).toBeDisabled()
   })
 
   it('enables the submit button when the user types in the name field', async () => {
     const user = userEvent.setup()
+
     render(<LabelForm slug='org-1' />)
 
     const submitButton = screen.getByRole('button', { name: /save/i })
+
     expect(submitButton).toBeDisabled()
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
+
     await user.type(nameInput, 'Feature')
 
     expect(submitButton).toBeEnabled()
@@ -123,6 +133,7 @@ describe('LabelForm', () => {
     const onSuccessMock = vi.fn()
 
     let capturedOnSuccess: (() => void) | undefined
+
     vi.mocked(useAction).mockImplementation(
       <TInput, TOutput>(
         action: (
@@ -132,6 +143,7 @@ describe('LabelForm', () => {
       ) => {
         if ((action as object) === createLabelAction) {
           capturedOnSuccess = options?.onSuccess as (() => void) | undefined
+
           return {
             execute: mockCreateExecute as (
               input: TInput
@@ -147,6 +159,7 @@ describe('LabelForm', () => {
             isPending: false,
           }
         }
+
         return {
           execute: vi.fn() as (input: TInput) => Promise<TOutput | undefined>,
           isPending: false,
@@ -161,15 +174,19 @@ describe('LabelForm', () => {
     render(<LabelForm slug='org-1' onSuccess={onSuccessMock} />)
 
     const nameInput = screen.getByRole('textbox', { name: /name/i })
+
     await user.type(nameInput, 'New Label')
 
     const colorTrigger = screen.getByRole('combobox', { name: /color/i })
+
     await user.click(colorTrigger)
 
     const blueOption = screen.getByRole('option', { name: /blue/i })
+
     await user.click(blueOption)
 
     const submitButton = screen.getByRole('button', { name: /save/i })
+
     await user.click(submitButton)
 
     await waitFor(() => {
@@ -203,6 +220,7 @@ describe('LabelForm', () => {
     await user.type(nameInput, 'Updated Name')
 
     const submitButton = screen.getByRole('button', { name: /save/i })
+
     await user.click(submitButton)
 
     await waitFor(() => {
@@ -223,6 +241,7 @@ describe('LabelForm', () => {
     render(<LabelForm slug='org-1' />)
 
     const submitButton = screen.getByRole('button', { name: /saving/i })
+
     expect(submitButton).toBeDisabled()
   })
 })

@@ -4,6 +4,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type User } from '@/entities/user'
 import {
+  AvatarValueKind,
   type UpdateProfileFormValues,
   UpdateProfileSchema,
 } from './update-profile.schema'
@@ -16,7 +17,9 @@ interface UseUpdateProfileFormProps {
 function parseDob(dobString?: string | null): Date | undefined {
   if (!dobString) return undefined
   const [year, month, day] = dobString.split('-').map(Number)
+
   if (!year || !month || !day) return undefined
+
   return new Date(year, month - 1, day)
 }
 
@@ -34,8 +37,8 @@ export const useUpdateProfileForm = (
     dob: parseDob(user?.dob),
     urls: user?.urls?.map((url) => ({ value: url })) ?? [],
     avatar: user?.avatar
-      ? { kind: 'key', value: user.avatar }
-      : { kind: 'none' },
+      ? { kind: AvatarValueKind.KEY, value: user.avatar }
+      : { kind: AvatarValueKind.NONE },
   }
 
   const form = useForm<UpdateProfileFormValues>({

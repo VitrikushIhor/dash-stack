@@ -14,7 +14,7 @@ import {
   type OrganizationSummary,
 } from '@/entities/organization'
 
-export interface OrganizationCardProps {
+interface OrganizationCardProps {
   organization: OrganizationSummary
   role?: string
   memberCount?: number

@@ -12,16 +12,19 @@ export interface HttpClientConfig {
 function buildQueryString(params?: RequestOptions['params']): string {
   if (!params) return ''
   const searchParams = new URLSearchParams()
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined) searchParams.append(key, String(value))
   })
   const str = searchParams.toString()
+
   return str ? `?${str}` : ''
 }
 
 async function parseBody(response: Response): Promise<unknown> {
   if (response.status === 204) return null
   const contentType = response.headers.get('content-type') ?? ''
+
   return contentType.includes('application/json')
     ? response.json()
     : response.text()
@@ -43,8 +46,10 @@ export function createHttpClient(config: HttpClientConfig) {
       params,
       headers: customHeaders,
       skipAuth,
+      suppressUnauthorizedHandler,
       cache,
       next,
+      signal,
     } = options
 
     const isFormData = body instanceof FormData
@@ -61,6 +66,7 @@ export function createHttpClient(config: HttpClientConfig) {
       : `/${endpoint}`
 
     let requestBody: BodyInit | undefined = undefined
+
     if (body) {
       requestBody = isFormData ? (body as FormData) : JSON.stringify(body)
     }
@@ -73,10 +79,11 @@ export function createHttpClient(config: HttpClientConfig) {
         body: requestBody,
         cache,
         next,
+        signal,
       }
     )
 
-    if (response.status === 401) {
+    if (response.status === 401 && !suppressUnauthorizedHandler) {
       config.onUnauthorized?.()
     }
 
@@ -84,6 +91,7 @@ export function createHttpClient(config: HttpClientConfig) {
 
     if (!response.ok) {
       const raw = data as ApiErrorResponse | null
+
       throw new ApiError(response.status, extractErrorMessage(raw), raw)
     }
 

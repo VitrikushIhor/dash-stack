@@ -4,7 +4,7 @@ import { getUserDisplayName, getUserInitials } from '@/shared/lib/utils'
 import { useCurrentUser } from '@/entities/user'
 import { useLogout } from '@/features/auth'
 
-export interface NavbarAuthViewModel {
+interface NavbarAuthViewModel {
   isAuthenticated: boolean
   isLoading: boolean
   displayName: string
@@ -17,7 +17,7 @@ export interface NavbarAuthViewModel {
 
 export function useLandingNavbarAuth(): NavbarAuthViewModel {
   const { data: user, isLoading } = useCurrentUser()
-  const logoutMutation = useLogout()
+  const { handleLogout, isPending } = useLogout()
 
   return {
     isAuthenticated: !!user,
@@ -31,7 +31,7 @@ export function useLandingNavbarAuth(): NavbarAuthViewModel {
     initials: getUserInitials(user?.firstName, user?.lastName, user?.email),
     email: user?.email,
     avatar: user?.avatar,
-    isPendingLogout: logoutMutation.isPending,
-    logout: () => logoutMutation.mutate(),
+    isPendingLogout: isPending,
+    logout: handleLogout,
   }
 }

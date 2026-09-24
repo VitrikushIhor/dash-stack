@@ -23,6 +23,7 @@ export function AgendaTaskCard({
   onTaskClick,
 }: IProps) {
   const anchor = getTaskCalendarAnchor(task)
+
   if (!anchor) return null
   const startDate = parseISO(anchor)
   const endDate = startDate

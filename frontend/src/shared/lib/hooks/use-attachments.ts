@@ -44,6 +44,7 @@ export function useAttachments() {
   const onFileReject = useCallback((file: File, message: string) => {
     const fileName =
       file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name
+
     toast.error(message, {
       description: `"${fileName}" has been rejected`,
     })

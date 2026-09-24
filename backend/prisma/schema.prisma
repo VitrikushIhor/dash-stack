@@ -7,21 +7,28 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  email         String         @unique
-  password      String?
-  avatar        String?
-  emailVerified DateTime?
-  firstName     String?
-  lastName      String?
-  dob           DateTime?
-  bio           String?
-  urls          String[]       @default([])
-  accounts      Account[]
-  memberships   Membership[]
-  refreshTokens RefreshToken[]
+  id                     String               @id @default(cuid())
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  email                  String               @unique
+  password               String?
+  avatar                 String?
+  emailVerified          DateTime?
+  firstName              String?
+  lastName               String?
+  dob                    DateTime?
+  bio                    String?
+  urls                   String[]             @default([])
+  accounts               Account[]
+  memberships            Membership[]
+  refreshTokens          RefreshToken[]
+  decks                  Deck[]               @relation("UserDecks")
+  vocabProgress          VocabProgress[]      @relation("UserVocabProgress")
+  deckLeaderboardEntries DeckLeaderboard[]    @relation("UserDeckLeaderboard")
+  matchSessions          MatchSession[]
+  vocabStudyAttempts     VocabStudyAttempt[]
+  vocabImportReceipts    VocabImportReceipt[]
+  deckEditorReceipts     DeckEditorReceipt[]
 }
 
 model Account {
@@ -67,14 +74,14 @@ model RefreshToken {
 }
 
 model Organization {
-  id             String          @id @default(cuid())
+  id             String              @id @default(cuid())
   name           String
-  slug           String          @unique
+  slug           String              @unique
   description    String?
   logo           String?
   stripeId       String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
   calendarEvents CalendarEvent[]
   invitations    Invitation[]
   memberships    Membership[]
@@ -130,14 +137,14 @@ model Project {
 }
 
 model Task {
-  id             String          @id @default(cuid())
+  id             String             @id @default(cuid())
   title          String
   description    String?
-  status         TaskStatus      @default(PLANNED)
-  attachments    String[]        @default([])
+  status         TaskStatus         @default(PLANNED)
+  attachments    String[]           @default([])
   organizationId String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
   completedAt    DateTime?
   dueDate        DateTime?
   startDate      DateTime?
@@ -145,8 +152,8 @@ model Task {
   checklists     Checklist[]
   labelId        String?
   label          OrganizationLabel? @relation("TaskLabel", fields: [labelId], references: [id], onDelete: SetNull)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignees      Membership[]    @relation("TaskAssignees")
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignees      Membership[]       @relation("TaskAssignees")
 
   @@unique([id, organizationId])
   @@index([organizationId])
@@ -207,6 +214,200 @@ model CalendarEvent {
   @@index([start])
 }
 
+model Deck {
+  id               String         @id @default(cuid())
+  ownerUserId      String
+  title            String
+  slug             String?        @unique
+  description      String?
+  language         String         @default("en")
+  level            CEFRLevel?
+  tags             String[]       @default([])
+  visibility       DeckVisibility @default(PRIVATE)
+  status           DeckStatus     @default(DRAFT)
+  type             DeckType       @default(USER_GENERATED)
+  forkedFromDeckId String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  owner          User                 @relation("UserDecks", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  flashcards     Flashcard[]
+  vocabProgress  VocabProgress[]
+  leaderboard    DeckLeaderboard[]
+  matchSessions  MatchSession[]
+  studyAttempts  VocabStudyAttempt[]
+  importReceipts VocabImportReceipt[]
+  editorReceipts DeckEditorReceipt[]
+  forkedFrom     Deck?                @relation("DeckForks", fields: [forkedFromDeckId], references: [id], onDelete: SetNull)
+  forks          Deck[]               @relation("DeckForks")
+
+  @@index([ownerUserId])
+  @@index([visibility, status])
+  @@map("decks")
+}
+
+model Flashcard {
+  id         String   @id @default(cuid())
+  deckId     String
+  term       String
+  definition String
+  example    String?
+  imageUrl   String?
+  position   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  deck          Deck                @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  progress      VocabProgress[]
+  matchSessions MatchSessionCard[]
+  studyAttempts VocabStudyAttempt[]
+
+  @@index([deckId, position])
+  @@map("flashcards")
+}
+
+model VocabProgress {
+  id             String              @id @default(cuid())
+  userId         String
+  deckId         String
+  flashcardId    String
+  status         VocabProgressStatus @default(NEW)
+  box            Int                 @default(1)
+  isStarred      Boolean             @default(false)
+  correctStreak  Int                 @default(0)
+  correctCount   Int                 @default(0)
+  incorrectCount Int                 @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  user      User      @relation("UserVocabProgress", fields: [userId], references: [id], onDelete: Cascade)
+  deck      Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deckId, flashcardId])
+  @@index([userId, deckId, nextReviewAt])
+  @@index([userId, nextReviewAt])
+  @@index([deckId])
+  @@map("vocab_progress")
+}
+
+model VocabStudyAttempt {
+  userId      String
+  attemptId   String   @db.VarChar(100)
+  deckId      String
+  flashcardId String
+  isCorrect   Boolean
+  processedAt DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck      Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@id([userId, attemptId])
+  @@index([deckId])
+  @@index([flashcardId])
+  @@map("vocab_study_attempts")
+}
+
+model VocabImportReceipt {
+  userId      String
+  importId    String   @db.VarChar(100)
+  deckId      String
+  payloadHash String   @db.VarChar(64)
+  cardIds     String[]
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@id([userId, importId])
+  @@index([deckId])
+  @@map("vocab_import_receipts")
+}
+
+model DeckEditorReceipt {
+  userId          String
+  operationId     String   @db.Uuid
+  deckId          String
+  payloadHash     String   @db.VarChar(64)
+  resultUpdatedAt DateTime
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@id([userId, operationId])
+  @@index([deckId])
+  @@map("deck_editor_receipts")
+}
+
+model MatchSession {
+  id           String    @id @default(cuid())
+  deckId       String
+  userId       String
+  startedAt    DateTime
+  expiresAt    DateTime
+  completedAt  DateTime?
+  penaltyCount Int       @default(0)
+
+  deck     Deck                  @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards    MatchSessionCard[]
+  attempts MatchSessionAttempt[]
+
+  @@index([deckId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("match_sessions")
+}
+
+model MatchSessionAttempt {
+  sessionId   String
+  attemptId   String   @db.Uuid
+  payloadHash String   @db.VarChar(64)
+  isCorrect   Boolean
+  createdAt   DateTime @default(now())
+
+  session MatchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, attemptId])
+  @@map("match_session_attempts")
+}
+
+model MatchSessionCard {
+  sessionId   String
+  flashcardId String
+  position    Int
+  matchedAt   DateTime?
+
+  session   MatchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  flashcard Flashcard    @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, flashcardId])
+  @@unique([sessionId, position])
+  @@index([flashcardId])
+  @@map("match_session_cards")
+}
+
+model DeckLeaderboard {
+  id         String   @id @default(cuid())
+  deckId     String
+  userId     String
+  durationMs Int
+  cardCount  Int
+  createdAt  DateTime @default(now())
+
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  user User @relation("UserDeckLeaderboard", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([deckId, userId])
+  @@index([userId])
+  @@index([deckId, durationMs, createdAt, id])
+  @@map("deck_leaderboards")
+}
+
 enum TokenType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
@@ -240,4 +441,38 @@ enum EventType {
   MEETING
   DEADLINE
   REMINDER
+}
+
+enum DeckVisibility {
+  PRIVATE
+  UNLISTED
+  PUBLIC
+}
+
+enum DeckStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum DeckType {
+  USER_GENERATED
+  SYSTEM
+}
+
+enum CEFRLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum VocabProgressStatus {
+  NEW
+  LEARNING
+  KNOWN
+  MASTERED
+  FORGOTTEN
 }

@@ -29,6 +29,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     handleServerError: vi.fn(),
@@ -86,11 +87,13 @@ describe('InviteMemberDialog', () => {
 
   it('shows validation errors if submitted empty', async () => {
     const user = userEvent.setup()
+
     render(<InviteMemberDialog />)
 
     const submitButton = screen.getByRole('button', {
       name: /send invitation/i,
     })
+
     await user.click(submitButton)
 
     // Zod validation should kick in for the email field
@@ -120,12 +123,14 @@ describe('InviteMemberDialog', () => {
 
     // Fill out the form
     const emailInput = screen.getByPlaceholderText('user@example.com')
+
     await user.type(emailInput, 'test@example.com')
 
     // Submit
     const submitButton = screen.getByRole('button', {
       name: /send invitation/i,
     })
+
     await user.click(submitButton)
 
     // Verify action called with correct data

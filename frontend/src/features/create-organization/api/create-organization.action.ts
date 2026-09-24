@@ -13,7 +13,9 @@ export const createOrganizationAction = createAction(
   CreateOrganizationDtoSchema,
   async (dto): Promise<Organization> => {
     const res = await organizationServerApi.create(dto)
+
     revalidateTag(SERVER_CACHE_TAGS.organizations)
+
     return res
   }
 )

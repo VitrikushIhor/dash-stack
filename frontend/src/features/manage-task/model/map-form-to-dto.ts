@@ -10,6 +10,7 @@ function serializeDate(
 ): string | null | undefined {
   if (value === undefined) return undefined
   if (value === null) return mode === ManageTaskMode.EDIT ? null : undefined
+
   return value.toISOString()
 }
 

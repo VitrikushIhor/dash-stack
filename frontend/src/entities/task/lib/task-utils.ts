@@ -76,14 +76,17 @@ export async function loadFilesFromUrls(urls: string[]) {
       .filter((url) => url.startsWith('http'))
       .map((url) => urlToFile(url, url.split('/').pop() || 'file'))
   )
+
   return existingFiles.filter((f): f is File => f !== null)
 }
 
 async function urlToFile(url: string, filename: string) {
   try {
     const res = await fetch(url)
+
     if (!res.ok) throw new Error(`Failed to fetch ${url}`)
     const blob = await res.blob()
+
     return new File([blob], filename, { type: blob.type })
   } catch (_error) {
     return null

@@ -9,6 +9,7 @@ export class EventEmitter<T extends EventMap> {
       this.events[event] = new Set()
     }
     this.events[event]!.add(listener)
+
     return () => this.off(event, listener)
   }
 
@@ -28,12 +29,14 @@ export class EventEmitter<T extends EventMap> {
       unsubscribe()
       listener(payload)
     })
+
     return unsubscribe
   }
 
   clear<K extends keyof T>(event?: K): void {
     if (event) {
       delete this.events[event]
+
       return
     }
     this.events = {}

@@ -4,6 +4,7 @@ import { VerifyEmail } from './verify-email'
 
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     VerifyEmailCard: ({ token }: { token?: string }) => (

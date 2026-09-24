@@ -18,12 +18,14 @@ export function useSendInvite() {
   ) => {
     startTransition(async () => {
       const result = await sendInviteAction(slug, dto)
+
       if (!result.success) {
         handleServerError(
           result.validationMessages?.length
             ? result.validationMessages
             : result.error
         )
+
         return
       }
       toast.success('Invitation sent successfully')

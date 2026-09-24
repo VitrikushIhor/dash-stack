@@ -18,6 +18,7 @@ export async function acceptInviteAction(
     revalidateTag(SERVER_CACHE_TAGS.organizations)
 
     const slug = result?.organization?.slug
+
     if (slug) {
       revalidateTag(SERVER_CACHE_TAGS.orgDetail(slug))
       revalidateTag(SERVER_CACHE_TAGS.orgMembers(slug))
@@ -32,6 +33,7 @@ export async function acceptInviteAction(
         validationMessages: error.validationMessages,
       }
     }
+
     return { success: false, error: getErrorMessage(error) }
   }
 }

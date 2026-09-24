@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
@@ -15,12 +16,14 @@ interface UseOAuthCallbackProps {
 
 export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const hasHandledRef = useRef(false)
 
   const { execute: exchangeToken } = useAction(oauthExchangeAction, {
     successMessage: 'Successfully signed in!',
     onSuccess: () => {
-      router.replace(ROUTES.organizations)
+      queryClient.clear()
+      router.replace(ROUTES.vocabDecks)
     },
   })
 
@@ -31,6 +34,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
     if (error) {
       toast.error(`Authentication failed: ${error}`)
       router.replace(ROUTES.signIn)
+
       return
     }
 
@@ -38,6 +42,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
 
     if (!token) {
       router.replace(ROUTES.signIn)
+
       return
     }
 

@@ -80,6 +80,7 @@ export function DndProviderWrapper({
     }
 
     const newDueDateISO = newStartDate.toISOString()
+
     if (droppedEvent.dueDate === newDueDateISO) return
 
     startTransition(async () => {

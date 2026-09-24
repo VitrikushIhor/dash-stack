@@ -1,0 +1,556 @@
+import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
+import { config } from 'dotenv';
+import { PrismaClient, DeckStatus } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import { PrismaService } from 'nestjs-prisma';
+import { ArchiveDeckUseCase } from '../../application/use-cases/archive-deck.use-case';
+import { DeleteDeckUseCase } from '../../application/use-cases/delete-deck.use-case';
+import { DeleteFlashcardUseCase } from '../../application/use-cases/delete-flashcard.use-case';
+import { ForkDeckUseCase } from '../../application/use-cases/fork-deck.use-case';
+import { PublishDeckUseCase } from '../../application/use-cases/publish-deck.use-case';
+import { ReorderFlashcardsUseCase } from '../../application/use-cases/reorder-flashcards.use-case';
+import { RestoreDeckUseCase } from '../../application/use-cases/restore-deck.use-case';
+import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
+import { UnpublishDeckUseCase } from '../../application/use-cases/unpublish-deck.use-case';
+import { UpdateDeckUseCase } from '../../application/use-cases/update-deck.use-case';
+import {
+  DeckAccessForbiddenException,
+  DeckEditorStaleRevisionException,
+  DeckLifecycleInvalidTransitionException,
+  DeckPublishInvalidException,
+  InvalidFlashcardDataException,
+} from '../../domain/exceptions/vocab-domain.exceptions';
+import { PrismaDeckRepository } from '../../infrastructure/persistence/prisma-deck.repository';
+import { PrismaDeckEditorRepository } from '../../infrastructure/persistence/prisma-deck-editor.repository';
+import { PrismaFlashcardRepository } from '../../infrastructure/persistence/prisma-flashcard.repository';
+
+config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
+
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is required to run Vocabulary integration tests');
+}
+
+describe('Vocabulary lifecycle integration', () => {
+  let pool: Pool;
+  let prisma: PrismaClient;
+  let deckRepository: PrismaDeckRepository;
+  let flashcardRepository: PrismaFlashcardRepository;
+  let deckEditorRepository: PrismaDeckEditorRepository;
+  let ownerUserId: string;
+
+  const createDeck = async (cardCount: number) => {
+    return prisma.deck.create({
+      data: {
+        ownerUserId,
+        title: `Lifecycle integration ${randomUUID()}`,
+        language: 'en',
+        flashcards: {
+          create: Array.from({ length: cardCount }, (_, index) => ({
+            term: `Term ${index}`,
+            definition: `Definition ${index}`,
+            position: index,
+          })),
+        },
+      },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+  };
+
+  const createUser = async () => {
+    const id = `vocab-lifecycle-${randomUUID()}`;
+    await prisma.user.create({ data: { id, email: `${id}@example.test` } });
+
+    return id;
+  };
+
+  const createForkableDeck = async () => {
+    const deck = await createDeck(2);
+
+    return prisma.deck.update({
+      where: { id: deck.id },
+      data: { visibility: 'PUBLIC', status: 'PUBLISHED' },
+    });
+  };
+
+  beforeAll(() => {
+    pool = new Pool({ connectionString: databaseUrl });
+    prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
+    const prismaService = prisma as unknown as PrismaService;
+    deckRepository = new PrismaDeckRepository(prismaService);
+    flashcardRepository = new PrismaFlashcardRepository(prismaService);
+    deckEditorRepository = new PrismaDeckEditorRepository(prismaService);
+  });
+
+  beforeEach(async () => {
+    ownerUserId = `vocab-lifecycle-${randomUUID()}`;
+    await prisma.user.create({
+      data: {
+        id: ownerUserId,
+        email: `${ownerUserId}@example.test`,
+      },
+    });
+  });
+
+  afterEach(async () => {
+    await prisma.user.delete({ where: { id: ownerUserId } });
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  });
+
+  it('persists every approved lifecycle command', async () => {
+    const deck = await createDeck(2);
+    const publishDeck = new PublishDeckUseCase(deckRepository);
+    const unpublishDeck = new UnpublishDeckUseCase(deckRepository);
+    const archiveDeck = new ArchiveDeckUseCase(deckRepository);
+    const restoreDeck = new RestoreDeckUseCase(deckRepository);
+
+    await publishDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).status).toBe(
+      DeckStatus.PUBLISHED,
+    );
+
+    await unpublishDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    await publishDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    await archiveDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).status).toBe(
+      DeckStatus.ARCHIVED,
+    );
+
+    await restoreDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).status).toBe(
+      DeckStatus.DRAFT,
+    );
+  });
+
+  it('does not persist an invalid lifecycle command', async () => {
+    const deck = await createDeck(2);
+    const archiveDeck = new ArchiveDeckUseCase(deckRepository);
+
+    await expect(archiveDeck.execute({ deckId: deck.id, userId: ownerUserId })).rejects.toThrow(
+      DeckLifecycleInvalidTransitionException,
+    );
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).status).toBe(
+      DeckStatus.DRAFT,
+    );
+  });
+
+  it('does not restore stale visibility when a metadata save races with a privacy change', async () => {
+    const deck = await createDeck(2);
+    const updateDeck = new UpdateDeckUseCase(deckRepository);
+    const findById = deckRepository.findById.bind(deckRepository);
+    const findByIdSpy = jest
+      .spyOn(deckRepository, 'findById')
+      .mockImplementation(async (deckId) => {
+        const loaded = await findById(deckId);
+        await prisma.deck.update({
+          where: { id: deck.id },
+          data: { visibility: 'PRIVATE' },
+        });
+
+        return loaded;
+      });
+
+    try {
+      await updateDeck.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        title: 'Renamed after privacy change',
+      });
+
+      expect(await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).toMatchObject({
+        title: 'Renamed after privacy change',
+        visibility: 'PRIVATE',
+      });
+    } finally {
+      findByIdSpy.mockRestore();
+    }
+  });
+
+  it('atomically deletes a card and demotes a published deck below the publish minimum', async () => {
+    const deck = await createDeck(2);
+    const publishDeck = new PublishDeckUseCase(deckRepository);
+    const deleteFlashcard = new DeleteFlashcardUseCase(deckRepository, flashcardRepository);
+
+    await publishDeck.execute({ deckId: deck.id, userId: ownerUserId });
+    await deleteFlashcard.execute({
+      deckId: deck.id,
+      cardId: deck.flashcards[0].id,
+      userId: ownerUserId,
+    });
+
+    const persistedDeck = await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } });
+    const remainingCards = await prisma.flashcard.count({ where: { deckId: deck.id } });
+    expect(persistedDeck.status).toBe(DeckStatus.DRAFT);
+    expect(remainingCards).toBe(1);
+  });
+
+  it('never leaves a published deck below the minimum when publish and delete overlap', async () => {
+    const deck = await createDeck(2);
+    const publishDeck = new PublishDeckUseCase(deckRepository);
+    const deleteFlashcard = new DeleteFlashcardUseCase(deckRepository, flashcardRepository);
+
+    const [publishResult, deleteResult] = await Promise.allSettled([
+      publishDeck.execute({ deckId: deck.id, userId: ownerUserId }),
+      deleteFlashcard.execute({
+        deckId: deck.id,
+        cardId: deck.flashcards[0].id,
+        userId: ownerUserId,
+      }),
+    ]);
+
+    expect(deleteResult.status).toBe('fulfilled');
+    if (publishResult.status === 'rejected') {
+      expect(publishResult.reason).toBeInstanceOf(DeckPublishInvalidException);
+    }
+
+    const persisted = await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } });
+    const remainingCards = await prisma.flashcard.count({ where: { deckId: deck.id } });
+    expect(remainingCards).toBe(1);
+    expect(persisted.status).toBe(DeckStatus.DRAFT);
+  });
+
+  it('persists only an exact, zero-based reorder permutation', async () => {
+    const deck = await createDeck(3);
+    const reorderFlashcards = new ReorderFlashcardsUseCase(deckRepository, flashcardRepository);
+    const orderedCardIds = [deck.flashcards[2].id, deck.flashcards[0].id, deck.flashcards[1].id];
+
+    await reorderFlashcards.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      orderedCardIds,
+    });
+
+    const persistedOrder = await prisma.flashcard.findMany({
+      where: { deckId: deck.id },
+      orderBy: { position: 'asc' },
+    });
+    expect(persistedOrder.map((card) => card.id)).toEqual(orderedCardIds);
+    expect(persistedOrder.map((card) => card.position)).toEqual([0, 1, 2]);
+
+    await expect(
+      reorderFlashcards.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        orderedCardIds: [orderedCardIds[0], orderedCardIds[0], orderedCardIds[1]],
+      }),
+    ).rejects.toThrow(InvalidFlashcardDataException);
+
+    const unchangedOrder = await prisma.flashcard.findMany({
+      where: { deckId: deck.id },
+      orderBy: { position: 'asc' },
+    });
+    expect(unchangedOrder.map((card) => card.id)).toEqual(orderedCardIds);
+  });
+
+  it('atomically saves metadata and the complete flashcard editor snapshot', async () => {
+    const deck = await createDeck(3);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Updated atomically', description: 'Saved with cards' },
+      cards: [
+        {
+          id: deck.flashcards[1].id,
+          term: 'Updated term',
+          definition: 'Updated definition',
+        },
+        {
+          id: deck.flashcards[0].id,
+          term: deck.flashcards[0].term,
+          definition: deck.flashcards[0].definition,
+        },
+        { term: 'New term', definition: 'New definition' },
+      ],
+      deletedCardIds: [deck.flashcards[2].id],
+    });
+
+    const saved = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(saved.title).toBe('Updated atomically');
+    expect(saved.description).toBe('Saved with cards');
+    expect(saved.flashcards.map((card) => card.position)).toEqual([0, 1, 2]);
+    expect(saved.flashcards.map((card) => card.term)).toEqual([
+      'Updated term',
+      deck.flashcards[0].term,
+      'New term',
+    ]);
+    expect(saved.flashcards.some((card) => card.id === deck.flashcards[2].id)).toBe(false);
+  });
+
+  it('saves a complete editor snapshot with more than 500 imported cards', async () => {
+    const deck = await createDeck(501);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Large editable deck' },
+      cards: deck.flashcards.map((card, position) => ({
+        id: card.id,
+        term: position === 500 ? 'Updated final term' : card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    const saved = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(saved.title).toBe('Large editable deck');
+    expect(saved.flashcards).toHaveLength(501);
+    expect(saved.flashcards[500]?.term).toBe('Updated final term');
+  });
+
+  it('saves the maximum 2000-card editor snapshot within one transaction', async () => {
+    const deck = await createDeck(2000);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Maximum editable deck' },
+      cards: deck.flashcards.map((card) => ({
+        id: card.id,
+        term: card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    expect(await prisma.flashcard.count({ where: { deckId: deck.id } })).toBe(2000);
+    expect((await prisma.deck.findUniqueOrThrow({ where: { id: deck.id } })).title).toBe(
+      'Maximum editable deck',
+    );
+  });
+
+  it('rejects a stale editor snapshot without partially applying its changes', async () => {
+    const deck = await createDeck(2);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+    const revision = deck.updatedAt.toISOString();
+
+    await saveEditor.execute({
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: revision,
+      metadata: { title: 'First editor save' },
+      cards: deck.flashcards.map((card) => ({
+        id: card.id,
+        term: card.term,
+        definition: card.definition,
+      })),
+      deletedCardIds: [],
+    });
+
+    await expect(
+      saveEditor.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        operationId: randomUUID(),
+        expectedUpdatedAt: revision,
+        metadata: { title: 'Stale editor save' },
+        cards: deck.flashcards.map((card) => ({
+          id: card.id,
+          term: 'Stale term',
+          definition: card.definition,
+        })),
+        deletedCardIds: [],
+      }),
+    ).rejects.toThrow(DeckEditorStaleRevisionException);
+
+    const persisted = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: { orderBy: { position: 'asc' } } },
+    });
+    expect(persisted.title).toBe('First editor save');
+    expect(persisted.flashcards.map((card) => card.term)).toEqual(
+      deck.flashcards.map((card) => card.term),
+    );
+  });
+
+  it('returns the committed editor result when the same operation is retried after response loss', async () => {
+    const deck = await createDeck(1);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+    const command = {
+      deckId: deck.id,
+      userId: ownerUserId,
+      operationId: randomUUID(),
+      expectedUpdatedAt: deck.updatedAt.toISOString(),
+      metadata: { title: 'Committed once' },
+      cards: [
+        {
+          id: deck.flashcards[0].id,
+          term: deck.flashcards[0].term,
+          definition: deck.flashcards[0].definition,
+        },
+        { term: 'Created once', definition: 'No duplicate on retry' },
+      ],
+      deletedCardIds: [],
+    };
+
+    const first = await saveEditor.execute(command);
+    const replay = await saveEditor.execute(command);
+
+    expect(replay.updatedAt).toEqual(first.updatedAt);
+    expect(replay.flashcards?.map((card) => card.term)).toEqual([
+      deck.flashcards[0].term,
+      'Created once',
+    ]);
+    expect(await prisma.flashcard.count({ where: { deckId: deck.id } })).toBe(2);
+    expect(
+      await prisma.deckEditorReceipt.count({
+        where: { userId: ownerUserId, operationId: command.operationId },
+      }),
+    ).toBe(1);
+  });
+
+  it('does not persist editor metadata when the card snapshot is invalid', async () => {
+    const deck = await createDeck(2);
+    const saveEditor = new SaveDeckEditorUseCase(deckRepository, deckEditorRepository);
+
+    await expect(
+      saveEditor.execute({
+        deckId: deck.id,
+        userId: ownerUserId,
+        operationId: randomUUID(),
+        expectedUpdatedAt: deck.updatedAt.toISOString(),
+        metadata: { title: 'Must not persist' },
+        cards: [
+          {
+            id: deck.flashcards[0].id,
+            term: deck.flashcards[0].term,
+            definition: deck.flashcards[0].definition,
+          },
+        ],
+        deletedCardIds: [],
+      }),
+    ).rejects.toThrow(InvalidFlashcardDataException);
+
+    const unchanged = await prisma.deck.findUniqueOrThrow({
+      where: { id: deck.id },
+      include: { flashcards: true },
+    });
+    expect(unchanged.title).toBe(deck.title);
+    expect(unchanged.flashcards).toHaveLength(2);
+  });
+
+  it('deletes only the self-created fork when the source owner forks their own deck', async () => {
+    const source = await createForkableDeck();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+    const fork = await forkDeck.execute({ deckId: source.id, targetUserId: ownerUserId });
+
+    await deleteDeck.execute({ deckId: fork.id, userId: ownerUserId });
+
+    expect(await prisma.deck.findUnique({ where: { id: fork.id } })).toBeNull();
+    expect(await prisma.deck.findUnique({ where: { id: source.id } })).not.toBeNull();
+  });
+
+  it('deletes only the requesting users fork and preserves the source and sibling forks', async () => {
+    const source = await createForkableDeck();
+    const firstForkOwnerId = await createUser();
+    const secondForkOwnerId = await createUser();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+
+    try {
+      const firstFork = await forkDeck.execute({
+        deckId: source.id,
+        targetUserId: firstForkOwnerId,
+      });
+      const siblingFork = await forkDeck.execute({
+        deckId: source.id,
+        targetUserId: secondForkOwnerId,
+      });
+
+      await expect(
+        deleteDeck.execute({ deckId: source.id, userId: firstForkOwnerId }),
+      ).rejects.toThrow(DeckAccessForbiddenException);
+
+      await deleteDeck.execute({ deckId: firstFork.id, userId: firstForkOwnerId });
+
+      expect(await prisma.deck.findUnique({ where: { id: firstFork.id } })).toBeNull();
+      expect(await prisma.deck.findUnique({ where: { id: source.id } })).not.toBeNull();
+      expect(await prisma.deck.findUnique({ where: { id: siblingFork.id } })).toMatchObject({
+        forkedFromDeckId: source.id,
+      });
+    } finally {
+      await prisma.user.deleteMany({
+        where: { id: { in: [firstForkOwnerId, secondForkOwnerId] } },
+      });
+    }
+  });
+
+  it('preserves every fork and clears its attribution when the source deck is deleted', async () => {
+    const source = await createForkableDeck();
+    const firstForkOwnerId = await createUser();
+    const secondForkOwnerId = await createUser();
+    const forkDeck = new ForkDeckUseCase(deckRepository);
+    const deleteDeck = new DeleteDeckUseCase(deckRepository);
+
+    try {
+      const forks = await Promise.all([
+        forkDeck.execute({ deckId: source.id, targetUserId: firstForkOwnerId }),
+        forkDeck.execute({ deckId: source.id, targetUserId: secondForkOwnerId }),
+      ]);
+
+      await deleteDeck.execute({ deckId: source.id, userId: ownerUserId });
+
+      expect(await prisma.deck.findUnique({ where: { id: source.id } })).toBeNull();
+      expect(
+        await prisma.deck.findMany({
+          where: { id: { in: forks.map((fork) => fork.id) } },
+          orderBy: { id: 'asc' },
+        }),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: forks[0].id, forkedFromDeckId: null }),
+          expect.objectContaining({ id: forks[1].id, forkedFromDeckId: null }),
+        ]),
+      );
+    } finally {
+      await prisma.user.deleteMany({
+        where: { id: { in: [firstForkOwnerId, secondForkOwnerId] } },
+      });
+    }
+  });
+});
+
+describe('Database reset guard integration', () => {
+  it('rejects a destructive reset in production before executing reset operations', () => {
+    const backendRoot = resolve(__dirname, '../../../../');
+
+    try {
+      execFileSync(process.execPath, ['-r', 'ts-node/register', 'prisma/reset.ts', '--confirm'], {
+        cwd: backendRoot,
+        env: { ...process.env, NODE_ENV: 'production' },
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
+      throw new Error('Expected the production reset guard to terminate the process');
+    } catch (error: unknown) {
+      const processError = error as Error & { status?: number; stderr?: string | Buffer };
+      expect(processError.status).toBe(1);
+      expect(processError.stderr?.toString()).toContain('FATAL: Running destructive reset');
+    }
+  });
+});

@@ -42,6 +42,7 @@ describe('OrganizationCard', () => {
     render(<OrganizationCard organization={mockOrg} onSelect={onSelectMock} />)
 
     const cardLink = screen.getByRole('link', { name: /cyberdyne systems/i })
+
     expect(cardLink).toHaveAttribute('href', '/organizations/cyberdyne')
 
     await user.click(cardLink)

@@ -35,6 +35,7 @@ export async function sendInviteAction(
         validationMessages: error.validationMessages,
       }
     }
+
     return { success: false, error: getErrorMessage(error) }
   }
 }

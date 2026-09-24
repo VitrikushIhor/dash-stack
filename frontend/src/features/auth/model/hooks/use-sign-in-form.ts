@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
@@ -20,6 +21,7 @@ interface UseSignInFormProps {
 
 export function useSignInForm(options?: UseSignInFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const form = useForm<TSignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -28,12 +30,14 @@ export function useSignInForm(options?: UseSignInFormProps) {
 
   const { execute: signIn, isPending } = useAction(signInAction, {
     onSuccess: () => {
+      queryClient.clear()
       toast.success(`Welcome back, ${form.getValues('email')}!`)
 
       const targetPath = sanitizeRedirectUrl(
         options?.redirectTo,
-        ROUTES.organizations
+        ROUTES.vocabDecks
       )
+
       router.replace(targetPath)
     },
   })

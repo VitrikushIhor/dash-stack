@@ -83,8 +83,10 @@ export function LayoutProvider({
 // Define the hook for the provider
 export function useLayout() {
   const context = useContext(LayoutContext)
+
   if (!context) {
     throw new Error('useLayout must be used within a LayoutProvider')
   }
+
   return context
 }

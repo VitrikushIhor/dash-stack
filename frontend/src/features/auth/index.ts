@@ -10,7 +10,7 @@ export { useSignInForm } from './model/hooks/use-sign-in-form'
 export { useSignUpForm } from './model/hooks/use-sign-up-form'
 export { useForgotPasswordForm } from './model/hooks/use-forgot-password-form'
 export { useResetPasswordForm } from './model/hooks/use-reset-password-form'
-export { useLogout } from './model/mutations/use-logout'
+export { useLogout } from './model/mutations/use-logout-hook'
 export { useVerifyEmail } from './model/hooks/use-verify-email'
 export { useOAuthCallback } from './model/hooks/use-oauth-callback'
 

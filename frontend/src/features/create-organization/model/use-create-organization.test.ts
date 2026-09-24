@@ -14,6 +14,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     useUploadImage: () => ({
@@ -53,6 +54,7 @@ describe('useCreateOrganization', () => {
     const { result } = renderHook(() => useCreateOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.createOrganization(
         {
@@ -82,6 +84,7 @@ describe('useCreateOrganization', () => {
     const { result } = renderHook(() => useCreateOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.createOrganization({
         name: 'Duplicate Corp',

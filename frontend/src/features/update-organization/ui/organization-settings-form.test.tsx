@@ -43,20 +43,24 @@ describe('OrganizationSettingsForm', () => {
     render(<OrganizationSettingsForm organization={mockOrg} />)
 
     const saveBtn = screen.getByRole('button', { name: 'Save Changes' })
+
     expect(saveBtn).toBeDisabled()
   })
 
   it('enables save button and submits when input values are modified', async () => {
     const user = userEvent.setup()
+
     mockUpdateOrganization.mockResolvedValue(true)
 
     render(<OrganizationSettingsForm organization={mockOrg} />)
 
     const nameInput = screen.getByLabelText(/organization name/i)
+
     await user.clear(nameInput)
     await user.type(nameInput, 'Acme Global Corp')
 
     const saveBtn = screen.getByRole('button', { name: 'Save Changes' })
+
     expect(saveBtn).toBeEnabled()
 
     await user.click(saveBtn)

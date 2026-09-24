@@ -19,6 +19,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/core/radio-group'
 import { Switch } from '@/shared/ui/core/switch'
 import {
+  NotificationPreference,
   type NotificationsFormInput,
   type NotificationsFormValues,
   notificationsDefaultValues,
@@ -56,7 +57,7 @@ export function NotificationsForm() {
                 >
                   <FormItem className='flex items-center'>
                     <FormControl>
-                      <RadioGroupItem value='all' />
+                      <RadioGroupItem value={NotificationPreference.ALL} />
                     </FormControl>
                     <FormLabel className='font-normal'>
                       All new messages
@@ -64,7 +65,7 @@ export function NotificationsForm() {
                   </FormItem>
                   <FormItem className='flex items-center'>
                     <FormControl>
-                      <RadioGroupItem value='mentions' />
+                      <RadioGroupItem value={NotificationPreference.MENTIONS} />
                     </FormControl>
                     <FormLabel className='font-normal'>
                       Direct messages and mentions
@@ -72,7 +73,7 @@ export function NotificationsForm() {
                   </FormItem>
                   <FormItem className='flex items-center'>
                     <FormControl>
-                      <RadioGroupItem value='none' />
+                      <RadioGroupItem value={NotificationPreference.NONE} />
                     </FormControl>
                     <FormLabel className='font-normal'>Nothing</FormLabel>
                   </FormItem>

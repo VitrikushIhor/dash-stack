@@ -63,11 +63,13 @@ describe('useTaskQuery', () => {
     const { result: nullId } = renderHook(() => useTaskQuery('org-1', null), {
       wrapper: createWrapper(),
     })
+
     expect(nullId.current.fetchStatus).toBe('idle')
 
     const { result: emptyId } = renderHook(() => useTaskQuery('org-1', ''), {
       wrapper: createWrapper(),
     })
+
     expect(emptyId.current.fetchStatus).toBe('idle')
 
     expect(getTaskAction).not.toHaveBeenCalled()

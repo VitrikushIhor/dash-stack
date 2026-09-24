@@ -254,7 +254,7 @@ The initial MVP can focus on a subset of the above:
 7. Calendar & Scheduling (basic)  
    - Create events for tasks, show per-organization calendar.
 
-Progress, leaderboards, AI features, folders, advanced analytics, and communication features can be added in later iterations once the core flows are stable.
+AI features, folders, advanced analytics, and communication features can be added in later iterations once the core flows are stable. Vocabulary progress and Match leaderboards are in the Vocabulary & SRS delivery scope; see `docs/specs/vocabulary/FEATURE-SPEC-vocabulary.md` for their detailed contract.
 
 ---
 

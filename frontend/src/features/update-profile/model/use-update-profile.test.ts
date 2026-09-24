@@ -14,8 +14,10 @@ vi.mock('sonner', () => ({
 }))
 
 const mockMutateAsync = vi.fn()
+
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     useUploadImage: () => ({
@@ -62,6 +64,7 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(
         baseUser,
@@ -92,6 +95,7 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(
         baseUser,
@@ -128,6 +132,7 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice',
@@ -156,6 +161,7 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice New',

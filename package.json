@@ -22,6 +22,11 @@
     "docker:dev:down": "docker compose --env-file backend/.env --env-file frontend/.env -f docker-compose.dev.yml down",
     "docker:logs": "docker compose logs -f",
     "docker:ps": "docker compose ps",
+    "sonar:up": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml up -d sonarqube",
+    "sonar:down": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml down",
+    "sonar:logs": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml logs -f sonarqube",
+    "sonar:status": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml ps",
+    "sonar:scan": "docker compose --env-file .env.sonarqube -f docker-compose.sonarqube.yml --profile scan run --rm sonar-scanner",
     "knip": "knip"
   },
   "devDependencies": {
@@ -31,18 +36,22 @@
     "knip": "^5.88.1",
     "lint-staged": "^16.2.7"
   },
-  "lint-staged": {
-    "frontend/**/*.{ts,tsx}": [
-      "pnpm --filter frontend run lint:fix",
-      "pnpm --filter frontend run format",
-      "pnpm --filter frontend run test:related"
-    ],
-    "backend/**/*.ts": [
-      "pnpm --filter backend run lint",
-      "pnpm --filter backend run format"
-    ]
-  },
   "pnpm": {
+    "overrides": {
+      "ajv@^8.0.0": "8.20.0",
+      "cross-spawn": "6.0.6",
+      "deepmerge-ts": "8.0.0",
+      "fast-uri": "3.1.6",
+      "file-type": "21.3.2",
+      "js-yaml@^3.0.0": "3.15.2",
+      "js-yaml@^4.0.0": "4.3.2",
+      "js-yaml@^5.0.0": "5.2.2",
+      "multer": "2.4.0",
+      "mysql2": "3.23.1",
+      "postcss": "8.5.26",
+      "qs": "6.16.0",
+      "tar": "7.5.21"
+    },
     "onlyBuiltDependencies": [
       "@nestjs/core",
       "@prisma/client",

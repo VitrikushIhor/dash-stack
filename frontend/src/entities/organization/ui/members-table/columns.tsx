@@ -60,6 +60,7 @@ export const membersTableColumns: ColumnDef<Membership>[] = [
     ),
     cell: ({ row }) => {
       const role = row.getValue('role') as OrgRole
+
       return <Badge variant={getRoleVariant(role)}>{role}</Badge>
     },
   },
@@ -71,6 +72,7 @@ export const membersTableColumns: ColumnDef<Membership>[] = [
     ),
     cell: ({ row }) => {
       const date = row.original.joinedAt || row.original.createdAt
+
       return (
         <span className='text-muted-foreground text-sm'>
           {formatJoinedDate(date)}

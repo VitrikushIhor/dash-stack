@@ -1,21 +1,18 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
-import { z } from 'zod'
 import { SERVER_CACHE_TAGS } from '@/shared/config'
 import { createAction } from '@/shared/lib'
-import { OrganizationSlugSchema } from '@/entities/organization'
-import { BulkDeleteTasksDtoSchema } from '@/entities/task'
 import { taskServerApi } from '@/entities/task/server'
+import { BulkDeleteTasksActionSchema } from '../model/manage-task-action.schema'
 
 export const bulkDeleteTasksAction = createAction(
-  z.object({
-    slug: OrganizationSlugSchema,
-    ids: BulkDeleteTasksDtoSchema,
-  }),
+  BulkDeleteTasksActionSchema,
   async ({ slug, ids }) => {
     const res = await taskServerApi.bulkDelete(slug, ids)
+
     revalidateTag(SERVER_CACHE_TAGS.tasks(slug))
+
     return res
   }
 )

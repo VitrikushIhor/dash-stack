@@ -30,6 +30,7 @@ export const useDeleteOrganization = (
             ? result.validationMessages
             : result.error
         )
+
         return false
       }
 
@@ -37,7 +38,9 @@ export const useDeleteOrganization = (
       options.onSuccess?.()
 
       const targetPath = options.redirectTo ?? ROUTES.organizations
+
       router.push(targetPath)
+
       return true
     } finally {
       setIsDeleting(false)

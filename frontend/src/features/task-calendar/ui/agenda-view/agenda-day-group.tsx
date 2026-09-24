@@ -12,7 +12,9 @@ export function AgendaDayGroup({ date, tasks, onTaskClick }: IProps) {
   const sortedEvents = [...tasks].sort((a, b) => {
     const anchorA = getTaskCalendarAnchor(a)
     const anchorB = getTaskCalendarAnchor(b)
+
     if (!anchorA || !anchorB) return 0
+
     return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
   })
 

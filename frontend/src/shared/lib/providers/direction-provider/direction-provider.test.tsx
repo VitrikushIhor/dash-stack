@@ -77,6 +77,7 @@ describe('DirectionProvider & useDirection', () => {
   describe('TC-3: Runtime direction switching (setDir)', () => {
     it('updates state, DOM, and cookie when setDir is called', async () => {
       const user = userEvent.setup()
+
       vi.mocked(getCookie).mockReturnValue(undefined)
 
       render(
@@ -102,6 +103,7 @@ describe('DirectionProvider & useDirection', () => {
   describe('TC-4: Reset to default (resetDir)', () => {
     it('resets to default direction, clears cookie, and updates DOM', async () => {
       const user = userEvent.setup()
+
       vi.mocked(getCookie).mockReturnValue('rtl')
 
       render(
@@ -128,6 +130,7 @@ describe('DirectionProvider & useDirection', () => {
 
       function BadComponent() {
         useDirection()
+
         return null
       }
 

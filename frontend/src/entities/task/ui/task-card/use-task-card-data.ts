@@ -4,6 +4,7 @@ import { type Task, TaskStatusEnum } from '../../model/types'
 
 export function useTaskCardData(task: Task) {
   const { totalItems, completedItems } = calculateTaskProgress(task)
+
   return {
     isCompleted: task.status === TaskStatusEnum.COMPLETED,
     overdue: isTaskOverdue(task),
