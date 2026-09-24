@@ -2,11 +2,11 @@
 
 import { type Deck } from '@/entities/deck'
 import { type DeckCardsPage } from '@/entities/vocab'
-import { useDeckBoardViewModel } from '../model/use-deck-board-view-model'
-import { DeckBoardHeader } from './deck-board/deck-board-header'
-import { DeckCardList } from './deck-board/deck-card-list'
-import { DeckCardPreview } from './deck-board/deck-card-preview'
-import { DeckPracticePanel } from './deck-board/deck-practice-panel'
+import { useDeckBoardViewModel } from '../../model/use-deck-board-view-model'
+import { DeckBoardHeader } from '../deck-board-header/deck-board-header'
+import { DeckCardList } from '../deck-card-list/deck-card-list'
+import { DeckCardPreview } from '../deck-card-preview/deck-card-preview'
+import { DeckPracticePanel } from '../deck-practice-panel/deck-practice-panel'
 
 type DeckBoardProps = {
   deck: Deck
@@ -51,7 +51,7 @@ export function DeckBoard({
 
       <DeckCardList
         {...viewModel.cardList}
-        cardCount={viewModel.cardCount}
+        totalCardCount={viewModel.cardCount}
         isAuthenticated={isAuthenticated}
       />
     </main>

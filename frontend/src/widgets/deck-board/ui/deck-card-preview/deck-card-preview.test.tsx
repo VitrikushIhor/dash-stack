@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { type StudyCard } from '@/entities/vocab'
-import { DeckCardPreview } from './deck-card-preview'
+import { DeckCardPreview } from '../deck-card-preview/deck-card-preview'
 
 const card: StudyCard = {
   id: 'card-1',

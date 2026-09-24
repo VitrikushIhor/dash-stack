@@ -10,7 +10,7 @@ export function DeckCardListSkeleton({
   label,
 }: DeckCardListSkeletonProps) {
   return (
-    <div className='space-y-3 py-1' role='status' aria-label={label}>
+    <output className='space-y-3 py-1' aria-label={label}>
       {Array.from({ length: count }, (_, index) => (
         <div
           key={index}
@@ -24,6 +24,6 @@ export function DeckCardListSkeleton({
           <Skeleton className='size-9 rounded-md' />
         </div>
       ))}
-    </div>
+    </output>
   )
 }

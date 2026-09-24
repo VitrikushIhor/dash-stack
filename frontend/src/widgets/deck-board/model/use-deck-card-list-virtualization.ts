@@ -17,7 +17,7 @@ type VirtualizedCard = {
 
 type UseDeckCardListVirtualizationParams = {
   cards: VirtualizedCard[]
-  filteredCardCount: number
+  filteredTotalCardCount: number
   hasNextPage: boolean
   isFetchingNextPage: boolean
   onLoadMore: () => void
@@ -25,13 +25,13 @@ type UseDeckCardListVirtualizationParams = {
 
 export function useDeckCardListVirtualization({
   cards,
-  filteredCardCount,
+  filteredTotalCardCount,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
 }: UseDeckCardListVirtualizationParams) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const shouldVirtualize = filteredCardCount > VIRTUALIZATION_THRESHOLD
+  const shouldVirtualize = filteredTotalCardCount > VIRTUALIZATION_THRESHOLD
   const getScrollElement = useCallback(() => scrollContainerRef.current, [])
   const getItemKey = useCallback(
     (index: number) => cards[index]?.id ?? index,

@@ -149,7 +149,7 @@ export function useDeckBoardViewModel({
     cardList: {
       cards: deckCards.cards.map(withStarOverride),
       pendingStars: board.pendingStars,
-      filteredCardCount: deckCards.meta.total,
+      filteredTotalCardCount: deckCards.meta.total,
       hasNextPage: deckCards.hasNextPage,
       isFetchingNextPage: deckCards.isFetchingNextPage,
       isNextPageError: deckCards.isNextPageError,

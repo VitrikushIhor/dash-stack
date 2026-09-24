@@ -1,5 +1,5 @@
 import { Skeleton } from '@/shared/ui/core/skeleton'
-import { DeckCardListSkeleton } from './deck-board/deck-card-list-skeleton'
+import { DeckCardListSkeleton } from '../deck-card-list/deck-card-list-skeleton'
 
 export function DeckBoardSkeleton() {
   return (

@@ -45,9 +45,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={0}
+        totalCardCount={0}
         cards={[]}
-        filteredCardCount={0}
+        filteredTotalCardCount={0}
         hasNextPage={false}
         isAuthenticated={false}
         isFetchingNextPage={false}
@@ -80,9 +80,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={3}
+        totalCardCount={3}
         cards={[]}
-        filteredCardCount={0}
+        filteredTotalCardCount={0}
         hasNextPage={false}
         isAuthenticated={false}
         isFetchingNextPage={false}
@@ -116,9 +116,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={cards.length}
+        totalCardCount={cards.length}
         cards={cards}
-        filteredCardCount={cards.length}
+        filteredTotalCardCount={cards.length}
         hasNextPage={false}
         isAuthenticated={false}
         isFetchingNextPage={false}
@@ -151,9 +151,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={0}
+        totalCardCount={0}
         cards={[]}
-        filteredCardCount={0}
+        filteredTotalCardCount={0}
         hasNextPage={false}
         isAuthenticated={false}
         isFetchingNextPage={false}
@@ -184,9 +184,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={51}
+        totalCardCount={51}
         cards={[createCard(0)]}
-        filteredCardCount={51}
+        filteredTotalCardCount={51}
         hasNextPage
         isAuthenticated={false}
         isFetchingNextPage={false}
@@ -219,9 +219,9 @@ describe('DeckCardList', () => {
 
     render(
       <DeckCardList
-        cardCount={51}
+        totalCardCount={51}
         cards={[createCard(0)]}
-        filteredCardCount={51}
+        filteredTotalCardCount={51}
         hasNextPage
         isAuthenticated={false}
         isFetchingNextPage
@@ -243,5 +243,38 @@ describe('DeckCardList', () => {
 
     expect(status.children).toHaveLength(1)
     expect(screen.queryByText('Loading more cards…')).not.toBeInTheDocument()
+  })
+
+  it('should_disable_a_pending_star_in_a_non_virtualized_list', () => {
+    useVirtualizerMock.mockReturnValue({
+      getTotalSize: () => 0,
+      getVirtualItems: () => [],
+      measureElement: vi.fn(),
+    })
+    const card = createCard(0)
+
+    render(
+      <DeckCardList
+        pendingStars={new Set([card.id])}
+        totalCardCount={1}
+        cards={[card]}
+        filteredTotalCardCount={1}
+        hasNextPage={false}
+        isAuthenticated
+        isFetchingNextPage={false}
+        isNextPageError={false}
+        isSearchError={false}
+        isSearchPending={false}
+        onLoadMore={vi.fn()}
+        onRetryNextPage={vi.fn()}
+        onRetrySearch={vi.fn()}
+        onSearchChange={vi.fn()}
+        onToggleStar={vi.fn()}
+        search=''
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Star card' })).toBeDisabled()
+    expect(screen.getByLabelText('Saving star')).toBeInTheDocument()
   })
 })
