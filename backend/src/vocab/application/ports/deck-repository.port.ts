@@ -25,6 +25,10 @@ export interface UpdateDeckMetadata {
   visibility?: DeckVisibility;
 }
 
+export interface DeckMetadataRepositoryPort {
+  findMetadataById(id: string): Promise<Deck | null>;
+}
+
 export interface DeckRepositoryPort {
   save(deck: Deck): Promise<Deck>;
   updateMetadata(deckId: string, metadata: UpdateDeckMetadata): Promise<Deck>;

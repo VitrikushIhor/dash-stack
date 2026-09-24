@@ -36,6 +36,7 @@ export function useDeckBoard(deckId: string) {
       setStarOverrides((current) => ({ ...current, [cardId]: !currentValue }))
       try {
         const result = await saveStar({
+          deckId,
           cardId,
           isStarred: !currentValue,
         })

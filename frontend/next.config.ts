@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
     serverActions: {
-      bodySizeLimit: '4mb',
+      bodySizeLimit: '5mb',
     },
     optimizePackageImports: [
       'lucide-react',

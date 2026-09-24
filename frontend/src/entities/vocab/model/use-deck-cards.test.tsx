@@ -20,6 +20,29 @@ const initialPage: DeckCardsPage = {
   summary: { total: 0, due: 0, starred: 0, dueAndStarred: 0 },
 }
 
+function createStudyCard(id: string, position: number) {
+  return {
+    id,
+    deckId: 'deck-1',
+    term: `Term ${position + 1}`,
+    definition: `Definition ${position + 1}`,
+    example: null,
+    imageUrl: null,
+    position,
+    progress: {
+      id: `progress-${id}`,
+      status: 'NEW' as const,
+      box: 1,
+      isStarred: false,
+      correctStreak: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+      lastReviewedAt: null,
+      nextReviewAt: null,
+    },
+  } satisfies DeckCardsPage['data'][number]
+}
+
 describe('useDeckCards', () => {
   afterEach(() => {
     vi.useRealTimers()
@@ -314,5 +337,63 @@ describe('useDeckCards', () => {
     expect(unfiltered?.pages[0]?.summary.starred).toBe(5)
     expect(searched?.pages[0]?.summary.starred).toBe(5)
     expect(searched?.pages[0]?.data[0]?.progress.isStarred).toBe(true)
+  })
+
+  it('should_preserve_subsequent_pages_when_initial_page_props_update', async () => {
+    const client = new QueryClient()
+    const pageOne: DeckCardsPage = {
+      ...initialPage,
+      meta: {
+        currentPage: 1,
+        perPage: 1,
+        total: 2,
+        lastPage: 2,
+        next: 2,
+        prev: null,
+      },
+      data: [{ ...createStudyCard('card-1', 0), term: 'First' }],
+    }
+    const pageTwo: DeckCardsPage = {
+      ...initialPage,
+      meta: {
+        currentPage: 2,
+        perPage: 1,
+        total: 2,
+        lastPage: 2,
+        next: null,
+        prev: 1,
+      },
+      data: [{ ...createStudyCard('card-2', 1), term: 'Second' }],
+    }
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+
+    client.setQueryData(vocabKeys.deckCards('deck-1', ''), {
+      pages: [pageOne, pageTwo],
+      pageParams: [1, 2],
+    })
+
+    const { result, rerender } = renderHook(
+      ({ page }) => useDeckCards('deck-1', '', page),
+      { initialProps: { page: pageOne }, wrapper }
+    )
+
+    expect(result.current.cards).toHaveLength(2)
+    expect(result.current.cards[0]?.term).toBe('First')
+    expect(result.current.cards[1]?.term).toBe('Second')
+
+    const updatedPageOne: DeckCardsPage = {
+      ...pageOne,
+      data: [{ ...pageOne.data[0], term: 'First Updated' }],
+    }
+
+    rerender({ page: updatedPageOne })
+
+    await waitFor(() => {
+      expect(result.current.cards[0]?.term).toBe('First Updated')
+    })
+    expect(result.current.cards).toHaveLength(2)
+    expect(result.current.cards[1]?.term).toBe('Second')
   })
 })

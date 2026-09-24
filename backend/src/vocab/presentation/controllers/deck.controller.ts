@@ -20,6 +20,7 @@ import { UserEntity, AuthUser } from '../../../common/decorators/user.decorator'
 import { CreateDeckUseCase } from '../../application/use-cases/create-deck.use-case';
 import { GetMyDecksUseCase } from '../../application/use-cases/get-my-decks.use-case';
 import { GetDeckByIdUseCase } from '../../application/use-cases/get-deck-by-id.use-case';
+import { GetDeckMetadataUseCase } from '../../application/use-cases/get-deck-metadata.use-case';
 import { UpdateDeckUseCase } from '../../application/use-cases/update-deck.use-case';
 import { SaveDeckEditorUseCase } from '../../application/use-cases/save-deck-editor.use-case';
 import { DeleteDeckUseCase } from '../../application/use-cases/delete-deck.use-case';
@@ -44,6 +45,7 @@ export class DeckController {
     private readonly createDeckUseCase: CreateDeckUseCase,
     private readonly getMyDecksUseCase: GetMyDecksUseCase,
     private readonly getDeckByIdUseCase: GetDeckByIdUseCase,
+    private readonly getDeckMetadataUseCase: GetDeckMetadataUseCase,
     private readonly updateDeckUseCase: UpdateDeckUseCase,
     private readonly saveDeckEditorUseCase: SaveDeckEditorUseCase,
     private readonly deleteDeckUseCase: DeleteDeckUseCase,
@@ -120,6 +122,22 @@ export class DeckController {
     @UserEntity() user: AuthUser | null,
   ): Promise<DeckResponseDto> {
     const deck = await this.getDeckByIdUseCase.execute({
+      deckId: id,
+      userId: user?.id ?? null,
+    });
+
+    return DeckPresentationMapper.toResponse(deck);
+  }
+
+  @Get(':id/metadata')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiOperation({ summary: 'Get deck metadata without loading cards' })
+  @ApiResponse({ status: HttpStatus.OK, type: DeckResponseDto })
+  async getDeckMetadata(
+    @Param('id') id: string,
+    @UserEntity() user: AuthUser | null,
+  ): Promise<DeckResponseDto> {
+    const deck = await this.getDeckMetadataUseCase.execute({
       deckId: id,
       userId: user?.id ?? null,
     });

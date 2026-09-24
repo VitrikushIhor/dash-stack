@@ -25,6 +25,19 @@ const deck: Deck = {
 describe('DeckBoardHeader', () => {
   afterEach(() => vi.restoreAllMocks())
 
+  it('capitalizes_every_metadata_label_in_the_header', () => {
+    render(
+      <DeckBoardHeader
+        deck={{ ...deck, language: 'en', visibility: 'PRIVATE' }}
+        cardCount={1006}
+        isAuthenticated={false}
+        isOwner={false}
+      />
+    )
+
+    expect(screen.getByLabelText('Deck metadata')).toHaveClass('capitalize')
+  })
+
   it('should_copy_the_canonical_deck_url_without_personal_filters', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
 

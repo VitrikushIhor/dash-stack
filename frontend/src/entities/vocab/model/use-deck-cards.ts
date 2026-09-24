@@ -1,7 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useDebounce } from '@/shared/lib'
 import { vocabApi } from '../api/vocab-api'
 import { vocabKeys } from '../api/vocab-query-keys'
@@ -20,10 +24,23 @@ export function useDeckCards(
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    queryClient.setQueryData(vocabKeys.deckCards(deckId, ''), {
-      pages: [initialPage],
-      pageParams: [1],
-    })
+    queryClient.setQueryData(
+      vocabKeys.deckCards(deckId, ''),
+      (existing: InfiniteData<DeckCardsPage, number> | undefined) => {
+        if (!existing || existing.pages.length === 0) {
+          return {
+            pages: [initialPage],
+            pageParams: [1],
+          }
+        }
+        const updatedPages = [...existing.pages]
+        updatedPages[0] = initialPage
+        return {
+          ...existing,
+          pages: updatedPages,
+        }
+      }
+    )
   }, [deckId, initialPage, queryClient])
 
   const query = useInfiniteQuery({

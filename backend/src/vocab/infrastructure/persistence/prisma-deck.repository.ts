@@ -4,6 +4,7 @@ import { Prisma, CEFRLevel } from '@prisma/client';
 import { Deck } from '../../domain/entities/deck.entity';
 import {
   DeckRepositoryPort,
+  DeckMetadataRepositoryPort,
   FindMyDecksFilter,
   SearchPublicDecksFilter,
   UpdateDeckMetadata,
@@ -15,7 +16,7 @@ import { paginate } from '../../../common/pagination/paginate';
 import { PaginatedResult } from '../../../common/pagination/pagination.models';
 
 @Injectable()
-export class PrismaDeckRepository implements DeckRepositoryPort {
+export class PrismaDeckRepository implements DeckRepositoryPort, DeckMetadataRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async save(deck: Deck): Promise<Deck> {
@@ -106,6 +107,20 @@ export class PrismaDeckRepository implements DeckRepositoryPort {
         flashcards: {
           orderBy: { position: OrderDirection.asc },
         },
+        _count: {
+          select: { flashcards: true, forks: true },
+        },
+      },
+    });
+
+    return raw ? PrismaDeckMapper.toDomain(raw) : null;
+  }
+
+  async findMetadataById(id: string): Promise<Deck | null> {
+    const raw = await this.prisma.deck.findUnique({
+      where: { id },
+      include: {
+        owner: { select: { firstName: true, lastName: true, avatar: true } },
         _count: {
           select: { flashcards: true, forks: true },
         },

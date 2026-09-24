@@ -11,6 +11,7 @@ interface CardStarButtonProps {
 
 export function CardStarButton({ card }: CardStarButtonProps) {
   const { isStarred, toggleStar, isPending, isDisabled } = useStarCard(
+    card.deckId,
     card.id,
     card.progress.isStarred
   )

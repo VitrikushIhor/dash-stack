@@ -11,13 +11,14 @@ vi.mock('@/entities/vocab/server', () => ({
 describe('toggleStarAction', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('should_save_the_desired_state_without_revalidating_the_active_route', async () => {
+  it('should_save_the_desired_state_and_only_revalidate_the_study_session', async () => {
     vi.mocked(vocabServerApi.setStar).mockResolvedValue({
       flashcardId: 'card-1',
       isStarred: true,
     })
 
     const result = await toggleStarAction({
+      deckId: 'deck-1',
       cardId: 'card-1',
       isStarred: true,
     })
@@ -29,6 +30,7 @@ describe('toggleStarAction', () => {
     expect(vocabServerApi.setStar).toHaveBeenCalledWith('card-1', {
       isStarred: true,
     })
-    expect(revalidateTag).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledOnce()
+    expect(revalidateTag).toHaveBeenCalledWith('study-session-deck-1')
   })
 })

@@ -44,6 +44,7 @@ describe('useDeckBoard star', () => {
 
     expect(submittedCount).toBe(1)
     expect(toggleStarAction).toHaveBeenCalledWith({
+      deckId: 'deck-1',
       cardId: 'card-1',
       isStarred: true,
     })
@@ -62,6 +63,7 @@ describe('useDeckBoard star', () => {
     })
     expect(toggleStarAction).toHaveBeenCalledTimes(2)
     expect(toggleStarAction).toHaveBeenLastCalledWith({
+      deckId: 'deck-1',
       cardId: 'card-2',
       isStarred: false,
     })

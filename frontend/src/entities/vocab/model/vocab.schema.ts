@@ -64,6 +64,7 @@ export const SubmitProgressPayloadSchema = z
   })
 
 export const ToggleStarPayloadSchema = z.object({
+  deckId: z.string().min(1),
   cardId: z.string().min(1),
   isStarred: z.boolean(),
 })

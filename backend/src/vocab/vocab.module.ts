@@ -16,6 +16,7 @@ import { UnsplashAdapter } from './infrastructure/integrations/unsplash.adapter'
 import { CreateDeckUseCase } from './application/use-cases/create-deck.use-case';
 import { GetMyDecksUseCase } from './application/use-cases/get-my-decks.use-case';
 import { GetDeckByIdUseCase } from './application/use-cases/get-deck-by-id.use-case';
+import { GetDeckMetadataUseCase } from './application/use-cases/get-deck-metadata.use-case';
 import { UpdateDeckUseCase } from './application/use-cases/update-deck.use-case';
 import { SaveDeckEditorUseCase } from './application/use-cases/save-deck-editor.use-case';
 import { DeleteDeckUseCase } from './application/use-cases/delete-deck.use-case';
@@ -70,6 +71,7 @@ import { PrismaDeckImportTransaction } from './infrastructure/persistence/prisma
     CreateDeckUseCase,
     GetMyDecksUseCase,
     GetDeckByIdUseCase,
+    GetDeckMetadataUseCase,
     UpdateDeckUseCase,
     SaveDeckEditorUseCase,
     DeleteDeckUseCase,

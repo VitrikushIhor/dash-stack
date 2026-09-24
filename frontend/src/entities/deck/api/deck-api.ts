@@ -52,6 +52,11 @@ export function createDeckApi(client: HttpClient) {
         next: { tags: [SERVER_CACHE_TAGS.deckDetail(id)] },
       }),
 
+    getMetadata: (id: string): Promise<Deck> =>
+      client.get<Deck>(`/v1/vocab/decks/${id}/metadata`, {
+        next: { tags: [SERVER_CACHE_TAGS.deckDetail(id)] },
+      }),
+
     create: (data: CreateDeckDto): Promise<Deck> =>
       client.post<Deck>('/v1/vocab/decks', data),
 

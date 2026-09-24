@@ -23,3 +23,18 @@ describe('deckApi.getPublicDecks', () => {
     })
   })
 })
+
+describe('deckApi.getMetadata', () => {
+  it('loads deck metadata without the full card collection', async () => {
+    const client = {
+      get: vi.fn().mockResolvedValue({}),
+    } as unknown as HttpClient
+
+    await createDeckApi(client).getMetadata('deck-1')
+
+    expect(client.get).toHaveBeenCalledWith(
+      '/v1/vocab/decks/deck-1/metadata',
+      expect.anything()
+    )
+  })
+})

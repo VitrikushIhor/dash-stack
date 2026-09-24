@@ -48,6 +48,7 @@ export function FlashcardPlayer({ cards, onComplete }: FlashcardPlayerProps) {
     isPending: isStarPending,
     isDisabled: isStarDisabled,
   } = useStarCard(
+    currentCard?.deckId ?? '',
     currentCard?.id ?? '',
     currentCard?.progress.isStarred ?? false
   )

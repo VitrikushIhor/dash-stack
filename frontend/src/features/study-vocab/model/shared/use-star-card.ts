@@ -8,7 +8,11 @@ import { toggleStarAction } from '../../server'
 
 const STAR_COOLDOWN_MS = 1000
 
-export function useStarCard(cardId: string, initialIsStarred: boolean) {
+export function useStarCard(
+  deckId: string,
+  cardId: string,
+  initialIsStarred: boolean
+) {
   const { data: user } = useCurrentUser()
   const nextAllowedAtRef = useRef(0)
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -66,7 +70,7 @@ export function useStarCard(cardId: string, initialIsStarred: boolean) {
       }))
 
       try {
-        const result = await execute({ cardId, isStarred: nextValue })
+        const result = await execute({ deckId, cardId, isStarred: nextValue })
 
         setStarredOverrides((previous) => ({
           ...previous,
@@ -77,7 +81,7 @@ export function useStarCard(cardId: string, initialIsStarred: boolean) {
         setPendingCards(new Set(pendingCardsRef.current))
       }
     },
-    [cardId, execute, isStarred, user]
+    [cardId, deckId, execute, isStarred, user]
   )
 
   return {
