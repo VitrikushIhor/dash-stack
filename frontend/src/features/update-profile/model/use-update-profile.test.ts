@@ -71,7 +71,6 @@ describe('useUpdateProfile', () => {
         {
           firstName: 'Alice Updated',
           lastName: 'Smith',
-          email: 'alice@example.com',
           bio: 'New bio',
           dob: new Date(1995, 4, 15),
           avatar: { kind: 'key', value: 'avatars/old.webp' },
@@ -102,7 +101,6 @@ describe('useUpdateProfile', () => {
         {
           firstName: 'Alice',
           lastName: 'Smith',
-          email: 'alice@example.com',
           bio: 'Old bio',
           dob: new Date(1995, 4, 15),
           avatar: { kind: 'key', value: 'avatars/old.webp' },
@@ -137,7 +135,6 @@ describe('useUpdateProfile', () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice',
         lastName: 'Smith',
-        email: 'alice@example.com',
         bio: 'Old bio',
         dob: new Date(1995, 4, 15),
         avatar: { kind: 'file', value: fakeFile },
@@ -166,7 +163,6 @@ describe('useUpdateProfile', () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice New',
         lastName: 'Smith',
-        email: 'alice@example.com',
         bio: 'Old bio',
         avatar: { kind: 'none' },
         urls: [{ value: 'https://old.com' }],

@@ -39,6 +39,10 @@ describe('UpdateProfileForm', () => {
     expect(screen.getByLabelText(/email address/i)).toHaveValue(
       'john.doe@example.com'
     )
+    expect(screen.getByLabelText(/email address/i)).toBeDisabled()
+    expect(
+      screen.getByText(/email changes require verification/i)
+    ).toBeInTheDocument()
     expect(screen.getByLabelText(/bio/i)).toHaveValue('Software engineer')
   })
 
@@ -63,7 +67,6 @@ describe('UpdateProfileForm', () => {
       expect.objectContaining({
         firstName: 'Johnny',
         lastName: 'Doe',
-        email: 'john.doe@example.com',
       }),
       expect.any(Object)
     )

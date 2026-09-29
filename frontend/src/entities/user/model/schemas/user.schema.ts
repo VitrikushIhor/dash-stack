@@ -18,14 +18,15 @@ export const userValidationRules = {
   bio: z.string().max(160, 'Bio must not be longer than 160 characters.'),
 }
 
-export const UpdateUserDtoSchema = z.object({
-  email: userValidationRules.email.optional(),
-  firstName: userValidationRules.firstName.nullable().optional(),
-  lastName: userValidationRules.lastName.nullable().optional(),
-  dob: z.string().nullable().optional(),
-  bio: userValidationRules.bio.nullable().optional(),
-  urls: z.array(z.string().url('Please enter a valid URL.')).optional(),
-  avatar: z.string().nullable().optional(),
-})
+export const UpdateUserDtoSchema = z
+  .object({
+    firstName: userValidationRules.firstName.nullable().optional(),
+    lastName: userValidationRules.lastName.nullable().optional(),
+    dob: z.string().nullable().optional(),
+    bio: userValidationRules.bio.nullable().optional(),
+    urls: z.array(z.string().url('Please enter a valid URL.')).optional(),
+    avatar: z.string().nullable().optional(),
+  })
+  .strict()
 
 export type UpdateUserDto = z.infer<typeof UpdateUserDtoSchema>

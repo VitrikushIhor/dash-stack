@@ -19,6 +19,7 @@ export function UpdateProfileForm({ user }: UpdateProfileFormProps) {
       <form onSubmit={onSubmit} className='space-y-8'>
         <ProfileFormElements
           form={form}
+          email={user.email}
           fields={fields}
           append={append}
           remove={remove}

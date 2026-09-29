@@ -36,7 +36,6 @@ describe('useUpdateProfileForm', () => {
     expect(result.current.form.getValues()).toEqual({
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
       bio: 'Software engineer',
       dob: new Date(1990, 0, 15),
       avatar: { kind: 'key', value: 'avatars/avatar.webp' },
