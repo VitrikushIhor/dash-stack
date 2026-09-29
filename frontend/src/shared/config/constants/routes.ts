@@ -3,6 +3,7 @@ export const ROUTES = {
 
   // Auth
   signIn: '/sign-in',
+  oauthStart: '/api/auth/oauth/start',
   signUp: '/sign-up',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
@@ -12,6 +13,7 @@ export const ROUTES = {
   organizations: '/organizations',
   createOrganization: '/create-organization',
   settings: '/settings',
+  settingsAccounts: '/user/settings/accounts',
   settingsAppearance: '/settings/appearance',
   settingsNotifications: '/settings/notifications',
   settingsDisplay: '/settings/display',
@@ -38,6 +40,7 @@ export const ROUTES = {
   vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
   vocabCatalog: '/vocab/catalog',
   vocabSettings: '/vocab/settings',
+  vocabSettingsAccounts: '/user/settings/accounts',
   vocabDeckStudy: (id: string) => `/vocab/decks/${id}/flashcards`,
   vocabDeckLearn: (id: string) => `/vocab/decks/${id}/learn`,
   vocabMatch: (id: string) => `/vocab/decks/${id}/match`,

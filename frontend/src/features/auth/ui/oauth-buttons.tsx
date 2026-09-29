@@ -12,17 +12,9 @@ export function OAuthButtons({
   disabled,
   showDivider = true,
 }: OAuthButtonsProps) {
-  const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN
-  const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID
-
   const handleOAuthRedirect = (connection: string) => {
     if (typeof window === 'undefined') return
-    const redirectUri = `${window.location.origin}/oauth/callback`
-    const authUrl = `https://${domain}/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(
-      redirectUri
-    )}&connection=${connection}&scope=openid%20profile%20email`
-
-    window.location.href = authUrl
+    window.location.href = `/api/auth/oauth/start?connection=${connection}`
   }
 
   return (

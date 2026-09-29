@@ -1,13 +1,6 @@
-import { OAuthCallback } from '@/views/auth'
+import { redirect } from 'next/navigation'
+import { ROUTES } from '@/shared/config'
 
-interface OAuthCallbackPageProps {
-  searchParams: Promise<{ code?: string; error?: string }>
-}
-
-export default async function OAuthCallbackRoute({
-  searchParams,
-}: OAuthCallbackPageProps) {
-  const { code, error } = await searchParams
-
-  return <OAuthCallback code={code} error={error} />
+export default function OAuthCallbackRoute(): never {
+  redirect(ROUTES.signIn)
 }
