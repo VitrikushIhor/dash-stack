@@ -1,4 +1,4 @@
-import { Bell, Monitor, Palette, UserCog } from 'lucide-react'
+import { Bell, Link2, Monitor, Palette, UserCog } from 'lucide-react'
 import { ROUTES } from '@/shared/config'
 import { Separator } from '@/shared/ui/core/separator'
 import { SidebarNav } from '@/shared/ui/sidebar-nav'
@@ -12,6 +12,11 @@ const sidebarNavItems = [
     title: 'Active sessions',
     href: ROUTES.settingsSessions,
     icon: <Monitor size={18} />,
+  },
+  {
+    title: 'Connected accounts',
+    href: ROUTES.settingsAccounts,
+    icon: <Link2 size={18} />,
   },
   {
     title: 'Profile',
