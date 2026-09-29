@@ -1,8 +1,11 @@
+import { usePathname } from 'next/navigation'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { type User, userApi, userKeys } from '@/entities/user'
 import { GuestStudySaveProgressCta } from './guest-study-save-progress-cta'
+
+vi.mock('next/navigation', () => ({ usePathname: vi.fn() }))
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -35,6 +38,17 @@ describe('GuestStudySaveProgressCta', () => {
       screen.getByRole('link', { name: /create account/i })
     ).toHaveAttribute('href', '/sign-up')
     expect(getMe).not.toHaveBeenCalled()
+  })
+
+  it('should_return_to_the_study_page_after_guest_sign_in', () => {
+    vi.mocked(usePathname).mockReturnValue('/vocab/decks/deck-1/flashcards')
+
+    renderCta(null)
+
+    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute(
+      'href',
+      '/sign-in?redirect=%2Fvocab%2Fdecks%2Fdeck-1%2Fflashcards'
+    )
   })
 
   it('does not render for an authenticated visitor', () => {

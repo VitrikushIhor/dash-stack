@@ -17,7 +17,7 @@ export function GuestStudySaveProgressCta() {
 
   const signInHref =
     pathname && pathname !== '/'
-      ? `${ROUTES.signIn}?redirectTo=${encodeURIComponent(pathname)}`
+      ? `${ROUTES.signIn}?redirect=${encodeURIComponent(pathname)}`
       : ROUTES.signIn
   const signUpHref =
     pathname && pathname !== '/'
