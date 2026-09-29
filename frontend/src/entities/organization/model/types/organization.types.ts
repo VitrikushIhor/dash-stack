@@ -47,7 +47,6 @@ export interface Invitation {
   email: string
   orgId: string
   role: OrgRole
-  token: string
   expiresAt: string
   invitedBy: string
   acceptedAt?: string

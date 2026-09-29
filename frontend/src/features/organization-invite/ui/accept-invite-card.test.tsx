@@ -50,13 +50,10 @@ describe('AcceptInviteCard Component', () => {
 
     renderComponent(<AcceptInviteCard token='valid-invite-token' />)
 
-    await waitFor(() => {
-      expect(mockAcceptInviteAction).toHaveBeenCalledWith('valid-invite-token')
-    })
-
     expect(
-      screen.getByText('Your invitation has been accepted!')
+      await screen.findByText('Your invitation has been accepted!')
     ).toBeInTheDocument()
+    expect(mockAcceptInviteAction).toHaveBeenCalledWith('valid-invite-token')
     expect(
       screen.getByText(/you have joined the organization/i)
     ).toBeInTheDocument()
