@@ -1,26 +1,10 @@
-import { z } from 'zod'
+import { envSchema } from './env.schema'
+import type { FrontendEnv } from './env.types'
 
-const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-  AWS_CLOUDFRONT_DOMAIN: z.string().optional(),
-  NEXT_PUBLIC_API_URL: z.string().url().optional(),
-  NEXT_PUBLIC_AUTH0_DOMAIN: z.string().optional(),
-  NEXT_PUBLIC_AUTH0_CLIENT_ID: z.string().optional(),
-  API_URL: z.string().url().optional(),
-  COOKIE_SECURE: z.string().optional(),
-})
-
-const parsedEnv = envSchema.safeParse(process.env)
-
-if (!parsedEnv.success) {
-  // eslint-disable-next-line no-console
-  console.error(
-    '❌ Invalid environment variables:',
-    parsedEnv.error.flatten().fieldErrors
-  )
-  throw new Error('Invalid environment variables')
+export function parseFrontendEnv(input: Record<string, unknown>): FrontendEnv {
+  const parsed = envSchema.safeParse(input)
+  if (!parsed.success) throw new Error('Invalid environment variables')
+  return parsed.data
 }
 
-export const env = parsedEnv.data
+export const env = parseFrontendEnv(process.env)
