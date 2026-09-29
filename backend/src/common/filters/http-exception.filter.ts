@@ -24,12 +24,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? errorResponse['message']
         : errorResponse;
 
-    this.logger.error(`Http Status: ${status} Error Message: ${JSON.stringify(message)}`);
+    this.logger.error(`HTTP request rejected with status ${status}`);
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path: request.path,
       message,
     });
   }

@@ -12,7 +12,7 @@ export default (): Config => ({
     credentials: true,
   },
   swagger: {
-    enabled: true,
+    enabled: process.env.NODE_ENV !== 'production',
     title: 'Nestjs ',
     description: 'The nestjs API description',
     version: '1.0',
