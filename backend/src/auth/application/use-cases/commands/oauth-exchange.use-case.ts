@@ -1,10 +1,16 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { OAuthSignupTransactionPort } from '../../ports/outgoing/oauth-signup-transaction.port';
 import { UserRepositoryPort } from '../../ports/outgoing/user.repository.port';
 import { AccountRepositoryPort } from '../../ports/outgoing/account.repository.port';
 import { TokenGeneratorPort } from '../../ports/outgoing/token-generator.port';
-import { Auth0ClientPort } from '../../ports/outgoing/auth0-client.port';
+import { Auth0ClientPort, Auth0UserInfo } from '../../ports/outgoing/auth0-client.port';
 import { AuthTokens } from '../../../shared/types/token.type';
-import { UNKNOWN_PROVIDER } from '../../../domain/constants/auth.constants';
+import { parseOAuthSubject } from '../../../domain/policies/oauth-identity.policy';
+import {
+  ConflictException,
+  UnauthorizedException,
+} from '../../../../common/exceptions/domain.exception';
+import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 
 import { OAuthExchangeCommand } from '../../commands/oauth-exchange.command';
 
@@ -21,65 +27,55 @@ export class OAuthExchangeUseCase {
     private readonly tokenGenerator: TokenGeneratorPort,
     @Inject('Auth0ClientPort')
     private readonly auth0Client: Auth0ClientPort,
+    @Inject('OAuthSignupTransactionPort')
+    private readonly oauthSignup: OAuthSignupTransactionPort,
   ) {}
 
   async execute(command: OAuthExchangeCommand): Promise<AuthTokens> {
     const userInfo = await this.auth0Client.getUserInfo(command.auth0Token);
-    const [provider, providerAccountId] = this.parseAuth0Sub(userInfo.sub);
+    return this.authenticate(userInfo);
+  }
+
+  async executeCode(code: string, codeVerifier: string, userAgent?: string): Promise<AuthTokens> {
+    const userInfo = await this.auth0Client.exchangeCode(code, codeVerifier);
+    return this.authenticate(userInfo, userAgent);
+  }
+
+  private async authenticate(userInfo: Auth0UserInfo, userAgent?: string): Promise<AuthTokens> {
+    if (userInfo.email_verified !== true) {
+      throw new UnauthorizedException(AUTH_ERRORS.AUTH0_EMAIL_NOT_VERIFIED);
+    }
+
+    const [provider, providerAccountId] = parseOAuthSubject(userInfo.sub);
 
     const existingAccount = await this.accountRepo.findByProvider(provider, providerAccountId);
 
     if (existingAccount) {
-      this.logger.log(`OAuth login: existing user ${existingAccount.user.email} via ${provider}`);
-      return this.tokenGenerator.generateTokens(existingAccount.user.id);
+      this.logger.log(`OAuth login succeeded via ${provider}`);
+      return userAgent
+        ? this.tokenGenerator.generateTokens(existingAccount.user.id, userAgent)
+        : this.tokenGenerator.generateTokens(existingAccount.user.id);
     }
 
-    let user = await this.userRepo.findByEmail(userInfo.email);
+    const existingUser = await this.userRepo.findByEmail(userInfo.email);
+    if (existingUser) {
+      throw new ConflictException(AUTH_ERRORS.AUTH0_LINKING_NOT_ALLOWED);
+    }
 
-    if (user) {
-      this.logger.log(`OAuth login: linking ${provider} to existing user ${userInfo.email}`);
-    } else {
-      const firstName = userInfo.name?.split(' ')[0] || null;
-      const lastName = userInfo.name?.split(' ').slice(1).join(' ') || null;
-
-      user = await this.userRepo.create({
+    const userId = await this.oauthSignup.create({
+      user: {
         email: userInfo.email,
-        firstName,
-        lastName,
+        firstName: userInfo.name?.split(' ')[0] || null,
+        lastName: userInfo.name?.split(' ').slice(1).join(' ') || null,
         avatar: userInfo.picture || null,
         emailVerified: new Date(),
-      });
-
-      this.logger.log(`OAuth login: created new user ${userInfo.email} via ${provider}`);
-    }
-
-    await this.accountRepo.create({
-      userId: user.id,
+      },
       provider,
       providerAccountId,
     });
-
-    return this.tokenGenerator.generateTokens(user.id);
-  }
-
-  /**
-   * Parse Auth0 `sub` claim into provider and account ID.
-   * Examples:
-   *   "google-oauth2|123456789" → ["google", "123456789"]
-   *   "github|12345"            → ["github", "12345"]
-   *   "auth0|abc123"            → ["auth0", "abc123"]
-   */
-  private parseAuth0Sub(sub: string): [string, string] {
-    const separatorIndex = sub.indexOf('|');
-
-    if (separatorIndex === -1) {
-      return [UNKNOWN_PROVIDER, sub];
-    }
-
-    const rawProvider = sub.substring(0, separatorIndex);
-    const accountId = sub.substring(separatorIndex + 1);
-    const provider = rawProvider.replace('-oauth2', '');
-
-    return [provider, accountId];
+    this.logger.log(`OAuth account created via ${provider}`);
+    return userAgent
+      ? this.tokenGenerator.generateTokens(userId, userAgent)
+      : this.tokenGenerator.generateTokens(userId);
   }
 }

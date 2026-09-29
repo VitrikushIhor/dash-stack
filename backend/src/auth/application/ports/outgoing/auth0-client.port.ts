@@ -8,4 +8,5 @@ export interface Auth0UserInfo {
 
 export interface Auth0ClientPort {
   getUserInfo(token: string): Promise<Auth0UserInfo>;
+  exchangeCode(code: string, codeVerifier: string): Promise<Auth0UserInfo>;
 }
