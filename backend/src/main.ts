@@ -35,10 +35,10 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true, // Enable transformation
       transformOptions: {
-        enableImplicitConversion: true, // Enable automatic type conversion
+        enableImplicitConversion: false,
       },
       whitelist: true, // Remove properties that are not in the DTO
-      forbidNonWhitelisted: false,
+      forbidNonWhitelisted: true,
     }),
   );
 
