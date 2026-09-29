@@ -6,6 +6,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
+import {
+  AUTH_SESSION_EVENT_KIND,
+  publishAuthSessionEvent,
+} from '@/shared/lib/auth-session-events'
 import { oauthExchangeAction } from '../../api/actions/oauth-exchange.action'
 import { extractOAuthToken } from '../../lib/oauth-token-extractor'
 
@@ -23,6 +27,7 @@ export function useOAuthCallback({ code, error }: UseOAuthCallbackProps) {
     successMessage: 'Successfully signed in!',
     onSuccess: () => {
       queryClient.clear()
+      publishAuthSessionEvent(AUTH_SESSION_EVENT_KIND.SIGNED_IN)
       router.replace(ROUTES.vocabDecks)
     },
   })

@@ -7,6 +7,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
+import {
+  AUTH_SESSION_EVENT_KIND,
+  publishAuthSessionEvent,
+} from '@/shared/lib/auth-session-events'
 import { sanitizeRedirectUrl } from '@/shared/lib/utils'
 import { signInAction } from '../../api/actions/sign-in.action'
 import {
@@ -31,6 +35,7 @@ export function useSignInForm(options?: UseSignInFormProps) {
   const { execute: signIn, isPending } = useAction(signInAction, {
     onSuccess: () => {
       queryClient.clear()
+      publishAuthSessionEvent(AUTH_SESSION_EVENT_KIND.SIGNED_IN)
       toast.success(`Welcome back, ${form.getValues('email')}!`)
 
       const targetPath = sanitizeRedirectUrl(

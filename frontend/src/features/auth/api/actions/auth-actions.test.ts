@@ -169,7 +169,7 @@ describe('Auth Server Actions', () => {
       })
     })
 
-    it('clears cookies and returns success ActionState even if logout endpoint throws', async () => {
+    it('clears local cookies and reports failure when server revocation fails', async () => {
       const mockGet = vi
         .fn()
         .mockReturnValue({ value: 'existing-refresh-token' })
@@ -185,8 +185,8 @@ describe('Auth Server Actions', () => {
 
       expect(clearAuthCookies).toHaveBeenCalled()
       expect(result).toEqual({
-        success: true,
-        data: { message: 'Logged out successfully' },
+        success: false,
+        error: 'Network error',
       })
     })
 
