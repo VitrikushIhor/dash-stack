@@ -1,13 +1,10 @@
-import { notFound } from 'next/navigation'
-import { getCurrentUser } from '@/entities/user/server'
+import { requireAuthenticatedUser } from '@/entities/user/server'
 import { UpdateProfileForm } from '@/features/update-profile'
 
-export default async function SettingsProfilePage() {
-  const { data: user } = await getCurrentUser()
+export const dynamic = 'force-dynamic'
 
-  if (!user) {
-    notFound()
-  }
+export default async function SettingsProfilePage() {
+  const user = await requireAuthenticatedUser()
 
   return (
     <div className='space-y-6'>

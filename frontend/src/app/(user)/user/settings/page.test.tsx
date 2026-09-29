@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ensureHasOrganization } from '@/entities/organization/server'
 import { requireAuthenticatedUser } from '@/entities/user/server'
-import VocabularySettingsPage from './page'
+import UserSettingsPage from './page'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/entities/organization/server', () => ({
@@ -17,7 +17,7 @@ vi.mock('@/features/update-profile', () => ({
   ),
 }))
 
-describe('VocabularySettingsPage', () => {
+describe('UserSettingsPage', () => {
   beforeEach(() => {
     vi.mocked(requireAuthenticatedUser).mockResolvedValue({
       id: 'owner',
@@ -27,12 +27,12 @@ describe('VocabularySettingsPage', () => {
   })
 
   it('should_render_profile_settings_for_an_authenticated_user_without_an_organization', async () => {
-    render(await VocabularySettingsPage())
+    render(await UserSettingsPage())
 
     expect(requireAuthenticatedUser).toHaveBeenCalledOnce()
     expect(ensureHasOrganization).not.toHaveBeenCalled()
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Settings' })
+      screen.getByRole('heading', { level: 3, name: 'Profile' })
     ).toBeInTheDocument()
     expect(
       screen.getByText('Profile form for owner@example.test')
@@ -44,6 +44,6 @@ describe('VocabularySettingsPage', () => {
       new Error('Unauthorized')
     )
 
-    await expect(VocabularySettingsPage()).rejects.toThrow('Unauthorized')
+    await expect(UserSettingsPage()).rejects.toThrow('Unauthorized')
   })
 })
