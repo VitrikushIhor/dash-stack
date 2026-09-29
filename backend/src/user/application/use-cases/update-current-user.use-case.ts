@@ -17,15 +17,15 @@ export class UpdateCurrentUserUseCase {
       throw new UserNotFoundException();
     }
 
-    const updatedUser = await this.userRepo.updateProfile(command.userId, {
-      email: command.email,
-      firstName: command.firstName ?? null,
-      lastName: command.lastName ?? null,
-      dob: command.dob ? new Date(command.dob) : null,
-      bio: command.bio ?? null,
-      urls: command.urls ?? null,
-      avatar: command.avatar ?? null,
-    });
+    const changes: Parameters<UserRepositoryPort['updateProfile']>[1] = {};
+    if (command.firstName !== undefined) changes.firstName = command.firstName;
+    if (command.lastName !== undefined) changes.lastName = command.lastName;
+    if (command.dob !== undefined) changes.dob = command.dob ? new Date(command.dob) : null;
+    if (command.bio !== undefined) changes.bio = command.bio;
+    if (command.urls !== undefined) changes.urls = command.urls;
+    if (command.avatar !== undefined) changes.avatar = command.avatar;
+
+    const updatedUser = await this.userRepo.updateProfile(command.userId, changes);
 
     return UserReadModel.fromSummary(updatedUser);
   }
