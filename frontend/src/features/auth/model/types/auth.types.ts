@@ -1,6 +1,5 @@
-export interface AuthTokens {
-  accessToken: string
-  refreshToken: string
+export interface AuthenticatedActionResult {
+  authenticated: true
 }
 
 export interface SignUpInput {

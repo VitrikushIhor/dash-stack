@@ -1,5 +1,4 @@
 export type {
-  AuthTokens,
   SignUpInput,
   SignInInput,
   VerificationStatus,

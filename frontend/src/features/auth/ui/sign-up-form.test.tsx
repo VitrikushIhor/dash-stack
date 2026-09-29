@@ -84,5 +84,11 @@ describe('SignUpForm Component', () => {
     expect(
       screen.getByRole('link', { name: /back to sign in/i })
     ).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: /request another link/i })
+    )
+    expect(
+      screen.getByRole('button', { name: /create account/i })
+    ).toBeInTheDocument()
   })
 })
