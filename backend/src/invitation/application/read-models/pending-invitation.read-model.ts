@@ -6,7 +6,6 @@ export interface PendingInvitationReadModel {
   role: OrgRole;
   orgId: string;
   invitedBy: string;
-  token: string;
   expiresAt: Date;
   acceptedAt: Date | null;
   createdAt: Date;

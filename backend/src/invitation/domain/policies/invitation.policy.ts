@@ -12,9 +12,17 @@ import {
   InvitationEmailMismatchException,
   InvitationAlreadyAcceptedException,
   InvitationExpiredException,
+  OwnerInvitationForbiddenException,
 } from '../exceptions/invitation-invalid.exception';
+import { OrgRole } from '../../../organization/domain/enums/org-role.enum';
 
 export class InvitationPolicy {
+  static assertInvitableRole(role: OrgRole): void {
+    if (role === OrgRole.OWNER) {
+      throw new OwnerInvitationForbiddenException();
+    }
+  }
+
   static assertNotAlreadyMember(existingMember: unknown): void {
     if (existingMember) {
       throw new AlreadyMemberException();
@@ -48,7 +56,7 @@ export class InvitationPolicy {
       throw new InvitationAlreadyAcceptedException();
     }
 
-    if (invitation.expiresAt < new Date()) {
+    if (invitation.expiresAt <= new Date()) {
       throw new InvitationExpiredException();
     }
   }

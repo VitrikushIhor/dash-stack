@@ -8,6 +8,7 @@ import {
   InvitationEmailMismatchException,
   InvitationAlreadyAcceptedException,
   InvitationExpiredException,
+  OwnerInvitationForbiddenException,
 } from '../../../domain/exceptions/invitation-invalid.exception';
 
 const mockInvitation = (
@@ -18,7 +19,6 @@ const mockInvitation = (
   role: OrgRole.MEMBER,
   orgId: 'org-1',
   invitedBy: 'admin-1',
-  token: 'token-abc',
   expiresAt: new Date(Date.now() + 86400000),
   acceptedAt: null,
   createdAt: new Date(),
@@ -61,7 +61,13 @@ describe('AcceptInviteUseCase', () => {
 
     expect(result).toBe(membership);
     expect(repository.findByToken).toHaveBeenCalledWith('token-abc');
-    expect(repository.accept).toHaveBeenCalledWith('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
+    expect(repository.accept).toHaveBeenCalledWith(
+      'inv-1',
+      'user-1',
+      'user@example.com',
+      'org-1',
+      OrgRole.MEMBER,
+    );
   });
 
   it('should throw InvitationNotFoundException when token is invalid', async () => {
@@ -89,6 +95,13 @@ describe('AcceptInviteUseCase', () => {
       useCase.execute({ ...command, userEmail: 'USER@EXAMPLE.COM' }),
     ).resolves.not.toThrow();
     expect(repository.accept).toHaveBeenCalled();
+  });
+
+  it('should_reject_legacy_pending_invitation_when_role_is_owner', async () => {
+    repository.findByToken.mockResolvedValue(mockInvitation({ role: OrgRole.OWNER }));
+
+    await expect(useCase.execute(command)).rejects.toThrow(OwnerInvitationForbiddenException);
+    expect(repository.accept).not.toHaveBeenCalled();
   });
 
   it('should throw InvitationAlreadyAcceptedException when already accepted', async () => {

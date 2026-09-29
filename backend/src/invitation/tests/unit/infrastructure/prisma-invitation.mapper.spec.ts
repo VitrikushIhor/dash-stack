@@ -25,7 +25,7 @@ describe('PrismaInvitationMapper', () => {
       expect(result.role).toBe(OrgRole.MEMBER);
       expect(result.orgId).toBe('org-1');
       expect(result.invitedBy).toBe('admin-1');
-      expect(result.token).toBe('token-abc-123');
+      expect(result).not.toHaveProperty('token');
     });
 
     it('maps dates correctly', () => {

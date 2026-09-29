@@ -22,7 +22,6 @@ export class PrismaInvitationMapper {
       role: PrismaOrgRoleMapper.toDomain(payload.role),
       orgId: payload.orgId,
       invitedBy: payload.invitedBy,
-      token: payload.token,
       expiresAt: payload.expiresAt,
       acceptedAt: payload.acceptedAt,
       createdAt: payload.createdAt,
