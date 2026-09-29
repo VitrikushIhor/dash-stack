@@ -1,5 +1,6 @@
+import { HTTP_METHODS } from '@/shared/api/http-methods'
+import type { ApiErrorResponse, RequestOptions } from '../types'
 import { ApiError, extractErrorMessage } from './api-error'
-import type { ApiErrorResponse, RequestOptions } from './types'
 
 export interface HttpClientConfig {
   baseURL: string
@@ -7,6 +8,7 @@ export interface HttpClientConfig {
   getHeaders: () => Promise<Record<string, string>> | Record<string, string>
   /** Hook fired on 401 — e.g. redirect on client, throw/redirect on server */
   onUnauthorized?: () => void
+  onResponse?: (response: Response) => Promise<void> | void
 }
 
 function buildQueryString(params?: RequestOptions['params']): string {
@@ -41,7 +43,7 @@ export function createHttpClient(config: HttpClientConfig) {
     options: RequestOptions<TBody> = {}
   ): Promise<T> {
     const {
-      method = 'GET',
+      method = HTTP_METHODS.GET,
       body,
       params,
       headers: customHeaders,
@@ -83,6 +85,8 @@ export function createHttpClient(config: HttpClientConfig) {
       }
     )
 
+    await config.onResponse?.(response)
+
     if (response.status === 401 && !suppressUnauthorizedHandler) {
       config.onUnauthorized?.()
     }
@@ -103,24 +107,39 @@ export function createHttpClient(config: HttpClientConfig) {
     get: <T>(
       endpoint: string,
       options?: Omit<RequestOptions, 'method' | 'body'>
-    ) => request<T>(endpoint, { ...options, method: 'GET' }),
+    ) => request<T>(endpoint, { ...options, method: HTTP_METHODS.GET }),
     post: <T, TBody = unknown>(
       endpoint: string,
       body?: TBody,
       options?: Omit<RequestOptions<TBody>, 'method' | 'body'>
-    ) => request<T, TBody>(endpoint, { ...options, method: 'POST', body }),
+    ) =>
+      request<T, TBody>(endpoint, {
+        ...options,
+        method: HTTP_METHODS.POST,
+        body,
+      }),
     put: <T, TBody = unknown>(
       endpoint: string,
       body?: TBody,
       options?: Omit<RequestOptions<TBody>, 'method' | 'body'>
-    ) => request<T, TBody>(endpoint, { ...options, method: 'PUT', body }),
+    ) =>
+      request<T, TBody>(endpoint, {
+        ...options,
+        method: HTTP_METHODS.PUT,
+        body,
+      }),
     patch: <T, TBody = unknown>(
       endpoint: string,
       body?: TBody,
       options?: Omit<RequestOptions<TBody>, 'method' | 'body'>
-    ) => request<T, TBody>(endpoint, { ...options, method: 'PATCH', body }),
+    ) =>
+      request<T, TBody>(endpoint, {
+        ...options,
+        method: HTTP_METHODS.PATCH,
+        body,
+      }),
     delete: <T>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
-      request<T>(endpoint, { ...options, method: 'DELETE' }),
+      request<T>(endpoint, { ...options, method: HTTP_METHODS.DELETE }),
   }
 }
 

@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 import { logger } from '@/shared/lib'
-import { ApiError } from './api-error'
+import { ApiError } from './http/api-error'
 
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof ApiError) {
@@ -14,7 +14,9 @@ export const getErrorMessage = (error: unknown): string => {
 }
 
 export function handleServerError(error: unknown): void {
-  logger.error('[Server Error]:', error)
+  logger.error('[Server Error]', {
+    statusCode: error instanceof ApiError ? error.statusCode : undefined,
+  })
 
   if (Array.isArray(error)) {
     error.forEach((msg) => {
