@@ -45,3 +45,5 @@ export { VerifyEmailCard } from './ui/verify-email-card'
 export { OAuthCallbackCard } from './ui/oauth-callback-card'
 export { OAuthButtons } from './ui/oauth-buttons'
 export { SignOutDialog } from './ui/sign-out-dialog'
+
+export { AuthSessionSync } from './ui/auth-session-sync'
