@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsBcryptPassword } from '../validators/is-bcrypt-password.decorator';
 
 export class SignupDto {
   @ApiProperty({
@@ -16,6 +17,7 @@ export class SignupDto {
   })
   @IsNotEmpty()
   @MinLength(8)
+  @IsBcryptPassword()
   password: string;
 
   @ApiProperty({ example: 'John', description: 'First name', required: false })
