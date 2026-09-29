@@ -5,47 +5,86 @@ import { AuthTokenType } from '../../../../../src/auth/domain/enums/token-type.e
 describe('VerifyEmailUseCase', () => {
   let useCase: VerifyEmailUseCase;
   let verificationTokenRepoMock: any;
-  let userRepoMock: any;
   let tokenGeneratorMock: any;
+  let oneTimeTokenMock: any;
+  let sessionCredentialMock: any;
+  let emailVerificationTransactionMock: any;
 
   beforeEach(() => {
     verificationTokenRepoMock = {
       findByToken: jest.fn(),
       deleteById: jest.fn(),
     };
-    userRepoMock = {
-      updateEmailVerified: jest.fn(),
-    };
     tokenGeneratorMock = {
-      generateTokens: jest.fn(),
+      generateAccessToken: jest.fn(),
+      getSessionExpiresAt: jest.fn(),
+    };
+    oneTimeTokenMock = {
+      hash: jest.fn().mockReturnValue('token-hash'),
+    };
+    sessionCredentialMock = {
+      create: jest.fn().mockReturnValue({ raw: 'raw-session', hash: 'session-hash' }),
+    };
+    emailVerificationTransactionMock = {
+      complete: jest.fn(),
     };
 
-    useCase = new VerifyEmailUseCase(verificationTokenRepoMock, userRepoMock, tokenGeneratorMock);
+    useCase = new VerifyEmailUseCase(
+      verificationTokenRepoMock,
+      tokenGeneratorMock,
+      oneTimeTokenMock,
+      sessionCredentialMock,
+      emailVerificationTransactionMock,
+    );
   });
 
   it('should successfully verify email and generate tokens', async () => {
     verificationTokenRepoMock.findByToken.mockResolvedValue({
       id: 'token-1',
       email: 'test@example.com',
+      token: 'token-hash',
       type: AuthTokenType.EMAIL_VERIFICATION,
       expires: new Date(Date.now() + 10000),
     });
-    userRepoMock.updateEmailVerified.mockResolvedValue({ id: 'user-1' });
-    tokenGeneratorMock.generateTokens.mockReturnValue({ accessToken: 'acc' });
+    tokenGeneratorMock.getSessionExpiresAt.mockReturnValue(new Date('2026-10-02T10:00:00.000Z'));
+    tokenGeneratorMock.generateAccessToken.mockReturnValue('access-token');
+    emailVerificationTransactionMock.complete.mockResolvedValue({
+      userId: 'user-1',
+      sessionId: 'session-1',
+    });
 
     const result = await useCase.execute({ token: 'valid' });
 
-    expect(userRepoMock.updateEmailVerified).toHaveBeenCalledWith(
-      'test@example.com',
-      expect.any(Date),
-    );
-    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
-    expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('user-1');
-    expect(result).toEqual({ accessToken: 'acc' });
+    expect(verificationTokenRepoMock.findByToken).toHaveBeenCalledWith('token-hash');
+    expect(emailVerificationTransactionMock.complete).toHaveBeenCalledWith({
+      tokenId: 'token-1',
+      tokenHash: 'token-hash',
+      email: 'test@example.com',
+      credentialHash: 'session-hash',
+      sessionExpiresAt: new Date('2026-10-02T10:00:00.000Z'),
+      now: expect.any(Date),
+    });
+    expect(tokenGeneratorMock.generateAccessToken).toHaveBeenCalledWith('user-1', 'session-1');
+    expect(result).toEqual({ accessToken: 'access-token', refreshToken: 'raw-session' });
   });
 
   it('should throw BadRequestException if token not found', async () => {
     verificationTokenRepoMock.findByToken.mockResolvedValue(null);
     await expect(useCase.execute({ token: 'invalid' })).rejects.toThrow(BadRequestException);
+  });
+
+  it('should reject verification when token was consumed concurrently', async () => {
+    verificationTokenRepoMock.findByToken.mockResolvedValue({
+      id: 'token-1',
+      email: 'test@example.com',
+      token: 'token-hash',
+      type: AuthTokenType.EMAIL_VERIFICATION,
+      expires: new Date(Date.now() + 10_000),
+    });
+    tokenGeneratorMock.getSessionExpiresAt.mockReturnValue(new Date(Date.now() + 10_000));
+    emailVerificationTransactionMock.complete.mockResolvedValue(null);
+
+    await expect(useCase.execute({ token: 'valid' })).rejects.toThrow(BadRequestException);
+    expect(tokenGeneratorMock.generateAccessToken).not.toHaveBeenCalled();
   });
 });

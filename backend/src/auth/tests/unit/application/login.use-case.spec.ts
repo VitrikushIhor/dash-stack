@@ -1,7 +1,7 @@
+import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { LoginUseCase } from '../../../../../src/auth/application/use-cases/commands/login.use-case';
 import {
   UnauthorizedException,
-  BadRequestException,
   ForbiddenException,
 } from '../../../../../src/common/exceptions/domain.exception';
 
@@ -17,6 +17,7 @@ describe('LoginUseCase', () => {
     };
     passwordHasherMock = {
       validatePassword: jest.fn(),
+      hashPassword: jest.fn(),
     };
     tokenGeneratorMock = {
       generateTokens: jest.fn(),
@@ -41,6 +42,7 @@ describe('LoginUseCase', () => {
     const result = await useCase.execute({
       email: 'test@example.com',
       password: 'password123',
+      userAgent: 'Browser test agent',
     });
 
     expect(userRepoMock.findByEmailWithPassword).toHaveBeenCalledWith('test@example.com');
@@ -48,7 +50,7 @@ describe('LoginUseCase', () => {
       'password123',
       'hashed_password',
     );
-    expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('1');
+    expect(tokenGeneratorMock.generateTokens).toHaveBeenCalledWith('1', 'Browser test agent');
     expect(result).toEqual({
       accessToken: 'acc_token',
       refreshToken: 'ref_token',
@@ -61,17 +63,21 @@ describe('LoginUseCase', () => {
     await expect(useCase.execute({ email: 'test@example.com', password: 'pwd' })).rejects.toThrow(
       UnauthorizedException,
     );
+    expect(passwordHasherMock.hashPassword).toHaveBeenCalledWith('pwd');
   });
 
-  it('should throw BadRequestException if user has no password (social login)', async () => {
+  it('should return generic credentials error if user has no password (social login)', async () => {
     userRepoMock.findByEmailWithPassword.mockResolvedValue({
       id: '1',
       password: null,
     });
 
-    await expect(useCase.execute({ email: 'test@example.com', password: 'pwd' })).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(
+      useCase.execute({ email: 'test@example.com', password: 'pwd' }),
+    ).rejects.toMatchObject({
+      message: AUTH_ERRORS.INVALID_CREDENTIALS,
+    });
+    expect(passwordHasherMock.hashPassword).toHaveBeenCalledWith('pwd');
   });
 
   it('should throw UnauthorizedException on wrong password', async () => {

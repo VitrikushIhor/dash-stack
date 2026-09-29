@@ -21,7 +21,6 @@ model User {
   urls                   String[]             @default([])
   accounts               Account[]
   memberships            Membership[]
-  refreshTokens          RefreshToken[]
   authSessions           AuthSession[]
   decks                  Deck[]               @relation("UserDecks")
   vocabProgress          VocabProgress[]      @relation("UserVocabProgress")
@@ -88,20 +87,6 @@ model VerificationToken {
   @@index([expires])
 }
 
-model RefreshToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  userAgent String?
-  ipAddress String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
-  @@index([expiresAt])
-}
 
 model Organization {
   id             String              @id @default(cuid())

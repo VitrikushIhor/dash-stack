@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UnauthorizedException } from '../../../../common/exceptions/domain.exception';
-import { RefreshTokenRepositoryPort } from '../../ports/outgoing/refresh-token.repository.port';
+import { AuthSessionRepositoryPort } from '../../ports/outgoing/auth-session.repository.port';
+import { SessionCredentialPort } from '../../ports/outgoing/session-credential.port';
 import { TokenGeneratorPort } from '../../ports/outgoing/token-generator.port';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokens } from '../../../shared/types/token.type';
@@ -9,26 +10,28 @@ import { RefreshTokenCommand } from '../../commands/refresh-token.command';
 @Injectable()
 export class RefreshTokenUseCase {
   constructor(
-    @Inject('RefreshTokenRepositoryPort')
-    private readonly refreshTokenRepo: RefreshTokenRepositoryPort,
+    @Inject('AuthSessionRepositoryPort')
+    private readonly authSessionRepo: AuthSessionRepositoryPort,
+    @Inject('SessionCredentialPort')
+    private readonly sessionCredential: SessionCredentialPort,
     @Inject('TokenGeneratorPort')
     private readonly tokenGenerator: TokenGeneratorPort,
   ) {}
 
   async execute(command: RefreshTokenCommand): Promise<AuthTokens> {
-    const refreshToken = await this.refreshTokenRepo.findByToken(command.token);
+    const credentialHash = this.sessionCredential.hash(command.token);
+    const session = await this.authSessionRepo.findByCredentialHash(credentialHash);
 
-    if (!refreshToken) {
+    if (!session) {
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_REFRESH_TOKEN);
     }
-
-    if (refreshToken.expiresAt < new Date()) {
-      await this.refreshTokenRepo.deleteById(refreshToken.id);
+    if (session.revokedAt || session.expiresAt <= new Date()) {
       throw new UnauthorizedException(AUTH_ERRORS.REFRESH_TOKEN_EXPIRED);
     }
 
-    await this.refreshTokenRepo.deleteById(refreshToken.id);
-
-    return this.tokenGenerator.generateTokens(refreshToken.userId);
+    return {
+      accessToken: this.tokenGenerator.generateAccessToken(session.userId, session.id),
+      refreshToken: command.token,
+    };
   }
 }

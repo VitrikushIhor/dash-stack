@@ -1,30 +1,50 @@
+import { AuthSessionRepositoryPort } from '../../../../../src/auth/application/ports/outgoing/auth-session.repository.port';
+import { SessionCredentialPort } from '../../../../../src/auth/application/ports/outgoing/session-credential.port';
 import { LogoutUseCase } from '../../../../../src/auth/application/use-cases/commands/logout.use-case';
-import { BadRequestException } from '../../../../../src/common/exceptions/domain.exception';
 import { AUTH_ERRORS } from '../../../../../src/auth/domain/constants/auth-errors';
+import { BadRequestException } from '../../../../../src/common/exceptions/domain.exception';
 
 describe('LogoutUseCase', () => {
   let useCase: LogoutUseCase;
-  let refreshTokenRepoMock: any;
+  let authSessionRepo: jest.Mocked<AuthSessionRepositoryPort>;
+  let sessionCredential: jest.Mocked<SessionCredentialPort>;
 
   beforeEach(() => {
-    refreshTokenRepoMock = {
-      deleteByToken: jest.fn(),
+    authSessionRepo = {
+      recordActivity: jest.fn(),
+      create: jest.fn(),
+      findByCredentialHash: jest.fn(),
+      findById: jest.fn(),
+      revokeByCredentialHash: jest.fn(),
+      revokeAllByUserId: jest.fn(),
     };
-    useCase = new LogoutUseCase(refreshTokenRepoMock);
+    sessionCredential = {
+      create: jest.fn(),
+      hash: jest.fn(),
+    };
+
+    useCase = new LogoutUseCase(authSessionRepo, sessionCredential);
   });
 
-  it('should delete the refresh token and return success', async () => {
-    refreshTokenRepoMock.deleteByToken.mockResolvedValue({ count: 1 });
+  it('should_revoke_auth_session_when_session_credential_is_valid', async () => {
+    sessionCredential.hash.mockReturnValue('credential-hash');
+    authSessionRepo.revokeByCredentialHash.mockResolvedValue({ count: 1 });
 
-    const result = await useCase.execute({ refreshToken: 'valid-token' });
+    const result = await useCase.execute({ refreshToken: 'session-credential' });
 
-    expect(refreshTokenRepoMock.deleteByToken).toHaveBeenCalledWith('valid-token');
+    expect(authSessionRepo.revokeByCredentialHash).toHaveBeenCalledWith(
+      'credential-hash',
+      expect.any(Date),
+    );
     expect(result).toEqual({ message: AUTH_ERRORS.LOGOUT_SUCCESS });
   });
 
-  it('should throw BadRequestException if token not found (count 0)', async () => {
-    refreshTokenRepoMock.deleteByToken.mockResolvedValue({ count: 0 });
+  it('should_reject_logout_when_session_is_not_found', async () => {
+    sessionCredential.hash.mockReturnValue('unknown-hash');
+    authSessionRepo.revokeByCredentialHash.mockResolvedValue({ count: 0 });
 
-    await expect(useCase.execute({ refreshToken: 'invalid' })).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute({ refreshToken: 'unknown-token' })).rejects.toThrow(
+      BadRequestException,
+    );
   });
 });

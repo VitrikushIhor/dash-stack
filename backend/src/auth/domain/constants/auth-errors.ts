@@ -19,7 +19,7 @@ export const AUTH_ERRORS = {
   RESET_TOKEN_EXPIRED: 'Reset token has expired',
 
   FORGOT_PASSWORD_SUCCESS: 'If an account exists, a password reset email has been sent.',
-  SIGNUP_SUCCESS: 'Verification email sent. Please check your inbox.',
+  SIGNUP_SUCCESS: 'If this address needs verification, check your inbox.',
   LOGOUT_SUCCESS: 'Logged out successfully',
   LOGOUT_ALL_SUCCESS: 'Logged out from all devices',
   RESET_PASSWORD_SUCCESS: 'Password reset successfully. Please log in with your new password.',

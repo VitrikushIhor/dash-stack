@@ -1,3 +1,8 @@
+import { PrismaPasswordResetTransaction } from './infrastructure/persistence/prisma-password-reset-transaction';
+import { PrismaEmailVerificationTransaction } from './infrastructure/persistence/prisma-email-verification-transaction';
+import { PrismaSignupTransaction } from './infrastructure/persistence/prisma-signup-transaction';
+import { SessionCredentialAdapter } from './infrastructure/security/session-credential.adapter';
+import { OneTimeTokenAdapter } from './infrastructure/security/one-time-token.adapter';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaService } from 'nestjs-prisma';
 import { PostgresThrottlerStorage } from './infrastructure/throttling/postgres-throttler-storage';
@@ -28,7 +33,7 @@ import { ValidateUserUseCase } from './application/use-cases/queries/validate-us
 
 // Infrastructure — Persistence
 import { PrismaUserRepository } from './infrastructure/persistence/prisma-user.repository';
-import { PrismaRefreshTokenRepository } from './infrastructure/persistence/prisma-refresh-token.repository';
+import { PrismaAuthSessionRepository } from './infrastructure/persistence/prisma-auth-session.repository';
 import { PrismaVerificationTokenRepository } from './infrastructure/persistence/prisma-verification-token.repository';
 import { PrismaAccountRepository } from './infrastructure/persistence/prisma-account.repository';
 
@@ -70,6 +75,20 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
   ],
   controllers: [AuthController],
   providers: [
+    PrismaPasswordResetTransaction,
+    { provide: 'PasswordResetTransactionPort', useExisting: PrismaPasswordResetTransaction },
+    PrismaEmailVerificationTransaction,
+    {
+      provide: 'EmailVerificationTransactionPort',
+      useExisting: PrismaEmailVerificationTransaction,
+    },
+    PrismaSignupTransaction,
+    { provide: 'SignupTransactionPort', useExisting: PrismaSignupTransaction },
+    SessionCredentialAdapter,
+    { provide: 'SessionCredentialPort', useExisting: SessionCredentialAdapter },
+    OneTimeTokenAdapter,
+    { provide: 'OneTimeTokenPort', useExisting: OneTimeTokenAdapter },
+
     AuthCredentialRetentionService,
     // Presentation
     JwtStrategy,
@@ -90,10 +109,10 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
     // Infrastructure — Persistence
     PrismaUserRepository,
     { provide: 'UserRepositoryPort', useExisting: PrismaUserRepository },
-    PrismaRefreshTokenRepository,
+    PrismaAuthSessionRepository,
     {
-      provide: 'RefreshTokenRepositoryPort',
-      useExisting: PrismaRefreshTokenRepository,
+      provide: 'AuthSessionRepositoryPort',
+      useExisting: PrismaAuthSessionRepository,
     },
     PrismaVerificationTokenRepository,
     {

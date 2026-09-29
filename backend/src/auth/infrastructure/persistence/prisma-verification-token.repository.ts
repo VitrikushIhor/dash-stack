@@ -45,6 +45,19 @@ export class PrismaVerificationTokenRepository implements VerificationTokenRepos
     return this.mapToModel(result);
   }
 
+  async issueLatest(data: CreateVerificationTokenData): Promise<VerificationTokenModel> {
+    const result = await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${data.email}:${data.type}`}, 0))`;
+      await tx.verificationToken.deleteMany({
+        where: { email: data.email, type: data.type as TokenType },
+      });
+      return tx.verificationToken.create({
+        data: { ...data, type: data.type as TokenType },
+      });
+    });
+    return this.mapToModel(result);
+  }
+
   async deleteById(id: string): Promise<VerificationTokenModel> {
     const result = await this.prisma.verificationToken.delete({
       where: { id },
