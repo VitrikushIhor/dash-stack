@@ -1,3 +1,7 @@
+import { ThrottlerModule } from '@nestjs/throttler';
+import { PrismaService } from 'nestjs-prisma';
+import { PostgresThrottlerStorage } from './infrastructure/throttling/postgres-throttler-storage';
+import { AuthCredentialRetentionService } from './infrastructure/maintenance/auth-credential-retention.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -38,6 +42,16 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
 
 @Module({
   imports: [
+    ThrottlerModule.forRootAsync({
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) => ({
+        throttlers: [
+          { name: 'default', ttl: 60000, limit: 600 },
+          { name: 'abuse', ttl: 60000, limit: 1200, getTracker: () => 'all' },
+        ],
+        storage: new PostgresThrottlerStorage(prisma),
+      }),
+    }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
@@ -56,6 +70,7 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
   ],
   controllers: [AuthController],
   providers: [
+    AuthCredentialRetentionService,
     // Presentation
     JwtStrategy,
     JwtAuthGuard,
@@ -106,6 +121,12 @@ import { Auth0ClientAdapter } from './infrastructure/integrations/auth0-client.a
     Auth0ClientAdapter,
     { provide: 'Auth0ClientPort', useExisting: Auth0ClientAdapter },
   ],
-  exports: [JwtAuthGuard, ValidateUserUseCase, PrismaUserRepository, 'UserRepositoryPort'],
+  exports: [
+    AuthCredentialRetentionService,
+    JwtAuthGuard,
+    ValidateUserUseCase,
+    PrismaUserRepository,
+    'UserRepositoryPort',
+  ],
 })
 export class AuthModule {}

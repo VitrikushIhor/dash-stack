@@ -50,6 +50,15 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+model AuthRateLimit {
+  key       String   @id
+  hits      Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+  @@map("auth_rate_limits")
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String

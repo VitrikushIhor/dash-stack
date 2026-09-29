@@ -40,6 +40,7 @@
     "migrate:reset": "pnpm exec prisma migrate reset",
     "migrate:deploy": "pnpm exec prisma migrate deploy",
     "migrate:status": "pnpm exec prisma migrate status",
+    "auth:cleanup:expired": "ts-node -r tsconfig-paths/register src/auth/maintenance/cleanup-expired-credentials.ts",
     "migrate:resolve": "pnpm exec prisma migrate resolve",
     "db:reset": "ts-node prisma/reset.ts",
     "db:dump": "docker exec dash-stack-db pg_dump -U postgres -d dash-stack-db -c > dump.sql",
