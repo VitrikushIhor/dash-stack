@@ -125,6 +125,14 @@ Or run standalone PostgreSQL:
 docker compose -f docker-compose.dev.yml up postgres -d
 ```
 
+For local email verification and password reset, start the Mailpit inbox:
+
+```bash
+docker compose -f docker-compose.dev.yml up mailpit -d
+```
+
+With `pnpm run docker:dev`, Mailpit starts alongside the app. Open `http://localhost:8025` to read captured mail. The example SMTP settings use `localhost:1025` when running the backend on the host; the dev Compose service uses the `mailpit` container hostname. Mailpit is for local development only and does not relay mail to recipients.
+
 ### 5. Apply Database Migrations & Seed
 
 ```bash
