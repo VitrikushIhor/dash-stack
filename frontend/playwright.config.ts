@@ -33,7 +33,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'pnpm --filter backend start',
+      command: 'corepack pnpm --filter backend start',
       cwd: '..',
       url: `${backendUrl.replace(/\/$/, '')}/health`,
       reuseExistingServer: false,
@@ -41,7 +41,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: `pnpm --filter frontend exec next dev --turbo --port ${frontendPort}`,
+      command: `corepack pnpm --filter frontend exec next dev --turbo --port ${frontendPort}`,
       cwd: '..',
       url: frontendUrl,
       reuseExistingServer: false,
