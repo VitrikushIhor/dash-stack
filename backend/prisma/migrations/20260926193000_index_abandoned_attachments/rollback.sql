@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS "stored_files_kind_taskId_deletionPendingAt_createdAt_idx";

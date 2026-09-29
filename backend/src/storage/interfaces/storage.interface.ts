@@ -3,6 +3,7 @@ export const STORAGE_PROVIDER = 'STORAGE_PROVIDER';
 export interface IStorageProvider {
   upload(dto: UploadFileDto): Promise<StorageUploadResult>;
   delete(key: string): Promise<void>;
+  read(key: string): Promise<Buffer>;
   getPublicUrl(key: string): string;
 }
 

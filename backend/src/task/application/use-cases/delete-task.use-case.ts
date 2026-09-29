@@ -14,12 +14,11 @@ export class DeleteTaskUseCase {
   ) {}
 
   async execute(id: string, organizationId: string) {
-    const task = await this.findTaskByIdUseCase.execute(id, organizationId);
+    await this.findTaskByIdUseCase.execute(id, organizationId);
+    const trackedAttachments = await this.taskRepository.delete(id, organizationId);
 
-    await this.taskRepository.delete(id, organizationId);
-
-    if (task.attachments.length) {
-      await this.taskFileStorage.deleteMany(task.attachments);
+    if (trackedAttachments.length) {
+      await this.taskFileStorage.deleteMany(trackedAttachments);
     }
   }
 }

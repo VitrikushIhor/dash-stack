@@ -38,8 +38,8 @@ import { databasePoolConfig } from './common/configs/database-pool-config';
       validate: validateAuthEnvironment,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(__dirname, '..', 'uploads', 'images'),
+      serveRoot: '/uploads/images',
       serveStaticOptions: {
         setHeaders: (res) => {
           res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');

@@ -7,6 +7,8 @@ import { TaskStatus } from '../../../domain/enums/task-status.enum';
 import { UpdateTaskCommand } from '../../../application/commands/update-task.command';
 import { InvalidTaskDatesException } from '../../../domain/exceptions/invalid-task-dates.exception';
 import { TaskReadModel } from '../../../application/read-models/task.read-model';
+import { TaskLabelValidatorService } from '../../../application/services/task-label-validator.service';
+import { InvalidTaskLabelException } from '../../../domain/exceptions/invalid-task-label.exception';
 
 const mockTask = (overrides?: Partial<TaskReadModel>): TaskReadModel => ({
   id: 'task-1',
@@ -32,6 +34,7 @@ describe('UpdateTaskUseCase', () => {
   let taskFileStorage: jest.Mocked<TaskFileStoragePort>;
   let findTaskByIdUseCase: jest.Mocked<FindTaskByIdUseCase>;
   let assigneeValidator: jest.Mocked<TaskAssigneeValidatorService>;
+  let labelValidator: jest.Mocked<TaskLabelValidatorService>;
 
   beforeEach(() => {
     taskRepository = {
@@ -45,6 +48,7 @@ describe('UpdateTaskUseCase', () => {
       updateMany: jest.fn(),
     };
     taskFileStorage = {
+      prepareDeletion: jest.fn(),
       deleteMany: jest.fn(),
     };
     findTaskByIdUseCase = {
@@ -53,11 +57,15 @@ describe('UpdateTaskUseCase', () => {
     assigneeValidator = {
       validateOrThrow: jest.fn(),
     } as any;
+    labelValidator = {
+      validateOrThrow: jest.fn(),
+    } as unknown as jest.Mocked<TaskLabelValidatorService>;
     useCase = new UpdateTaskUseCase(
       taskRepository,
       taskFileStorage,
       findTaskByIdUseCase,
       assigneeValidator,
+      labelValidator,
     );
   });
 
@@ -76,12 +84,13 @@ describe('UpdateTaskUseCase', () => {
       status: TaskStatus.UPCOMING,
     };
 
-    const result = await useCase.execute('task-1', 'org-1', command);
+    const result = await useCase.execute('task-1', 'org-1', 'user-1', command);
 
     expect(result.title).toBe('New Title');
     expect(findTaskByIdUseCase.execute).toHaveBeenCalledWith('task-1', 'org-1');
     expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith('org-1', undefined);
     expect(taskRepository.update).toHaveBeenCalledWith('task-1', 'org-1', {
+      actorUserId: 'user-1',
       title: 'New Title',
       description: 'New Description',
       status: TaskStatus.UPCOMING,
@@ -102,15 +111,20 @@ describe('UpdateTaskUseCase', () => {
     findTaskByIdUseCase.execute.mockResolvedValue(existingTask);
     assigneeValidator.validateOrThrow.mockResolvedValue(undefined);
     taskFileStorage.deleteMany.mockResolvedValue(undefined);
+    taskFileStorage.prepareDeletion.mockResolvedValue(['file-2.pdf', 'file-3.jpg']);
     taskRepository.update.mockResolvedValue(mockTask());
 
     const command: UpdateTaskCommand = {
       attachments: ['file-1.png'],
     };
 
-    await useCase.execute('task-1', 'org-1', command);
+    await useCase.execute('task-1', 'org-1', 'user-1', command);
 
     expect(taskFileStorage.deleteMany).toHaveBeenCalledWith(['file-2.pdf', 'file-3.jpg']);
+    expect(taskFileStorage.prepareDeletion).toHaveBeenCalledWith('task-1', [
+      'file-2.pdf',
+      'file-3.jpg',
+    ]);
     expect(taskRepository.update).toHaveBeenCalledWith(
       'task-1',
       'org-1',
@@ -132,7 +146,7 @@ describe('UpdateTaskUseCase', () => {
       attachments: ['file-1.png', 'file-2.pdf'],
     };
 
-    await useCase.execute('task-1', 'org-1', command);
+    await useCase.execute('task-1', 'org-1', 'user-1', command);
 
     expect(taskFileStorage.deleteMany).not.toHaveBeenCalled();
   });
@@ -149,7 +163,7 @@ describe('UpdateTaskUseCase', () => {
       startDate: '2026-06-15T00:00:00.000Z', // > existing dueDate (10th)
     };
 
-    await expect(useCase.execute('task-1', 'org-1', command)).rejects.toThrow(
+    await expect(useCase.execute('task-1', 'org-1', 'user-1', command)).rejects.toThrow(
       InvalidTaskDatesException,
     );
     expect(taskRepository.update).not.toHaveBeenCalled();
@@ -168,7 +182,7 @@ describe('UpdateTaskUseCase', () => {
       status: TaskStatus.COMPLETED,
     };
 
-    await useCase.execute('task-1', 'org-1', command);
+    await useCase.execute('task-1', 'org-1', 'user-1', command);
 
     expect(taskRepository.update).toHaveBeenCalledWith(
       'task-1',
@@ -178,6 +192,18 @@ describe('UpdateTaskUseCase', () => {
         completedAt: expect.any(Date),
       }),
     );
+  });
+
+  it('should not update a task when label does not belong to the organization', async () => {
+    findTaskByIdUseCase.execute.mockResolvedValue(mockTask());
+    labelValidator.validateOrThrow.mockRejectedValue(new InvalidTaskLabelException());
+
+    await expect(
+      useCase.execute('task-1', 'org-1', 'user-1', { labelId: 'foreign-label' }),
+    ).rejects.toThrow(InvalidTaskLabelException);
+
+    expect(labelValidator.validateOrThrow).toHaveBeenCalledWith('org-1', 'foreign-label');
+    expect(taskRepository.update).not.toHaveBeenCalled();
   });
 
   it('should set completedAt to null when task status changes from COMPLETED', async () => {
@@ -193,7 +219,7 @@ describe('UpdateTaskUseCase', () => {
       status: TaskStatus.PLANNED,
     };
 
-    await useCase.execute('task-1', 'org-1', command);
+    await useCase.execute('task-1', 'org-1', 'user-1', command);
 
     expect(taskRepository.update).toHaveBeenCalledWith(
       'task-1',

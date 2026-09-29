@@ -5,10 +5,13 @@ import { S3StorageProvider } from './providers/s3-storage.provider';
 import { LocalStorageProvider } from './providers/local-storage.provider';
 import { StorageService } from './storage.service';
 import { StorageController } from './storage.controller';
+import { PrismaStoredFileRepository } from './infrastructure/persistence/prisma-stored-file.repository';
+import { PendingFileCleanupService } from './infrastructure/maintenance/pending-file-cleanup.service';
+import { PrivateAttachmentController } from './private-attachment.controller';
 
 @Global()
 @Module({
-  controllers: [StorageController],
+  controllers: [StorageController, PrivateAttachmentController],
   providers: [
     {
       provide: STORAGE_PROVIDER,
@@ -24,7 +27,13 @@ import { StorageController } from './storage.controller';
       inject: [ConfigService],
     },
     StorageService,
+    PendingFileCleanupService,
+    PrismaStoredFileRepository,
+    {
+      provide: 'StoredFileRepositoryPort',
+      useExisting: PrismaStoredFileRepository,
+    },
   ],
-  exports: [StorageService],
+  exports: [StorageService, PendingFileCleanupService, 'StoredFileRepositoryPort'],
 })
 export class StorageModule {}

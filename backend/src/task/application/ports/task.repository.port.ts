@@ -13,6 +13,7 @@ export interface ChecklistInput {
 }
 
 export interface CreateTaskData {
+  actorUserId: string;
   organizationId: string;
   title: string;
   description?: string | null;
@@ -27,6 +28,7 @@ export interface CreateTaskData {
 }
 
 export interface UpdateTaskData {
+  actorUserId: string;
   title?: string;
   description?: string | null;
   status?: TaskStatus;
@@ -75,8 +77,8 @@ export interface TaskRepositoryPort {
   ): Promise<TaskReadModel[]>;
   findById(id: string, organizationId: string): Promise<TaskReadModel | null>;
   update(id: string, organizationId: string, data: UpdateTaskData): Promise<TaskReadModel>;
-  delete(id: string, organizationId: string): Promise<void>;
-  deleteMany(organizationId: string, ids: string[]): Promise<{ count: number }>;
+  delete(id: string, organizationId: string): Promise<string[]>;
+  deleteMany(organizationId: string, ids: string[]): Promise<{ count: number; keys: string[] }>;
   updateMany(
     organizationId: string,
     ids: string[],

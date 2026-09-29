@@ -8,6 +8,7 @@ export const STORAGE_ERRORS = {
   FILE_TOO_LARGE: (size: number, max: number) =>
     `File too large: ${(size / 1024 / 1024).toFixed(1)}MB. Maximum: ${max / 1024 / 1024}MB`,
   NO_FILE_PROVIDED: 'No file provided',
+  INVALID_STORAGE_KEY: 'Invalid storage key',
   UPLOAD_FAILED: 'Failed to upload file to storage',
   DELETE_FAILED: 'Failed to delete file from storage',
 } as const;

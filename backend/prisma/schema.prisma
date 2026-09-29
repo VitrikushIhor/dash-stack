@@ -29,6 +29,7 @@ model User {
   vocabStudyAttempts     VocabStudyAttempt[]
   vocabImportReceipts    VocabImportReceipt[]
   deckEditorReceipts     DeckEditorReceipt[]
+  storedFiles            StoredFile[]
 }
 
 model AuthSession {
@@ -86,7 +87,6 @@ model VerificationToken {
   @@index([email])
   @@index([expires])
 }
-
 
 model Organization {
   id             String              @id @default(cuid())
@@ -169,12 +169,33 @@ model Task {
   label          OrganizationLabel? @relation("TaskLabel", fields: [labelId], references: [id], onDelete: SetNull)
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignees      Membership[]       @relation("TaskAssignees")
+  storedFiles    StoredFile[]
 
   @@unique([id, organizationId])
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, dueDate])
   @@map("tasks")
+}
+
+model StoredFile {
+  id                String         @id @default(cuid())
+  key               String         @unique
+  ownerUserId       String
+  taskId            String?
+  kind              StoredFileKind
+  size              Int
+  mimeType          String
+  createdAt         DateTime       @default(now())
+  deletionPendingAt DateTime?
+  owner             User           @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  task              Task?          @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([ownerUserId])
+  @@index([taskId])
+  @@index([deletionPendingAt])
+  @@index([kind, taskId, deletionPendingAt, createdAt])
+  @@map("stored_files")
 }
 
 model OrganizationLabel {
@@ -426,6 +447,11 @@ model DeckLeaderboard {
 enum TokenType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+}
+
+enum StoredFileKind {
+  IMAGE
+  ATTACHMENT
 }
 
 enum OrgRole {
