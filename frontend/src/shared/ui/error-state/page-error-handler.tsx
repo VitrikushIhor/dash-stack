@@ -1,6 +1,6 @@
 import React from 'react'
 import { forbidden, notFound, unauthorized } from 'next/navigation'
-import { type QueryErrorCode } from '@/shared/api'
+import { QUERY_ERROR_CODES, type QueryErrorCode } from '@/shared/api'
 import { cn } from '@/shared/lib'
 import { ErrorFallback } from './error-fallback'
 
@@ -18,15 +18,15 @@ export function PageErrorHandler({
   className,
   withContainer = true,
 }: PageErrorHandlerProps) {
-  if (error.code === 'UNAUTHORIZED') {
+  if (error.code === QUERY_ERROR_CODES.UNAUTHORIZED) {
     unauthorized()
   }
 
-  if (error.code === 'FORBIDDEN') {
+  if (error.code === QUERY_ERROR_CODES.FORBIDDEN) {
     forbidden()
   }
 
-  if (error.code === 'NOT_FOUND') {
+  if (error.code === QUERY_ERROR_CODES.NOT_FOUND) {
     notFound()
   }
 
