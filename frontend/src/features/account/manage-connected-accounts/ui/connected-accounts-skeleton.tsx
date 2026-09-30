@@ -2,11 +2,7 @@ import { Skeleton } from '@/shared/ui/core/skeleton'
 
 export function ConnectedAccountsSkeleton() {
   return (
-    <div
-      role='status'
-      aria-label='Loading connected accounts'
-      className='space-y-4'
-    >
+    <output aria-label='Loading connected accounts' className='space-y-4'>
       <span className='sr-only'>Loading connected accounts...</span>
       {['google', 'github'].map((provider) => (
         <div
@@ -21,6 +17,6 @@ export function ConnectedAccountsSkeleton() {
           <Skeleton className='h-9 w-36 rounded-md' />
         </div>
       ))}
-    </div>
+    </output>
   )
 }

@@ -9,11 +9,13 @@ interface PasswordMessages {
   minimum: string
 }
 
+const DEFAULT_PASSWORD_MESSAGES: PasswordMessages = {
+  required: 'Please enter your password',
+  minimum: 'Password must be at least 8 characters long',
+}
+
 export function createPasswordSchema(
-  messages: PasswordMessages = {
-    required: 'Please enter your password',
-    minimum: 'Password must be at least 8 characters long',
-  }
+  messages: PasswordMessages = DEFAULT_PASSWORD_MESSAGES
 ) {
   return z
     .string()

@@ -30,6 +30,8 @@ describe('SignInForm Component', () => {
     })
   })
 
+  afterEach(() => vi.restoreAllMocks())
+
   it('renders all form input fields, links, and buttons', () => {
     render(
       <QueryClientProvider client={queryClient}>
@@ -65,8 +67,6 @@ describe('SignInForm Component', () => {
     ).toBeInTheDocument()
     expect(mockSignInAction).not.toHaveBeenCalled()
   })
-
-  afterEach(() => vi.restoreAllMocks())
 
   it.each([false, true])(
     'submits valid credentials and redirects to vocabulary decks by default with blocked storage %s',

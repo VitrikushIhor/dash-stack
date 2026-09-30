@@ -9,7 +9,7 @@ function isEmailConflict(error: unknown): boolean {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002')
     return false;
   const meta = error.meta;
-  if (!meta || meta.modelName !== 'User') return false;
+  if (meta?.modelName !== 'User') return false;
   const adapter = meta.driverAdapterError;
   if (typeof adapter !== 'object' || adapter === null || !('cause' in adapter)) return false;
   const cause: unknown = adapter.cause;

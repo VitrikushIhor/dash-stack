@@ -2,11 +2,7 @@ import { Skeleton } from '@/shared/ui/core/skeleton'
 
 export function ActiveSessionsSkeleton() {
   return (
-    <div
-      role='status'
-      aria-label='Loading active sessions'
-      className='space-y-3'
-    >
+    <output aria-label='Loading active sessions' className='space-y-3'>
       <span className='sr-only'>Loading active sessions…</span>
       {Array.from({ length: 3 }, (_, index) => (
         <div key={index} className='space-y-3 rounded-lg border p-4'>
@@ -16,6 +12,6 @@ export function ActiveSessionsSkeleton() {
           <Skeleton className='h-9 w-40' />
         </div>
       ))}
-    </div>
+    </output>
   )
 }

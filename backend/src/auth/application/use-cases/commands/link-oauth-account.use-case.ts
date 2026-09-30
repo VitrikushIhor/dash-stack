@@ -9,6 +9,8 @@ import {
 import { UnauthorizedException } from '../../../../common/exceptions/domain.exception';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 
+const LINKABLE_OAUTH_PROVIDER_NAMES: ReadonlySet<string> = new Set(LINKABLE_OAUTH_PROVIDERS);
+
 @Injectable()
 export class LinkOAuthAccountUseCase {
   constructor(
@@ -22,10 +24,7 @@ export class LinkOAuthAccountUseCase {
       throw new UnauthorizedException(AUTH_ERRORS.AUTH0_EMAIL_NOT_VERIFIED);
     }
     const [provider, accountId] = parseOAuthSubject(identity.sub);
-    if (
-      provider !== command.provider ||
-      !LINKABLE_OAUTH_PROVIDERS.some((value) => value === provider)
-    ) {
+    if (provider !== command.provider || !LINKABLE_OAUTH_PROVIDER_NAMES.has(provider)) {
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_AUTH0_IDENTITY);
     }
     await this.accounts.link(command.userId, provider, accountId);

@@ -25,7 +25,6 @@ import { LoginDto } from '../dto/login.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
-import { OAuthExchangeDto } from '../dto/oauth-exchange.dto';
 import { OAuthCodeDto } from '../dto/oauth-code.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthCookieHelper } from '../helpers/auth-cookie.helper';
@@ -40,6 +39,8 @@ import {
   getAuthCredentialTracker,
   getRefreshCredentialTracker,
 } from '../throttling/auth-credential-tracker';
+
+const EMPTY_REQUEST: Pick<ExpressRequest, 'headers'> = { headers: {} };
 
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
@@ -82,7 +83,7 @@ export class AuthController {
   async login(
     @Body() { email, password }: LoginDto,
     @Res({ passthrough: true }) res: Response,
-    @Request() req: Pick<ExpressRequest, 'headers'> = { headers: {} },
+    @Request() req: Pick<ExpressRequest, 'headers'> = EMPTY_REQUEST,
   ) {
     const userAgent = parseSessionUserAgent(req.headers['user-agent']);
     const tokens = await this.loginUseCase.execute({
@@ -145,12 +146,7 @@ export class AuthController {
 
   @Post('oauth/exchange')
   @HttpCode(HttpStatus.OK)
-  async oauthExchange(
-    @Body() { token }: OAuthExchangeDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    void token;
-    void res;
+  async oauthExchange() {
     throw new UnauthorizedException(AUTH_ERRORS.INVALID_AUTH0_TOKEN);
   }
 
@@ -160,7 +156,7 @@ export class AuthController {
   async oauthCode(
     @Body() { code, codeVerifier }: OAuthCodeDto,
     @Res({ passthrough: true }) res: Response,
-    @Request() req: Pick<ExpressRequest, 'headers'> = { headers: {} },
+    @Request() req: Pick<ExpressRequest, 'headers'> = EMPTY_REQUEST,
   ) {
     const tokens = await this.oauthExchangeUseCase.executeCode(
       code,

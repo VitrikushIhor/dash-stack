@@ -2,8 +2,8 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
 
-const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'];
-const TRUSTED_FETCH_SITES = ['same-origin', 'same-site'];
+const SAFE_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD', 'OPTIONS']);
+const TRUSTED_FETCH_SITES: ReadonlySet<string> = new Set(['same-origin', 'same-site']);
 const UNTRUSTED_ORIGIN_MESSAGE = 'Request origin is not trusted';
 
 function isTrustedMutation(request: Request, allowedOrigins: readonly string[]): boolean {
@@ -12,7 +12,7 @@ function isTrustedMutation(request: Request, allowedOrigins: readonly string[]):
   const trustedOrigin = typeof origin === 'string' && allowedOrigins.includes(origin);
 
   if (origin !== undefined && !trustedOrigin) return false;
-  if (fetchSite !== undefined && !TRUSTED_FETCH_SITES.includes(fetchSite)) return false;
+  if (fetchSite !== undefined && !TRUSTED_FETCH_SITES.has(fetchSite)) return false;
   if (fetchSite === 'same-site' && !trustedOrigin) return false;
   if (typeof request.headers.cookie === 'string' && !trustedOrigin) return false;
 
@@ -25,7 +25,7 @@ export class CsrfOriginGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    if (SAFE_METHODS.includes(request.method)) return true;
+    if (SAFE_METHODS.has(request.method)) return true;
 
     const allowedOrigins = this.configService.get<{ origins: string[] }>('cors')?.origins ?? [];
     if (!isTrustedMutation(request, allowedOrigins)) {

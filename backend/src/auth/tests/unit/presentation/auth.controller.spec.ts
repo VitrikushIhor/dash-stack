@@ -120,12 +120,10 @@ describe('AuthController', () => {
   });
 
   it('should_reject_legacy_oauth_access_token_exchange', async () => {
-    const response = { cookie: jest.fn() } as unknown as Response;
     const execute = jest.spyOn(oauthExchangeUseCase, 'execute');
 
-    await expect(controller.oauthExchange({ token: 'access-token' }, response)).rejects.toThrow();
+    await expect(controller.oauthExchange()).rejects.toThrow();
     expect(execute).not.toHaveBeenCalled();
-    expect(response.cookie).not.toHaveBeenCalled();
   });
 
   it('should_not_clear_auth_cookies_when_server_revocation_fails', async () => {

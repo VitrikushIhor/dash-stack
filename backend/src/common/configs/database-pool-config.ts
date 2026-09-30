@@ -4,7 +4,7 @@ export function databasePoolConfig(connectionString: string | undefined): PoolCo
   if (!connectionString) throw new Error('Database URL is required');
 
   const schema = new URL(connectionString).searchParams.get('schema');
-  if (schema && !/^[A-Za-z_][A-Za-z0-9_]*$/.test(schema)) {
+  if (schema && !/^[A-Za-z_]\w*$/.test(schema)) {
     throw new Error('Invalid database schema configuration');
   }
 

@@ -5,6 +5,7 @@ import { SAFE_PROXY_METHODS } from './proxy-method-groups'
 
 const MIB = 1024 * 1024
 const MAX_PATH_DECODE_DEPTH = 4
+const LOCAL_HOSTS: ReadonlySet<string> = new Set(['localhost', '127.0.0.1'])
 const BODY_LIMITS = {
   DEFAULT: 5 * MIB,
   FORM: MIB,
@@ -26,13 +27,12 @@ function trustedAppOrigin(requestOrigin: string): string | null {
 }
 
 function isAllowedLocalOrigin(origin: URL, trustedOrigin: URL): boolean {
-  const localHosts = ['localhost', '127.0.0.1']
   return (
     env.NODE_ENV !== 'production' &&
     origin.protocol === 'http:' &&
     trustedOrigin.protocol === 'http:' &&
-    localHosts.includes(origin.hostname) &&
-    localHosts.includes(trustedOrigin.hostname) &&
+    LOCAL_HOSTS.has(origin.hostname) &&
+    LOCAL_HOSTS.has(trustedOrigin.hostname) &&
     origin.port === trustedOrigin.port
   )
 }

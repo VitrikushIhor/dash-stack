@@ -100,10 +100,7 @@ export async function handleUnauthorizedResponse(
         cookiesToDelete,
       }
 
-    default: {
-      const unexpectedOutcome: never = refreshOutcome
-      void unexpectedOutcome
+    default:
       throw new Error('Unexpected session refresh outcome')
-    }
   }
 }
