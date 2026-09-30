@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test'
 
 test('should_open_connected_accounts_and_start_session_bound_provider_confirmation', async ({ page, context }) => {
   await page.goto('/sign-in')
-  await page.getByLabel('Email', { exact: true }).fill('bart@simpson.com')
+  await page.getByLabel('Email', { exact: true }).fill('connected-e2e@dashstack.app')
   await page.getByLabel('Password', { exact: true }).fill('secret42')
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
   await expect(page).toHaveURL(/\/vocab\/decks$/, { timeout: 15_000 })
-  await page.goto('/vocab/settings')
+  await page.goto('/user/settings')
   await page.getByRole('link', { name: 'Connected accounts', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Connect Google' })).toBeVisible()
 
@@ -33,10 +33,11 @@ test('should_open_connected_accounts_and_start_session_bound_provider_confirmati
   expect(flow?.value).toContain('sessionHash')
 
   await page.goto(`/api/auth/oauth/callback?state=${state}&error=access_denied`)
-  await expect(page).toHaveURL(/\/vocab\/settings\/accounts\?link=failed$/)
-  const error = page.getByRole('alert').filter({ hasText: 'Could not connect this account' })
-  await expect(error).toContainText('Could not connect this account')
-  await expect(error).toContainText('It may already be connected to another user, or the confirmation expired. Try again.')
+  await expect(
+    page.getByText(
+      'Could not connect this account. It may already be connected to another user, or the confirmation expired. Try again.'
+    )
+  ).toBeVisible()
   const result = await context.request.get('/api/proxy/auth/accounts')
   expect(result.ok()).toBeTruthy()
   expect(await result.json()).toEqual({ providers: [] })

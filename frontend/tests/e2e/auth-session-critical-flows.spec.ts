@@ -29,7 +29,7 @@ test.describe('Auth session browser lifecycle', () => {
     if (!refresh) throw new Error('Refresh cookie is required for this scenario')
     await context.addCookies([refresh])
 
-    const response = await page.goto('/vocab/settings')
+    const response = await page.goto('/user/settings')
 
     expect(response?.status()).toBe(200)
     await expect(page.getByLabel('Email Address')).toHaveValue(accounts.bart.email)
@@ -59,7 +59,7 @@ test.describe('Auth session browser lifecycle', () => {
     const cookiesAfter = await context.cookies()
     expect(cookiesAfter.find((cookie) => cookie.name === 'refresh_token')?.value).toBe(refreshBefore?.value)
     expect(cookiesAfter.find((cookie) => cookie.name === 'access_token')?.value).not.toBe('invalid-access-token')
-    await page.goto('/vocab/settings')
+    await page.goto('/user/settings')
     await expect(page.getByLabel('Email Address')).toHaveValue(accounts.bart.email)
   })
 
@@ -91,9 +91,9 @@ test.describe('Auth session browser lifecycle', () => {
       sameSite: 'Lax' as const,
     })))
 
-    await page.goto('/vocab/settings')
+    await page.goto('/user/settings')
 
-    await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fvocab%2Fsettings$/)
+    await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fuser%2Fsettings$/)
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible()
     await expect(page.getByLabel('Email Address')).toHaveCount(0)
   })
@@ -113,10 +113,10 @@ test.describe('Auth session browser lifecycle', () => {
       },
     ])
 
-    const response = await page.goto('/vocab/settings')
+    const response = await page.goto('/user/settings')
 
     expect(response?.status()).toBe(200)
-    await expect(page).toHaveURL(/\/vocab\/settings$/)
+    await expect(page).toHaveURL(/\/user\/settings$/)
     await expect(page.getByLabel('Email Address')).toHaveValue(accounts.admin.email)
     const cookies = await context.cookies()
     expect(cookies.find((cookie) => cookie.name === 'access_token')?.value).not.toBe(
@@ -132,7 +132,7 @@ test.describe('Auth session browser lifecycle', () => {
     const oldAccess = (await context.cookies()).find((cookie) => cookie.name === 'access_token')
     expect(oldAccess).toBeDefined()
     const otherTab = await context.newPage()
-    await otherTab.goto('/vocab/settings')
+    await otherTab.goto('/user/settings')
     await expect(otherTab.getByLabel('Email Address')).toHaveValue(accounts.admin.email)
 
     await page.getByRole('button', { name: /user menu:/i }).click()
@@ -149,33 +149,40 @@ test.describe('Auth session browser lifecycle', () => {
 
     await signIn(page, accounts.bart)
     await expect(otherTab).toHaveURL(/\/vocab\/decks$/)
-    await otherTab.goto('/vocab/settings')
+    await otherTab.goto('/user/settings')
     await expect(otherTab.getByLabel('Email Address')).toHaveValue(accounts.bart.email)
   })
   test('should_refresh_other_tab_identity_after_oauth_completion_signal', async ({ page, context }) => {
     await signIn(page, accounts.bart)
     const otherTab = await context.newPage()
-    await otherTab.goto('/vocab/settings')
+    await otherTab.goto('/user/settings')
     await expect(otherTab.getByLabel('Email Address')).toHaveValue(accounts.bart.email)
 
     // Issue the replacement session locally; live Auth0 is outside this bridge regression.
     const backendUrl = process.env.E2E_BACKEND_URL ?? 'http://127.0.0.1:8000/api'
     const login = await context.request.post(`${backendUrl}/auth/login`, {
-      data: accounts.admin, headers: { origin: 'http://localhost:3000' },
+      data: { email: 'review-e2e@dashstack.app', password: 'secret42' },
+      headers: { origin: process.env.E2E_FRONTEND_URL ?? 'http://localhost:3000' },
     })
     expect(login.ok()).toBeTruthy()
     await page.goto('/vocab/decks?auth-session=changed')
     await expect(page).toHaveURL(/\/vocab\/decks$/)
     await expect(otherTab).toHaveURL(/\/vocab\/decks$/)
-    await otherTab.goto('/vocab/settings')
-    await expect(otherTab.getByLabel('Email Address')).toHaveValue(accounts.admin.email)
+    await otherTab.goto('/user/settings')
+    await expect(otherTab.getByLabel('Email Address')).toHaveValue(
+      'review-e2e@dashstack.app'
+    )
   })
 
   test('should_clear_local_session_and_other_tab_when_server_revoke_rejects_credential', async ({ page, context }) => {
-    await signIn(page, accounts.admin)
+    const account = {
+      email: 'sessions-e2e@dashstack.app',
+      password: 'secret42',
+    }
+    await signIn(page, account)
     const otherTab = await context.newPage()
-    await otherTab.goto('/vocab/settings')
-    await expect(otherTab.getByLabel('Email Address')).toHaveValue(accounts.admin.email)
+    await otherTab.goto('/user/settings')
+    await expect(otherTab.getByLabel('Email Address')).toHaveValue(account.email)
     await context.addCookies([{
       name: 'refresh_token', value: 'invalid-session-credential',
       url: new URL(page.url()).origin, httpOnly: true, sameSite: 'Lax',

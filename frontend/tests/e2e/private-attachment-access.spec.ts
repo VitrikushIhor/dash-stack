@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
 
 const accounts = {
-  owner: { email: 'admin@dashstack.app', password: 'secret42' },
-  stranger: { email: 'bart@simpson.com', password: 'secret42' },
+  owner: { email: 'sessions-e2e@dashstack.app', password: 'secret42' },
+  stranger: { email: 'connected-e2e@dashstack.app', password: 'secret42' },
 } as const
 
 async function signIn(

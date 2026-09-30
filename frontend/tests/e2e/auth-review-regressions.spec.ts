@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 const backendUrl = process.env.E2E_BACKEND_URL ?? 'http://127.0.0.1:8000/api'
+const reviewAccount = 'review-e2e@dashstack.app'
 
 async function signIn(page: import('@playwright/test').Page, email: string) {
   await page.goto('/sign-in')
@@ -15,7 +16,7 @@ test('should_allow_sign_in_after_another_device_revokes_an_unexpired_session', a
   context,
   playwright,
 }) => {
-  await signIn(page, 'admin@dashstack.app')
+  await signIn(page, reviewAccount)
   const oldAccess = (await context.cookies()).find(
     (cookie) => cookie.name === 'access_token'
   )
@@ -28,7 +29,7 @@ test('should_allow_sign_in_after_another_device_revokes_an_unexpired_session', a
   })
   try {
     const login = await deviceB.post(`${backendUrl}/auth/login`, {
-      data: { email: 'admin@dashstack.app', password: 'secret42' },
+      data: { email: reviewAccount, password: 'secret42' },
     })
     expect(login.status()).toBe(200)
     const revoke = await deviceB.post(`${backendUrl}/auth/logout-all`)
@@ -40,7 +41,7 @@ test('should_allow_sign_in_after_another_device_revokes_an_unexpired_session', a
   } finally {
     await deviceB.dispose()
   }
-  await page.goto('/vocab/settings')
+  await page.goto('/user/settings')
   await expect(page.getByText('Unauthorized Access')).toBeVisible()
   expect(
     (await context.cookies()).find((cookie) => cookie.name === 'access_token')
@@ -48,13 +49,13 @@ test('should_allow_sign_in_after_another_device_revokes_an_unexpired_session', a
   ).toBe(oldAccess.value)
   await page.getByRole('link', { name: 'Sign In', exact: true }).click()
   await expect(page.getByLabel('Email', { exact: true })).toBeVisible()
-  await page.getByLabel('Email', { exact: true }).fill('admin@dashstack.app')
+  await page.getByLabel('Email', { exact: true }).fill(reviewAccount)
   await page.getByLabel('Password', { exact: true }).fill('secret42')
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
   await expect(page).toHaveURL(/\/vocab\/decks$/, { timeout: 15_000 })
-  await page.goto('/vocab/settings')
+  await page.goto('/user/settings')
   await expect(page.getByLabel('Email Address')).toHaveValue(
-    'admin@dashstack.app'
+    reviewAccount
   )
 })
 
@@ -78,7 +79,7 @@ test('should_complete_sign_in_and_logout_when_auth_notification_storage_is_block
   })
   const uncaught: string[] = []
   page.on('pageerror', (error) => uncaught.push(error.message))
-  await signIn(page, 'bart@simpson.com')
+  await signIn(page, reviewAccount)
   await page.getByRole('button', { name: /user menu:/i }).click()
   await page.getByRole('menuitem', { name: 'Sign out' }).click()
   await expect(page).toHaveURL(/\/sign-in$/)
