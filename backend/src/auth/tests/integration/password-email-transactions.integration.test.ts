@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -11,6 +11,8 @@ import { PrismaEmailVerificationTransaction } from '../../infrastructure/persist
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error('DATABASE_URL is required for auth integration tests');
+
+const createCredentialHash = (): string => createHash('sha256').update(randomUUID()).digest('hex');
 
 describe('Password and email transactions PostgreSQL integration', () => {
   let pool: Pool;
@@ -47,7 +49,7 @@ describe('Password and email transactions PostgreSQL integration', () => {
       data: { email, token: `reset-${randomUUID()}`, type: TokenType.PASSWORD_RESET, expires },
     });
     await prisma.authSession.create({
-      data: { userId, credentialHash: randomUUID().replaceAll('-', ''), expiresAt: expires },
+      data: { userId, credentialHash: createCredentialHash(), expiresAt: expires },
     });
     const data = {
       tokenId: token.id,
@@ -80,8 +82,8 @@ describe('Password and email transactions PostgreSQL integration', () => {
     };
 
     const outcomes = await Promise.all([
-      verify.complete({ ...data, credentialHash: randomUUID().replaceAll('-', '') }),
-      verify.complete({ ...data, credentialHash: randomUUID().replaceAll('-', '') }),
+      verify.complete({ ...data, credentialHash: createCredentialHash() }),
+      verify.complete({ ...data, credentialHash: createCredentialHash() }),
     ]);
 
     expect(outcomes.filter((outcome) => outcome !== null)).toHaveLength(1);
@@ -102,7 +104,7 @@ describe('Password and email transactions PostgreSQL integration', () => {
       tokenId: token.id,
       tokenHash: token.token,
       email,
-      credentialHash: randomUUID().replaceAll('-', ''),
+      credentialHash: createCredentialHash(),
       sessionExpiresAt: expires,
       now,
     });
@@ -115,7 +117,7 @@ describe('Password and email transactions PostgreSQL integration', () => {
     const token = await prisma.verificationToken.create({
       data: { email, token: `verify-${randomUUID()}`, type: TokenType.EMAIL_VERIFICATION, expires },
     });
-    const credentialHash = randomUUID().replaceAll('-', '');
+    const credentialHash = createCredentialHash();
     await prisma.authSession.create({ data: { userId, credentialHash, expiresAt: expires } });
 
     await expect(
