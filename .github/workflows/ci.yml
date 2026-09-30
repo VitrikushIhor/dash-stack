@@ -155,6 +155,8 @@ jobs:
         env:
           API_URL: https://api.example.com
           NEXT_PUBLIC_APP_URL: https://app.example.com
+          NEXT_PUBLIC_AUTH0_DOMAIN: ''
+          NEXT_PUBLIC_AUTH0_CLIENT_ID: ''
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
