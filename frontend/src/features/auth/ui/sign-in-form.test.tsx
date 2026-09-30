@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ROUTES } from '@/shared/config'
 import { render, screen, waitFor } from '@/shared/lib/test'
 import { userKeys } from '@/entities/user'
@@ -29,6 +29,8 @@ describe('SignInForm Component', () => {
       defaultOptions: { queries: { retry: false } },
     })
   })
+
+  afterEach(() => vi.restoreAllMocks())
 
   it('renders all form input fields, links, and buttons', () => {
     render(
@@ -66,35 +68,42 @@ describe('SignInForm Component', () => {
     expect(mockSignInAction).not.toHaveBeenCalled()
   })
 
-  it('submits valid credentials and redirects to vocabulary decks by default', async () => {
-    const user = userEvent.setup()
+  it.each([false, true])(
+    'submits valid credentials and redirects to vocabulary decks by default with blocked storage %s',
+    async (blockedStorage) => {
+      if (blockedStorage)
+        vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+          throw new DOMException('Blocked', 'SecurityError')
+        })
+      const user = userEvent.setup()
 
-    mockSignInAction.mockResolvedValueOnce({ success: true })
-    queryClient.setQueryData(userKeys.me(), { id: 'user-a' })
+      mockSignInAction.mockResolvedValueOnce({ success: true })
+      queryClient.setQueryData(userKeys.me(), { id: 'user-a' })
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <SignInForm />
-      </QueryClientProvider>
-    )
+      render(
+        <QueryClientProvider client={queryClient}>
+          <SignInForm />
+        </QueryClientProvider>
+      )
 
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'Password123!')
-    await user.click(screen.getByRole('button', { name: /sign in/i }))
+      await user.type(screen.getByLabelText(/email/i), 'user@example.com')
+      await user.type(screen.getByLabelText(/password/i), 'Password123!')
+      await user.click(screen.getByRole('button', { name: /sign in/i }))
 
-    await waitFor(() => {
-      expect(mockSignInAction).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        password: 'Password123!',
+      await waitFor(() => {
+        expect(mockSignInAction).toHaveBeenCalledWith({
+          email: 'user@example.com',
+          password: 'Password123!',
+        })
       })
-    })
 
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
-    })
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledWith(ROUTES.vocabDecks)
+      })
 
-    expect(queryClient.getQueryData(userKeys.me())).toBeUndefined()
-  })
+      expect(queryClient.getQueryData(userKeys.me())).toBeUndefined()
+    }
+  )
 
   it('redirects to custom target URL when redirectTo prop is specified', async () => {
     const user = userEvent.setup()

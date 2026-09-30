@@ -61,10 +61,6 @@ export const useUpdateProfile = () => {
         dto.lastName = values.lastName
       }
 
-      if (values.email !== user.email) {
-        dto.email = values.email
-      }
-
       const bioVal = values.bio?.trim() ? values.bio.trim() : null
       const userBio = user.bio ?? null
 

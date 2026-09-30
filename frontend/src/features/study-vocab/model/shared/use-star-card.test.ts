@@ -1,9 +1,18 @@
-import { act, renderHook } from '@testing-library/react'
+import { createElement } from 'react'
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from '@testing-library/react'
 import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { type User, useCurrentUser } from '@/entities/user'
+import { ROUTES } from '@/shared/config'
+import { type User, useCurrentUserState } from '@/entities/user'
 import { useStarCard } from './use-star-card'
 
+const mockPush = vi.fn()
 const mockExecute = vi.fn()
 const refetchMock = vi.fn()
 const mockUser: User = {
@@ -23,21 +32,24 @@ vi.mock('@/shared/lib', async (importOriginal) => {
   }
 })
 
-vi.mock('@/entities/user', () => ({
-  useCurrentUser: vi.fn(),
+vi.mock('@/entities/user', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/entities/user')>()),
+  useCurrentUserState: vi.fn(),
 }))
 vi.mock('sonner', () => ({ toast: { info: vi.fn() } }))
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/vocab/decks/deck-1/flashcards',
+  useRouter: () => ({ push: mockPush }),
+}))
 
 describe('useStarCard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     refetchMock.mockResolvedValue({ data: undefined })
-    vi.mocked(useCurrentUser).mockReturnValue({
-      data: mockUser,
+    vi.mocked(useCurrentUserState).mockReturnValue({
+      authState: { status: 'authenticated', user: mockUser },
       refetch: refetchMock,
-    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
-      typeof useCurrentUser
-    >)
+    } as ReturnType<typeof useCurrentUserState>)
   })
 
   afterEach(() => vi.useRealTimers())
@@ -198,10 +210,10 @@ describe('useStarCard', () => {
   })
 
   it('does not persist or update a star for a guest', async () => {
-    vi.mocked(useCurrentUser).mockReturnValue({
-      data: null,
+    vi.mocked(useCurrentUserState).mockReturnValue({
+      authState: { status: 'guest' },
       refetch: refetchMock,
-    } as unknown as ReturnType<typeof useCurrentUser>)
+    } as ReturnType<typeof useCurrentUserState>)
 
     const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
 
@@ -212,16 +224,45 @@ describe('useStarCard', () => {
     expect(result.current.isStarred).toBe(false)
     expect(mockExecute).not.toHaveBeenCalled()
     expect(refetchMock).not.toHaveBeenCalled()
-    expect(toast.info).toHaveBeenCalledWith('Sign in to save starred cards.')
+    expect(toast.info).toHaveBeenCalledWith(
+      'Sign in to save starred cards.',
+      expect.objectContaining({
+        action: expect.objectContaining({ label: 'Sign in' }),
+      })
+    )
+    const options = vi.mocked(toast.info).mock.calls[0]?.[1]
+    const action = options?.action
+    if (!action || typeof action !== 'object' || !('onClick' in action))
+      throw new Error('Missing sign-in action')
+
+    render(createElement('button', { onClick: action.onClick }, 'Sign in'))
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+    expect(mockPush).toHaveBeenCalledWith(
+      `${ROUTES.signIn}?redirect=%2Fvocab%2Fdecks%2Fdeck-1%2Fflashcards`
+    )
+  })
+
+  it('should_disable_star_when_identity_lookup_fails', async () => {
+    vi.mocked(useCurrentUserState).mockReturnValue({
+      authState: { status: 'error', message: 'Identity unavailable' },
+      refetch: refetchMock,
+    } as ReturnType<typeof useCurrentUserState>)
+    const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
+
+    expect(result.current.isDisabled).toBe(true)
+    await act(async () => {
+      await result.current.toggleStar()
+    })
+
+    expect(mockExecute).not.toHaveBeenCalled()
+    expect(toast.info).not.toHaveBeenCalled()
   })
 
   it('waits for identity resolution instead of sending an unauthenticated action', async () => {
-    vi.mocked(useCurrentUser).mockReturnValue({
-      data: undefined,
+    vi.mocked(useCurrentUserState).mockReturnValue({
+      authState: { status: 'loading' },
       refetch: refetchMock,
-    } as Partial<ReturnType<typeof useCurrentUser>> as ReturnType<
-      typeof useCurrentUser
-    >)
+    } as ReturnType<typeof useCurrentUserState>)
     const { result } = renderHook(() => useStarCard('deck-1', 'card-1', false))
 
     await act(async () => {

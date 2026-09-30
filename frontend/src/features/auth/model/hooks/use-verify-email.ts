@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
+import {
+  AUTH_SESSION_EVENT_KIND,
+  publishAuthSessionEvent,
+} from '@/shared/lib/auth-session-events'
 import { verifyEmailAction } from '../../api/actions/verify-email.action'
 import { VerificationStatus } from '../types/auth.types'
 
@@ -24,6 +28,7 @@ export function useVerifyEmail(token: string | null) {
   const { execute: verifyEmail, isPending } = useAction(verifyEmailAction, {
     onSuccess: () => {
       queryClient.clear()
+      publishAuthSessionEvent(AUTH_SESSION_EVENT_KIND.SIGNED_IN)
       setStatus(VerificationStatus.SUCCESS)
     },
     onError: (error) => {

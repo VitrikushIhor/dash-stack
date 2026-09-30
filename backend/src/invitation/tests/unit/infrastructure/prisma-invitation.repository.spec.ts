@@ -1,5 +1,7 @@
 import { PrismaInvitationRepository } from '../../../infrastructure/persistence/prisma-invitation.repository';
 import { OrgRole } from '../../../../organization/domain/enums/org-role.enum';
+import { PrismaService } from 'nestjs-prisma';
+import { createHash } from 'node:crypto';
 
 const mockPrismaInvitation = (overrides?: Record<string, unknown>) => ({
   id: 'inv-1',
@@ -16,10 +18,10 @@ const mockPrismaInvitation = (overrides?: Record<string, unknown>) => ({
 
 describe('PrismaInvitationRepository', () => {
   let repository: PrismaInvitationRepository;
-  let prisma: any;
+  let prisma: ReturnType<typeof createPrismaMock>;
 
-  beforeEach(() => {
-    prisma = {
+  const createPrismaMock = () => {
+    return {
       membership: {
         findFirst: jest.fn(),
         findUnique: jest.fn(),
@@ -32,13 +34,18 @@ describe('PrismaInvitationRepository', () => {
         create: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
+        deleteMany: jest.fn(),
       },
       organization: {
         findUnique: jest.fn(),
       },
       $transaction: jest.fn(),
     };
-    repository = new PrismaInvitationRepository(prisma);
+  };
+
+  beforeEach(() => {
+    prisma = createPrismaMock();
+    repository = new PrismaInvitationRepository(prisma as unknown as PrismaService);
   });
 
   describe('findMembershipByEmailAndOrg()', () => {
@@ -110,7 +117,7 @@ describe('PrismaInvitationRepository', () => {
   });
 
   describe('create()', () => {
-    it('creates invitation and returns read model', async () => {
+    it('should_store_only_token_hash_and_return_raw_token_for_email', async () => {
       const prismaResult = mockPrismaInvitation();
       prisma.invitation.create.mockResolvedValue(prismaResult);
 
@@ -122,35 +129,42 @@ describe('PrismaInvitationRepository', () => {
         expiresAt: new Date('2026-07-01'),
       });
 
-      expect(prisma.invitation.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          email: 'user@example.com',
-          role: OrgRole.MEMBER,
-        }),
-      });
-      expect(result.id).toBe('inv-1');
-      expect(result.token).toBe('token-abc');
+      expect(result.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      const createInput = prisma.invitation.create.mock.calls[0]?.[0];
+      expect(createInput.data.email).toBe('user@example.com');
+      expect(createInput.data.role).toBe(OrgRole.MEMBER);
+      expect(createInput.data.token).toMatch(/^[a-f0-9]{64}$/);
+      expect(createInput.data.token).toBe(createHash('sha256').update(result.token).digest('hex'));
+      expect(createInput.data.token).not.toBe(result.token);
+      expect(result.invitation.id).toBe('inv-1');
+      expect(result.invitation).not.toHaveProperty('token');
     });
   });
 
   describe('findByToken()', () => {
-    it('returns read model when invitation found', async () => {
+    it('should_lookup_by_hash_of_raw_token_without_exposing_digest', async () => {
       prisma.invitation.findUnique.mockResolvedValue(mockPrismaInvitation());
+      const rawToken = 'a'.repeat(43);
 
-      const result = await repository.findByToken('token-abc');
+      const result = await repository.findByToken(rawToken);
 
       expect(prisma.invitation.findUnique).toHaveBeenCalledWith({
-        where: { token: 'token-abc' },
+        where: { token: createHash('sha256').update(rawToken).digest('hex') },
       });
       expect(result).not.toBeNull();
-      expect(result?.token).toBe('token-abc');
+      expect(result).not.toHaveProperty('token');
     });
 
     it('returns null when invitation not found', async () => {
       prisma.invitation.findUnique.mockResolvedValue(null);
 
-      const result = await repository.findByToken('nonexistent');
+      const result = await repository.findByToken('a'.repeat(43));
       expect(result).toBeNull();
+    });
+
+    it('should_reject_malformed_token_without_database_lookup', async () => {
+      await expect(repository.findByToken('nonexistent')).resolves.toBeNull();
+      expect(prisma.invitation.findUnique).not.toHaveBeenCalled();
     });
   });
 
@@ -184,22 +198,40 @@ describe('PrismaInvitationRepository', () => {
           create: jest.fn().mockResolvedValue(membership),
         },
         invitation: {
-          update: jest.fn().mockResolvedValue({}),
+          updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         },
       };
-      prisma.$transaction.mockImplementation((cb: any) => cb(tx));
+      prisma.$transaction.mockImplementation((cb: (transaction: typeof tx) => Promise<unknown>) =>
+        cb(tx),
+      );
 
-      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
+      const result = await repository.accept(
+        'inv-1',
+        'user-1',
+        'user@example.com',
+        'org-1',
+        OrgRole.MEMBER,
+      );
 
+      expect(tx.invitation.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: 'inv-1',
+          email: { equals: 'user@example.com', mode: 'insensitive' },
+          orgId: 'org-1',
+          role: OrgRole.MEMBER,
+          acceptedAt: null,
+          expiresAt: { gt: expect.any(Date) },
+        },
+        data: { acceptedAt: expect.any(Date) },
+      });
+      expect(tx.invitation.updateMany.mock.invocationCallOrder[0]).toBeLessThan(
+        tx.membership.create.mock.invocationCallOrder[0],
+      );
       expect(tx.membership.findUnique).toHaveBeenCalledWith({
         where: { userId_orgId: { userId: 'user-1', orgId: 'org-1' } },
       });
       expect(tx.membership.create).toHaveBeenCalledWith({
         data: { userId: 'user-1', orgId: 'org-1', role: OrgRole.MEMBER },
-      });
-      expect(tx.invitation.update).toHaveBeenCalledWith({
-        where: { id: 'inv-1' },
-        data: { acceptedAt: expect.any(Date) },
       });
       expect(result).toBe(membership);
     });
@@ -212,16 +244,40 @@ describe('PrismaInvitationRepository', () => {
           create: jest.fn(),
         },
         invitation: {
-          update: jest.fn().mockResolvedValue({}),
+          updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         },
       };
-      prisma.$transaction.mockImplementation((cb: any) => cb(tx));
+      prisma.$transaction.mockImplementation((cb: (transaction: typeof tx) => Promise<unknown>) =>
+        cb(tx),
+      );
 
-      const result = await repository.accept('inv-1', 'user-1', 'org-1', OrgRole.MEMBER);
+      const result = await repository.accept(
+        'inv-1',
+        'user-1',
+        'user@example.com',
+        'org-1',
+        OrgRole.MEMBER,
+      );
 
       expect(tx.membership.create).not.toHaveBeenCalled();
-      expect(tx.invitation.update).toHaveBeenCalled();
+      expect(tx.invitation.updateMany).toHaveBeenCalled();
       expect(result).toBe(existing);
+    });
+
+    it('should_not_create_membership_when_invitation_was_consumed_or_revoked', async () => {
+      const tx = {
+        membership: { findUnique: jest.fn(), create: jest.fn() },
+        invitation: { updateMany: jest.fn().mockResolvedValue({ count: 0 }) },
+      };
+      prisma.$transaction.mockImplementation((cb: (transaction: typeof tx) => Promise<unknown>) =>
+        cb(tx),
+      );
+
+      await expect(
+        repository.accept('inv-1', 'user-1', 'user@example.com', 'org-1', OrgRole.MEMBER),
+      ).rejects.toThrow('Invitation is no longer valid');
+      expect(tx.membership.findUnique).not.toHaveBeenCalled();
+      expect(tx.membership.create).not.toHaveBeenCalled();
     });
   });
 
@@ -256,14 +312,22 @@ describe('PrismaInvitationRepository', () => {
   });
 
   describe('delete()', () => {
-    it('calls prisma.invitation.delete with correct id', async () => {
-      prisma.invitation.delete.mockResolvedValue({});
+    it('should_revoke_only_pending_invitation_in_the_requested_org', async () => {
+      prisma.invitation.deleteMany.mockResolvedValue({ count: 1 });
 
-      await repository.delete('inv-1');
+      await repository.delete('inv-1', 'org-1');
 
-      expect(prisma.invitation.delete).toHaveBeenCalledWith({
-        where: { id: 'inv-1' },
+      expect(prisma.invitation.deleteMany).toHaveBeenCalledWith({
+        where: { id: 'inv-1', orgId: 'org-1', acceptedAt: null },
       });
+    });
+
+    it('should_reject_revoke_when_parallel_accept_already_consumed_invitation', async () => {
+      prisma.invitation.deleteMany.mockResolvedValue({ count: 0 });
+
+      await expect(repository.delete('inv-1', 'org-1')).rejects.toThrow(
+        'Invitation is no longer valid',
+      );
     });
   });
 });

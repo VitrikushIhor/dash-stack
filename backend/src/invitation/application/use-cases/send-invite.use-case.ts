@@ -5,6 +5,7 @@ import { SendInviteCommand } from '../commands/send-invite.command';
 import { InvitationPolicy } from './../../domain/policies/invitation.policy';
 import { InvitationEmail } from './../../domain/value-objects/invitation-email.vo';
 import { INVITATION_EXPIRATION_DAYS } from './../../domain/constants/invitation.constants';
+import { InternalErrorException } from '../../../common/exceptions/domain.exception';
 
 @Injectable()
 export class SendInviteUseCase {
@@ -16,6 +17,8 @@ export class SendInviteUseCase {
   ) {}
 
   async execute(orgId: string, invitedBy: string, command: SendInviteCommand) {
+    InvitationPolicy.assertInvitableRole(command.role);
+
     const email = new InvitationEmail(command.email);
 
     const existingMember = await this.repository.findMembershipByEmailAndOrg(email.value, orgId);
@@ -30,7 +33,7 @@ export class SendInviteUseCase {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + INVITATION_EXPIRATION_DAYS);
 
-    const invitation = await this.repository.create({
+    const created = await this.repository.create({
       email: email.value,
       role: command.role,
       orgId,
@@ -38,8 +41,19 @@ export class SendInviteUseCase {
       expiresAt,
     });
 
-    await this.mailer.sendInviteEmail(email.value, invitation.token, org.name);
+    try {
+      await this.mailer.sendInviteEmail(email.value, created.token, org.name);
+    } catch (error) {
+      try {
+        await this.repository.delete(created.invitation.id, orgId);
+      } catch {
+        throw new InternalErrorException(
+          'Invitation delivery failed and pending invitation cleanup failed',
+        );
+      }
+      throw error;
+    }
 
-    return invitation;
+    return created.invitation;
   }
 }

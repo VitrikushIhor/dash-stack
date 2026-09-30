@@ -1,13 +1,8 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
-import { AUTH_COOKIE_NAMES } from '../../domain/constants/auth.constants';
+import { extractRefreshToken } from '../validators/refresh-token-request.validator';
 
 export const RefreshToken = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): string | undefined => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    const bodyToken = request.body?.token || request.body?.refreshToken;
-    const cookieToken = request.cookies?.[AUTH_COOKIE_NAMES.REFRESH_TOKEN];
-
-    return bodyToken || cookieToken || undefined;
-  },
+  (_data: unknown, context: ExecutionContext): string | undefined =>
+    extractRefreshToken(context.switchToHttp().getRequest<Request>()),
 );

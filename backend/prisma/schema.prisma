@@ -21,7 +21,7 @@ model User {
   urls                   String[]             @default([])
   accounts               Account[]
   memberships            Membership[]
-  refreshTokens          RefreshToken[]
+  authSessions           AuthSession[]
   decks                  Deck[]               @relation("UserDecks")
   vocabProgress          VocabProgress[]      @relation("UserVocabProgress")
   deckLeaderboardEntries DeckLeaderboard[]    @relation("UserDeckLeaderboard")
@@ -29,6 +29,34 @@ model User {
   vocabStudyAttempts     VocabStudyAttempt[]
   vocabImportReceipts    VocabImportReceipt[]
   deckEditorReceipts     DeckEditorReceipt[]
+  storedFiles            StoredFile[]
+}
+
+model AuthSession {
+  id             String    @id @default(cuid())
+  userId         String
+  credentialHash String    @unique @db.Text
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  userAgent      String?
+  ipAddress      String?
+  lastUsedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+model AuthRateLimit {
+  key       String   @id
+  hits      Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+  @@map("auth_rate_limits")
 }
 
 model Account {
@@ -57,20 +85,7 @@ model VerificationToken {
 
   @@unique([email, token])
   @@index([email])
-}
-
-model RefreshToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  userAgent String?
-  ipAddress String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
+  @@index([expires])
 }
 
 model Organization {
@@ -154,12 +169,33 @@ model Task {
   label          OrganizationLabel? @relation("TaskLabel", fields: [labelId], references: [id], onDelete: SetNull)
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignees      Membership[]       @relation("TaskAssignees")
+  storedFiles    StoredFile[]
 
   @@unique([id, organizationId])
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, dueDate])
   @@map("tasks")
+}
+
+model StoredFile {
+  id                String         @id @default(cuid())
+  key               String         @unique
+  ownerUserId       String
+  taskId            String?
+  kind              StoredFileKind
+  size              Int
+  mimeType          String
+  createdAt         DateTime       @default(now())
+  deletionPendingAt DateTime?
+  owner             User           @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  task              Task?          @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([ownerUserId])
+  @@index([taskId])
+  @@index([deletionPendingAt])
+  @@index([kind, taskId, deletionPendingAt, createdAt])
+  @@map("stored_files")
 }
 
 model OrganizationLabel {
@@ -411,6 +447,11 @@ model DeckLeaderboard {
 enum TokenType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+}
+
+enum StoredFileKind {
+  IMAGE
+  ATTACHMENT
 }
 
 enum OrgRole {

@@ -26,12 +26,12 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = getDomainExceptionHttpStatus(exception.code);
 
-    this.logger.error(`Http Status: ${status} Error Message: ${exception.message}`);
+    this.logger.error(`Domain request rejected with status ${status} and code ${exception.code}`);
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path: request.path,
       message: exception.message,
     });
   }

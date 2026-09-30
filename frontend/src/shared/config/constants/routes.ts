@@ -3,6 +3,7 @@ export const ROUTES = {
 
   // Auth
   signIn: '/sign-in',
+  oauthStart: '/api/auth/oauth/start',
   signUp: '/sign-up',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
@@ -11,10 +12,12 @@ export const ROUTES = {
   // App
   organizations: '/organizations',
   createOrganization: '/create-organization',
-  settings: '/settings',
-  settingsAppearance: '/settings/appearance',
-  settingsNotifications: '/settings/notifications',
-  settingsDisplay: '/settings/display',
+  settings: '/user/settings',
+  settingsSessions: '/user/settings/sessions',
+  settingsAccounts: '/user/settings/accounts',
+  settingsAppearance: '/user/settings/appearance',
+  settingsNotifications: '/user/settings/notifications',
+  settingsDisplay: '/user/settings/display',
   acceptInvite: '/accept-invite',
 
   // Tenant Routes (Slug-based)
@@ -37,7 +40,9 @@ export const ROUTES = {
   vocabDeck: (id: string) => `/vocab/decks/${id}`,
   vocabDeckEdit: (id: string) => `/vocab/decks/${id}/edit`,
   vocabCatalog: '/vocab/catalog',
-  vocabSettings: '/vocab/settings',
+  vocabSettings: '/user/settings',
+  vocabSettingsSessions: '/user/settings/sessions',
+  vocabSettingsAccounts: '/user/settings/accounts',
   vocabDeckStudy: (id: string) => `/vocab/decks/${id}/flashcards`,
   vocabDeckLearn: (id: string) => `/vocab/decks/${id}/learn`,
   vocabMatch: (id: string) => `/vocab/decks/${id}/match`,

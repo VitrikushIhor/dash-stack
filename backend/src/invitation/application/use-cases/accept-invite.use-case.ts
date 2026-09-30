@@ -14,7 +14,14 @@ export class AcceptInviteUseCase {
     const invitation = await this.repository.findByToken(command.token);
 
     InvitationPolicy.assertCanAccept(invitation, command.userEmail);
+    InvitationPolicy.assertInvitableRole(invitation.role);
 
-    return this.repository.accept(invitation.id, command.userId, invitation.orgId, invitation.role);
+    return this.repository.accept(
+      invitation.id,
+      command.userId,
+      command.userEmail,
+      invitation.orgId,
+      invitation.role,
+    );
   }
 }

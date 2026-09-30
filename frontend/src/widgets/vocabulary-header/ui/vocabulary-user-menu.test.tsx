@@ -34,7 +34,7 @@ describe('VocabularyUserMenu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'Profile' })).toHaveAttribute(
       'href',
-      '/vocab/settings'
+      '/user/settings'
     )
     expect(
       screen.getByRole('menuitem', { name: 'Sign out' })

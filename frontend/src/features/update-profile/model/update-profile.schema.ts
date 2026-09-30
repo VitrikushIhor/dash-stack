@@ -29,7 +29,6 @@ export type AvatarValue = z.infer<typeof avatarSchema>
 export const UpdateProfileSchema = z.object({
   firstName: userValidationRules.firstName,
   lastName: userValidationRules.lastName,
-  email: userValidationRules.email,
   bio: userValidationRules.bio,
   dob: z.date().optional(),
   urls: z

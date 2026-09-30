@@ -7,4 +7,6 @@ export const INVITATION_ERRORS = {
   EXPIRED: 'Invitation expired',
   NOT_IN_ORG: 'Invitation not found in this organization',
   ORG_NOT_FOUND: 'Organization not found',
+  OWNER_ROLE_FORBIDDEN: 'Organization ownership cannot be granted by invitation',
+  NO_LONGER_VALID: 'Invitation is no longer valid',
 } as const;

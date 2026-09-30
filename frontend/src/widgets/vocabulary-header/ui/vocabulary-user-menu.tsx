@@ -68,7 +68,7 @@ export function VocabularyUserMenu({ user }: VocabularyUserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={ROUTES.vocabSettings}>
+            <Link href={ROUTES.settings}>
               <BadgeCheck />
               Profile
             </Link>

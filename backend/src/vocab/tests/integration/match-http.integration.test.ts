@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { signAccessTokenFixture } from './sign-access-token.fixture';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -14,6 +15,7 @@ import { DomainExceptionFilter } from '../../../common/filters/domain-exception.
 import { JwtStrategy } from '../../../auth/presentation/guards/jwt.strategy';
 import { ValidateUserUseCase } from '../../../auth/application/use-cases/queries/validate-user.use-case';
 import { PrismaUserRepository } from '../../../auth/infrastructure/persistence/prisma-user.repository';
+import { PrismaAuthSessionRepository } from '../../../auth/infrastructure/persistence/prisma-auth-session.repository';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 const databaseUrl = process.env.DATABASE_URL;
@@ -86,6 +88,8 @@ describe('Match HTTP integration', () => {
         ValidateUserUseCase,
         PrismaUserRepository,
         { provide: 'UserRepositoryPort', useExisting: PrismaUserRepository },
+        PrismaAuthSessionRepository,
+        { provide: 'AuthSessionRepositoryPort', useExisting: PrismaAuthSessionRepository },
       ],
     }).compile();
     app = module.createNestApplication({ logger: false });
@@ -109,7 +113,14 @@ describe('Match HTTP integration', () => {
   beforeEach(async () => {
     userId = `match-http-${randomUUID()}`;
     await prisma.user.create({ data: { id: userId, email: `${userId}@example.test` } });
-    token = jwt.sign({ userId });
+    const session = await prisma.authSession.create({
+      data: {
+        userId,
+        credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    token = signAccessTokenFixture(jwt, userId, session.id);
     const deck = await prisma.deck.create({
       data: {
         ownerUserId: userId,
@@ -189,6 +200,13 @@ describe('Match HTTP integration', () => {
     const stranger = await prisma.user.create({
       data: { email: `match-stranger-${randomUUID()}@example.test` },
     });
+    const strangerSession = await prisma.authSession.create({
+      data: {
+        userId: stranger.id,
+        credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
     try {
       expect(
         (
@@ -196,7 +214,7 @@ describe('Match HTTP integration', () => {
             `${deckId}/match/sessions/${id}/complete`,
             'POST',
             undefined,
-            jwt.sign({ userId: stranger.id }),
+            signAccessTokenFixture(jwt, stranger.id, strangerSession.id),
           )
         ).status,
       ).toBe(404);

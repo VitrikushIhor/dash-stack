@@ -6,6 +6,8 @@ import { CreateTaskCommand } from '../../../application/commands/create-task.com
 import { InvalidTaskDatesException } from '../../../domain/exceptions/invalid-task-dates.exception';
 import { InvalidAssigneesException } from '../../../domain/exceptions/invalid-assignees.exception';
 import { TaskReadModel } from '../../../application/read-models/task.read-model';
+import { TaskLabelValidatorService } from '../../../application/services/task-label-validator.service';
+import { InvalidTaskLabelException } from '../../../domain/exceptions/invalid-task-label.exception';
 
 const mockTask = (overrides?: Partial<TaskReadModel>): TaskReadModel => ({
   id: 'task-1',
@@ -29,6 +31,7 @@ describe('CreateTaskUseCase', () => {
   let useCase: CreateTaskUseCase;
   let taskRepository: jest.Mocked<TaskRepositoryPort>;
   let assigneeValidator: jest.Mocked<TaskAssigneeValidatorService>;
+  let labelValidator: jest.Mocked<TaskLabelValidatorService>;
 
   beforeEach(() => {
     taskRepository = {
@@ -44,7 +47,10 @@ describe('CreateTaskUseCase', () => {
     assigneeValidator = {
       validateOrThrow: jest.fn(),
     } as any;
-    useCase = new CreateTaskUseCase(taskRepository, assigneeValidator);
+    labelValidator = {
+      validateOrThrow: jest.fn(),
+    } as unknown as jest.Mocked<TaskLabelValidatorService>;
+    useCase = new CreateTaskUseCase(taskRepository, assigneeValidator, labelValidator);
   });
 
   it('should successfully create a task', async () => {
@@ -76,11 +82,12 @@ describe('CreateTaskUseCase', () => {
     assigneeValidator.validateOrThrow.mockResolvedValue(undefined);
     taskRepository.create.mockResolvedValue(expectedTask);
 
-    const result = await useCase.execute('org-1', command);
+    const result = await useCase.execute('org-1', 'user-1', command);
 
     expect(result).toBe(expectedTask);
     expect(assigneeValidator.validateOrThrow).toHaveBeenCalledWith('org-1', ['user-1']);
     expect(taskRepository.create).toHaveBeenCalledWith({
+      actorUserId: 'user-1',
       organizationId: 'org-1',
       title: 'New Task',
       description: 'Some desc',
@@ -110,9 +117,10 @@ describe('CreateTaskUseCase', () => {
     assigneeValidator.validateOrThrow.mockResolvedValue(undefined);
     taskRepository.create.mockResolvedValue(mockTask());
 
-    await useCase.execute('org-1', command);
+    await useCase.execute('org-1', 'user-1', command);
 
     expect(taskRepository.create).toHaveBeenCalledWith({
+      actorUserId: 'user-1',
       organizationId: 'org-1',
       title: 'Minimal Task',
       description: null,
@@ -138,7 +146,7 @@ describe('CreateTaskUseCase', () => {
     assigneeValidator.validateOrThrow.mockResolvedValue(undefined);
     taskRepository.create.mockResolvedValue(mockTask());
 
-    await useCase.execute('org-1', command);
+    await useCase.execute('org-1', 'user-1', command);
 
     expect(taskRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -155,7 +163,9 @@ describe('CreateTaskUseCase', () => {
       dueDate: '2026-06-01T00:00:00.000Z',
     };
 
-    await expect(useCase.execute('org-1', command)).rejects.toThrow(InvalidTaskDatesException);
+    await expect(useCase.execute('org-1', 'user-1', command)).rejects.toThrow(
+      InvalidTaskDatesException,
+    );
     expect(taskRepository.create).not.toHaveBeenCalled();
   });
 
@@ -169,7 +179,23 @@ describe('CreateTaskUseCase', () => {
 
     assigneeValidator.validateOrThrow.mockRejectedValue(new InvalidAssigneesException());
 
-    await expect(useCase.execute('org-1', command)).rejects.toThrow(InvalidAssigneesException);
+    await expect(useCase.execute('org-1', 'user-1', command)).rejects.toThrow(
+      InvalidAssigneesException,
+    );
+    expect(taskRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('should not create a task when label does not belong to the organization', async () => {
+    labelValidator.validateOrThrow.mockRejectedValue(new InvalidTaskLabelException());
+
+    await expect(
+      useCase.execute('org-1', 'user-1', {
+        title: 'Task with foreign label',
+        labelId: 'foreign-label',
+      }),
+    ).rejects.toThrow(InvalidTaskLabelException);
+
+    expect(labelValidator.validateOrThrow).toHaveBeenCalledWith('org-1', 'foreign-label');
     expect(taskRepository.create).not.toHaveBeenCalled();
   });
 });

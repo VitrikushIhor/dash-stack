@@ -1,3 +1,6 @@
+import type { HTTP_METHODS } from './http-methods'
+import type { QUERY_ERROR_CODES } from './query/query-error-codes'
+
 export interface ApiErrorResponse {
   statusCode: number
   message: string | string[]
@@ -11,7 +14,7 @@ export type ActionState<T = void> =
   | { success: false; error: string; validationMessages?: string[] }
 
 export type QueryErrorCode =
-  'UNAUTHORIZED' | 'FORBIDDEN' | 'VALIDATION' | 'NOT_FOUND' | 'UNKNOWN'
+  (typeof QUERY_ERROR_CODES)[keyof typeof QUERY_ERROR_CODES]
 
 export type QueryResult<T> =
   | { ok: true; data: T }
@@ -24,7 +27,7 @@ export type QueryResult<T> =
       }
     }
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+export type HttpMethod = (typeof HTTP_METHODS)[keyof typeof HTTP_METHODS]
 
 export interface RequestOptions<TBody = unknown> {
   method?: HttpMethod

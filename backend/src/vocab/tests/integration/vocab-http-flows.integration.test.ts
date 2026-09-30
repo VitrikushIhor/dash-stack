@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { signAccessTokenFixture } from './sign-access-token.fixture';
 import { PassportModule } from '@nestjs/passport';
 import { Test } from '@nestjs/testing';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -11,6 +12,7 @@ import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { Pool } from 'pg';
 import { ValidateUserUseCase } from '../../../auth/application/use-cases/queries/validate-user.use-case';
 import { PrismaUserRepository } from '../../../auth/infrastructure/persistence/prisma-user.repository';
+import { PrismaAuthSessionRepository } from '../../../auth/infrastructure/persistence/prisma-auth-session.repository';
 import { JwtStrategy } from '../../../auth/presentation/guards/jwt.strategy';
 import { DomainExceptionFilter } from '../../../common/filters/domain-exception.filter';
 import { VocabModule } from '../../vocab.module';
@@ -101,6 +103,8 @@ describe('Vocabulary critical HTTP flows integration', () => {
         ValidateUserUseCase,
         PrismaUserRepository,
         { provide: 'UserRepositoryPort', useExisting: PrismaUserRepository },
+        PrismaAuthSessionRepository,
+        { provide: 'AuthSessionRepositoryPort', useExisting: PrismaAuthSessionRepository },
       ],
     }).compile();
 
@@ -131,8 +135,24 @@ describe('Vocabulary critical HTTP flows integration', () => {
         { id: learnerId, email: `${learnerId}@example.test` },
       ],
     });
-    ownerToken = jwt.sign({ userId: ownerId });
-    learnerToken = jwt.sign({ userId: learnerId });
+    const [ownerSession, learnerSession] = await Promise.all([
+      prisma.authSession.create({
+        data: {
+          userId: ownerId,
+          credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+          expiresAt: new Date(Date.now() + 60_000),
+        },
+      }),
+      prisma.authSession.create({
+        data: {
+          userId: learnerId,
+          credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+          expiresAt: new Date(Date.now() + 60_000),
+        },
+      }),
+    ]);
+    ownerToken = signAccessTokenFixture(jwt, ownerId, ownerSession.id);
+    learnerToken = signAccessTokenFixture(jwt, learnerId, learnerSession.id);
   });
 
   afterEach(async () => {

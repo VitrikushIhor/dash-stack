@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import 'server-only'
-import { type QueryResult, handleQueryError } from '@/shared/api'
+import {
+  QUERY_ERROR_CODES,
+  type QueryResult,
+  handleQueryError,
+} from '@/shared/api'
 
 type QueryHandler<TInput, TOutput> = (input: TInput) => Promise<TOutput>
 type EmptyQueryHandler<TOutput> = () => Promise<TOutput>
@@ -45,7 +49,7 @@ export function createServerQuery<TInput, TOutput>(
       return {
         ok: false,
         error: {
-          code: 'VALIDATION',
+          code: QUERY_ERROR_CODES.VALIDATION,
           message: `Invalid arguments for ${queryName}`,
           details: z.flattenError(parsed.error).fieldErrors,
         },

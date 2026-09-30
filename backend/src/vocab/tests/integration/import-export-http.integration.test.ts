@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { signAccessTokenFixture } from './sign-access-token.fixture';
 import { Test } from '@nestjs/testing';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -11,6 +12,7 @@ import { Pool } from 'pg';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { ValidateUserUseCase } from '../../../auth/application/use-cases/queries/validate-user.use-case';
 import { PrismaUserRepository } from '../../../auth/infrastructure/persistence/prisma-user.repository';
+import { PrismaAuthSessionRepository } from '../../../auth/infrastructure/persistence/prisma-auth-session.repository';
 import { JwtStrategy } from '../../../auth/presentation/guards/jwt.strategy';
 import { DomainExceptionFilter } from '../../../common/filters/domain-exception.filter';
 import { VocabModule } from '../../vocab.module';
@@ -93,6 +95,8 @@ describe('Vocabulary import/export HTTP integration', () => {
         ValidateUserUseCase,
         PrismaUserRepository,
         { provide: 'UserRepositoryPort', useExisting: PrismaUserRepository },
+        PrismaAuthSessionRepository,
+        { provide: 'AuthSessionRepositoryPort', useExisting: PrismaAuthSessionRepository },
       ],
     }).compile();
 
@@ -111,7 +115,14 @@ describe('Vocabulary import/export HTTP integration', () => {
   beforeEach(async () => {
     userId = `import-export-${randomUUID()}`;
     await prisma.user.create({ data: { id: userId, email: `${userId}@example.test` } });
-    token = jwt.sign({ userId });
+    const session = await prisma.authSession.create({
+      data: {
+        userId,
+        credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    token = signAccessTokenFixture(jwt, userId, session.id);
     const deck = await prisma.deck.create({
       data: { ownerUserId: userId, title: 'Café export' },
     });
@@ -219,7 +230,14 @@ describe('Vocabulary import/export HTTP integration', () => {
     const stranger = await prisma.user.create({
       data: { email: `import-export-stranger-${randomUUID()}@example.test` },
     });
-    const strangerToken = jwt.sign({ userId: stranger.id });
+    const strangerSession = await prisma.authSession.create({
+      data: {
+        userId: stranger.id,
+        credentialHash: randomUUID().replaceAll('-', '').repeat(2),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    const strangerToken = signAccessTokenFixture(jwt, stranger.id, strangerSession.id);
 
     try {
       expect(

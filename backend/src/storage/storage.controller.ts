@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
+import { UserEntity } from '../common/decorators/user.decorator';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -63,11 +64,14 @@ export class StorageController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid file type or file too large',
   })
-  async uploadImage(@UploadedFile() file: Express.Multer.File): Promise<UploadResponseDto> {
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @UserEntity() user: { id: string },
+  ): Promise<UploadResponseDto> {
     if (!file) {
       throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }
-    return this.storageService.uploadImage(file, 'images');
+    return this.storageService.uploadImage(file, 'images', user.id);
   }
 
   @Post('file')
@@ -96,10 +100,13 @@ export class StorageController {
     description: 'File uploaded successfully',
     type: UploadResponseDto,
   })
-  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<UploadResponseDto> {
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @UserEntity() user: { id: string },
+  ): Promise<UploadResponseDto> {
     if (!file) {
       throw new StorageValidationException(STORAGE_ERRORS.NO_FILE_PROVIDED);
     }
-    return this.storageService.uploadFile(file, 'files');
+    return this.storageService.uploadFile(file, 'files', user.id);
   }
 }

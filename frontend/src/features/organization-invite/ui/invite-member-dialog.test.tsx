@@ -111,7 +111,6 @@ describe('InviteMemberDialog', () => {
         email: 'test@example.com',
         role: OrgRole.MEMBER,
         orgId: 'org-1',
-        token: 'token-1',
         invitedBy: 'admin-1',
         expiresAt: '2026-12-31T00:00:00.000Z',
         createdAt: '2026-12-01T00:00:00.000Z',

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from '../../../email/email.service';
 import { EmailConfig } from '../../../common/configs/config.interface';
@@ -6,6 +6,7 @@ import { AuthMailerPort } from '../../application/ports/outgoing/auth-mailer.por
 
 @Injectable()
 export class AuthMailerAdapter implements AuthMailerPort {
+  private readonly logger = new Logger(AuthMailerAdapter.name);
   private emailConfig: EmailConfig;
 
   constructor(
@@ -32,8 +33,8 @@ export class AuthMailerAdapter implements AuthMailerPort {
         subject: 'Verify your email',
         html,
       });
-    } catch (error) {
-      console.error('Email send error:', error);
+    } catch {
+      this.logger.error('Verification email delivery failed');
       throw new InternalServerErrorException('Failed to send verification email');
     }
   }
@@ -55,8 +56,8 @@ export class AuthMailerAdapter implements AuthMailerPort {
         subject: 'Reset your password',
         html,
       });
-    } catch (error) {
-      console.error('Email send error:', error);
+    } catch {
+      this.logger.error('Password reset email delivery failed');
       throw new InternalServerErrorException('Failed to send password reset email');
     }
   }

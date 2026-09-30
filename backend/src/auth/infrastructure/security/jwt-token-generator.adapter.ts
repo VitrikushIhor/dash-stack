@@ -1,11 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { randomUUID } from 'crypto';
 import { SecurityConfig } from '../../../common/configs/config.interface';
 import { TokenGeneratorPort } from '../../application/ports/outgoing/token-generator.port';
-import { RefreshTokenRepositoryPort } from '../../application/ports/outgoing/refresh-token.repository.port';
+import { AuthSessionRepositoryPort } from '../../application/ports/outgoing/auth-session.repository.port';
+import { SessionCredentialPort } from '../../application/ports/outgoing/session-credential.port';
 import { AuthTokens } from '../../shared/types/token.type';
+import {
+  ACCESS_JWT_AUDIENCE,
+  ACCESS_JWT_ISSUER,
+  ACCESS_JWT_USE,
+} from '../../shared/constants/access-jwt.constants';
 
 import {
   DEFAULT_REFRESH_TOKEN_TTL,
@@ -20,8 +25,10 @@ export class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    @Inject('RefreshTokenRepositoryPort')
-    private readonly refreshTokenRepo: RefreshTokenRepositoryPort,
+    @Inject('AuthSessionRepositoryPort')
+    private readonly authSessionRepo: AuthSessionRepositoryPort,
+    @Inject('SessionCredentialPort')
+    private readonly sessionCredential: SessionCredentialPort,
   ) {}
 
   async generateTokens(
@@ -29,34 +36,34 @@ export class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
     userAgent?: string,
     ipAddress?: string,
   ): Promise<AuthTokens> {
-    const accessToken = this.generateAccessToken(userId);
-    const refreshToken = await this.createRefreshToken(userId, userAgent, ipAddress);
-
-    return { accessToken, refreshToken };
-  }
-
-  generateAccessToken(userId: string): string {
-    return this.jwtService.sign({ userId });
-  }
-
-  private async createRefreshToken(
-    userId: string,
-    userAgent?: string,
-    ipAddress?: string,
-  ): Promise<string> {
-    const securityConfig = this.configService.get<SecurityConfig>('security');
-    const token = randomUUID();
-    const expiresMs = this.parseExpiration(securityConfig.refreshIn);
-
-    await this.refreshTokenRepo.create({
+    const credential = this.sessionCredential.create();
+    const expiresAt = this.getSessionExpiresAt(new Date());
+    const session = await this.authSessionRepo.create({
       userId,
-      token,
-      expiresAt: new Date(Date.now() + expiresMs),
+      credentialHash: credential.hash,
+      expiresAt,
       userAgent,
       ipAddress,
     });
+    const accessToken = this.generateAccessToken(userId, session.id);
 
-    return token;
+    return { accessToken, refreshToken: credential.raw };
+  }
+
+  generateAccessToken(userId: string, sessionId: string): string {
+    return this.jwtService.sign(
+      { userId, sessionId, tokenUse: ACCESS_JWT_USE },
+      {
+        algorithm: 'HS256',
+        issuer: ACCESS_JWT_ISSUER,
+        audience: ACCESS_JWT_AUDIENCE,
+      },
+    );
+  }
+
+  getSessionExpiresAt(now: Date): Date {
+    const securityConfig = this.configService.get<SecurityConfig>('security');
+    return new Date(now.getTime() + this.parseExpiration(securityConfig.refreshIn));
   }
 
   private parseExpiration(expiration: string): number {

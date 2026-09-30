@@ -1,14 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
-import { extname, join } from 'node:path';
-import { mkdir, writeFile, unlink } from 'node:fs/promises';
+import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { mkdir, writeFile, unlink, readFile } from 'node:fs/promises';
 import type {
   IStorageProvider,
   UploadFileDto,
   StorageUploadResult,
 } from '../interfaces/storage.interface';
-import { StorageUploadException, StorageDeleteException } from '../exceptions/storage.exception';
+import {
+  StorageUploadException,
+  StorageDeleteException,
+  StorageValidationException,
+} from '../exceptions/storage.exception';
+import { STORAGE_ERRORS } from '../exceptions/storage-errors';
+import { privateAttachmentUrl } from '../private-attachment-url';
 
 @Injectable()
 export class LocalStorageProvider implements IStorageProvider {
@@ -55,8 +61,12 @@ export class LocalStorageProvider implements IStorageProvider {
     }
   }
 
+  read(key: string): Promise<Buffer> {
+    return readFile(this.resolveStoragePath(key));
+  }
+
   async delete(key: string): Promise<void> {
-    const filePath = join(this.uploadDir, key);
+    const filePath = this.resolveStoragePath(key);
 
     try {
       await unlink(filePath);
@@ -64,7 +74,7 @@ export class LocalStorageProvider implements IStorageProvider {
     } catch (error) {
       if (error instanceof Error) {
         // If the file doesn't exist, silently succeed — same behavior as S3
-        if ((error as any).code === 'ENOENT') {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
           this.logger.warn(`File not found during delete (already removed): ${key}`);
           return;
         }
@@ -81,11 +91,35 @@ export class LocalStorageProvider implements IStorageProvider {
   }
 
   getPublicUrl(key: string): string {
+    if (key.startsWith('files/')) return privateAttachmentUrl(key);
     return `http://localhost:${this.port}/uploads/${key}`;
   }
 
   private sanitizeExtension(originalName: string): string {
     const ext = extname(originalName).toLowerCase();
     return /^\.[a-z0-9]+$/.test(ext) ? ext : '';
+  }
+
+  private resolveStoragePath(key: string): string {
+    let decodedKey: string;
+
+    try {
+      decodedKey = decodeURIComponent(key);
+    } catch {
+      throw new StorageValidationException(STORAGE_ERRORS.INVALID_STORAGE_KEY);
+    }
+
+    if (!key || decodedKey !== key || key.includes('\\') || key.includes('\0') || isAbsolute(key)) {
+      throw new StorageValidationException(STORAGE_ERRORS.INVALID_STORAGE_KEY);
+    }
+
+    const filePath = resolve(this.uploadDir, key);
+    const relativePath = relative(this.uploadDir, filePath);
+
+    if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${sep}`)) {
+      throw new StorageValidationException(STORAGE_ERRORS.INVALID_STORAGE_KEY);
+    }
+
+    return filePath;
   }
 }

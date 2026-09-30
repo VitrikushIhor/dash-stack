@@ -34,7 +34,9 @@ export const CreateOrganizationDtoSchema = z.object({
   logo: z.string().url().optional(),
 })
 
-export const InvitationTokenSchema = z.string().min(1, 'Token is required')
+export const InvitationTokenSchema = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{43}$/, 'Invalid invitation token')
 export const InvitationIdSchema = z.string().cuid('Invalid invitation ID')
 
 export const SendInviteDtoSchema = z.object({

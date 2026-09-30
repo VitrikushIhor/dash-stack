@@ -14,6 +14,6 @@ export class RevokeInviteUseCase {
 
     InvitationPolicy.assertBelongsToOrg(invitation, orgId);
 
-    await this.repository.delete(invitationId);
+    await this.repository.delete(invitationId, orgId);
   }
 }

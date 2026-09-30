@@ -9,6 +9,7 @@ import {
 } from '@/shared/lib/providers'
 import '@/shared/styles/index.css'
 import { Toaster } from '@/shared/ui/core/sonner'
+import { AuthSessionSync } from '@/features/auth'
 
 const inter = Inter({ subsets: ['latin', 'latin-ext'] })
 
@@ -30,7 +31,7 @@ export default function RootLayout({
           <NuqsAdapter>
             <ThemeProvider>
               <DirectionProvider>
-                {children}
+                <AuthSessionSync>{children}</AuthSessionSync>
                 <Toaster duration={5000} />
               </DirectionProvider>
             </ThemeProvider>

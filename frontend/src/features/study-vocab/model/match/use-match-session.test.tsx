@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
-import { type User, userApi, userKeys } from '@/entities/user'
+import { type User, useCurrentUser, userApi, userKeys } from '@/entities/user'
 import { type MatchLeaderboard, vocabApi } from '@/entities/vocab'
 import {
   completeMatchSessionAction,
@@ -72,9 +72,11 @@ function renderSession(
 
   if (seedCurrentUser) client.setQueryData(userKeys.me(), currentUser)
 
-  return renderHook(
-    ({ deckId }) =>
-      useMatchSession(deckId, { onlyDue: true, onlyStarred: false }),
+  const rendered = renderHook(
+    ({ deckId }) => ({
+      ...useMatchSession(deckId, { onlyDue: true, onlyStarred: false }),
+      identity: useCurrentUser(),
+    }),
     {
       initialProps: { deckId: 'deck-1' },
       reactStrictMode: true,
@@ -83,6 +85,7 @@ function renderSession(
       ),
     }
   )
+  return { ...rendered, client }
 }
 
 describe('useMatchSession', () => {
@@ -121,6 +124,33 @@ describe('useMatchSession', () => {
     })
     expect(createMatchSessionAction).toHaveBeenCalledTimes(1)
     expect(result.current.session?.cards).toEqual(session.cards)
+  })
+
+  it('should_preserve_playing_session_when_identity_refetch_fails_and_recovers', async () => {
+    const getMe = vi
+      .spyOn(userApi, 'getMe')
+      .mockRejectedValue(new ApiError(503, 'Service unavailable'))
+    const { result, client } = renderSession()
+    await waitFor(() => expect(result.current.status).toBe('playing'))
+    const activeSession = result.current.session
+
+    await act(async () => {
+      await client.refetchQueries({ queryKey: userKeys.me() })
+    })
+
+    await waitFor(() => expect(result.current.identity.isError).toBe(true))
+    expect(result.current.status).toBe('playing')
+    expect(result.current.session).toBe(activeSession)
+    expect(createMatchSessionAction).toHaveBeenCalledTimes(1)
+
+    getMe.mockResolvedValue(user)
+    await act(async () => {
+      await client.refetchQueries({ queryKey: userKeys.me() })
+    })
+    await waitFor(() => expect(result.current.identity.isSuccess).toBe(true))
+    expect(result.current.status).toBe('playing')
+    expect(result.current.session).toBe(activeSession)
+    expect(createMatchSessionAction).toHaveBeenCalledTimes(1)
   })
 
   it('should_complete_each_server_session_exactly_once', async () => {
@@ -208,17 +238,20 @@ describe('useMatchSession', () => {
   it('should_expose_identity_failure_and_retry_until_guest_is_resolved', async () => {
     vi.spyOn(userApi, 'getMe')
       .mockRejectedValueOnce(new ApiError(500, 'Identity service unavailable'))
+      .mockRejectedValueOnce(new ApiError(500, 'Identity service unavailable'))
       .mockRejectedValueOnce(new ApiError(401, 'Unauthorized'))
     const { result } = renderSession(undefined, false)
 
-    await waitFor(() => expect(result.current.status).toBe('error'))
+    await waitFor(() => expect(result.current.status).toBe('error'), {
+      timeout: 3000,
+    })
     expect(result.current.error).toBe('Identity service unavailable')
     expect(createMatchSessionAction).not.toHaveBeenCalled()
 
     act(() => result.current.retry())
 
     await waitFor(() => expect(result.current.status).toBe('guest'))
-    expect(userApi.getMe).toHaveBeenCalledTimes(2)
+    expect(userApi.getMe).toHaveBeenCalledTimes(3)
     expect(createMatchSessionAction).not.toHaveBeenCalled()
   })
 })

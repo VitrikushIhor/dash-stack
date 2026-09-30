@@ -15,12 +15,12 @@ export const logoutAction = createAction(
     if (refreshToken) {
       try {
         await authServerApi.logout(refreshToken)
-      } catch {
-        // Ignore network/server errors during logout and proceed to clear cookies
+      } finally {
+        await clearAuthCookies()
       }
+    } else {
+      await clearAuthCookies()
     }
-
-    await clearAuthCookies()
 
     return { message: 'Logged out successfully' }
   }

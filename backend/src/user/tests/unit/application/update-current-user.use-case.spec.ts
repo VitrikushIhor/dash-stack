@@ -66,13 +66,10 @@ describe('UpdateCurrentUserUseCase', () => {
 
     expect(userRepository.findById).toHaveBeenCalledWith('1');
     expect(userRepository.updateProfile).toHaveBeenCalledWith('1', {
-      email: undefined,
       firstName: 'Updated',
       lastName: 'Name',
-      dob: null,
       bio: 'New bio',
       urls: ['https://example.com'],
-      avatar: null,
     });
 
     expect(result).toBeInstanceOf(UserReadModel);
@@ -81,6 +78,28 @@ describe('UpdateCurrentUserUseCase', () => {
     expect(result.lastName).toBe('Name');
     expect(result.bio).toBe('New bio');
     expect(result.urls).toEqual(['https://example.com']);
+  });
+
+  it('should_preserve_omitted_profile_fields_when_only_first_name_changes', async () => {
+    const original = {
+      id: '1',
+      email: 'test@example.com',
+      firstName: 'Before',
+      lastName: 'Tester',
+      avatar: 'avatars/existing.webp',
+      dob: new Date('1990-01-01'),
+      bio: 'Existing bio',
+      urls: ['https://example.com'],
+      emailVerified: new Date(),
+    };
+    userRepository.findById.mockResolvedValue(original);
+    userRepository.updateProfile.mockResolvedValue({ ...original, firstName: 'After' });
+
+    await useCase.execute({ userId: '1', firstName: 'After' });
+
+    expect(userRepository.updateProfile).toHaveBeenCalledWith('1', {
+      firstName: 'After',
+    });
   });
 
   it('should throw UserNotFoundException when user does not exist', async () => {

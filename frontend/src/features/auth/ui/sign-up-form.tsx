@@ -44,8 +44,15 @@ export function SignUpForm({
         <p className='text-muted-foreground text-sm'>
           We&apos;ve sent a verification link to your email address.
           <br />
-          Please click the link to verify your account.
+          You can submit the form again to request a new link.
         </p>
+        <Button
+          variant='outline'
+          type='button'
+          onClick={() => setIsSuccess(false)}
+        >
+          Request another link
+        </Button>
         <Button variant='outline' className='mt-4' asChild>
           <Link href={ROUTES.signIn}>Back to Sign In</Link>
         </Button>

@@ -31,6 +31,7 @@ import { BulkDeleteTasksDto, BulkUpdateTasksDto } from './dto/bulk-action.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateTaskCommand } from '../application/commands/create-task.command';
 import { UpdateTaskCommand } from '../application/commands/update-task.command';
+import { UserEntity } from '../../common/decorators/user.decorator';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -51,7 +52,11 @@ export class TaskController {
   @Post()
   @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Create a new task' })
-  create(@TenantId() orgId: string, @Body() dto: CreateTaskDto) {
+  create(
+    @TenantId() orgId: string,
+    @UserEntity() user: { id: string },
+    @Body() dto: CreateTaskDto,
+  ) {
     const command: CreateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -69,7 +74,7 @@ export class TaskController {
         })),
       })),
     };
-    return this.createTaskUseCase.execute(orgId, command);
+    return this.createTaskUseCase.execute(orgId, user.id, command);
   }
 
   @Get()
@@ -115,7 +120,12 @@ export class TaskController {
   @Patch(':id')
   @RequireTenantRole(OrgRole.MEMBER)
   @ApiOperation({ summary: 'Update a task' })
-  update(@TenantId() orgId: string, @Param('id') id: string, @Body() dto: UpdateTaskDto) {
+  update(
+    @TenantId() orgId: string,
+    @UserEntity() user: { id: string },
+    @Param('id') id: string,
+    @Body() dto: UpdateTaskDto,
+  ) {
     const command: UpdateTaskCommand = {
       title: dto.title,
       description: dto.description,
@@ -133,7 +143,7 @@ export class TaskController {
         })),
       })),
     };
-    return this.updateTaskUseCase.execute(id, orgId, command);
+    return this.updateTaskUseCase.execute(id, orgId, user.id, command);
   }
 
   @Delete(':id')

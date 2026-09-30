@@ -32,7 +32,6 @@ export const useUpdateProfileForm = (
   const defaultValues: Partial<UpdateProfileFormValues> = {
     firstName: user?.firstName ?? '',
     lastName: user?.lastName ?? '',
-    email: user?.email ?? '',
     bio: user?.bio ?? '',
     dob: parseDob(user?.dob),
     urls: user?.urls?.map((url) => ({ value: url })) ?? [],

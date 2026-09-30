@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InvitationMailerPort } from '../../application/ports/invitation-mailer.port';
 import { EmailService } from '../../../email/email.service';
@@ -6,6 +6,7 @@ import { EmailConfig } from '../../../common/configs/config.interface';
 
 @Injectable()
 export class EmailInvitationMailerAdapter implements InvitationMailerPort {
+  private readonly logger = new Logger(EmailInvitationMailerAdapter.name);
   private emailConfig: EmailConfig;
 
   constructor(
@@ -16,7 +17,8 @@ export class EmailInvitationMailerAdapter implements InvitationMailerPort {
   }
 
   async sendInviteEmail(email: string, token: string, orgName: string): Promise<void> {
-    const acceptUrl = `${this.emailConfig.frontendUrl}/invite/accept?token=${token}`;
+    const acceptUrl = new URL('/accept-invite', this.emailConfig.frontendUrl);
+    acceptUrl.searchParams.set('token', token);
     const escapedOrgName = this.escapeHtml(orgName);
 
     const subject = `You're invited to join ${orgName}`;
@@ -35,8 +37,8 @@ export class EmailInvitationMailerAdapter implements InvitationMailerPort {
         subject,
         html,
       });
-    } catch (error) {
-      console.error('Email send error:', error);
+    } catch {
+      this.logger.warn('Invitation email delivery failed');
       throw new InternalServerErrorException('Failed to send invitation email');
     }
   }

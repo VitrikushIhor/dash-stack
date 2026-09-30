@@ -1,5 +1,5 @@
 import 'server-only'
-import { serverApi } from '@/shared/api/server-api-client'
+import { serverApi } from '@/shared/api/server'
 import { type UnsplashSearchResult } from '../model/types'
 
 export const unsplashServerApi = {

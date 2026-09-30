@@ -11,6 +11,7 @@ import { RevokeInviteUseCase } from '../../application/use-cases/revoke-invite.u
 import { SendInviteCommand } from '../../application/commands/send-invite.command';
 
 @Controller('organizations/:slug/invitations')
+@UseGuards(JwtAuthGuard)
 export class InvitationController {
   constructor(
     private readonly sendInviteUseCase: SendInviteUseCase,
@@ -19,7 +20,6 @@ export class InvitationController {
   ) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   @RequireTenantRole(OrgRole.ADMIN)
   sendInvite(
     @TenantId() orgId: string,
@@ -34,14 +34,12 @@ export class InvitationController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @RequireTenantRole(OrgRole.ADMIN)
   listPending(@TenantId() orgId: string) {
     return this.listPendingUseCase.execute(orgId);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   @RequireTenantRole(OrgRole.ADMIN)
   revokeInvite(@TenantId() orgId: string, @Param('id') id: string) {
     return this.revokeInviteUseCase.execute(id, orgId);
