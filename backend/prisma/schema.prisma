@@ -35,7 +35,7 @@ model User {
 model AuthSession {
   id             String    @id @default(cuid())
   userId         String
-  credentialHash String    @unique @db.Char(64)
+  credentialHash String    @unique @db.Text
   expiresAt      DateTime
   revokedAt      DateTime?
   userAgent      String?

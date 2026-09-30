@@ -458,7 +458,8 @@ jobs:
           push: false
           tags: dash-stack-frontend:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_API_URL=http://localhost:8000/api
+            API_URL=http://localhost:8000
+            NEXT_PUBLIC_API_URL=http://localhost:8000
             NEXT_PUBLIC_APP_URL=http://localhost:3000
           cache-from: type=gha
           cache-to: type=gha,mode=max

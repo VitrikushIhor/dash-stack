@@ -1,7 +1,7 @@
 CREATE TABLE "auth_sessions" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "credentialHash" CHAR(64) NOT NULL,
+    "credentialHash" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "revokedAt" TIMESTAMP(3),
     "userAgent" TEXT,
@@ -10,7 +10,8 @@ CREATE TABLE "auth_sessions" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "auth_sessions_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "auth_sessions_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "auth_sessions_credentialHash_length_check" CHECK (char_length("credentialHash") = 64)
 );
 
 CREATE UNIQUE INDEX "auth_sessions_credentialHash_key" ON "auth_sessions"("credentialHash");

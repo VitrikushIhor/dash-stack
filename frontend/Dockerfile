@@ -21,13 +21,14 @@ COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY frontend/ ./frontend/
 
-# Build-time args for NEXT_PUBLIC_* variables
-# These are baked into the Next.js client bundle at compile time
+# Build-time configuration for Next.js
+ARG API_URL
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_AUTH0_DOMAIN
 ARG NEXT_PUBLIC_AUTH0_CLIENT_ID
 
+ENV API_URL=$API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_AUTH0_DOMAIN=$NEXT_PUBLIC_AUTH0_DOMAIN
