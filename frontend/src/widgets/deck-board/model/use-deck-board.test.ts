@@ -1,4 +1,6 @@
-import { act, renderHook } from '@testing-library/react'
+import { type ReactNode, createElement } from 'react'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toggleStarAction } from '@/features/study-vocab/server'
 import { useDeckBoard } from './use-deck-board'
@@ -21,14 +23,51 @@ const success: StarResult = {
   data: { flashcardId: 'card-1', isStarred: true },
 }
 
-describe('useDeckBoard star', () => {
+describe('useDeckBoard', () => {
   beforeEach(() => vi.resetAllMocks())
+
+  const wrapper = ({ children }: { children: ReactNode }) =>
+    createElement(NuqsTestingAdapter, null, children)
+
+  it('should_preserve_other_url_filters_and_limit_search_length', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const withUrl = ({ children }: { children: ReactNode }) =>
+      createElement(NuqsTestingAdapter, {
+        searchParams: '?onlyDue=true&q=alpha',
+        onUrlUpdate,
+        hasMemory: true,
+        children,
+      })
+    const { result } = renderHook(() => useDeckBoard('deck-1'), {
+      wrapper: withUrl,
+    })
+
+    expect(result.current.search).toBe('alpha')
+    act(() => result.current.setSearch('b'.repeat(101)))
+    await waitFor(() =>
+      expect(onUrlUpdate.mock.lastCall?.[0].searchParams.get('q')).toBe(
+        'b'.repeat(100)
+      )
+    )
+    expect(onUrlUpdate.mock.lastCall?.[0].searchParams.get('onlyDue')).toBe(
+      'true'
+    )
+    expect(onUrlUpdate.mock.lastCall?.[0].options).toMatchObject({
+      history: 'replace',
+      shallow: true,
+    })
+
+    act(() => result.current.setSearch(''))
+    await waitFor(() =>
+      expect(onUrlUpdate.mock.lastCall?.[0].queryString).toBe('?onlyDue=true')
+    )
+  })
 
   it('should_block_same_card_interactions_when_the_first_request_is_pending', async () => {
     const pending = pendingStar()
 
     vi.mocked(toggleStarAction).mockReturnValue(pending.promise)
-    const { result } = renderHook(() => useDeckBoard('deck-1'))
+    const { result } = renderHook(() => useDeckBoard('deck-1'), { wrapper })
     const submissions: Promise<unknown>[] = []
 
     act(() => {
@@ -54,7 +93,7 @@ describe('useDeckBoard star', () => {
     const pending = pendingStar()
 
     vi.mocked(toggleStarAction).mockReturnValue(pending.promise)
-    const { result } = renderHook(() => useDeckBoard('deck-1'))
+    const { result } = renderHook(() => useDeckBoard('deck-1'), { wrapper })
     const submissions: Promise<unknown>[] = []
 
     act(() => {
@@ -77,7 +116,7 @@ describe('useDeckBoard star', () => {
     vi.mocked(toggleStarAction)
       .mockResolvedValueOnce({ success: false, error: 'Could not save star' })
       .mockResolvedValueOnce(success)
-    const { result } = renderHook(() => useDeckBoard('deck-1'))
+    const { result } = renderHook(() => useDeckBoard('deck-1'), { wrapper })
 
     await act(async () => {
       expect(await result.current.toggleStar('card-1', false)).toBeUndefined()
@@ -93,7 +132,7 @@ describe('useDeckBoard star', () => {
 
   it('should_remove_the_optimistic_override_after_the_query_cache_is_reconciled', async () => {
     vi.mocked(toggleStarAction).mockResolvedValue(success)
-    const { result } = renderHook(() => useDeckBoard('deck-1'))
+    const { result } = renderHook(() => useDeckBoard('deck-1'), { wrapper })
 
     await act(async () => {
       await result.current.toggleStar('card-1', false)

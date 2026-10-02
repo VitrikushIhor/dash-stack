@@ -1,19 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import {
-  type InfiniteData,
-  useInfiniteQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@/shared/lib'
-import { vocabApi } from '../api/vocab-api'
 import { vocabKeys } from '../api/vocab-query-keys'
 import { type DeckCardsPage } from './types'
 import { useDeckCardStarCache } from './use-deck-card-star-cache'
+import { useDeckCardsQuery } from './use-deck-cards-query'
 
 const SEARCH_DEBOUNCE_MS = 300
-const CARDS_PER_PAGE = 50
 
 export function useDeckCards(
   deckId: string,
@@ -43,26 +38,7 @@ export function useDeckCards(
     )
   }, [deckId, initialPage, queryClient])
 
-  const query = useInfiniteQuery({
-    queryKey: vocabKeys.deckCards(deckId, debouncedSearch),
-    queryFn: ({ pageParam, signal }) =>
-      vocabApi.browseDeckCards(
-        deckId,
-        {
-          search: debouncedSearch,
-          page: pageParam,
-          perPage: CARDS_PER_PAGE,
-        },
-        signal
-      ),
-    initialPageParam: 1,
-    staleTime: 30_000,
-    initialData:
-      debouncedSearch === ''
-        ? { pages: [initialPage], pageParams: [1] }
-        : undefined,
-    getNextPageParam: (lastPage) => lastPage.meta.next ?? undefined,
-  })
+  const query = useDeckCardsQuery(deckId, debouncedSearch, initialPage)
 
   const invalidateDeckCards = useCallback(
     () =>

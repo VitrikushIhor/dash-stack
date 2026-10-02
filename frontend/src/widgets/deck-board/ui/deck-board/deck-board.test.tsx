@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { type Deck } from '@/entities/deck'
 import { userKeys } from '@/entities/user'
@@ -194,6 +194,117 @@ describe('DeckBoard', () => {
       deck.id,
       { search: '', page: 2, perPage: 50 },
       expect.any(AbortSignal)
+    )
+  })
+
+  it('should_keep_infinite_pages_separate_when_url_search_changes', async () => {
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const firstPage = {
+      data: [card('1', null)],
+      meta: {
+        total: 51,
+        lastPage: 2,
+        currentPage: 1,
+        perPage: 50,
+        prev: null,
+        next: 2,
+      },
+      summary: { total: 51, due: 0, starred: 0, dueAndStarred: 0 },
+    }
+    const browse = vi
+      .spyOn(vocabApi, 'browseDeckCards')
+      .mockImplementation(async (_deckId, query) => ({
+        ...firstPage,
+        data: [card(query.search === 'beta' ? '3' : '2', null)],
+        meta: {
+          ...firstPage.meta,
+          currentPage: query.page,
+          next: query.page === 1 ? 2 : null,
+          prev: query.page === 1 ? null : 1,
+        },
+      }))
+
+    render(
+      <QueryClientProvider client={client}>
+        <NuqsTestingAdapter
+          searchParams='?onlyDue=true&q=alpha'
+          onUrlUpdate={onUrlUpdate}
+          hasMemory
+        >
+          <DeckBoard
+            deck={{ ...deck, cardCount: 51 }}
+            initialCardsPage={firstPage}
+            isAuthenticated={false}
+            isOwner={false}
+          />
+        </NuqsTestingAdapter>
+      </QueryClientProvider>
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Search cards' })).toHaveValue(
+      'alpha'
+    )
+    await waitFor(() =>
+      expect(browse).toHaveBeenCalledWith(
+        deck.id,
+        { search: 'alpha', page: 1, perPage: 50 },
+        expect.any(AbortSignal)
+      )
+    )
+    await waitFor(() =>
+      expect(
+        document.querySelector('div[aria-label="Cards in this deck"]')
+      ).toBeInTheDocument()
+    )
+
+    const scrollToEnd = () => {
+      const container = document.querySelector<HTMLDivElement>(
+        'div[aria-label="Cards in this deck"]'
+      )
+      if (!container) throw new Error('Cards scroll container is missing')
+      Object.defineProperties(container, {
+        scrollHeight: { configurable: true, value: 1000 },
+        scrollTop: { configurable: true, value: 800 },
+        clientHeight: { configurable: true, value: 200 },
+      })
+      fireEvent.scroll(container)
+    }
+
+    scrollToEnd()
+    await waitFor(() =>
+      expect(browse).toHaveBeenCalledWith(
+        deck.id,
+        { search: 'alpha', page: 2, perPage: 50 },
+        expect.any(AbortSignal)
+      )
+    )
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Search cards' }), {
+      target: { value: 'beta' },
+    })
+    await waitFor(() =>
+      expect(onUrlUpdate.mock.lastCall?.[0].queryString).toBe(
+        '?onlyDue=true&q=beta'
+      )
+    )
+    await waitFor(() =>
+      expect(browse).toHaveBeenCalledWith(
+        deck.id,
+        { search: 'beta', page: 1, perPage: 50 },
+        expect.any(AbortSignal)
+      )
+    )
+
+    scrollToEnd()
+    await waitFor(() =>
+      expect(browse).toHaveBeenCalledWith(
+        deck.id,
+        { search: 'beta', page: 2, perPage: 50 },
+        expect.any(AbortSignal)
+      )
     )
   })
 })
