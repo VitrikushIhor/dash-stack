@@ -126,7 +126,7 @@
     "prisma": "^7.2.0",
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
-    "typescript": "^5.1.6",
+    "typescript": "6.0.3",
     "typescript-eslint": "^8.46.0"
   },
   "jest": {
@@ -141,10 +141,17 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "moduleNameMapper": {
+      "^@auth/(.*)$": "<rootDir>/auth/$1",
       "^@common/(.*)$": "<rootDir>/common/$1",
-      "^@task/(.*)$": "<rootDir>/task/$1",
+      "^@email/(.*)$": "<rootDir>/email/$1",
+      "^@health/(.*)$": "<rootDir>/health/$1",
+      "^@invitation/(.*)$": "<rootDir>/invitation/$1",
+      "^@label/(.*)$": "<rootDir>/label/$1",
       "^@organization/(.*)$": "<rootDir>/organization/$1",
-      "^@auth/(.*)$": "<rootDir>/auth/$1"
+      "^@storage/(.*)$": "<rootDir>/storage/$1",
+      "^@task/(.*)$": "<rootDir>/task/$1",
+      "^@user/(.*)$": "<rootDir>/user/$1",
+      "^@vocab/(.*)$": "<rootDir>/vocab/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
