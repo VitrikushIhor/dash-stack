@@ -1,3 +1,4 @@
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { fetchCalendarTasks } from '../server'
 import { CalendarViewClient } from './calendar-view-client'
 
@@ -7,7 +8,10 @@ interface Props {
 }
 
 export async function CalendarMonthPage({ slug, searchParams }: Props) {
-  const { tasks } = await fetchCalendarTasks(slug, 'month', searchParams)
+  const { result } = await fetchCalendarTasks(slug, 'month', searchParams)
 
-  return <CalendarViewClient slug={slug} tasks={tasks} view='month' />
+  if (!result.ok)
+    return <PageErrorHandler error={result.error} withContainer={false} />
+
+  return <CalendarViewClient slug={slug} tasks={result.data} view='month' />
 }

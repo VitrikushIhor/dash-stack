@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE, MAX_TASKS_PER_PAGE } from '@/shared/config'
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { TaskListPageView } from '@/views/task'
 import { fetchTaskViewData } from '@/views/task/server'
 
@@ -19,5 +20,9 @@ export default async function OrganizationTaskListPage({
     perPage: MAX_TASKS_PER_PAGE,
   })
 
-  return <TaskListPageView slug={data.slug} tasks={data.tasks} />
+  if (!data.result.ok) {
+    return <PageErrorHandler error={data.result.error} withContainer={false} />
+  }
+
+  return <TaskListPageView slug={data.slug} tasks={data.result.data.data} />
 }

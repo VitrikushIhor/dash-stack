@@ -1,6 +1,4 @@
-import { notFound } from 'next/navigation'
 import 'server-only'
-import { getOrganizationBySlug } from '@/entities/organization/server'
 import { getTasksUnpaginated } from '@/entities/task/server'
 import { type TCalendarView } from '@/features/task-calendar'
 import { calendarSearchParamsCache } from '@/features/task-calendar/model/calendar-search-params.server'
@@ -11,25 +9,18 @@ export async function fetchCalendarTasks(
   view: TCalendarView,
   searchParams: Promise<Record<string, string | string[] | undefined>>
 ) {
-  const orgResult = await getOrganizationBySlug(slug)
-
-  if (orgResult.error || !orgResult.data) {
-    notFound()
-  }
-
   const parsedParams = await calendarSearchParamsCache.parse(searchParams)
   const date = parsedParams.date || new Date()
 
   const range = getVisibleRange(view, date)
 
-  const tasksResult = await getTasksUnpaginated(slug, {
+  const result = await getTasksUnpaginated(slug, {
     ...range,
   })
 
   return {
-    tasks: tasksResult.data || [],
+    result,
     date,
-    slug: slug,
-    error: tasksResult.error ?? null,
+    slug,
   }
 }

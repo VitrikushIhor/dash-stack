@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { toast } from 'sonner'
 import { useAction } from '@/shared/lib'
 import { type Task } from '@/entities/task'
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
@@ -33,20 +32,15 @@ export function CalendarViewClient({
   const [, setTaskParams] = useTaskSearchParams()
   const selectedDate = useMemo(() => date || new Date(), [date])
 
-  const { execute } = useAction(updateTaskAction, {
-    onError: (error: unknown) => {
-      // eslint-disable-next-line no-console
-      console.error('[Calendar DnD Error]', error)
-      toast.error('Failed to update task date.')
-    },
-  })
+  const { execute } = useAction(updateTaskAction)
 
-  const handleTaskUpdate = async (id: string, data: Partial<Task>) => {
+  const handleTaskUpdate = async (
+    id: string,
+    data: Partial<Task>
+  ): Promise<boolean> => {
     const result = await execute({ slug, id, data })
 
-    if (result === undefined) {
-      throw new Error('Failed to update task date')
-    }
+    return result !== undefined
   }
 
   const renderViewContent = (optimisticTasks: Task[]) => {

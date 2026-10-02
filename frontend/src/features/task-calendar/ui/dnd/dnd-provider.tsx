@@ -11,13 +11,13 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { toast } from 'sonner'
+import { handleServerError } from '@/shared/api'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
   tasks: Task[]
-  onTaskUpdate: (id: string, data: Partial<Task>) => void | Promise<void>
+  onTaskUpdate: (id: string, data: Partial<Task>) => Promise<boolean>
   children: (optimisticTasks: Task[]) => ReactNode
 }
 
@@ -87,15 +87,22 @@ export function DndProviderWrapper({
       setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
 
       try {
-        await onTaskUpdate(droppedEvent.id, { dueDate: newDueDateISO })
+        const saved = await onTaskUpdate(droppedEvent.id, {
+          dueDate: newDueDateISO,
+        })
+
+        if (!saved) {
+          setOptimisticTasks({
+            id: droppedEvent.id,
+            dueDate: droppedEvent.dueDate,
+          })
+        }
       } catch (error) {
         setOptimisticTasks({
           id: droppedEvent.id,
           dueDate: droppedEvent.dueDate,
         })
-        // eslint-disable-next-line no-console
-        console.error('[Calendar DnD Error]', error)
-        toast.error('Failed to update task date.')
+        handleServerError(error)
       }
     })
   }
