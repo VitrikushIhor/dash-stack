@@ -1,13 +1,8 @@
-import { z } from 'zod'
 import {
   type DraftStoreState,
+  deckEditorDraftStorageSchema,
   persistedSchema,
 } from './deck-editor-draft.schema'
-
-const storageSchema = z.object({
-  version: z.literal(1),
-  state: persistedSchema,
-})
 
 export function createDeckEditorDraftStore(name: string) {
   const clear = () => localStorage.removeItem(name)
@@ -16,7 +11,7 @@ export function createDeckEditorDraftStore(name: string) {
     if (raw === null) return null
 
     const stored: unknown = JSON.parse(raw)
-    return storageSchema.parse(stored).state.draft
+    return deckEditorDraftStorageSchema.parse(stored).state.draft
   }
   const write = (draft: DraftStoreState['draft']) =>
     localStorage.setItem(

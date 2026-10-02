@@ -27,7 +27,7 @@ import { FormFileUpload } from '@/shared/ui/form-fields'
 import { FormLabelSelector, type Label } from '@/entities/label'
 import { FormChecklist, TaskStatusEnum } from '@/entities/task'
 import { FormMemberPicker } from '@/entities/team'
-import { type TaskFormValues } from '../model/create-task-schema'
+import { type TaskFormValues } from '../model/task-form.schema'
 import { TaskDatePickerField } from './task-date-picker-field'
 
 type TaskFormProps = {

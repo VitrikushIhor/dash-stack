@@ -4,7 +4,7 @@ export { TaskModals } from './ui/task-modals'
 export { TaskHeaderActions } from './ui/task-header-actions'
 export { ManageTaskForm } from './ui/manage-task-form'
 export { mapTaskFormToDto } from './model/map-form-to-dto'
-export { taskFormSchema } from './model/create-task-schema'
+export { taskFormSchema } from './model/task-form.schema'
 export {
   taskSearchParams,
   useTaskSearchParams,

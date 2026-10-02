@@ -33,6 +33,11 @@ export type DeckEditorDraftState = z.infer<typeof draftStateSchema>
 export const persistedSchema = z.object({ draft: draftSchema.nullable() })
 export type DraftStoreState = z.infer<typeof persistedSchema>
 
+export const deckEditorDraftStorageSchema = z.object({
+  version: z.literal(1),
+  state: persistedSchema,
+})
+
 export function createDraftSnapshot(state: DeckEditorDraftState) {
   const result = draftStateSchema.safeParse(state)
 

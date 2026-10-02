@@ -1,5 +1,5 @@
 export { TeamMemberCard } from './ui/team-member-card'
-export { membershipSchema } from './membership-schema'
+export { membershipSchema } from './model/membership.schema'
 export { TeamGrid } from './ui/team-grid'
 export { FormMemberPicker } from './ui/form-member-picker'
 export { TeamMemberPicker } from './ui/team-member-picker'
