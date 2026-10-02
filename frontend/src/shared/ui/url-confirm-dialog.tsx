@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
   AlertDialog,
@@ -13,10 +13,8 @@ import {
 } from './core/alert-dialog'
 import { Button } from './core/button'
 
-interface UrlConfirmDialogProps {
+interface UrlConfirmDialogRootProps {
   queryKey: string
-  title: ReactNode
-  desc: ReactNode
   handleConfirm: () => void
   enabled?: boolean
   onClose?: () => void
@@ -26,13 +24,11 @@ interface UrlConfirmDialogProps {
   destructive?: boolean
   isLoading?: boolean
   className?: string
-  children?: ReactNode
+  children: ReactNode
 }
 
-export function UrlConfirmDialog({
+function Root({
   queryKey,
-  title,
-  desc,
   handleConfirm,
   enabled = true,
   onClose,
@@ -43,7 +39,7 @@ export function UrlConfirmDialog({
   isLoading = false,
   className,
   children,
-}: UrlConfirmDialogProps) {
+}: UrlConfirmDialogRootProps) {
   const [value, setValue] = useQueryState(queryKey, parseAsString)
 
   const handleOpenChange = (open: boolean) => {
@@ -59,12 +55,6 @@ export function UrlConfirmDialog({
       onOpenChange={handleOpenChange}
     >
       <AlertDialogContent className={className}>
-        <AlertDialogHeader className='text-start'>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div>{desc}</div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
         {children}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>
@@ -81,4 +71,46 @@ export function UrlConfirmDialog({
       </AlertDialogContent>
     </AlertDialog>
   )
+}
+
+function Header(props: ComponentProps<typeof AlertDialogHeader>) {
+  return <AlertDialogHeader className='text-start' {...props} />
+}
+
+function Title(props: ComponentProps<typeof AlertDialogTitle>) {
+  return <AlertDialogTitle {...props} />
+}
+
+function Description({
+  children,
+  ...props
+}: Omit<ComponentProps<typeof AlertDialogDescription>, 'asChild'>) {
+  return (
+    <AlertDialogDescription asChild {...props}>
+      <div>{children}</div>
+    </AlertDialogDescription>
+  )
+}
+
+function Body({ className, ...props }: ComponentProps<'div'>) {
+  return <div className={className} {...props} />
+}
+
+function Error({ className, ...props }: ComponentProps<'output'>) {
+  return (
+    <output
+      role='alert'
+      className={className ?? 'text-destructive text-sm'}
+      {...props}
+    />
+  )
+}
+
+export const UrlConfirmDialog = {
+  Root,
+  Header,
+  Title,
+  Description,
+  Body,
+  Error,
 }

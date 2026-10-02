@@ -2,7 +2,7 @@
 
 import { Loader2 } from 'lucide-react'
 import { useAction } from '@/shared/lib'
-import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
+import { UrlConfirmDialog } from '@/shared/ui/url-confirm-dialog'
 import { useTaskSearchParams } from '../model/task-search-params'
 import { useTaskQuery } from '../model/use-task-query'
 import { deleteTaskAction } from '../server'
@@ -36,33 +36,37 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
   }
 
   return (
-    <ConfirmDialog
+    <UrlConfirmDialog.Root
+      queryKey='delete-task'
       destructive
-      open={isOpen}
-      onOpenChange={(open) => !open && close()}
+      enabled={isOpen}
+      disabled={isLoading || !selectedTask}
       handleConfirm={handleDelete}
       className='max-w-md'
-      title={
-        isLoading
-          ? 'Loading task...'
-          : `Delete this task: ${selectedTask?.title} ?`
-      }
-      desc={
-        isLoading ? (
-          <div className='flex items-center justify-center p-8'>
-            <Loader2 className='text-primary h-8 w-8 animate-spin' />
-          </div>
-        ) : (
-          <>
-            Are you sure you want to delete{' '}
-            <strong>{selectedTask?.title}</strong>
-            ?
-            <br />
-            This action cannot be undone.
-          </>
-        )
-      }
       confirmText='Delete'
-    />
+    >
+      <UrlConfirmDialog.Header>
+        <UrlConfirmDialog.Title>
+          {isLoading
+            ? 'Loading task...'
+            : `Delete this task: ${selectedTask?.title} ?`}
+        </UrlConfirmDialog.Title>
+        <UrlConfirmDialog.Description>
+          {isLoading ? (
+            <div className='flex items-center justify-center p-8'>
+              <Loader2 className='text-primary h-8 w-8 animate-spin' />
+            </div>
+          ) : (
+            <>
+              Are you sure you want to delete{' '}
+              <strong>{selectedTask?.title}</strong>
+              ?
+              <br />
+              This action cannot be undone.
+            </>
+          )}
+        </UrlConfirmDialog.Description>
+      </UrlConfirmDialog.Header>
+    </UrlConfirmDialog.Root>
   )
 }

@@ -1,6 +1,7 @@
-import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
+import { useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs/server'
 import { toast } from 'sonner'
 import { useAction } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
@@ -32,7 +33,10 @@ export function TaskTableBulkActions<TData>({
   slug,
   table,
 }: TaskTableBulkActionsProps<TData>) {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [, setDeleteConfirm] = useQueryState(
+    'delete-selected-tasks',
+    parseAsBoolean.withDefault(false)
+  )
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
   const { execute: executeBulkUpdate, isPending: isUpdating } = useAction(
@@ -47,7 +51,7 @@ export function TaskTableBulkActions<TData>({
     {
       onSuccess: () => {
         table.resetRowSelection()
-        setShowDeleteConfirm(false)
+        void setDeleteConfirm(false)
       },
     }
   )
@@ -137,7 +141,7 @@ export function TaskTableBulkActions<TData>({
             <Button
               variant='destructive'
               size='icon'
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={() => void setDeleteConfirm(true)}
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
@@ -153,12 +157,7 @@ export function TaskTableBulkActions<TData>({
         </Tooltip>
       </DataTableBulkActions>
 
-      <TasksBulkDeleteDialog
-        open={showDeleteConfirm}
-        onOpenChange={setShowDeleteConfirm}
-        table={table}
-        handleDelete={handleBulkDelete}
-      />
+      <TasksBulkDeleteDialog table={table} handleDelete={handleBulkDelete} />
     </>
   )
 }
