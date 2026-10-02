@@ -1,14 +1,17 @@
-import { create } from 'zustand'
+'use client'
 
-interface CreateOrganizationModalState {
-  isOpen: boolean
-  open: () => void
-  close: () => void
+import { useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs/server'
+
+export function useCreateOrganizationModalStore() {
+  const [isOpen, setIsOpen] = useQueryState(
+    'create-organization',
+    parseAsBoolean.withDefault(false)
+  )
+
+  return {
+    isOpen,
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(null),
+  }
 }
-
-export const useCreateOrganizationModalStore =
-  create<CreateOrganizationModalState>((set) => ({
-    isOpen: false,
-    open: () => set({ isOpen: true }),
-    close: () => set({ isOpen: false }),
-  }))
