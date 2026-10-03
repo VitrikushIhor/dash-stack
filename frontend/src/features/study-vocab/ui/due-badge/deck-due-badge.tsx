@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ErrorFallback } from '@/shared/ui/error-state'
+import { WidgetErrorState } from '@/shared/ui/feedback'
 import { useDueReviews } from '@/entities/vocab'
 import { DueBadge } from './due-badge'
 import { useDueCount } from './due-reviews-provider'
@@ -12,10 +12,18 @@ interface DeckDueBadgeProps {
 }
 
 function DeckDueBadgeStandalone({ deckId, className }: DeckDueBadgeProps) {
-  const { data, isError, isLoading } = useDueReviews({ deckId })
+  const { data, isError, isLoading, refetch } = useDueReviews({ deckId })
 
   if (isError) {
-    return <ErrorFallback message='Failed to load due reviews' />
+    return (
+      <WidgetErrorState
+        size='compact'
+        title='Review count unavailable'
+        description='Try loading this deck again.'
+        onRetry={() => void refetch()}
+        className='rounded-md p-2'
+      />
+    )
   }
 
   if (isLoading || !data) {

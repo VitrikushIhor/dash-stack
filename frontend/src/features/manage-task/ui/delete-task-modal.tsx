@@ -1,7 +1,9 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { getErrorMessage } from '@/shared/api'
 import { useAction } from '@/shared/lib'
+import { Skeleton } from '@/shared/ui/core/skeleton'
+import { WidgetErrorState } from '@/shared/ui/feedback'
 import { UrlConfirmDialog } from '@/shared/ui/url-confirm-dialog'
 import { useTaskSearchParams } from '../model/task-search-params'
 import { useTaskQuery } from '../model/use-task-query'
@@ -16,8 +18,14 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
 
   const isOpen = !!deleteId
 
-  const { data: fetchedTask, isLoading } = useTaskQuery(slug, deleteId)
-  const selectedTask = deleteId ? (fetchedTask ?? null) : null
+  const {
+    data: fetchedTask,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useTaskQuery(slug, deleteId)
+  const selectedTask = fetchedTask ?? null
 
   const close = () => {
     setParams({
@@ -40,27 +48,33 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
       queryKey='delete-task'
       destructive
       enabled={isOpen}
-      disabled={isLoading || !selectedTask}
+      disabled={isFetching || isError || !selectedTask?.title}
       handleConfirm={handleDelete}
       className='max-w-md'
       confirmText='Delete'
     >
       <UrlConfirmDialog.Header>
-        <UrlConfirmDialog.Title>
-          {isLoading
-            ? 'Loading task...'
-            : `Delete this task: ${selectedTask?.title} ?`}
-        </UrlConfirmDialog.Title>
+        <UrlConfirmDialog.Title>Delete task</UrlConfirmDialog.Title>
         <UrlConfirmDialog.Description>
-          {isLoading ? (
-            <div className='flex items-center justify-center p-8'>
-              <Loader2 className='text-primary h-8 w-8 animate-spin' />
+          {isFetching ? (
+            <div className='space-y-3 py-2' aria-busy='true'>
+              <Skeleton className='h-4 w-4/5' />
+              <Skeleton className='h-4 w-2/3' />
             </div>
+          ) : isError || !selectedTask?.title ? (
+            <WidgetErrorState
+              size='compact'
+              title='Could not load task'
+              description={getErrorMessage(
+                error ?? 'This task is unavailable. It may have been deleted.'
+              )}
+              onRetry={() => void refetch()}
+              className='rounded-md p-2'
+            />
           ) : (
             <>
               Are you sure you want to delete{' '}
-              <strong>{selectedTask?.title}</strong>
-              ?
+              <strong>{selectedTask.title}</strong>?
               <br />
               This action cannot be undone.
             </>
