@@ -17,6 +17,7 @@ import {
   ImportSource,
   type ImportSource as ImportSourceValue,
 } from '../model/import-preview'
+import { getImportSourceDelimiter } from '../model/import-source-options'
 import type { ImportViewModel } from '../model/use-import-preview'
 
 const importSources = [
@@ -40,10 +41,7 @@ export function ImportOptionsFields({ model }: { model: ImportViewModel }) {
       model.changeOptions({
         ...model.options,
         source: value,
-        delimiter:
-          value === ImportSource.QUIZLET || value === ImportSource.QUENTI
-            ? '\t'
-            : 'auto',
+        delimiter: getImportSourceDelimiter(value),
       })
     },
     [model]
