@@ -25,7 +25,8 @@ import { Textarea } from '@/shared/ui/core/textarea'
 import {
   CEFRLevelEnum,
   DeckVisibilityEnum,
-  normalizeDeckTag,
+  addDeckTag,
+  removeDeckTag,
 } from '@/entities/deck'
 import { useCreateDeckForm } from '../model/use-create-deck-form'
 
@@ -40,10 +41,10 @@ export function CreateDeckForm() {
   ) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
-      const trimmed = normalizeDeckTag(tagInput)
+      const nextTags = addDeckTag(currentTags, tagInput)
 
-      if (trimmed && !currentTags.includes(trimmed)) {
-        onChange([...currentTags, trimmed])
+      if (nextTags !== currentTags) {
+        onChange(nextTags)
         setTagInput('')
       }
     }
@@ -54,7 +55,7 @@ export function CreateDeckForm() {
     currentTags: string[],
     onChange: (tags: string[]) => void
   ) => {
-    onChange(currentTags.filter((t) => t !== tagToRemove))
+    onChange(removeDeckTag(currentTags, tagToRemove))
   }
 
   return (

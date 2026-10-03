@@ -11,7 +11,8 @@ import { Textarea } from '@/shared/ui/core/textarea'
 import {
   CEFRLevelEnum,
   DeckVisibilityEnum,
-  normalizeDeckTag,
+  addDeckTag,
+  removeDeckTag,
 } from '@/entities/deck'
 import { type useDeckMetadata } from '../model/use-deck-metadata'
 
@@ -37,10 +38,12 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
   } = state
 
   const addTag = (value: string) => {
-    const tag = normalizeDeckTag(value)
+    const nextTags = addDeckTag(tags, value)
 
-    if (tag && !tags.includes(tag)) setTags([...tags, tag])
-    setTagInput('')
+    if (nextTags !== tags) {
+      setTags(nextTags)
+      setTagInput('')
+    }
   }
 
   const handleTagKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -185,7 +188,7 @@ export function DeckMetadataForm({ state }: DeckMetadataFormProps) {
                   <button
                     type='button'
                     aria-label={`Remove tag ${tag}`}
-                    onClick={() => setTags(tags.filter((item) => item !== tag))}
+                    onClick={() => setTags(removeDeckTag(tags, tag))}
                     className='text-muted-foreground hover:text-foreground ml-1'
                   >
                     ×
