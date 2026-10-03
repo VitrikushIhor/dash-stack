@@ -1,47 +1,27 @@
 'use client'
 
 import { getErrorMessage } from '@/shared/api'
-import { useAction } from '@/shared/lib'
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { WidgetErrorState } from '@/shared/ui/feedback'
 import { UrlConfirmDialog } from '@/shared/ui/url-confirm-dialog'
-import { useTaskSearchParams } from '../model/task-search-params'
-import { useTaskQuery } from '../model/use-task-query'
-import { deleteTaskAction } from '../server'
+import { useDeleteTaskModal } from '../model/use-delete-task-modal'
 
 interface DeleteTaskModalProps {
   slug: string
 }
 
 export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
-  const [{ 'delete-task': deleteId }, setParams] = useTaskSearchParams()
-
-  const isOpen = !!deleteId
-
   const {
-    data: fetchedTask,
+    isOpen,
+    selectedTask,
     isFetching,
     isError,
     error,
     refetch,
-  } = useTaskQuery(slug, deleteId)
-  const selectedTask = fetchedTask ?? null
+    handleDelete,
+  } = useDeleteTaskModal(slug)
 
-  const close = () => {
-    setParams({
-      'delete-task': null,
-    })
-  }
-
-  const { execute: executeDelete } = useAction(deleteTaskAction, {
-    successMessage: 'Task deleted successfully',
-    onSuccess: () => close(),
-  })
-
-  const handleDelete = async () => {
-    if (!selectedTask) return
-    await executeDelete({ slug, id: selectedTask.id })
-  }
+  const isShowErrorState = !isFetching && (isError || !selectedTask?.title)
 
   return (
     <UrlConfirmDialog.Root
@@ -56,12 +36,13 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
       <UrlConfirmDialog.Header>
         <UrlConfirmDialog.Title>Delete task</UrlConfirmDialog.Title>
         <UrlConfirmDialog.Description>
-          {isFetching ? (
+          {isFetching && (
             <div className='space-y-3 py-2' aria-busy='true'>
               <Skeleton className='h-4 w-4/5' />
               <Skeleton className='h-4 w-2/3' />
             </div>
-          ) : isError || !selectedTask?.title ? (
+          )}
+          {isShowErrorState ? (
             <WidgetErrorState
               size='compact'
               title='Could not load task'
@@ -72,12 +53,15 @@ export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
               className='rounded-md p-2'
             />
           ) : (
-            <>
-              Are you sure you want to delete{' '}
-              <strong>{selectedTask.title}</strong>?
-              <br />
-              This action cannot be undone.
-            </>
+            !isFetching &&
+            selectedTask?.title && (
+              <>
+                Are you sure you want to delete{' '}
+                <strong>{selectedTask.title}</strong>?
+                <br />
+                This action cannot be undone.
+              </>
+            )
           )}
         </UrlConfirmDialog.Description>
       </UrlConfirmDialog.Header>

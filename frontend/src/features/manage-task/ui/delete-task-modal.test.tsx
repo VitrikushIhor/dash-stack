@@ -11,6 +11,26 @@ vi.mock('../server', () => ({
 }))
 
 describe('DeleteTaskModal', () => {
+  it('should_show_only_loading_state_while_task_lookup_is_pending', () => {
+    vi.mocked(getTaskAction).mockImplementation(() => new Promise(() => {}))
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <NuqsTestingAdapter searchParams='?delete-task=task-1' hasMemory>
+          <DeleteTaskModal slug='org-1' />
+        </NuqsTestingAdapter>
+      </QueryClientProvider>
+    )
+
+    expect(
+      screen.getByRole('alertdialog').querySelector('[aria-busy="true"]')
+    ).toBeVisible()
+    expect(screen.queryByText('Could not load task')).not.toBeInTheDocument()
+  })
+
   it('should_keep_dialog_open_with_retry_when_task_lookup_fails', async () => {
     vi.mocked(getTaskAction).mockResolvedValue({
       success: false,
