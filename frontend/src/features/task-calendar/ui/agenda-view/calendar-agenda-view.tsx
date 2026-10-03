@@ -3,19 +3,14 @@ import { format, isSameMonth, parseISO, startOfDay } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
 import { AgendaDayGroup } from './agenda-day-group'
-
-interface IProps {
-  tasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
 
 export function CalendarAgendaView({
   tasks,
   selectedDate,
   onTaskClick,
-}: IProps) {
+}: CalendarViewProps) {
   const eventsByDay = useMemo(() => {
     const allDates = new Map<string, { date: Date; tasks: Task[] }>()
 

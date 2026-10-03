@@ -6,12 +6,8 @@ import { type Task } from '@/entities/task'
 import { useTaskSearchParams } from '@/features/manage-task/model/task-search-params'
 import { updateTaskAction } from '@/features/manage-task/server'
 import {
-  CalendarAgendaView,
-  CalendarDayView,
   CalendarHeader,
-  CalendarMonthView,
-  CalendarWeekView,
-  CalendarYearView,
+  CalendarView,
   DndProviderWrapper,
   type TCalendarView,
   useCalendarSearchParams,
@@ -43,52 +39,7 @@ export function CalendarViewClient({
     return result !== undefined
   }
 
-  const renderViewContent = (optimisticTasks: Task[]) => {
-    const handleTaskClick = (id: string) => setTaskParams({ 'update-task': id })
-
-    switch (view) {
-      case 'month':
-        return (
-          <CalendarMonthView
-            singleDayTasks={optimisticTasks}
-            selectedDate={selectedDate}
-            onTaskClick={handleTaskClick}
-          />
-        )
-      case 'week':
-        return (
-          <CalendarWeekView
-            singleDayTasks={optimisticTasks}
-            selectedDate={selectedDate}
-            onTaskClick={handleTaskClick}
-          />
-        )
-      case 'day':
-        return (
-          <CalendarDayView
-            singleDayTasks={optimisticTasks}
-            selectedDate={selectedDate}
-            onTaskClick={handleTaskClick}
-          />
-        )
-      case 'year':
-        return (
-          <CalendarYearView
-            tasks={optimisticTasks}
-            selectedDate={selectedDate}
-            onTaskClick={handleTaskClick}
-          />
-        )
-      case 'agenda':
-        return (
-          <CalendarAgendaView
-            tasks={optimisticTasks}
-            selectedDate={selectedDate}
-            onTaskClick={handleTaskClick}
-          />
-        )
-    }
-  }
+  const handleTaskClick = (id: string) => setTaskParams({ 'update-task': id })
 
   return (
     <DndProviderWrapper tasks={tasks} onTaskUpdate={handleTaskUpdate}>
@@ -100,7 +51,12 @@ export function CalendarViewClient({
             selectedDate={selectedDate}
             setParams={setParams}
           />
-          {renderViewContent(optimisticTasks)}
+          <CalendarView
+            view={view}
+            tasks={optimisticTasks}
+            selectedDate={selectedDate}
+            onTaskClick={handleTaskClick}
+          />
         </div>
       )}
     </DndProviderWrapper>

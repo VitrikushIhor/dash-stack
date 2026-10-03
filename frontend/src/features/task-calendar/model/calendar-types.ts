@@ -5,7 +5,12 @@ export const CALENDAR_VIEWS = [
   'year',
   'agenda',
 ] as const
+
 export type TCalendarView = (typeof CALENDAR_VIEWS)[number]
+
+export function isCalendarView(value: string): value is TCalendarView {
+  return (CALENDAR_VIEWS as readonly string[]).includes(value)
+}
 
 export const BADGE_VARIANTS = ['mixed', 'dot', 'solid'] as const
 export type TBadgeVariant = (typeof BADGE_VARIANTS)[number]
