@@ -1,9 +1,5 @@
 import { type Table } from '@tanstack/react-table'
 import { CircleArrowUp, Trash2 } from 'lucide-react'
-import { useQueryState } from 'nuqs'
-import { parseAsBoolean } from 'nuqs/server'
-import { toast } from 'sonner'
-import { useAction } from '@/shared/lib'
 import { Button } from '@/shared/ui/core/button'
 import {
   DropdownMenu,
@@ -17,85 +13,26 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/core/tooltip'
 import { DataTableBulkActions } from '@/shared/ui/data-table'
-import { STATUS_CONFIG, type Task, type TaskStatusEnum } from '@/entities/task'
-import {
-  bulkDeleteTasksAction,
-  bulkUpdateTasksAction,
-} from '@/features/manage-task/server'
+import { STATUS_CONFIG, type Task } from '@/entities/task'
+import { useTaskTableBulkActions } from '../model/use-task-table-bulk-actions'
 import { TasksBulkDeleteDialog } from './tasks-bulk-delete-dialog'
 
-type TaskTableBulkActionsProps<TData> = {
+type TaskTableBulkActionsProps = {
   slug: string
-  table: Table<TData>
+  table: Table<Task>
 }
 
-export function TaskTableBulkActions<TData>({
+export function TaskTableBulkActions({
   slug,
   table,
-}: TaskTableBulkActionsProps<TData>) {
-  const [, setDeleteConfirm] = useQueryState(
-    'delete-selected-tasks',
-    parseAsBoolean.withDefault(false)
-  )
-  const selectedRows = table.getFilteredSelectedRowModel().rows
-
-  const { execute: executeBulkUpdate, isPending: isUpdating } = useAction(
-    bulkUpdateTasksAction,
-    {
-      onSuccess: () => table.resetRowSelection(),
-    }
-  )
-
-  const { execute: executeBulkDelete, isPending: isDeleting } = useAction(
-    bulkDeleteTasksAction,
-    {
-      onSuccess: () => {
-        table.resetRowSelection()
-        void setDeleteConfirm(false)
-      },
-    }
-  )
-
-  const handleBulkStatusChange = async (status: string) => {
-    if (!slug) return
-    const selectedIds = selectedRows.map((row) => (row.original as Task).id)
-    const toastId = toast.loading('Updating status...')
-
-    const result = await executeBulkUpdate({
-      slug,
-      ids: selectedIds,
-      data: { status: status as TaskStatusEnum },
-    })
-
-    if (result !== undefined) {
-      toast.success(
-        `Status updated to "${status}" for ${selectedIds.length} task${selectedIds.length > 1 ? 's' : ''}.`,
-        { id: toastId }
-      )
-    } else {
-      toast.dismiss(toastId)
-    }
-  }
-
-  const handleBulkDelete = async () => {
-    if (!slug) return
-    const selectedIds = selectedRows.map((row) => (row.original as Task).id)
-    const toastId = toast.loading('Deleting tasks...')
-
-    const result = await executeBulkDelete({
-      slug,
-      ids: selectedIds,
-    })
-
-    if (result !== undefined) {
-      toast.success(
-        `Deleted ${selectedIds.length} ${selectedIds.length > 1 ? 'tasks' : 'task'}`,
-        { id: toastId }
-      )
-    } else {
-      toast.dismiss(toastId)
-    }
-  }
+}: TaskTableBulkActionsProps) {
+  const {
+    isUpdating,
+    isDeleting,
+    openDeleteConfirm,
+    handleBulkStatusChange,
+    handleBulkDelete,
+  } = useTaskTableBulkActions(slug, table)
 
   return (
     <>
@@ -141,7 +78,7 @@ export function TaskTableBulkActions<TData>({
             <Button
               variant='destructive'
               size='icon'
-              onClick={() => void setDeleteConfirm(true)}
+              onClick={openDeleteConfirm}
               className='size-8'
               aria-label='Delete selected tasks'
               title='Delete selected tasks'
