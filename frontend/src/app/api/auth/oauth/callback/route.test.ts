@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { sessionBinding } from '@/shared/api/oauth/oauth-link-flow'
-import { forwardProxyRequest } from '@/shared/api/proxy'
+import { forwardProxyRequestFacade } from '@/shared/api/proxy'
 import { GET } from './route'
 
-vi.mock('@/shared/api/proxy', () => ({ forwardProxyRequest: vi.fn() }))
+vi.mock('@/shared/api/proxy', () => ({ forwardProxyRequestFacade: vi.fn() }))
 
 describe('OAuth callback route', () => {
   const state = 's'.repeat(43)
@@ -136,7 +136,7 @@ describe('OAuth callback route', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
   it('should_link_only_the_session_that_started_the_flow_without_replacing_identity', async () => {
-    vi.mocked(forwardProxyRequest).mockResolvedValue(
+    vi.mocked(forwardProxyRequestFacade).mockResolvedValue(
       new NextResponse('{}', { status: 200 })
     )
     const flow = JSON.stringify({
@@ -158,7 +158,7 @@ describe('OAuth callback route', () => {
       'http://localhost:3000/user/settings/accounts?link=success'
     )
     expect(response.cookies.get(`oauth_flow_${state}`)?.maxAge).toBe(0)
-    const forwarded = vi.mocked(forwardProxyRequest).mock.calls[0][0]
+    const forwarded = vi.mocked(forwardProxyRequestFacade).mock.calls[0][0]
     expect(await forwarded.json()).toEqual({
       code: 'code',
       codeVerifier: verifier,
@@ -187,6 +187,6 @@ describe('OAuth callback route', () => {
     expect(response.headers.get('location')).toBe(
       'http://localhost:3000/user/settings/accounts?link=failed'
     )
-    expect(forwardProxyRequest).not.toHaveBeenCalled()
+    expect(forwardProxyRequestFacade).not.toHaveBeenCalled()
   })
 })

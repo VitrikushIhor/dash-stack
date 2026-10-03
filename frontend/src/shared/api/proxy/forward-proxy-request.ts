@@ -7,7 +7,10 @@ import { sendUpstreamRequest } from './proxy-upstream'
 import { isTrustedMutation, normalizePath } from './request/proxy-request'
 import { createProxyRequestContext } from './request/proxy-request-context'
 
-export async function forwardProxyRequest(req: NextRequest, path: string[]) {
+export async function forwardProxyRequestFacade(
+  req: NextRequest,
+  path: string[]
+) {
   if (!isTrustedMutation(req)) {
     return proxyErrorResponse(PROXY_ERROR_CONFIG.CSRF_FORBIDDEN, {
       'Cache-Control': 'no-store',

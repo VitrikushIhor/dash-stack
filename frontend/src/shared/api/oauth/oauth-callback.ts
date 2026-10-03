@@ -12,7 +12,7 @@ import { OAUTH_SESSION_CHANGE } from './route-settings/oauth-session-change'
 const STATE_PATTERN = /^[A-Za-z0-9_-]{43}$/
 const VERIFIER_PATTERN = /^[A-Za-z0-9_-]{43,128}$/
 
-export async function handleOAuthCallback(
+export async function handleOAuthCallbackFacade(
   request: NextRequest
 ): Promise<NextResponse> {
   const state = request.nextUrl.searchParams.get('state')

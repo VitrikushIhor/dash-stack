@@ -1,9 +1,12 @@
 import type { NextRequest } from 'next/server'
-import { type ProxyRouteContext, forwardProxyRequest } from '@/shared/api/proxy'
+import {
+  type ProxyRouteContext,
+  forwardProxyRequestFacade,
+} from '@/shared/api/proxy'
 
 async function handle(req: NextRequest, { params }: ProxyRouteContext) {
   const { path = [] } = await params
-  return forwardProxyRequest(req, path)
+  return forwardProxyRequestFacade(req, path)
 }
 
 export const GET = handle

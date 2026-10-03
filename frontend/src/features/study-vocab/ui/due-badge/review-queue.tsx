@@ -9,7 +9,7 @@ import { WidgetErrorState } from '@/shared/ui/feedback'
 import { useCurrentUserState } from '@/entities/user'
 import { useDueReviews } from '@/entities/vocab'
 
-function useDueReviewsState() {
+function useDueReviewsFacade() {
   const { authState, refetch: retryIdentity } = useCurrentUserState()
   const { data, isError, isPending, refetch } = useDueReviews({
     enabled: authState.status === 'authenticated',
@@ -21,7 +21,7 @@ function useDueReviewsState() {
 function ReviewQueueContent({
   state,
 }: {
-  state: ReturnType<typeof useDueReviewsState>
+  state: ReturnType<typeof useDueReviewsFacade>
 }) {
   const { authState, retryIdentity, data, isPending, isError, refetch } = state
 
@@ -85,7 +85,7 @@ function ReviewQueueSkeleton() {
 }
 
 export function GlobalDueCount() {
-  const { authState, data, isError } = useDueReviewsState()
+  const { authState, data, isError } = useDueReviewsFacade()
 
   if (authState.status === 'loading') {
     return (
@@ -132,7 +132,7 @@ export function GlobalDueCount() {
 }
 
 export function ReviewQueue() {
-  const state = useDueReviewsState()
+  const state = useDueReviewsFacade()
 
   if (state.authState.status === 'guest') return null
 

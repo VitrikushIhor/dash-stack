@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { HTTP_METHODS } from '@/shared/api/http-methods'
-import { forwardProxyRequest } from '@/shared/api/proxy'
+import { forwardProxyRequestFacade } from '@/shared/api/proxy'
 import { ROUTES } from '@/shared/config'
 import { COOKIE_CONFIG } from '@/shared/lib/session-cookies'
 import { oauthLinkFlowSchema, sessionBinding } from './oauth-link-flow'
@@ -50,7 +50,7 @@ export async function completeAccountLink(
   )
     return response
 
-  const upstream = await forwardProxyRequest(
+  const upstream = await forwardProxyRequestFacade(
     new NextRequest(new URL('/api/proxy/auth/oauth/link-code', appUrl), {
       method: HTTP_METHODS.POST,
       headers: {
