@@ -37,22 +37,21 @@ export function CreateDeckDialog({
   const [params, setParams] = useDeckSearchParams()
 
   const isOpen = params['create-deck'] || false
+  const trigger =
+    children ??
+    (triggerButton ? (
+      <Button className='gap-2 shadow-md'>
+        <Plus className='h-4 w-4' />
+        <span>Create New Deck</span>
+      </Button>
+    ) : null)
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => setParams({ 'create-deck': open })}
     >
-      <DialogTrigger asChild>
-        {children ? (
-          children
-        ) : triggerButton ? (
-          <Button className='gap-2 shadow-md'>
-            <Plus className='h-4 w-4' />
-            <span>Create New Deck</span>
-          </Button>
-        ) : null}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
 
       <DialogContent className='border-border/70 bg-card/95 max-w-lg backdrop-blur-xl sm:max-w-xl'>
         <DialogHeader>
