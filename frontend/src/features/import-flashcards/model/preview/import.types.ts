@@ -1,4 +1,4 @@
-import type { Delimiter } from './delimited-text.types'
+import type { Delimiter } from '../parsing/delimited-text.types'
 
 export const ImportSource = {
   GENERIC: 'generic',

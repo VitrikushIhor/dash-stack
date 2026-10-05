@@ -1,5 +1,5 @@
 import { useForm, useWatch } from 'react-hook-form'
-import type { ImportOptions } from './import-preview'
+import type { ImportOptions } from '../preview/import.types'
 
 const defaultImportOptions: ImportOptions = {
   source: 'generic',

@@ -1,7 +1,10 @@
 import { useRef, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { IMPORT_MAX_BYTES } from './import-preview'
+import { IMPORT_MAX_BYTES } from '../preview/import.constants'
 import type { ImportFormValues } from './use-import-form'
+
+const SUPPORTED_IMPORT_FILE_PATTERN = /\.(csv|tsv|txt|json)$/i
+const JSON_IMPORT_FILE_PATTERN = /\.json$/i
 
 interface UseImportFileProps {
   form: UseFormReturn<ImportFormValues>
@@ -23,7 +26,7 @@ export function useImportFile({
     resetPreview()
     setReading(true)
     try {
-      if (!/\.(csv|tsv|txt|json)$/i.test(file.name)) {
+      if (!SUPPORTED_IMPORT_FILE_PATTERN.test(file.name)) {
         throw new Error('Choose a .csv, .tsv, .txt or .json file')
       }
 
@@ -37,7 +40,7 @@ export function useImportFile({
 
       if (version === fileVersion.current) {
         form.setValue('text', value)
-        if (/\.json$/i.test(file.name)) {
+        if (JSON_IMPORT_FILE_PATTERN.test(file.name)) {
           form.setValue('source', 'dash-stack-json')
         }
       }

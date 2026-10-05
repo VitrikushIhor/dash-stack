@@ -1,10 +1,10 @@
 import { FlashcardSchema } from '@/entities/deck'
-import { DashStackJsonBackupSchema } from './dash-stack-json-backup.schema'
+import { DashStackJsonBackupSchema } from '../parsing/dash-stack-json-backup.schema'
 import {
   type Delimiter,
   detectDelimiter,
   parseDelimitedText,
-} from './delimited-text-parser'
+} from '../parsing/delimited-text-parser'
 import { IMPORT_MAX_BYTES, IMPORT_MAX_ROWS } from './import.constants'
 import {
   type ImportCard,

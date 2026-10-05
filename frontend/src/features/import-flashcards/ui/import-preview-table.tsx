@@ -10,15 +10,8 @@ import {
   TableRow,
 } from '@/shared/ui/core/table'
 import { Textarea } from '@/shared/ui/core/textarea'
-import type { ImportViewModel } from '../model/use-import-preview'
-
-const fields = ['term', 'definition', 'example', 'imageUrl'] as const
-const labels = {
-  term: 'Term',
-  definition: 'Definition',
-  example: 'Example',
-  imageUrl: 'Image URL',
-}
+import type { ImportViewModel } from '../model/dialog/use-import-preview'
+import { importFieldLabels, importFields } from './import-fields'
 
 export function ImportPreviewTable({ model }: { model: ImportViewModel }) {
   if (!model.preview) return null
@@ -36,8 +29,8 @@ export function ImportPreviewTable({ model }: { model: ImportViewModel }) {
             <TableRow>
               <TableHead>Exclude</TableHead>
               <TableHead>Source row</TableHead>
-              {fields.map((field) => (
-                <TableHead key={field}>{labels[field]}</TableHead>
+              {importFields.map((field) => (
+                <TableHead key={field}>{importFieldLabels[field]}</TableHead>
               ))}
               <TableHead>Validation</TableHead>
             </TableRow>
@@ -55,11 +48,11 @@ export function ImportPreviewTable({ model }: { model: ImportViewModel }) {
                   />
                 </TableCell>
                 <TableCell>{row.sourceRow}</TableCell>
-                {fields.map((field) => (
+                {importFields.map((field) => (
                   <TableCell key={field} className='p-1'>
                     <Textarea
                       className='min-w-32'
-                      aria-label={`${labels[field]}, source row ${row.sourceRow}`}
+                      aria-label={`${importFieldLabels[field]}, source row ${row.sourceRow}`}
                       disabled={row.excluded}
                       value={row.card[field] ?? ''}
                       onChange={(event) =>
