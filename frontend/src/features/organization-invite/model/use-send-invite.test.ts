@@ -2,7 +2,6 @@ import { useRouter } from 'next/navigation'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { handleServerError } from '@/shared/api'
 import { OrgRole } from '@/entities/organization'
 import { sendInviteAction } from '../api/actions/send-invite.action'
 import { useSendInvite } from './use-send-invite'
@@ -18,18 +17,10 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('sonner', () => ({
   toast: {
+    error: vi.fn(),
     success: vi.fn(),
   },
 }))
-
-vi.mock('@/shared/api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/shared/api')>()
-
-  return {
-    ...actual,
-    handleServerError: vi.fn(),
-  }
-})
 
 describe('useSendInvite', () => {
   const mockRefresh = vi.fn()
@@ -80,15 +71,18 @@ describe('useSendInvite', () => {
 
     // Behavior verification:
     // 1. Called the API action
-    expect(sendInviteAction).toHaveBeenCalledWith('org-1', defaultDto)
+    expect(sendInviteAction).toHaveBeenCalledWith({
+      slug: 'org-1',
+      dto: defaultDto,
+    })
     // 2. Showed a success toast
     expect(toast.success).toHaveBeenCalledWith('Invitation sent successfully')
     // 3. Called the optional onSuccess callback
     expect(mockOnSuccess).toHaveBeenCalledTimes(1)
     // 4. Refreshed the page router
     expect(mockRefresh).toHaveBeenCalledTimes(1)
-    // 5. Did not call the error handler
-    expect(handleServerError).not.toHaveBeenCalled()
+    // 5. Did not show an error toast
+    expect(toast.error).not.toHaveBeenCalled()
   })
 
   it('handles server errors correctly (without validation messages)', async () => {
@@ -110,7 +104,7 @@ describe('useSendInvite', () => {
 
     // Behavior verification:
     // 1. Handled the server error (standard error message)
-    expect(handleServerError).toHaveBeenCalledWith('Failed to send')
+    expect(toast.error).toHaveBeenCalledWith('Failed to send')
     // 2. Did NOT show success toast
     expect(toast.success).not.toHaveBeenCalled()
     // 3. Did NOT call onSuccess
@@ -140,7 +134,7 @@ describe('useSendInvite', () => {
 
     // Behavior verification:
     // It should pass validationMessages to handleServerError instead of standard error
-    expect(handleServerError).toHaveBeenCalledWith(['Invalid email format'])
-    expect(handleServerError).not.toHaveBeenCalledWith('General Error')
+    expect(toast.error).toHaveBeenCalledWith('Invalid email format')
+    expect(toast.error).not.toHaveBeenCalledWith('General Error')
   })
 })

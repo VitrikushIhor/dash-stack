@@ -129,9 +129,12 @@ describe('InviteMemberDialog', () => {
 
     // Verify action called with correct data
     await waitFor(() => {
-      expect(sendInviteAction).toHaveBeenCalledWith('org-1', {
-        email: 'test@example.com',
-        role: 'MEMBER', // default role in the form
+      expect(sendInviteAction).toHaveBeenCalledWith({
+        slug: 'org-1',
+        dto: {
+          email: 'test@example.com',
+          role: 'MEMBER', // default role in the form
+        },
       })
     })
 
