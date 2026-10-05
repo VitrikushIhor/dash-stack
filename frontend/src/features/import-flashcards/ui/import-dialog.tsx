@@ -78,14 +78,13 @@ export function ImportDialog(props: ImportDialogProps) {
           </Alert>
         )}
         {model.reading && (
-          <div
-            role='status'
+          <output
             aria-label='Reading file'
             className='mx-6 flex items-center gap-3 sm:mx-8'
           >
             <Skeleton className='size-4 rounded-full' />
             <Skeleton className='h-4 w-40' />
-          </div>
+          </output>
         )}
         <div className='bg-muted/20 flex flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end sm:px-8'>
           <Button
@@ -95,10 +94,7 @@ export function ImportDialog(props: ImportDialogProps) {
           >
             Cancel
           </Button>
-          <Button
-            disabled={!model.canConfirm}
-            onClick={() => void model.confirm()}
-          >
+          <Button disabled={!model.canConfirm} onClick={() => model.confirm()}>
             {model.pending
               ? 'Importing…'
               : `Import ${model.includedCount} cards`}

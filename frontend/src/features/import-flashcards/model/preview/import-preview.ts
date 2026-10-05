@@ -31,6 +31,7 @@ export const validateImportCard = (card: ImportCard): ImportError[] => {
     example: card.example ?? undefined,
     imageUrl: card.imageUrl ?? undefined,
   })
+
   const errors = parsed.success
     ? []
     : parsed.error.issues.map(
@@ -88,10 +89,12 @@ export const prepareImport = (
         'Select a separator: detection is ambiguous or no delimited rows were found.',
       ],
     }
+
   const parsed = parseDelimitedText(text, delimiter)
   const data = options.hasHeader ? parsed.slice(1) : parsed
 
   if (data.length > IMPORT_MAX_ROWS) throw new Error('Import exceeds 2000 rows')
+
   const mapping = options.mapping
   const selected = Object.values(mapping).filter(
     (value): value is number => value !== null
@@ -99,15 +102,19 @@ export const prepareImport = (
 
   if (new Set(selected).size !== selected.length)
     throw new Error('Map each field to a different column')
+
   const rows = data.map((row): ImportPreviewRow => {
-    const value = (column: number | null) =>
-      column === null ? null : (row.fields[column] ?? '')
+    const value = (column: number | null) => {
+      return column === null ? null : (row.fields[column] ?? '')
+    }
+
     const card: ImportCard = {
       term: value(mapping.term) ?? '',
       definition: value(mapping.definition) ?? '',
       example: value(mapping.example),
       imageUrl: value(mapping.imageUrl),
     }
+
     const unmapped = row.fields.flatMap((field, index) =>
       !selected.includes(index) && field !== '' ? [index + 1] : []
     )
