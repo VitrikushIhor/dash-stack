@@ -22,3 +22,5 @@ export {
   getCalendarViewUrl,
   useCalendarNavigation,
 } from './lib/navigation'
+
+export { type CalendarTaskDateUpdate } from './model/calendar-task-move'

@@ -4,10 +4,11 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type Task } from '@/entities/task'
 import { updateTaskAction } from '@/features/manage-task/server'
+import { type CalendarTaskDateUpdate } from '@/features/task-calendar'
 import { CalendarViewClient } from './calendar-view-client'
 
-let taskUpdate: ((id: string, data: Partial<Task>) => Promise<boolean>) | null =
-  null
+let taskUpdate:
+  ((id: string, data: CalendarTaskDateUpdate) => Promise<boolean>) | null = null
 let renderCalendarChildren = false
 
 vi.mock('sonner', () => ({
@@ -30,7 +31,7 @@ vi.mock('@/features/task-calendar', () => ({
     children,
     tasks,
   }: {
-    onTaskUpdate: (id: string, data: Partial<Task>) => Promise<boolean>
+    onTaskUpdate: (id: string, data: CalendarTaskDateUpdate) => Promise<boolean>
     children: (tasks: Task[]) => ReactNode
     tasks: Task[]
   }) => {

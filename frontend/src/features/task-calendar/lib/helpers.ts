@@ -3,7 +3,6 @@ import {
   addMonths,
   addWeeks,
   addYears,
-  eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   endOfYear,
@@ -12,8 +11,6 @@ import {
   isSameMonth,
   isSameWeek,
   isSameYear,
-  parseISO,
-  startOfDay,
   startOfMonth,
   startOfWeek,
   startOfYear,
@@ -25,8 +22,6 @@ import {
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
 import { type TCalendarView } from '../model/calendar-types'
 import { type ICalendarCell } from '../model/types'
-
-// ================ Header helper functions ================ //
 
 export function getWeekDays(weekStart: Date) {
   return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
@@ -99,8 +94,6 @@ export function getEventsCount(
   }).length
 }
 
-// ================ Month view helper functions ================ //
-
 export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
   const currentYear = selectedDate.getFullYear()
   const currentMonth = selectedDate.getMonth()
@@ -141,97 +134,4 @@ export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
   )
 
   return [...prevMonthCells, ...currentMonthCells, ...nextMonthCells]
-}
-
-export function calculateMonthEventPositions(
-  singleDayTasks: Task[],
-  selectedDate: Date
-) {
-  const monthStart = startOfMonth(selectedDate)
-  const monthEnd = endOfMonth(selectedDate)
-
-  const eventPositions: { [key: string]: number } = {}
-  const occupiedPositions: { [key: string]: boolean[] } = {}
-
-  eachDayOfInterval({ start: monthStart, end: monthEnd }).forEach((day) => {
-    occupiedPositions[day.toISOString()] = [false, false, false]
-  })
-
-  const sortedEvents = [...singleDayTasks]
-
-  sortedEvents.sort((a, b) => {
-    const anchorA = getTaskCalendarAnchor(a)
-    const anchorB = getTaskCalendarAnchor(b)
-
-    if (!anchorA || !anchorB) return 0
-
-    return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-  })
-
-  sortedEvents.forEach((task) => {
-    const anchor = getTaskCalendarAnchor(task)
-
-    if (!anchor) return
-    const eventStart = parseISO(anchor)
-    const eventEnd = parseISO(anchor)
-    const eventDays = eachDayOfInterval({
-      start: eventStart < monthStart ? monthStart : eventStart,
-      end: eventEnd > monthEnd ? monthEnd : eventEnd,
-    })
-
-    let position = -1
-
-    for (let i = 0; i < 3; i++) {
-      if (
-        eventDays.every((day) => {
-          const dayPositions = occupiedPositions[startOfDay(day).toISOString()]
-
-          return dayPositions && !dayPositions[i]
-        })
-      ) {
-        position = i
-        break
-      }
-    }
-
-    if (position !== -1) {
-      eventDays.forEach((day) => {
-        const dayKey = startOfDay(day).toISOString()
-
-        occupiedPositions[dayKey][position] = true
-      })
-      eventPositions[task.id] = position
-    }
-  })
-
-  return eventPositions
-}
-
-export function getMonthCellEvents(
-  date: Date,
-  tasks: Task[],
-  eventPositions: Record<string, number>
-) {
-  const eventsForDate = tasks.filter((task) => {
-    const anchor = getTaskCalendarAnchor(task)
-
-    if (!anchor) return false
-    const eventStart = parseISO(anchor)
-    const eventEnd = parseISO(anchor)
-
-    return (
-      (date >= eventStart && date <= eventEnd) ||
-      isSameDay(date, eventStart) ||
-      isSameDay(date, eventEnd)
-    )
-  })
-
-  return eventsForDate
-    .map((task) => ({
-      ...task,
-      position: eventPositions[task.id] ?? -1,
-    }))
-    .sort((a, b) => {
-      return a.position - b.position
-    })
 }

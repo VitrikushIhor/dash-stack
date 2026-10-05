@@ -1,27 +1,21 @@
-import { useMemo } from 'react'
 import { DragOverlay, useDndContext } from '@dnd-kit/core'
 import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { readCalendarTaskDragData } from '../../model/calendar-task-move'
 import { MonthTaskBadge } from '../month-view/month-task-badge'
 
-export function CustomDragLayer() {
+export function CustomDragLayer({ tasks }: { tasks: Task[] }) {
   const { active } = useDndContext()
-
-  const fallbackDate = useMemo(() => new Date(), [])
-
-  if (!active || active.data.current?.type !== 'task') {
-    return null
-  }
-
-  const task = active.data.current.task as Task
+  const data = readCalendarTaskDragData(active?.data.current)
+  if (!data) return null
+  const task = tasks.find((item) => item.id === data.taskId)
+  if (!task) return null
+  const anchor = getTaskCalendarAnchor(task)
+  if (!anchor) return null
 
   return (
     <DragOverlay dropAnimation={null}>
       <div className='pointer-events-none opacity-80'>
-        <MonthTaskBadge
-          task={task}
-          cellDate={new Date(getTaskCalendarAnchor(task) || fallbackDate)}
-          position='none'
-        />
+        <MonthTaskBadge task={task} cellDate={new Date(anchor)} />
       </div>
     </DragOverlay>
   )

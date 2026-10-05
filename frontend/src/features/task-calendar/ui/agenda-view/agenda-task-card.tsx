@@ -9,16 +9,12 @@ import { agendaEventCardVariants } from '../variants'
 
 interface IProps {
   task: Task
-  eventCurrentDay?: number
-  eventTotalDays?: number
   badgeVariant?: TBadgeVariant
   onTaskClick?: (taskId: string) => void
 }
 
 export function AgendaTaskCard({
   task,
-  eventCurrentDay,
-  eventTotalDays,
   badgeVariant = 'dot',
   onTaskClick,
 }: IProps) {
@@ -26,7 +22,6 @@ export function AgendaTaskCard({
 
   if (!anchor) return null
   const startDate = parseISO(anchor)
-  const endDate = startDate
 
   const baseColor = getTaskColor(task)
   const color: TBadgeColor =
@@ -48,14 +43,7 @@ export function AgendaTaskCard({
         <div className='flex items-center gap-1.5'>
           {['mixed', 'dot'].includes(badgeVariant) && <TaskDot />}
 
-          <p className='font-medium'>
-            {eventCurrentDay && eventTotalDays && (
-              <span className='mr-1 text-xs'>
-                Day {eventCurrentDay} of {eventTotalDays} •{' '}
-              </span>
-            )}
-            {task.title}
-          </p>
+          <p className='font-medium'>{task.title}</p>
         </div>
 
         <div className='mt-1 flex items-center gap-1'>
@@ -66,7 +54,7 @@ export function AgendaTaskCard({
         <div className='flex items-center gap-1'>
           <Clock className='size-3 shrink-0' />
           <p className='text-foreground text-xs'>
-            {format(startDate, 'h:mm a')} - {format(endDate, 'h:mm a')}
+            {format(startDate, 'h:mm a')}
           </p>
         </div>
 

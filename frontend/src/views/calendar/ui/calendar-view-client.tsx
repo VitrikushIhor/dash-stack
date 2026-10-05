@@ -7,6 +7,7 @@ import { useTaskSearchParams } from '@/features/manage-task/model/task-search-pa
 import { updateTaskAction } from '@/features/manage-task/server'
 import {
   CalendarHeader,
+  type CalendarTaskDateUpdate,
   CalendarView,
   DndProviderWrapper,
   type TCalendarView,
@@ -32,7 +33,7 @@ export function CalendarViewClient({
 
   const handleTaskUpdate = async (
     id: string,
-    data: Partial<Task>
+    data: CalendarTaskDateUpdate
   ): Promise<boolean> => {
     const result = await execute({ slug, id, data })
 

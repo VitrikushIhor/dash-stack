@@ -1,7 +1,6 @@
 'use client'
 
 import { type ReactNode, useOptimistic, useTransition } from 'react'
-import { parseISO, set } from 'date-fns'
 import {
   DndContext,
   type DragEndEvent,
@@ -12,12 +11,18 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { handleServerError } from '@/shared/api'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { type Task } from '@/entities/task'
+import {
+  type CalendarTaskDateUpdate,
+  getCalendarTaskDateUpdate,
+  readCalendarDayDropData,
+  readCalendarTaskDragData,
+} from '../../model/calendar-task-move'
 import { CustomDragLayer } from './custom-drag-layer'
 
 interface DndProviderWrapperProps {
   tasks: Task[]
-  onTaskUpdate: (id: string, data: Partial<Task>) => Promise<boolean>
+  onTaskUpdate: (id: string, data: CalendarTaskDateUpdate) => Promise<boolean>
   children: (optimisticTasks: Task[]) => ReactNode
 }
 
@@ -30,7 +35,7 @@ export function DndProviderWrapper({
 
   const [optimisticTasks, setOptimisticTasks] = useOptimistic(
     tasks,
-    (state: Task[], updatedTask: Partial<Task> & { id: string }) =>
+    (state: Task[], updatedTask: Pick<Task, 'dueDate'> & { id: string }) =>
       state.map((task) =>
         task.id === updatedTask.id ? { ...task, ...updatedTask } : task
       )
@@ -49,58 +54,41 @@ export function DndProviderWrapper({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (!over || !active.data.current) return
+    if (!over) return
+    const dragData = readCalendarTaskDragData(active.data.current)
+    const dropData = readCalendarDayDropData(over.data.current)
+    if (!dragData || !dropData) return
+    const task = optimisticTasks.find((item) => item.id === dragData.taskId)
+    if (!task) return
 
-    const droppedEvent = active.data.current.task as Task
-    const overData = over.data.current
-
-    if (!droppedEvent || !overData) return
-
-    const anchor = getTaskCalendarAnchor(droppedEvent)
-    const eventStartDate = anchor ? parseISO(anchor) : new Date()
-
-    let newStartDate: Date
-
-    if (overData.type === 'day') {
-      newStartDate = set(new Date(overData.date), {
-        hours: eventStartDate.getHours(),
-        minutes: eventStartDate.getMinutes(),
-        seconds: eventStartDate.getSeconds(),
-        milliseconds: eventStartDate.getMilliseconds(),
-      })
-    } else if (overData.type === 'time-block') {
-      newStartDate = set(new Date(overData.date), {
-        hours: overData.hour,
-        minutes: overData.minute,
-        seconds: 0,
-        milliseconds: 0,
-      })
-    } else {
+    let update: CalendarTaskDateUpdate | null
+    try {
+      update = getCalendarTaskDateUpdate(task, dropData)
+    } catch (error) {
+      handleServerError(error)
       return
     }
-
-    const newDueDateISO = newStartDate.toISOString()
-
-    if (droppedEvent.dueDate === newDueDateISO) return
+    if (!update) return
+    const { dueDate } = update
 
     startTransition(async () => {
-      setOptimisticTasks({ id: droppedEvent.id, dueDate: newDueDateISO })
+      setOptimisticTasks({ id: task.id, dueDate })
 
       try {
-        const saved = await onTaskUpdate(droppedEvent.id, {
-          dueDate: newDueDateISO,
+        const saved = await onTaskUpdate(task.id, {
+          dueDate,
         })
 
         if (!saved) {
           setOptimisticTasks({
-            id: droppedEvent.id,
-            dueDate: droppedEvent.dueDate,
+            id: task.id,
+            dueDate: task.dueDate,
           })
         }
       } catch (error) {
         setOptimisticTasks({
-          id: droppedEvent.id,
-          dueDate: droppedEvent.dueDate,
+          id: task.id,
+          dueDate: task.dueDate,
         })
         handleServerError(error)
       }
@@ -110,7 +98,7 @@ export function DndProviderWrapper({
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       {children(optimisticTasks)}
-      <CustomDragLayer />
+      <CustomDragLayer tasks={optimisticTasks} />
     </DndContext>
   )
 }

@@ -1,6 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
+import { type CalendarTaskDragData } from '../../model/calendar-task-move'
 
 interface DraggableTaskProps {
   task: Task
@@ -12,9 +13,9 @@ export function DraggableTask({ task, children }: DraggableTaskProps) {
     useDraggable({
       id: `task-${task.id}`,
       data: {
-        task,
+        taskId: task.id,
         type: 'task',
-      },
+      } satisfies CalendarTaskDragData,
     })
 
   const style = transform
