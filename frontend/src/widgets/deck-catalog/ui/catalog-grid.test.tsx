@@ -67,4 +67,10 @@ describe('CatalogGrid', () => {
     expect(screen.getByText('3 forks')).toBeVisible()
     expect(screen.getByText('AL')).toBeVisible()
   })
+
+  it('offers_reset_when_client_filters_are_active', () => {
+    render(<CatalogGrid decks={[]} hasActiveFilters onResetFilters={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'Reset Filters' })).toBeVisible()
+  })
 })

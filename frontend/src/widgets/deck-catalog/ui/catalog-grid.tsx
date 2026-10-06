@@ -9,10 +9,7 @@ import { ForkDeckButton } from '@/features/manage-deck'
 interface CatalogGridProps {
   decks: Deck[]
   isAuthenticated?: boolean
-  currentQuery?: string
-  currentLevel?: string
-  currentLanguage?: string
-  currentTags?: string[]
+  hasActiveFilters?: boolean
   onResetFilters: () => void
   children?: React.ReactNode
 }
@@ -20,16 +17,10 @@ interface CatalogGridProps {
 export function CatalogGrid({
   decks,
   isAuthenticated = false,
-  currentQuery = '',
-  currentLevel,
-  currentLanguage,
-  currentTags = [],
+  hasActiveFilters = false,
   onResetFilters,
   children,
 }: CatalogGridProps) {
-  const isShowReset =
-    currentQuery || currentLevel || currentLanguage || currentTags.length > 0
-
   if (decks.length === 0) {
     return (
       <EmptyState
@@ -37,7 +28,7 @@ export function CatalogGrid({
         title='No public decks found'
         description='No public decks matched your search filters. Try selecting another level or clearing your keyword.'
         action={
-          isShowReset ? (
+          hasActiveFilters ? (
             <Button variant='outline' size='sm' onClick={onResetFilters}>
               Reset Filters
             </Button>
