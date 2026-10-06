@@ -35,9 +35,12 @@ describe('updateOrganizationAction', () => {
 
     vi.mocked(organizationServerApi.update).mockResolvedValue(mockUpdatedOrg)
 
-    const result = await updateOrganizationAction(validSlug, {
-      name: 'Updated Name',
-      description: 'Updated Description',
+    const result = await updateOrganizationAction({
+      slug: validSlug,
+      dto: {
+        name: 'Updated Name',
+        description: 'Updated Description',
+      },
     })
 
     expect(result.success).toBe(true)
@@ -51,8 +54,19 @@ describe('updateOrganizationAction', () => {
   })
 
   it('returns failure when organization ID is invalid', async () => {
-    const result = await updateOrganizationAction('', {
-      name: 'New Name',
+    const result = await updateOrganizationAction({
+      slug: '',
+      dto: { name: 'New Name' },
+    })
+
+    expect(result.success).toBe(false)
+    expect(organizationServerApi.update).not.toHaveBeenCalled()
+  })
+
+  it('returns failure when the update DTO is invalid', async () => {
+    const result = await updateOrganizationAction({
+      slug: validSlug,
+      dto: { name: 'x' },
     })
 
     expect(result.success).toBe(false)
@@ -64,8 +78,9 @@ describe('updateOrganizationAction', () => {
       new ApiError(403, 'Permission denied')
     )
 
-    const result = await updateOrganizationAction(validSlug, {
-      name: 'Forbidden Name',
+    const result = await updateOrganizationAction({
+      slug: validSlug,
+      dto: { name: 'Forbidden Name' },
     })
 
     expect(result.success).toBe(false)

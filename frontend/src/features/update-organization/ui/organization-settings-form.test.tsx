@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { type Organization } from '@/entities/organization'
@@ -39,7 +39,7 @@ describe('OrganizationSettingsForm', () => {
     )
   })
 
-  it('disables save button when form is untouched (not dirty)', () => {
+  it('disables save button when form is untouched', () => {
     render(<OrganizationSettingsForm organization={mockOrg} />)
 
     const saveBtn = screen.getByRole('button', { name: 'Save Changes' })
@@ -61,7 +61,7 @@ describe('OrganizationSettingsForm', () => {
 
     const saveBtn = screen.getByRole('button', { name: 'Save Changes' })
 
-    expect(saveBtn).toBeEnabled()
+    await waitFor(() => expect(saveBtn).toBeEnabled())
 
     await user.click(saveBtn)
 

@@ -56,13 +56,13 @@ export const useUpdateOrganization = () => {
       }
 
       if (Object.keys(dto).length === 0) {
-        toast.success('Organization updated successfully!')
-        options?.onSuccess?.()
-
         return true
       }
 
-      const result = await updateOrganizationAction(organization.slug, dto)
+      const result = await updateOrganizationAction({
+        slug: organization.slug,
+        dto,
+      })
 
       if (!result.success) {
         handleServerError(

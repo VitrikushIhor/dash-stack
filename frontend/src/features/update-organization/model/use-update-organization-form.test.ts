@@ -40,6 +40,38 @@ describe('useUpdateOrganizationForm', () => {
     })
   })
 
+  it('marks the form clean initially and dirty after edits', async () => {
+    const { result } = renderHook(() => useUpdateOrganizationForm(mockOrg))
+
+    expect(result.current.isDirty).toBe(false)
+
+    await act(async () => {
+      result.current.form.setValue('name', 'Changed name', {
+        shouldDirty: true,
+      })
+    })
+
+    expect(result.current.isDirty).toBe(true)
+  })
+
+  it('resets values when the selected organization changes', () => {
+    const { result, rerender } = renderHook(
+      ({ organization }) => useUpdateOrganizationForm(organization),
+      { initialProps: { organization: mockOrg } }
+    )
+    const nextOrganization = {
+      ...mockOrg,
+      id: 'org-201',
+      name: 'Other Org',
+      slug: 'other-org',
+    }
+
+    rerender({ organization: nextOrganization })
+
+    expect(result.current.form.getValues('name')).toBe('Other Org')
+    expect(result.current.isDirty).toBe(false)
+  })
+
   it('submits updated values when form is submitted', async () => {
     mockUpdateOrganization.mockResolvedValue(true)
 
