@@ -7,7 +7,7 @@ import { Input } from '@/shared/ui/core/input'
 import { type Label } from '@/entities/label'
 import { type Membership } from '@/entities/organization'
 import { generateFilterOptions } from '../lib/filters'
-import { useTasksTableSearchParams } from '../model/use-search-params'
+import { useTaskFiltersController } from '../model/use-task-filters-controller'
 import { TaskUrlDateRangeFilter } from './task-url-date-range-filter'
 import { TaskUrlFacetedFilter } from './task-url-faceted-filter'
 
@@ -22,13 +22,16 @@ export function TaskToolbar({ labels, members }: TaskToolbarProps) {
     [members, labels]
   )
 
-  const [params, setParams] = useTasksTableSearchParams()
-
-  const isFiltered =
-    params.status.length > 0 ||
-    params.labels.length > 0 ||
-    params.members.length > 0 ||
-    !!params.filter
+  const {
+    filters: params,
+    isFiltered,
+    setSearch,
+    setStatuses,
+    setLabels,
+    setMembers,
+    setDueDateRange,
+    resetFilters,
+  } = useTaskFiltersController()
 
   return (
     <div className='flex items-center justify-between'>
@@ -36,12 +39,7 @@ export function TaskToolbar({ labels, members }: TaskToolbarProps) {
         <Input
           placeholder='Filter tasks...'
           value={params.filter ?? ''}
-          onChange={(event) =>
-            setParams(
-              { filter: event.target.value || null },
-              { throttleMs: 300 }
-            )
-          }
+          onChange={(event) => setSearch(event.target.value)}
           className='h-8 w-37.5 lg:w-62.5'
         />
         <div className='flex gap-x-2'>
@@ -50,7 +48,7 @@ export function TaskToolbar({ labels, members }: TaskToolbarProps) {
               title='Status'
               options={filterOptions.status}
               value={params.status}
-              onChange={(value) => setParams({ status: value || null })}
+              onChange={setStatuses}
             />
           )}
           {filterOptions.labels.length > 0 && (
@@ -58,7 +56,7 @@ export function TaskToolbar({ labels, members }: TaskToolbarProps) {
               title='Label'
               options={filterOptions.labels}
               value={params.labels}
-              onChange={(value) => setParams({ labels: value || null })}
+              onChange={setLabels}
             />
           )}
           {filterOptions.members.length > 0 && (
@@ -66,27 +64,19 @@ export function TaskToolbar({ labels, members }: TaskToolbarProps) {
               title='Members'
               options={filterOptions.members}
               value={params.members}
-              onChange={(value) => setParams({ members: value || null })}
+              onChange={setMembers}
             />
           )}
           <TaskUrlDateRangeFilter
             title='Due Date'
             value={params.dueDate}
-            onChange={(value) => setParams({ dueDate: value || null })}
+            onChange={setDueDateRange}
           />
         </div>
         {isFiltered && (
           <Button
             variant='ghost'
-            onClick={() => {
-              setParams({
-                filter: null,
-                status: null,
-                labels: null,
-                members: null,
-                dueDate: null,
-              })
-            }}
+            onClick={resetFilters}
             className='h-8 px-2 lg:px-3'
           >
             Reset
