@@ -1,20 +1,12 @@
 'use client'
 
 import React from 'react'
-import dynamic from 'next/dynamic'
 import { type Deck, type Flashcard } from '@/entities/deck'
+import { UnsplashPickerDialog } from '@/features/unsplash-picker'
 import { useDeckEditor } from '../model/use-deck-editor'
 import { DeckEditorHeader } from './deck-editor-header'
 import { DeckFlashcardsSection } from './deck-flashcards-section'
 import { DeckMetadataForm } from './deck-metadata-form'
-
-const UnsplashPickerDialog = dynamic(
-  () =>
-    import('@/features/unsplash-picker').then(
-      (mod) => mod.UnsplashPickerDialog
-    ),
-  { ssr: false }
-)
 
 interface DeckEditorFormProps {
   initialDeck: Deck & { flashcards?: Flashcard[] }
