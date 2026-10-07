@@ -13,15 +13,12 @@ import {
   DialogTrigger,
 } from '@/shared/ui/core/dialog'
 import { useDeckSearchParams } from '../model/deck-search-params'
+import { CreateDeckFormSkeleton } from './create-deck-form-skeleton'
 
 const CreateDeckForm = dynamic(
   () => import('./create-deck-form').then((mod) => mod.CreateDeckForm),
   {
-    loading: () => (
-      <div className='flex h-64 items-center justify-center'>
-        <div className='border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent' />
-      </div>
-    ),
+    loading: CreateDeckFormSkeleton,
   }
 )
 
@@ -67,7 +64,7 @@ export function CreateDeckDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <CreateDeckForm />
+        {isOpen && <CreateDeckForm />}
       </DialogContent>
     </Dialog>
   )
