@@ -6,10 +6,13 @@ import { type StudyCard } from '@/entities/vocab'
 import {
   StudySessionContainer,
   StudySessionSkeleton,
-} from '@/features/study-vocab'
+} from '@/features/study-vocab/session-ui'
 
 const LearnPlayer = dynamic(
-  () => import('@/features/study-vocab').then((mod) => mod.AdaptiveLearnPlayer),
+  () =>
+    import('@/features/study-vocab/learn').then(
+      (mod) => mod.AdaptiveLearnPlayer
+    ),
   {
     ssr: false,
     loading: () => <StudySessionSkeleton />,

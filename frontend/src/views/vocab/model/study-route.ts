@@ -1,5 +1,6 @@
 import { type SearchParams } from 'nuqs/server'
-import { StudyMode } from '@/entities/vocab'
+import type { Deck } from '@/entities/deck'
+import { type StudyCard, StudyMode } from '@/entities/vocab'
 
 export const studyModes = [
   StudyMode.FLASHCARDS,
@@ -14,10 +15,21 @@ export type StudyRouteProps = {
   searchParams: Promise<SearchParams>
 }
 
+export interface StudyContentProps {
+  deck: Deck
+  initialCards: StudyCard[]
+  filters: { onlyDue: boolean; onlyStarred: boolean }
+  sessionKey: string
+}
+
 export function getStudySessionKey(
   deckId: string,
   mode: StudyRouteMode,
   filters: { onlyDue: boolean; onlyStarred: boolean }
 ) {
   return `${deckId}:${mode}:${filters.onlyDue}:${filters.onlyStarred}`
+}
+
+export function isStudyRouteMode(value: string): value is StudyRouteMode {
+  return studyModes.some((mode) => mode === value)
 }

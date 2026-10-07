@@ -10,7 +10,7 @@ vi.mock('next/dynamic', () => ({
   default: () => () => <div>Match player</div>,
 }))
 
-vi.mock('@/features/study-vocab', () => ({
+vi.mock('@/features/study-vocab/match', () => ({
   MAX_MATCH_CARDS: 12,
   MatchSessionStatus: {
     AUTH_LOADING: 'auth-loading',

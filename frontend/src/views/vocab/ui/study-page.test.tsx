@@ -7,12 +7,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getDeckQuery } from '@/entities/deck/server'
 import { userKeys } from '@/entities/user'
 import { getCurrentUser } from '@/entities/user/server'
-import { StudyMode } from '@/entities/vocab'
+import { type StudyCard, StudyMode } from '@/entities/vocab'
 import { getStudyCardsQuery } from '@/entities/vocab/server'
 import { VocabFlashcards } from '@/widgets/vocab-flashcards'
 import { getStudyRouteData } from '@/views/vocab/server'
-import FlashcardsPage from '@/app/(vocab)/vocab/decks/[id]/flashcards/page'
-import MatchPage from '@/app/(vocab)/vocab/decks/[id]/match/page'
+import StudyModePage, {
+  generateMetadata,
+} from '@/app/(vocab)/vocab/decks/[id]/[mode]/page'
 
 vi.mock('server-only', () => ({}))
 vi.mock('next/navigation', async (importOriginal) => ({
@@ -65,6 +66,35 @@ beforeEach(() => {
 })
 
 describe('study route composition', () => {
+  it.each(['flashcards', 'learn', 'match'] as const)(
+    'should_preserve_metadata_when_mode_is_%s',
+    async (mode) => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({ id: 'deck', mode }),
+        searchParams: Promise.resolve({}),
+      })
+      expect(metadata.title).toBe(
+        { flashcards: 'Flashcards', learn: 'Learn Mode', match: 'Match Game' }[
+          mode
+        ]
+      )
+    }
+  )
+
+  it('should_return_not_found_when_mode_is_unknown', async () => {
+    vi.mocked(getDeckQuery).mockClear()
+    const props = {
+      params: Promise.resolve({ id: 'deck', mode: 'unknown' }),
+      searchParams: Promise.resolve({}),
+    }
+    await expect(StudyModePage(props)).rejects.toThrow(
+      'NEXT_HTTP_ERROR_FALLBACK;404'
+    )
+    await expect(generateMetadata(props)).rejects.toThrow(
+      'NEXT_HTTP_ERROR_FALLBACK;404'
+    )
+    expect(getDeckQuery).not.toHaveBeenCalled()
+  })
   it.each([StudyMode.FLASHCARDS, StudyMode.LEARN, StudyMode.MATCH] as const)(
     'should_load_personalized_filters_when_mode_is_%s',
     async (mode) => {
@@ -88,13 +118,19 @@ describe('study route composition', () => {
     render(
       withQueryClient(
         <NuqsTestingAdapter>
-          {await FlashcardsPage({
-            params: Promise.resolve({ id: 'deck' }),
+          {await StudyModePage({
+            params: Promise.resolve({ id: 'deck', mode: 'flashcards' }),
             searchParams: Promise.resolve({}),
           })}
         </NuqsTestingAdapter>
       )
     )
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'No cards match these filters',
+      })
+    ).toBeVisible()
 
     expect(
       screen.queryByRole('navigation', { name: 'Study modes' })
@@ -109,8 +145,8 @@ describe('study route composition', () => {
     render(
       withQueryClient(
         <NuqsTestingAdapter>
-          {await MatchPage({
-            params: Promise.resolve({ id: 'deck' }),
+          {await StudyModePage({
+            params: Promise.resolve({ id: 'deck', mode: 'match' }),
             searchParams: Promise.resolve({ onlyStarred: 'true' }),
           })}
         </NuqsTestingAdapter>
@@ -124,6 +160,50 @@ describe('study route composition', () => {
       screen.queryByRole('heading', { name: 'Not enough cards for Match' })
     ).not.toBeInTheDocument()
   })
+
+  it.each([1, 5])(
+    'should_render_match_minimum_state_when_selection_has_%s_cards',
+    async (count) => {
+      const cards: StudyCard[] = Array.from(
+        { length: count },
+        (_, position) => ({
+          id: `card-${position}`,
+          deckId: 'deck',
+          term: `Term ${position}`,
+          definition: `Meaning ${position}`,
+          example: null,
+          imageUrl: null,
+          position,
+          progress: {
+            id: null,
+            status: 'NEW',
+            box: 0,
+            isStarred: false,
+            correctStreak: 0,
+            correctCount: 0,
+            incorrectCount: 0,
+            lastReviewedAt: null,
+            nextReviewAt: null,
+          },
+        })
+      )
+      vi.mocked(getStudyCardsQuery).mockResolvedValue({ ok: true, data: cards })
+
+      render(
+        await StudyModePage({
+          params: Promise.resolve({ id: 'deck', mode: 'match' }),
+          searchParams: Promise.resolve({}),
+        })
+      )
+
+      expect(
+        screen.getByRole('heading', { name: 'Not enough cards for Match' })
+      ).toBeVisible()
+      expect(
+        screen.queryByRole('heading', { name: 'No cards match these filters' })
+      ).not.toBeInTheDocument()
+    }
+  )
 
   it('should_keep_completion_summary_when_cards_are_removed_after_review', async () => {
     const client = new QueryClient({
