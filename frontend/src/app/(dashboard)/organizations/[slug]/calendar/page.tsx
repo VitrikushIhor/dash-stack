@@ -1,4 +1,4 @@
-import { CalendarMonthPage } from '@/views/calendar'
+import { renderCalendarPage } from '@/views/calendar'
 
 interface PageProps {
   params: Promise<{
@@ -13,5 +13,5 @@ export default async function OrganizationCalendarMonthRoute({
 }: PageProps) {
   const { slug } = await params
 
-  return <CalendarMonthPage slug={slug} searchParams={searchParams} />
+  return renderCalendarPage({ slug, searchParams, view: 'month' })
 }

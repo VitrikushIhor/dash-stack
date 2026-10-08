@@ -8,7 +8,7 @@ import {
   StudySessionContainer,
   StudySessionSkeleton,
   StudySummary,
-} from '@/features/study-vocab'
+} from '@/features/study-vocab/match'
 import { DynamicMatchPlayer } from './dynamic-match-player'
 import { MatchLeaderboardState } from './match-leaderboard-state'
 import { type MatchSessionView } from './match-session-view'

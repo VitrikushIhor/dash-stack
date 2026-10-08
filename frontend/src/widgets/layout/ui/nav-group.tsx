@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode } from 'react'
+import { type ReactNode, isValidElement } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
@@ -63,6 +63,8 @@ export function NavGroup({ title, items }: NavGroupProps) {
 }
 
 function NavBadge({ children }: { children: ReactNode }) {
+  if (isValidElement(children)) return children
+
   return <Badge className='rounded-full px-1 py-0 text-xs'>{children}</Badge>
 }
 

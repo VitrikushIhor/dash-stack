@@ -2,7 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { json } from 'express';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { AuthController } from '../../../presentation/controllers/auth.controller';
 import { SignupUseCase } from '../../../application/use-cases/commands/signup.use-case';
 import { LoginUseCase } from '../../../application/use-cases/commands/login.use-case';

@@ -12,3 +12,4 @@ export {
   formatJoinedDate,
   getMemberDisplayName,
 } from './utils/membership'
+export { OrganizationSlugSchema } from './schemas/organization-slug.schema'

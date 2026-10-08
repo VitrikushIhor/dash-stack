@@ -1,33 +1,11 @@
+import { cache } from 'react'
 import 'server-only'
-import { getErrorMessage } from '@/shared/api'
-import { type Membership } from '@/shared/model'
-import {
-  OrganizationSlugSchema,
-  OrganizationUserIdSchema,
-} from '../../model/schemas/organization.schema'
+import { createServerQuery } from '@/shared/lib/server'
 import { organizationServerApi } from '../organization-api.server'
+import { GetMemberQuerySchema } from './get-member.schema'
 
-type GetMemberResponse = {
-  data: Membership | null
-  error: string | null
-}
-
-type Params = {
-  slug: string
-  userId: string
-}
-
-export async function getMember(params: Params): Promise<GetMemberResponse> {
-  try {
-    const validSlug = OrganizationSlugSchema.parse(params.slug)
-    const validUserId = OrganizationUserIdSchema.parse(params.userId)
-    const data = await organizationServerApi.getMember({
-      slug: validSlug,
-      userId: validUserId,
-    })
-
-    return { data, error: null }
-  } catch (error) {
-    return { data: null, error: getErrorMessage(error) }
-  }
-}
+export const getMember = cache(
+  createServerQuery('getMember', GetMemberQuerySchema, ({ slug, userId }) =>
+    organizationServerApi.getMember({ slug, userId })
+  )
+)

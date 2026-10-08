@@ -29,11 +29,11 @@ import {
 import { useInviteMemberForm } from '../model/use-invite-member-form'
 import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
 
-export const InviteMemberDialog = () => {
-  const { isOpen, slug, close } = useInviteMemberModalStore()
+export const InviteMemberDialog = ({ slug }: { slug: string }) => {
+  const { isOpen, close } = useInviteMemberModalStore()
 
   const { form, onSubmit, isPending } = useInviteMemberForm({
-    slug: slug ?? '',
+    slug,
     onSuccess: () => {
       close()
     },

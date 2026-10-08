@@ -62,7 +62,7 @@ export const OrganizationSettingsForm = ({
           defaultPreview={getFileUrl(organization.logo)}
           className='w-full'
         />
-        <Button type='submit' disabled={isPending || isDirty}>
+        <Button type='submit' disabled={isPending || !isDirty}>
           {isPending ? 'Saving...' : 'Save Changes'}
         </Button>
       </form>

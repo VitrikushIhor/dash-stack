@@ -3,7 +3,7 @@
 import type { ComponentProps } from 'react'
 import dynamic from 'next/dynamic'
 import { type MatchCard } from '@/entities/vocab'
-import { MatchPlayer, StudySessionSkeleton } from '@/features/study-vocab'
+import { MatchPlayer, StudySessionSkeleton } from '@/features/study-vocab/match'
 
 export const DynamicMatchPlayer = dynamic(() => Promise.resolve(MatchPlayer), {
   ssr: false,

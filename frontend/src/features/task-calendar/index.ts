@@ -1,9 +1,5 @@
 // Components
-export { CalendarAgendaView } from './ui/agenda-view/calendar-agenda-view'
-export { CalendarDayView } from './ui/week-and-day-view/calendar-day-view'
-export { CalendarWeekView } from './ui/week-and-day-view/calendar-week-view'
-export { CalendarMonthView } from './ui/month-view/calendar-month-view'
-export { CalendarYearView } from './ui/year-view/calendar-year-view'
+export { CalendarView } from './ui/calendar-view'
 export { DndProviderWrapper } from './ui/dnd/dnd-provider'
 export { CalendarHeader } from './ui/header/calendar-header'
 
@@ -26,3 +22,5 @@ export {
   getCalendarViewUrl,
   useCalendarNavigation,
 } from './lib/navigation'
+
+export { type CalendarTaskDateUpdate } from './model/calendar-task-move'

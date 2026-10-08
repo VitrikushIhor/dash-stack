@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { getOrganizationBySlug } from '@/entities/organization/server'
 
 interface TenantLayoutProps {
@@ -15,8 +15,8 @@ export default async function TenantLayout({
   const { slug } = await params
   const orgResult = await getOrganizationBySlug(slug)
 
-  if (orgResult.error || !orgResult.data) {
-    notFound()
+  if (!orgResult.ok) {
+    return <PageErrorHandler error={orgResult.error} />
   }
 
   return <>{children}</>

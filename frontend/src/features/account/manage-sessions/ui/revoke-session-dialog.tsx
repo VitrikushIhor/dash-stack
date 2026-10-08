@@ -27,26 +27,26 @@ export function RevokeSessionDialog({
   }
 
   return (
-    <UrlConfirmDialog
+    <UrlConfirmDialog.Root
       queryKey='revoke-session'
       enabled={selectedSession !== undefined}
       onClose={resetError}
-      title='Sign out this session?'
-      desc={
-        selectedSession?.isCurrent
-          ? 'You will be signed out in this browser and its other tabs.'
-          : 'This session will lose access. It will need to sign in again.'
-      }
       confirmText={isPending ? 'Signing out…' : 'Confirm sign out'}
       destructive
       isLoading={isPending}
       handleConfirm={handleConfirm}
     >
+      <UrlConfirmDialog.Header>
+        <UrlConfirmDialog.Title>Sign out this session?</UrlConfirmDialog.Title>
+        <UrlConfirmDialog.Description>
+          {selectedSession?.isCurrent
+            ? 'You will be signed out in this browser and its other tabs.'
+            : 'This session will lose access. It will need to sign in again.'}
+        </UrlConfirmDialog.Description>
+      </UrlConfirmDialog.Header>
       {error && (
-        <output role='alert' className='text-destructive text-sm'>
-          {error}
-        </output>
+        <UrlConfirmDialog.ErrorMessage>{error}</UrlConfirmDialog.ErrorMessage>
       )}
-    </UrlConfirmDialog>
+    </UrlConfirmDialog.Root>
   )
 }

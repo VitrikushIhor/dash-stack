@@ -8,6 +8,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/shared/ui/core/dropdown-menu'
+import { ExportFormat } from '../model/export.types'
 import { useExportDeck } from '../model/use-export-deck'
 
 interface ExportDeckMenuItemsProps {
@@ -28,10 +29,10 @@ export function ExportDeckMenuItems({ deckId }: ExportDeckMenuItemsProps) {
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent>
-          <DropdownMenuItem onClick={() => void exportDeck('csv')}>
+          <DropdownMenuItem onClick={() => void exportDeck(ExportFormat.CSV)}>
             CSV (Spreadsheet)
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => void exportDeck('json')}>
+          <DropdownMenuItem onClick={() => void exportDeck(ExportFormat.JSON)}>
             JSON (Data)
           </DropdownMenuItem>
         </DropdownMenuSubContent>

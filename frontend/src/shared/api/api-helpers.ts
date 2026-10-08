@@ -2,7 +2,10 @@ import { toast } from 'sonner'
 import { logger } from '@/shared/lib'
 import { ApiError } from './http/api-error'
 
-export const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (
+  error: unknown,
+  fallbackMessage: string = 'An unexpected error occurred'
+): string => {
   if (error instanceof ApiError) {
     return error.message
   }
@@ -10,7 +13,7 @@ export const getErrorMessage = (error: unknown): string => {
     return error.message
   }
 
-  return 'An unexpected error occurred'
+  return fallbackMessage
 }
 
 export function handleServerError(error: unknown): void {

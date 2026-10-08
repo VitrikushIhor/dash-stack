@@ -1,17 +1,17 @@
-import { create } from 'zustand'
+'use client'
 
-interface InviteMemberModalState {
-  isOpen: boolean
-  slug: string | null
-  open: (slug: string) => void
-  close: () => void
+import { useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs/server'
+
+export function useInviteMemberModalStore() {
+  const [isOpen, setIsOpen] = useQueryState(
+    'invite-member',
+    parseAsBoolean.withDefault(false)
+  )
+
+  return {
+    isOpen,
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(null),
+  }
 }
-
-export const useInviteMemberModalStore = create<InviteMemberModalState>(
-  (set) => ({
-    isOpen: false,
-    slug: null,
-    open: (slug: string) => set({ isOpen: true, slug }),
-    close: () => set({ isOpen: false, slug: null }),
-  })
-)

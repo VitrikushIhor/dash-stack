@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { getOrganizationLabels } from '@/entities/label/server'
 import { getOrganizationBySlug } from '@/entities/organization/server'
 import { LabelsTabContent } from '@/widgets/organization-detail-tabs'
@@ -11,13 +11,18 @@ interface PageProps {
 
 export default async function OrganizationLabelsPage({ params }: PageProps) {
   const { slug } = await params
-  const orgResult = await getOrganizationBySlug(slug)
+  const [orgResult, labelsResult] = await Promise.all([
+    getOrganizationBySlug(slug),
+    getOrganizationLabels(slug),
+  ])
 
-  if (!orgResult.data) {
-    notFound()
+  if (!orgResult.ok) {
+    return <PageErrorHandler error={orgResult.error} withContainer={false} />
   }
 
-  const labelsResult = await getOrganizationLabels(slug)
+  if (!labelsResult.ok) {
+    return <PageErrorHandler error={labelsResult.error} withContainer={false} />
+  }
 
-  return <LabelsTabContent slug={slug} labels={labelsResult.data || []} />
+  return <LabelsTabContent slug={slug} labels={labelsResult.data} />
 }

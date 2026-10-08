@@ -1,27 +1,18 @@
 'use client'
 
-import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { handleServerError } from '@/shared/api'
+import { useAction } from '@/shared/lib'
 import { revokeInviteAction } from '../api/actions/revoke-invite.action'
 
 export function useRevokeInvite() {
-  const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const { execute, isPending } = useAction(revokeInviteAction, {
+    successMessage: 'Invitation revoked',
+    onSuccess: () => router.refresh(),
+  })
 
   const revokeInvite = (slug: string, invitationId: string) => {
-    startTransition(async () => {
-      const result = await revokeInviteAction(slug, invitationId)
-
-      if (!result.success) {
-        handleServerError(result.error)
-
-        return
-      }
-      toast.success('Invitation revoked')
-      router.refresh()
-    })
+    void execute({ slug, invitationId })
   }
 
   return { revokeInvite, isPending }

@@ -1,26 +1,19 @@
-import { type Task } from '@/entities/task'
+import { SHORT_WEEK_DAYS } from '../../lib/constants'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
 import { useMonthLayout } from '../../model/use-calendar-layouts'
 import { DayCell } from './day-cell'
 
-interface IProps {
-  singleDayTasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
-
-const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
 export function CalendarMonthView({
-  singleDayTasks,
+  tasks,
   selectedDate,
   onTaskClick,
-}: IProps) {
-  const { cells, eventPositions } = useMonthLayout(singleDayTasks, selectedDate)
+}: CalendarViewProps) {
+  const { cells } = useMonthLayout(tasks, selectedDate)
 
   return (
     <div>
       <div className='grid grid-cols-7 divide-x'>
-        {WEEK_DAYS.map((day) => (
+        {SHORT_WEEK_DAYS.map((day) => (
           <div key={day} className='flex items-center justify-center py-2'>
             <span className='text-muted-foreground text-xs font-medium'>
               {day}
@@ -34,9 +27,7 @@ export function CalendarMonthView({
           <DayCell
             key={cell.date.toISOString()}
             cell={cell}
-            tasks={singleDayTasks}
-            eventPositions={eventPositions}
-            selectedDate={selectedDate}
+            tasks={cell.tasks}
             onTaskClick={onTaskClick}
           />
         ))}

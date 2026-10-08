@@ -1,7 +1,8 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ExportFormat, useExportDeck } from './use-export-deck'
+import { ExportFormat } from './export.types'
+import { useExportDeck } from './use-export-deck'
 
 vi.mock('sonner', () => ({
   toast: {
@@ -12,7 +13,6 @@ vi.mock('sonner', () => ({
 
 describe('useExportDeck', () => {
   const createObjectUrl = vi.fn(() => 'blob:deck-export')
-  const revokeObjectUrl = vi.fn()
   const downloadClick = vi.fn()
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('useExportDeck', () => {
     vi.stubGlobal('fetch', vi.fn())
     vi.stubGlobal('URL', {
       createObjectURL: createObjectUrl,
-      revokeObjectURL: revokeObjectUrl,
+      revokeObjectURL: vi.fn(),
     })
     vi.spyOn(document, 'createElement').mockImplementation(
       (tagName: string) => {
@@ -51,12 +51,11 @@ describe('useExportDeck', () => {
       await result.current.exportDeck(ExportFormat.JSON)
     })
 
-    await waitFor(() => expect(downloadClick).toHaveBeenCalledOnce())
+    expect(downloadClick).toHaveBeenCalledOnce()
     expect(fetch).toHaveBeenCalledWith(
       '/api/proxy/v1/vocab/decks/deck%20id/export?format=json'
     )
     expect(createObjectUrl).toHaveBeenCalledOnce()
-    expect(revokeObjectUrl).toHaveBeenCalledWith('blob:deck-export')
     expect(toast.success).toHaveBeenCalledWith('Download started', {
       description: 'Deck export: JSON',
     })

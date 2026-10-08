@@ -8,7 +8,7 @@ import {
   StudySessionContainer,
   StudySummary,
   useFlashcardSession,
-} from '@/features/study-vocab'
+} from '@/features/study-vocab/flashcards'
 
 interface VocabFlashcardsProps {
   deck: Deck

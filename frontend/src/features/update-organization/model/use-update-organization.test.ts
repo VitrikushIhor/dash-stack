@@ -77,8 +77,9 @@ describe('useUpdateOrganization', () => {
     })
 
     expect(success).toBe(true)
-    expect(updateOrganizationAction).toHaveBeenCalledWith('original-name', {
-      name: 'Brand New Name',
+    expect(updateOrganizationAction).toHaveBeenCalledWith({
+      slug: 'original-name',
+      dto: { name: 'Brand New Name' },
     })
     expect(toast.success).toHaveBeenCalledWith(
       'Organization updated successfully!'
@@ -106,9 +107,7 @@ describe('useUpdateOrganization', () => {
 
     expect(success).toBe(true)
     expect(updateOrganizationAction).not.toHaveBeenCalled()
-    expect(toast.success).toHaveBeenCalledWith(
-      'Organization updated successfully!'
-    )
+    expect(toast.success).not.toHaveBeenCalled()
   })
 
   it('handles server action error response with handleServerError', async () => {

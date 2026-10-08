@@ -7,16 +7,9 @@ import {
   FormLabel,
 } from '@/shared/ui/core/form'
 import { Input } from '@/shared/ui/core/input'
-import type { ImportMapping } from '../model/import-preview'
-import type { ImportViewModel } from '../model/use-import-preview'
-
-const fields = ['term', 'definition', 'example', 'imageUrl'] as const
-const labels = {
-  term: 'Term',
-  definition: 'Definition',
-  example: 'Example',
-  imageUrl: 'Image URL',
-}
+import type { ImportViewModel } from '../model/dialog/use-import-preview'
+import type { ImportMapping } from '../model/preview/import.types'
+import { importFieldLabels, importFields } from './import-fields'
 
 export function ImportMappingFields({ model }: { model: ImportViewModel }) {
   const handleMappingChange = useCallback(
@@ -40,7 +33,7 @@ export function ImportMappingFields({ model }: { model: ImportViewModel }) {
         <TableProperties className='text-primary size-4' /> Column mapping
       </div>
       <div className='flex flex-wrap gap-3'>
-        {fields.map((fieldKey) => (
+        {importFields.map((fieldKey) => (
           <FormField
             key={fieldKey}
             control={model.form.control}
@@ -48,11 +41,11 @@ export function ImportMappingFields({ model }: { model: ImportViewModel }) {
             render={({ field }) => (
               <FormItem className='grid gap-1 space-y-0'>
                 <FormLabel className='text-xs font-medium'>
-                  {labels[fieldKey]} column
+                  {importFieldLabels[fieldKey]} column
                 </FormLabel>
                 <FormControl>
                   <Input
-                    aria-label={`${labels[fieldKey]} column`}
+                    aria-label={`${importFieldLabels[fieldKey]} column`}
                     type='number'
                     min='1'
                     value={field.value === null ? '' : field.value + 1}

@@ -13,8 +13,8 @@ import {
   FileUploadDropzone,
   FileUploadTrigger,
 } from '@/shared/ui/file-upload'
-import { IMPORT_MAX_BYTES } from '../model/import-preview'
-import type { ImportViewModel } from '../model/use-import-preview'
+import type { ImportViewModel } from '../model/dialog/use-import-preview'
+import { IMPORT_MAX_BYTES } from '../model/preview/import.constants'
 
 export function ImportInputs({ model }: { model: ImportViewModel }) {
   const handleTextChange = useCallback(

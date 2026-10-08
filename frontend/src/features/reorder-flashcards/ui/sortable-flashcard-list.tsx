@@ -16,8 +16,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import { type Flashcard } from '@/entities/deck'
+import { useSortableFlashcardVirtualization } from '../model/use-sortable-flashcard-virtualization'
 import { SortableFlashcardItem } from './sortable-flashcard-item'
 
 interface SortableFlashcardListProps {
@@ -32,9 +32,6 @@ interface SortableFlashcardListProps {
   onOpenImagePicker: (cardId: string) => void
 }
 
-const VIRTUALIZATION_THRESHOLD = 50
-const ESTIMATED_CARD_HEIGHT_PX = 260
-
 export function SortableFlashcardList({
   cards,
   onCardsReorder,
@@ -42,25 +39,8 @@ export function SortableFlashcardList({
   onCardDelete,
   onOpenImagePicker,
 }: SortableFlashcardListProps) {
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
-  const shouldVirtualize = cards.length > VIRTUALIZATION_THRESHOLD
-  const getScrollElement = React.useCallback(
-    () => scrollContainerRef.current,
-    []
-  )
-  const getItemKey = React.useCallback(
-    (index: number) => cards[index]?.id ?? index,
-    [cards]
-  )
-
-  const virtualizer = useVirtualizer({
-    count: cards.length,
-    enabled: shouldVirtualize,
-    getScrollElement,
-    getItemKey,
-    estimateSize: () => ESTIMATED_CARD_HEIGHT_PX,
-    overscan: 5,
-  })
+  const { scrollContainerRef, shouldVirtualize, virtualizer } =
+    useSortableFlashcardVirtualization(cards)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

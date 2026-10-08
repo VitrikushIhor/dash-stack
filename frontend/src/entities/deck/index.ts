@@ -41,7 +41,11 @@ export { deckApi, type PublicDeckFilters } from './api/deck-api'
 export { flashcardApi } from './api/flashcard-api'
 export { unsplashApi } from './api/unsplash-api'
 export { unsplashKeys } from './api/unsplash-query-keys'
-export { normalizeDeckTag } from './lib/normalize-deck-tag'
+export {
+  addDeckTag,
+  normalizeDeckTag,
+  removeDeckTag,
+} from './lib/normalize-deck-tag'
 
 export { DeckCard } from './ui/deck-card'
 export { DeckCardSkeleton } from './ui/deck-card-skeleton'

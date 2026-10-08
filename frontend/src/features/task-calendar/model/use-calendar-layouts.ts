@@ -1,45 +1,30 @@
 import { useMemo } from 'react'
-import { isSameDay, parseISO, startOfWeek } from 'date-fns'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
-import {
-  calculateMonthEventPositions,
-  getCalendarCells,
-  getWeekDays,
-} from '../lib/helpers'
+import { startOfWeek } from 'date-fns'
+import { type Task } from '@/entities/task'
+import { getCalendarCells, getWeekDays } from '../lib/helpers'
+import { getCalendarDayTasks } from './calendar-task-index'
+import { useCalendarTaskIndex } from './use-calendar-task-index'
 
 export function useMonthLayout(tasks: Task[], date: Date) {
-  const cells = useMemo(() => getCalendarCells(date), [date])
-
-  const eventPositions = useMemo(
-    () => calculateMonthEventPositions(tasks, date),
-    [tasks, date]
+  const index = useCalendarTaskIndex(tasks)
+  const cells = useMemo(
+    () =>
+      getCalendarCells(date).map((cell) => ({
+        ...cell,
+        tasks: getCalendarDayTasks(index, cell.date),
+      })),
+    [index, date]
   )
-
-  return { cells, eventPositions }
+  return { cells }
 }
 
 export function useTimelineLayout(tasks: Task[], date: Date) {
+  const index = useCalendarTaskIndex(tasks)
   const weekStart = useMemo(() => startOfWeek(date), [date])
   const weekDays = useMemo(() => getWeekDays(weekStart), [weekStart])
-
-  const eventsByDay = useMemo(() => {
-    return weekDays.map((day) => {
-      return tasks
-        .filter((task) => {
-          const anchor = getTaskCalendarAnchor(task)
-
-          return anchor && isSameDay(parseISO(anchor), day)
-        })
-        .sort((a, b) => {
-          const anchorA = getTaskCalendarAnchor(a)
-          const anchorB = getTaskCalendarAnchor(b)
-
-          if (!anchorA || !anchorB) return 0
-
-          return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-        })
-    })
-  }, [tasks, weekDays])
-
+  const eventsByDay = useMemo(
+    () => weekDays.map((day) => getCalendarDayTasks(index, day)),
+    [index, weekDays]
+  )
   return { weekStart, weekDays, eventsByDay }
 }

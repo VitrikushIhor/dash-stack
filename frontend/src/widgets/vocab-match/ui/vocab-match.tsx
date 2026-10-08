@@ -2,7 +2,10 @@
 
 import { type Deck } from '@/entities/deck'
 import { type StudyCard } from '@/entities/vocab'
-import { MatchSessionStatus, useMatchSession } from '@/features/study-vocab'
+import {
+  MatchSessionStatus,
+  useMatchSession,
+} from '@/features/study-vocab/match'
 import { AuthenticatedMatch } from './authenticated-match'
 import { GuestMatch } from './guest-match'
 

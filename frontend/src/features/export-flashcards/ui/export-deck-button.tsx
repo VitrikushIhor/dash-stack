@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
+import { ExportFormat } from '../model/export.types'
 import { useExportDeck } from '../model/use-export-deck'
 
 interface ExportDeckButtonProps {
@@ -16,8 +17,8 @@ interface ExportDeckButtonProps {
 
 export const ExportDeckButton = ({ deckId }: ExportDeckButtonProps) => {
   const { exportDeck, pending } = useExportDeck(deckId)
-  const handleExportCsv = () => void exportDeck('csv')
-  const handleExportJson = () => void exportDeck('json')
+  const handleExportCsv = () => void exportDeck(ExportFormat.CSV)
+  const handleExportJson = () => void exportDeck(ExportFormat.JSON)
 
   return (
     <DropdownMenu>

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { getOrganizationLabels } from '@/entities/label/server'
 import {
   getOrganizationBySlug,
@@ -23,8 +23,8 @@ export default async function OrganizationTasksLayout({
   const { slug } = await params
   const orgResult = await getOrganizationBySlug(slug)
 
-  if (orgResult.error || !orgResult.data) {
-    notFound()
+  if (!orgResult.ok) {
+    return <PageErrorHandler error={orgResult.error} />
   }
 
   const [membersResult, labelsResult] = await Promise.all([
@@ -32,8 +32,15 @@ export default async function OrganizationTasksLayout({
     getOrganizationLabels(slug),
   ])
 
-  const members = membersResult.data || []
-  const labels = labelsResult.data || []
+  if (!membersResult.ok) {
+    return <PageErrorHandler error={membersResult.error} />
+  }
+  if (!labelsResult.ok) {
+    return <PageErrorHandler error={labelsResult.error} />
+  }
+
+  const members = membersResult.data
+  const labels = labelsResult.data
 
   return (
     <Main>

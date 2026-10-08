@@ -14,15 +14,20 @@ function setup(searchParams: string, isLoading = false, enabled = true) {
       onUrlUpdate={onUrlUpdate}
       hasMemory
     >
-      <UrlConfirmDialog
+      <UrlConfirmDialog.Root
         queryKey='delete-item'
-        title='Delete item?'
-        desc='Confirm deletion.'
         handleConfirm={handleConfirm}
         onClose={onClose}
         isLoading={isLoading}
         enabled={enabled}
-      />
+      >
+        <UrlConfirmDialog.Header>
+          <UrlConfirmDialog.Title>Delete item?</UrlConfirmDialog.Title>
+          <UrlConfirmDialog.Description>
+            Confirm deletion.
+          </UrlConfirmDialog.Description>
+        </UrlConfirmDialog.Header>
+      </UrlConfirmDialog.Root>
     </NuqsTestingAdapter>
   )
 

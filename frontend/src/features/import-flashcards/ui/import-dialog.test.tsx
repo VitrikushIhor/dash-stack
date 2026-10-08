@@ -26,7 +26,7 @@ describe('import dialog', () => {
     })
 
     await user.type(
-      screen.getByLabelText('Paste text'),
+      await screen.findByLabelText('Paste text'),
       'hello,meaning\nbad,\nomit,'
     )
     await user.click(screen.getByLabelText('Separator'))
@@ -60,7 +60,41 @@ describe('import dialog', () => {
         </NuqsTestingAdapter>
       ),
     })
-    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(await screen.findByRole('button', { name: 'Cancel' }))
     expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it('should_reuse_the_unconfirmed_request_when_closed_and_reopened', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi
+      .fn()
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true)
+
+    render(<ImportDialog onConfirm={onConfirm} />, {
+      wrapper: ({ children }) => (
+        <NuqsTestingAdapter searchParams='?import-cards=true' hasMemory>
+          {children}
+        </NuqsTestingAdapter>
+      ),
+    })
+
+    await user.type(await screen.findByLabelText('Paste text'), 'hello,meaning')
+    await user.click(screen.getByLabelText('Separator'))
+    await user.click(screen.getByRole('option', { name: 'Comma' }))
+    await user.click(screen.getByRole('button', { name: 'Preview' }))
+    await user.click(screen.getByRole('button', { name: 'Import 1 cards' }))
+    await screen.findByText(/Import was not confirmed/)
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(
+      await screen.findByRole('button', { name: 'Import cards' })
+    )
+    await user.click(
+      await screen.findByRole('button', { name: 'Import 1 cards' })
+    )
+
+    expect(onConfirm).toHaveBeenCalledTimes(2)
+    expect(onConfirm.mock.calls[1]).toEqual(onConfirm.mock.calls[0])
   })
 })

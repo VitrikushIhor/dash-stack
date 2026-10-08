@@ -13,15 +13,12 @@ import {
   DialogTrigger,
 } from '@/shared/ui/core/dialog'
 import { useDeckSearchParams } from '../model/deck-search-params'
+import { CreateDeckFormSkeleton } from './create-deck-form-skeleton'
 
 const CreateDeckForm = dynamic(
   () => import('./create-deck-form').then((mod) => mod.CreateDeckForm),
   {
-    loading: () => (
-      <div className='flex h-64 items-center justify-center'>
-        <div className='border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent' />
-      </div>
-    ),
+    loading: CreateDeckFormSkeleton,
   }
 )
 
@@ -37,22 +34,21 @@ export function CreateDeckDialog({
   const [params, setParams] = useDeckSearchParams()
 
   const isOpen = params['create-deck'] || false
+  const trigger =
+    children ??
+    (triggerButton ? (
+      <Button className='gap-2 shadow-md'>
+        <Plus className='h-4 w-4' />
+        <span>Create New Deck</span>
+      </Button>
+    ) : null)
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => setParams({ 'create-deck': open })}
     >
-      <DialogTrigger asChild>
-        {children ? (
-          children
-        ) : triggerButton ? (
-          <Button className='gap-2 shadow-md'>
-            <Plus className='h-4 w-4' />
-            <span>Create New Deck</span>
-          </Button>
-        ) : null}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
 
       <DialogContent className='border-border/70 bg-card/95 max-w-lg backdrop-blur-xl sm:max-w-xl'>
         <DialogHeader>
@@ -68,7 +64,7 @@ export function CreateDeckDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <CreateDeckForm />
+        {isOpen && <CreateDeckForm />}
       </DialogContent>
     </Dialog>
   )

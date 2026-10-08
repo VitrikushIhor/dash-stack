@@ -13,11 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/core/select'
+import type { ImportViewModel } from '../model/dialog/use-import-preview'
 import {
   ImportSource,
   type ImportSource as ImportSourceValue,
-} from '../model/import-preview'
-import type { ImportViewModel } from '../model/use-import-preview'
+} from '../model/preview/import-preview'
+import { getImportSourceDelimiter } from '../model/preview/import-source-options'
 
 const importSources = [
   { value: ImportSource.GENERIC, label: 'Generic delimited text' },
@@ -40,10 +41,7 @@ export function ImportOptionsFields({ model }: { model: ImportViewModel }) {
       model.changeOptions({
         ...model.options,
         source: value,
-        delimiter:
-          value === ImportSource.QUIZLET || value === ImportSource.QUENTI
-            ? '\t'
-            : 'auto',
+        delimiter: getImportSourceDelimiter(value),
       })
     },
     [model]

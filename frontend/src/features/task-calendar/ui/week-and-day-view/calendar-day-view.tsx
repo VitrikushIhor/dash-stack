@@ -1,41 +1,18 @@
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { getCalendarDayTasks } from '../../model/calendar-task-index'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
+import { useCalendarTaskIndex } from '../../model/use-calendar-task-index'
 import { TaskBlock } from './task-block'
 
-interface IProps {
-  singleDayTasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
-
 export function CalendarDayView({
-  singleDayTasks,
+  tasks,
   selectedDate,
   onTaskClick,
-}: IProps) {
-  const dayEvents = singleDayTasks
-    .filter((task) => {
-      const anchor = getTaskCalendarAnchor(task)
-
-      if (!anchor) return false
-      const eventDate = parseISO(anchor)
-
-      return (
-        eventDate.getDate() === selectedDate.getDate() &&
-        eventDate.getMonth() === selectedDate.getMonth() &&
-        eventDate.getFullYear() === selectedDate.getFullYear()
-      )
-    })
-    .sort((a, b) => {
-      const anchorA = getTaskCalendarAnchor(a)
-      const anchorB = getTaskCalendarAnchor(b)
-
-      if (!anchorA || !anchorB) return 0
-
-      return parseISO(anchorA).getTime() - parseISO(anchorB).getTime()
-    })
+}: CalendarViewProps) {
+  const index = useCalendarTaskIndex(tasks)
+  const dayEvents = getCalendarDayTasks(index, selectedDate)
 
   return (
     <div className='flex'>

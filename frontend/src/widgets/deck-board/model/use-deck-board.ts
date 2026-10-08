@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useAction } from '@/shared/lib'
 import { toggleStarAction } from '@/features/study-vocab/server'
+import { useDeckBoardSearch } from './use-deck-board-search'
 
 export function useDeckBoard(deckId: string) {
   const pendingStarsRef = useRef(new Set<string>())
@@ -16,7 +17,7 @@ export function useDeckBoard(deckId: string) {
 
   const [previewIndex, setPreviewIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
-  const [search, setSearch] = useState('')
+  const { search, setSearch } = useDeckBoardSearch()
   const { execute: saveStar } = useAction(toggleStarAction)
 
   const movePreview = useCallback((direction: -1 | 1, cardCount: number) => {
@@ -55,10 +56,6 @@ export function useDeckBoard(deckId: string) {
     [deckId, saveStar]
   )
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value)
-  }, [])
-
   const clearStarOverride = useCallback((cardId: string) => {
     setStarOverrides((current) => {
       if (!(cardId in current)) return current
@@ -78,7 +75,7 @@ export function useDeckBoard(deckId: string) {
     previewIndex,
     isFlipped,
     search,
-    setSearch: handleSearchChange,
+    setSearch,
     flipPreview,
     movePreview,
     toggleStar,

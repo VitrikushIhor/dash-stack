@@ -1,6 +1,5 @@
-'use server'
-
 import { unauthorized } from 'next/navigation'
+import 'server-only'
 import { getCurrentUser } from '../../api/queries/get-current-user.server'
 import { type User } from '../../model/types'
 

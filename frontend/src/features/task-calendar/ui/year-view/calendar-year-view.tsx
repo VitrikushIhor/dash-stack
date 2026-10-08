@@ -1,19 +1,11 @@
 import { useMemo } from 'react'
 import { addMonths, startOfYear } from 'date-fns'
-import { type Task } from '@/entities/task'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
+import { useCalendarTaskIndex } from '../../model/use-calendar-task-index'
 import { YearViewMonth } from './year-view-month'
 
-interface IProps {
-  tasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
-
-export function CalendarYearView({
-  tasks,
-  selectedDate,
-  onTaskClick: _onTaskClick,
-}: IProps) {
+export function CalendarYearView({ tasks, selectedDate }: CalendarViewProps) {
+  const index = useCalendarTaskIndex(tasks)
   const months = useMemo(() => {
     const yearStart = startOfYear(selectedDate)
 
@@ -27,8 +19,7 @@ export function CalendarYearView({
           <YearViewMonth
             key={month.toString()}
             month={month}
-            tasks={tasks}
-            selectedDate={selectedDate}
+            taskIndex={index}
           />
         ))}
       </div>

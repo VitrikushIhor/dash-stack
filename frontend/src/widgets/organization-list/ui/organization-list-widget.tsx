@@ -4,20 +4,20 @@ import { OrganizationEmptyState } from './organization-empty-state'
 import { OrganizationGrid } from './organization-grid'
 
 export async function OrganizationListWidget() {
-  const { data: memberships, error } = await getUserOrganizations()
+  const result = await getUserOrganizations()
 
-  if (error) {
+  if (!result.ok) {
     return (
       <WidgetErrorState
         title='Failed to load organizations'
-        description={error}
+        description={result.error.message}
       />
     )
   }
 
-  if (!memberships || memberships.length === 0) {
+  if (result.data.length === 0) {
     return <OrganizationEmptyState />
   }
 
-  return <OrganizationGrid memberships={memberships} />
+  return <OrganizationGrid memberships={result.data} />
 }

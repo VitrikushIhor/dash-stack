@@ -1,40 +1,27 @@
-import { useMemo } from 'react'
-import { isToday, startOfDay } from 'date-fns'
+import { isToday } from 'date-fns'
 import { cn } from '@/shared/lib/utils'
 import { type Task } from '@/entities/task'
 import { getTaskColor } from '@/features/task-calendar/lib/mappers'
-import { getMonthCellEvents } from '../../lib/helpers'
 import { useCalendarNavigation } from '../../lib/navigation'
 import { type ICalendarCell } from '../../model/types'
+import { DraggableTask } from '../dnd/draggable-task'
 import { DroppableDayCell } from '../dnd/droppable-day-cell'
 import { MonthTaskBadge } from './month-task-badge'
 import { TaskBullet } from './task-bullet'
 
 interface IProps {
-  selectedDate: Date
   cell: ICalendarCell
   tasks: Task[]
-  eventPositions: Record<string, number>
   onTaskClick?: (taskId: string) => void
 }
 
 const MAX_VISIBLE_EVENTS = 3
 
-export function DayCell({
-  cell,
-  tasks,
-  eventPositions,
-  selectedDate: _selectedDate,
-  onTaskClick,
-}: IProps) {
+export function DayCell({ cell, tasks, onTaskClick }: IProps) {
   const { navigateToDay } = useCalendarNavigation()
 
   const { day, currentMonth, date } = cell
 
-  const cellEvents = useMemo(
-    () => getMonthCellEvents(date, tasks, eventPositions),
-    [date, tasks, eventPositions]
-  )
   const isSunday = date.getDay() === 0
 
   const handleClick = () => {
@@ -67,34 +54,38 @@ export function DayCell({
             !currentMonth && 'opacity-50'
           )}
         >
-          {[0, 1, 2].map((position) => {
-            const task = cellEvents.find((e) => e.position === position)
-            const eventKey = task
-              ? `task-${task.id}-${position}`
-              : `empty-${position}`
+          {Array.from({ length: MAX_VISIBLE_EVENTS }, (_, index) => index).map(
+            (position) => {
+              const task = tasks[position]
+              const eventKey = task
+                ? `task-${task.id}-${position}`
+                : `empty-${position}`
 
-            return (
-              <div key={eventKey} className='lg:flex-1'>
-                {task && (
-                  <>
-                    <TaskBullet
-                      className='lg:hidden'
-                      color={getTaskColor(task)}
-                    />
-                    <MonthTaskBadge
-                      className='hidden lg:flex'
-                      task={task}
-                      cellDate={startOfDay(date)}
-                      onTaskClick={onTaskClick}
-                    />
-                  </>
-                )}
-              </div>
-            )
-          })}
+              return (
+                <div key={eventKey} className='lg:flex-1'>
+                  {task && (
+                    <>
+                      <TaskBullet
+                        className='lg:hidden'
+                        color={getTaskColor(task)}
+                      />
+                      <DraggableTask task={task}>
+                        <MonthTaskBadge
+                          className='hidden lg:flex'
+                          task={task}
+                          cellDate={date}
+                          onTaskClick={onTaskClick}
+                        />
+                      </DraggableTask>
+                    </>
+                  )}
+                </div>
+              )
+            }
+          )}
         </div>
 
-        {cellEvents.length > MAX_VISIBLE_EVENTS && (
+        {tasks.length > MAX_VISIBLE_EVENTS && (
           <p
             className={cn(
               'text-muted-foreground h-4.5 px-1.5 text-xs font-semibold',
@@ -102,11 +93,11 @@ export function DayCell({
             )}
           >
             <span className='sm:hidden'>
-              +{cellEvents.length - MAX_VISIBLE_EVENTS}
+              +{tasks.length - MAX_VISIBLE_EVENTS}
             </span>
             <span className='hidden sm:inline'>
               {' '}
-              {cellEvents.length - MAX_VISIBLE_EVENTS} more...
+              {tasks.length - MAX_VISIBLE_EVENTS} more...
             </span>
           </p>
         )}

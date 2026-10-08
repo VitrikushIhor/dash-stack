@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@/shared/ui/core/skeleton'
 import { WidgetErrorState } from '@/shared/ui/feedback'
-import { MatchLeaderboard } from '@/features/study-vocab'
+import { MatchLeaderboard } from '@/features/study-vocab/match'
 import { type MatchSessionView } from './match-session-view'
 
 export function MatchLeaderboardState({
