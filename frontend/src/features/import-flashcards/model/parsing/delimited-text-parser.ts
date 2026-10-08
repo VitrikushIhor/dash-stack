@@ -2,6 +2,50 @@ import type { Delimiter, ParsedRow } from './delimited-text.types'
 
 export type { Delimiter } from './delimited-text.types'
 
+interface ParserState {
+  field: string
+  state: 'plain' | 'quoted' | 'closed'
+  line: number
+  errors: string[]
+}
+
+function consumeQuotedCharacter(
+  parser: ParserState,
+  character: string,
+  nextCharacter: string | undefined
+): number {
+  if (character === '"') {
+    if (nextCharacter === '"') {
+      parser.field += '"'
+      return 1
+    }
+    parser.state = 'closed'
+    return 0
+  }
+
+  parser.field += character
+  if (character === '\n' || (character === '\r' && nextCharacter !== '\n')) {
+    parser.line += 1
+  }
+  return 0
+}
+
+function consumePlainCharacter(parser: ParserState, character: string): void {
+  if (
+    character === '"' &&
+    parser.state === 'plain' &&
+    parser.field.length === 0
+  ) {
+    parser.state = 'quoted'
+    return
+  }
+
+  if (character === '"') parser.errors.push('Quote inside an unquoted field')
+  if (parser.state === 'closed')
+    parser.errors.push('Unexpected text after a closing quote')
+  parser.field += character
+}
+
 export const parseDelimitedText = (
   input: string,
   delimiter: Delimiter
@@ -9,45 +53,30 @@ export const parseDelimitedText = (
   const text = input.replace(/^\uFEFF/, '')
   const rows: ParsedRow[] = []
   let fields: string[] = []
-  let field = ''
-  let errors: string[] = []
-  let state: 'plain' | 'quoted' | 'closed' = 'plain'
-  let line = 1
+  const parser: ParserState = { field: '', errors: [], state: 'plain', line: 1 }
   let sourceRow = 1
 
   const finishField = () => {
-    fields.push(field)
-    field = ''
-    state = 'plain'
+    fields.push(parser.field)
+    parser.field = ''
+    parser.state = 'plain'
   }
 
   const finishRow = () => {
     finishField()
-    if (fields.length > 1 || fields[0]?.trim() || errors.length) {
-      rows.push({ sourceRow, fields, errors: [...new Set(errors)] })
+    if (fields.length > 1 || fields[0]?.trim() || parser.errors.length) {
+      rows.push({ sourceRow, fields, errors: [...new Set(parser.errors)] })
     }
     fields = []
-    errors = []
-    sourceRow = line
+    parser.errors = []
+    sourceRow = parser.line
   }
 
   for (let index = 0; index < text.length; index += 1) {
     const character = text[index]
 
-    if (state === 'quoted') {
-      if (character === '"') {
-        if (text[index + 1] === '"') {
-          field += '"'
-          index += 1
-        } else state = 'closed'
-      } else {
-        field += character
-        if (
-          character === '\n' ||
-          (character === '\r' && text[index + 1] !== '\n')
-        )
-          line += 1
-      }
+    if (parser.state === 'quoted') {
+      index += consumeQuotedCharacter(parser, character, text[index + 1])
       continue
     }
 
@@ -58,22 +87,15 @@ export const parseDelimitedText = (
 
     if (character === '\n' || character === '\r') {
       if (character === '\r' && text[index + 1] === '\n') index += 1
-      line += 1
+      parser.line += 1
       finishRow()
       continue
     }
 
-    if (character === '"' && state === 'plain' && field.length === 0) {
-      state = 'quoted'
-      continue
-    }
-
-    if (character === '"') errors.push('Quote inside an unquoted field')
-    if (state === 'closed') errors.push('Unexpected text after a closing quote')
-    field += character
+    consumePlainCharacter(parser, character)
   }
 
-  if (state === 'quoted') errors.push('Unclosed quoted field')
+  if (parser.state === 'quoted') parser.errors.push('Unclosed quoted field')
   finishRow()
 
   return rows

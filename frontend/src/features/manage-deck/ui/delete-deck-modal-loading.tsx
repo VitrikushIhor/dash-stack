@@ -19,13 +19,11 @@ export function DeleteDeckModalLoading() {
           Loading confirmation...
         </UrlConfirmDialog.Description>
       </UrlConfirmDialog.Header>
-      <div role='status'>
-        <span className='sr-only'>Loading confirmation...</span>
-        <div aria-hidden='true' className='space-y-4'>
-          <Skeleton className='h-4 w-48' />
-          <Skeleton className='h-9 w-full' />
-          <Skeleton className='h-24 w-full' />
-        </div>
+      <output className='sr-only'>Loading confirmation</output>
+      <div aria-hidden='true' className='space-y-4'>
+        <Skeleton className='h-4 w-48' />
+        <Skeleton className='h-9 w-full' />
+        <Skeleton className='h-24 w-full' />
       </div>
     </UrlConfirmDialog.Root>
   )

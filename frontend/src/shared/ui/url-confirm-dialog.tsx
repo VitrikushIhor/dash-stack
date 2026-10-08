@@ -96,7 +96,7 @@ function Body({ className, ...props }: ComponentProps<'div'>) {
   return <div className={className} {...props} />
 }
 
-function Error({ className, ...props }: ComponentProps<'output'>) {
+function ErrorMessage({ className, ...props }: ComponentProps<'output'>) {
   return (
     <output
       role='alert'
@@ -112,5 +112,5 @@ export const UrlConfirmDialog = {
   Title,
   Description,
   Body,
-  Error,
+  ErrorMessage,
 }

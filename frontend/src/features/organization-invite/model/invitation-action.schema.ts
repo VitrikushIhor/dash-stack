@@ -16,4 +16,4 @@ export const RevokeInvitationActionSchema = z.object({
   invitationId: InvitationIdSchema,
 })
 
-export const AcceptInvitationActionSchema = InvitationTokenSchema
+export { InvitationTokenSchema as AcceptInvitationActionSchema }

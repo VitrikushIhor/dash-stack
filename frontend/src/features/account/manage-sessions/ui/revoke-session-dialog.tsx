@@ -44,7 +44,9 @@ export function RevokeSessionDialog({
             : 'This session will lose access. It will need to sign in again.'}
         </UrlConfirmDialog.Description>
       </UrlConfirmDialog.Header>
-      {error && <UrlConfirmDialog.Error>{error}</UrlConfirmDialog.Error>}
+      {error && (
+        <UrlConfirmDialog.ErrorMessage>{error}</UrlConfirmDialog.ErrorMessage>
+      )}
     </UrlConfirmDialog.Root>
   )
 }

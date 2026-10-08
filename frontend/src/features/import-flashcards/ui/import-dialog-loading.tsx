@@ -34,16 +34,14 @@ export function ImportDialogLoading() {
           <DialogTitle className='text-xl'>Import flashcards</DialogTitle>
           <DialogDescription>Loading import form...</DialogDescription>
         </DialogHeader>
-        <div role='status' className='px-6 py-5 sm:px-8'>
-          <span className='sr-only'>Loading import form...</span>
-          <div aria-hidden='true' className='space-y-5'>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <Skeleton className='h-9 w-full' />
-              <Skeleton className='h-9 w-full' />
-            </div>
-            <Skeleton className='h-40 w-full' />
-            <Skeleton className='h-9 w-28' />
+        <output className='sr-only'>Loading import form</output>
+        <div aria-hidden='true' className='space-y-5 px-6 py-5 sm:px-8'>
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <Skeleton className='h-9 w-full' />
+            <Skeleton className='h-9 w-full' />
           </div>
+          <Skeleton className='h-40 w-full' />
+          <Skeleton className='h-9 w-28' />
         </div>
         <div
           aria-hidden='true'

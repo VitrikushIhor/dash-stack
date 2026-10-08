@@ -15,9 +15,9 @@ export function UnsplashPickerSkeleton() {
         </DialogTitle>
         <DialogDescription>Loading photo picker...</DialogDescription>
       </DialogHeader>
-      <div role='status' className='space-y-4 pt-2'>
-        <span className='sr-only'>Loading photo picker...</span>
-        <div aria-hidden='true' className='space-y-4'>
+      <>
+        <output className='sr-only'>Loading photo picker</output>
+        <div aria-hidden='true' className='space-y-4 pt-2'>
           <div className='flex gap-2'>
             <Skeleton className='h-9 flex-1' />
             <Skeleton className='h-9 w-20' />
@@ -33,7 +33,7 @@ export function UnsplashPickerSkeleton() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </DialogContent>
   )
 }

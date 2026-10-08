@@ -31,5 +31,5 @@ export function getStudySessionKey(
 }
 
 export function isStudyRouteMode(value: string): value is StudyRouteMode {
-  return studyModes.some((mode) => mode === value)
+  return (studyModes as readonly string[]).includes(value)
 }

@@ -87,7 +87,9 @@ describe('import dialog', () => {
     await screen.findByText(/Import was not confirmed/)
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    await user.click(screen.getByRole('button', { name: 'Import cards' }))
+    await user.click(
+      await screen.findByRole('button', { name: 'Import cards' })
+    )
     await user.click(
       await screen.findByRole('button', { name: 'Import 1 cards' })
     )

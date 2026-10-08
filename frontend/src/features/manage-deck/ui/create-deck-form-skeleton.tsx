@@ -3,9 +3,9 @@ import { Skeleton } from '@/shared/ui/core/skeleton'
 
 export function CreateDeckFormSkeleton() {
   return (
-    <div role='status' className='space-y-4 py-2'>
-      <span className='sr-only'>Loading deck form...</span>
-      <div aria-hidden='true' className='space-y-4'>
+    <>
+      <output className='sr-only'>Loading deck form</output>
+      <div aria-hidden='true' className='space-y-4 py-2'>
         <div className='grid gap-2'>
           <Skeleton className='h-4 w-24' />
           <Skeleton className='h-9 w-full' />
@@ -34,6 +34,6 @@ export function CreateDeckFormSkeleton() {
           <Skeleton className='h-9 w-full sm:w-40' />
         </DialogFooter>
       </div>
-    </div>
+    </>
   )
 }

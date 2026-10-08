@@ -6,11 +6,12 @@ export function readFilterDate(value: unknown): Date | undefined {
   if (typeof value !== 'string' && typeof value !== 'number') return undefined
   if (typeof value === 'string' && !value.trim()) return undefined
   const numeric = Number(value)
-  const date = Number.isFinite(numeric)
-    ? new Date(numeric)
-    : typeof value === 'string'
-      ? parseISO(value)
-      : undefined
+  let date: Date | undefined
+  if (Number.isFinite(numeric)) {
+    date = new Date(numeric)
+  } else if (typeof value === 'string') {
+    date = parseISO(value)
+  }
   return date && isValid(date) ? date : undefined
 }
 
