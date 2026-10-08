@@ -73,7 +73,7 @@ describe('import dialog', () => {
 
     render(<ImportDialog onConfirm={onConfirm} />, {
       wrapper: ({ children }) => (
-        <NuqsTestingAdapter searchParams='?import-cards=true'>
+        <NuqsTestingAdapter searchParams='?import-cards=true' hasMemory>
           {children}
         </NuqsTestingAdapter>
       ),
