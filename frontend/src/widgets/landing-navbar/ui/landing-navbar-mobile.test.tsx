@@ -17,6 +17,7 @@ describe('LandingNavbarMobile', () => {
   it('renders a hamburger menu button initially', () => {
     render(<LandingNavbarMobile navLinks={mockLinks} />)
     const button = screen.getByRole('button', { name: /toggle menu/i })
+
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('aria-expanded', 'false')
   })
@@ -58,6 +59,7 @@ describe('LandingNavbarMobile', () => {
     fireEvent.click(button)
 
     const featureLink = screen.getByText('Features')
+
     fireEvent.click(featureLink)
 
     expect(screen.queryByText('Features')).not.toBeInTheDocument()

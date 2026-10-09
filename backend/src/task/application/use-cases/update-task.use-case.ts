@@ -6,6 +6,7 @@ import { TaskFileStoragePort } from '../ports/task-file-storage.port';
 import { TaskRepositoryPort } from '../ports/task.repository.port';
 import { TaskAssigneeValidatorService } from '../services/task-assignee-validator.service';
 import { UpdateTaskCommand } from '../commands/update-task.command';
+import { TaskLabelValidatorService } from '../services/task-label-validator.service';
 
 @Injectable()
 export class UpdateTaskUseCase {
@@ -16,12 +17,19 @@ export class UpdateTaskUseCase {
     private readonly taskFileStorage: TaskFileStoragePort,
     private readonly findTaskByIdUseCase: FindTaskByIdUseCase,
     private readonly assigneeValidator: TaskAssigneeValidatorService,
+    private readonly labelValidator: TaskLabelValidatorService,
   ) {}
 
-  async execute(id: string, organizationId: string, command: UpdateTaskCommand) {
+  async execute(
+    id: string,
+    organizationId: string,
+    actorUserId: string,
+    command: UpdateTaskCommand,
+  ) {
     const existingTask = await this.findTaskByIdUseCase.execute(id, organizationId);
 
     await this.assigneeValidator.validateOrThrow(organizationId, command.assigneeIds);
+    await this.labelValidator.validateOrThrow(organizationId, command.labelId);
 
     const startDate = TaskDates.normalizeOptional(command.startDate);
     const dueDate = TaskDates.normalizeOptional(command.dueDate);
@@ -32,15 +40,17 @@ export class UpdateTaskUseCase {
     );
 
     const nextAttachments = command.attachments;
+    let trackedAttachmentsToDelete: string[] = [];
     if (nextAttachments !== undefined) {
       const toDelete = existingTask.attachments.filter((key) => !nextAttachments.includes(key));
 
       if (toDelete.length) {
-        await this.taskFileStorage.deleteMany(toDelete);
+        trackedAttachmentsToDelete = await this.taskFileStorage.prepareDeletion(id, toDelete);
       }
     }
 
-    return this.taskRepository.update(id, organizationId, {
+    const updatedTask = await this.taskRepository.update(id, organizationId, {
+      actorUserId,
       title: command.title,
       description: command.description,
       status: command.status,
@@ -55,5 +65,10 @@ export class UpdateTaskUseCase {
       labelId: command.labelId,
       checklists: command.checklists,
     });
+
+    if (trackedAttachmentsToDelete.length) {
+      await this.taskFileStorage.deleteMany(trackedAttachmentsToDelete);
+    }
+    return updatedTask;
   }
 }

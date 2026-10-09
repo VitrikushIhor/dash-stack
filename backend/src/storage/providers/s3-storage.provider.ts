@@ -1,8 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
+import { privateAttachmentUrl } from '../private-attachment-url';
+import { MAX_FILE_SIZE } from '../storage.constants';
 import type {
   IStorageProvider,
   UploadFileDto,
@@ -14,11 +21,16 @@ import { StorageUploadException, StorageDeleteException } from '../exceptions/st
 export class S3StorageProvider implements IStorageProvider {
   private readonly s3Client: S3Client;
   private readonly bucket: string;
+  private readonly privateBucket: string;
   private readonly cloudfrontDomain: string;
   private readonly logger = new Logger(S3StorageProvider.name);
 
   constructor(private readonly configService: ConfigService) {
     this.bucket = this.configService.getOrThrow<string>('storage.s3Bucket');
+    this.privateBucket = this.configService.getOrThrow<string>('storage.privateS3Bucket');
+    if (this.privateBucket === this.bucket) {
+      throw new Error('Private attachment bucket must differ from the public image bucket');
+    }
     this.cloudfrontDomain = this.configService.getOrThrow<string>('storage.cloudfrontDomain');
 
     this.s3Client = new S3Client({
@@ -41,14 +53,14 @@ export class S3StorageProvider implements IStorageProvider {
     try {
       await this.s3Client.send(
         new PutObjectCommand({
-          Bucket: this.bucket,
+          Bucket: this.bucketForKey(key),
           Key: key,
           Body: dto.buffer,
           ContentType: dto.mimeType,
           ContentDisposition: dto.mimeType.startsWith('image/')
             ? 'inline'
             : `attachment; filename="${encodeURIComponent(dto.originalName)}"`,
-          CacheControl: 'public, max-age=31536000',
+          CacheControl: key.startsWith('files/') ? 'private, no-store' : 'public, max-age=31536000',
           // Do NOT set ACL — use bucket policy for public read (more secure)
         }),
       );
@@ -75,11 +87,34 @@ export class S3StorageProvider implements IStorageProvider {
     }
   }
 
+  async read(key: string): Promise<Buffer> {
+    const response = await this.s3Client.send(
+      new GetObjectCommand({
+        Bucket: this.bucketForKey(key),
+        Key: key,
+        Range: `bytes=0-${MAX_FILE_SIZE}`,
+      }),
+      { abortSignal: AbortSignal.timeout(30_000) },
+    );
+    if (!response.Body) throw new Error('Storage object body is unavailable');
+    if (response.ContentLength && response.ContentLength > MAX_FILE_SIZE) {
+      throw new Error('Stored attachment exceeds size limit');
+    }
+    const bytes = Buffer.from(await response.Body.transformToByteArray());
+    if (bytes.length > MAX_FILE_SIZE || response.ContentRange?.includes('/')) {
+      const totalSize = Number(response.ContentRange?.split('/')[1]);
+      if (bytes.length > MAX_FILE_SIZE || totalSize > MAX_FILE_SIZE) {
+        throw new Error('Stored attachment exceeds size limit');
+      }
+    }
+    return bytes;
+  }
+
   async delete(key: string): Promise<void> {
     try {
       await this.s3Client.send(
         new DeleteObjectCommand({
-          Bucket: this.bucket,
+          Bucket: this.bucketForKey(key),
           Key: key,
         }),
       );
@@ -100,7 +135,12 @@ export class S3StorageProvider implements IStorageProvider {
   }
 
   getPublicUrl(key: string): string {
+    if (key.startsWith('files/')) return privateAttachmentUrl(key);
     return `https://${this.cloudfrontDomain}/${key}`;
+  }
+
+  private bucketForKey(key: string): string {
+    return key.startsWith('files/') ? this.privateBucket : this.bucket;
   }
 
   private sanitizeExtension(originalName: string): string {

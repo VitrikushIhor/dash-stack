@@ -1,3 +1,5 @@
+import { GUARDS_METADATA } from '@nestjs/common/constants';
+import { JwtAuthGuard } from '../../../../auth/presentation/guards/jwt-auth.guard';
 import { InvitationController } from '../../../presentation/controllers/invitation.controller';
 import { SendInviteUseCase } from '../../../application/use-cases/send-invite.use-case';
 import { ListPendingInvitationsUseCase } from '../../../application/use-cases/list-pending-invitations.use-case';
@@ -11,6 +13,11 @@ const mockUser: AuthUser = {
 };
 
 describe('InvitationController', () => {
+  it('should_authenticate_before_resolving_tenant_for_all_invitation_routes', () => {
+    const guards: unknown = Reflect.getMetadata(GUARDS_METADATA, InvitationController);
+
+    expect(guards).toContain(JwtAuthGuard);
+  });
   let controller: InvitationController;
   let sendInviteUseCase: jest.Mocked<Pick<SendInviteUseCase, 'execute'>>;
   let listPendingUseCase: jest.Mocked<Pick<ListPendingInvitationsUseCase, 'execute'>>;

@@ -64,6 +64,7 @@ describe('TeamSwitcherUI', () => {
 
   it('opens dropdown menu with organization memberships and Add organization option when clicked', async () => {
     const user = userEvent.setup()
+
     render(
       <SidebarProvider>
         <TeamSwitcherUI activeOrg={activeOrg} memberships={memberships} />
@@ -71,6 +72,7 @@ describe('TeamSwitcherUI', () => {
     )
 
     const trigger = screen.getByRole('button', { name: /active corp/i })
+
     await user.click(trigger)
 
     expect(screen.getByText('Organizations')).toBeInTheDocument()
@@ -80,6 +82,7 @@ describe('TeamSwitcherUI', () => {
 
   it('navigates to organization tasks when menu item is selected', async () => {
     const user = userEvent.setup()
+
     render(
       <SidebarProvider>
         <TeamSwitcherUI activeOrg={activeOrg} memberships={memberships} />
@@ -87,9 +90,11 @@ describe('TeamSwitcherUI', () => {
     )
 
     const trigger = screen.getByRole('button', { name: /active corp/i })
+
     await user.click(trigger)
 
     const secondOrgItem = screen.getByText('Secondary Corp')
+
     await user.click(secondOrgItem)
 
     expect(mockPush).toHaveBeenCalledWith(ROUTES.orgTasks('secondary-corp'))

@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/core/dropdown-menu'
 import { Skeleton } from '@/shared/ui/core/skeleton'
+import { WidgetErrorState } from '@/shared/ui/feedback'
 import { useLandingNavbarAuth } from './use-landing-navbar-auth'
 
 interface LandingNavbarAuthProps {
@@ -26,6 +27,8 @@ export function LandingNavbarAuth({
   const {
     isAuthenticated,
     isLoading,
+    authError,
+    retryAuth,
     displayName,
     initials,
     email,
@@ -35,9 +38,10 @@ export function LandingNavbarAuth({
   } = useLandingNavbarAuth()
 
   if (isLoading) {
-    return variant === 'mobile' ? (
-      <Skeleton className='h-10 w-full rounded-md' />
-    ) : (
+    if (variant === 'mobile')
+      return <Skeleton className='h-10 w-full rounded-md' />
+
+    return (
       <div className='flex items-center gap-3'>
         <Skeleton className='h-9 w-24 rounded-md' />
         <Skeleton className='h-8 w-8 rounded-full' />
@@ -45,36 +49,48 @@ export function LandingNavbarAuth({
     )
   }
 
-  if (variant === 'mobile') {
-    if (isAuthenticated) {
-      return (
-        <>
-          <div className='flex items-center gap-3 px-2 py-2'>
-            <Avatar className='h-8 w-8'>
-              <AvatarImage src={avatar ?? undefined} alt={displayName} />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-            <div className='flex flex-col'>
-              <span className='text-sm font-medium'>{displayName}</span>
-              <span className='text-muted-foreground text-xs'>{email}</span>
-            </div>
-          </div>
-          <Button className='w-full' asChild>
-            <Link href={ROUTES.organizations}>Go to App</Link>
-          </Button>
-          <Button
-            variant='destructive'
-            className='w-full'
-            disabled={isPendingLogout}
-            onClick={logout}
-          >
-            <LogOut className='mr-2 h-4 w-4' />
-            Sign out
-          </Button>
-        </>
-      )
-    }
+  if (authError) {
+    return (
+      <WidgetErrorState
+        size='compact'
+        title='Session check failed'
+        description={authError}
+        onRetry={retryAuth}
+        className={variant === 'mobile' ? 'w-full' : 'max-w-80'}
+      />
+    )
+  }
 
+  if (variant === 'mobile' && isAuthenticated) {
+    return (
+      <>
+        <div className='flex items-center gap-3 px-2 py-2'>
+          <Avatar className='h-8 w-8'>
+            <AvatarImage src={avatar ?? undefined} alt={displayName} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className='flex flex-col'>
+            <span className='text-sm font-medium'>{displayName}</span>
+            <span className='text-muted-foreground text-xs'>{email}</span>
+          </div>
+        </div>
+        <Button className='w-full' asChild>
+          <Link href={ROUTES.organizations}>Go to App</Link>
+        </Button>
+        <Button
+          variant='destructive'
+          className='w-full'
+          disabled={isPendingLogout}
+          onClick={logout}
+        >
+          <LogOut className='mr-2 h-4 w-4' />
+          Sign out
+        </Button>
+      </>
+    )
+  }
+
+  if (variant === 'mobile') {
     return (
       <div className='flex gap-3'>
         <Button variant='outline' className='flex-1' asChild>

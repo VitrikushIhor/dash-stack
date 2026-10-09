@@ -1,6 +1,5 @@
-'use server'
-
 import { redirect } from 'next/navigation'
+import 'server-only'
 import { ROUTES } from '@/shared/config'
 import { getOrganizationCount } from '../../api/queries/get-organizations-count.server'
 

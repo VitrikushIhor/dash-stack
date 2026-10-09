@@ -4,6 +4,7 @@ import { OAuthCallback } from './oauth-callback'
 
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     OAuthCallbackCard: ({ code, error }: { code?: string; error?: string }) => (

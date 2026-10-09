@@ -6,6 +6,7 @@ import { OrgRole } from '../types/org-role'
  */
 export const formatPosition = (pos?: string) => {
   if (!pos) return '—'
+
   return pos
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -43,7 +44,9 @@ export const formatJoinedDate = (date?: string | Date, fallback = '—') => {
   if (!date) return fallback
   try {
     const d = typeof date === 'string' ? new Date(date) : date
+
     if (isNaN(d.getTime())) return fallback
+
     return format(d, 'MMM d, yyyy')
   } catch {
     return fallback

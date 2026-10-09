@@ -13,7 +13,9 @@ describe('InvitationAcceptController', () => {
 
   beforeEach(() => {
     acceptInviteUseCase = { execute: jest.fn() };
-    controller = new InvitationAcceptController(acceptInviteUseCase as any);
+    controller = new InvitationAcceptController(
+      acceptInviteUseCase as unknown as AcceptInviteUseCase,
+    );
   });
 
   describe('acceptInvite()', () => {
@@ -21,7 +23,7 @@ describe('InvitationAcceptController', () => {
       const membership = { id: 'mem-1' };
       acceptInviteUseCase.execute.mockResolvedValue(membership);
 
-      const result = await controller.acceptInvite('token-abc', mockUser);
+      const result = await controller.acceptInvite({ token: 'token-abc' }, mockUser);
 
       expect(result).toBe(membership);
       expect(acceptInviteUseCase.execute).toHaveBeenCalledWith({
@@ -31,10 +33,10 @@ describe('InvitationAcceptController', () => {
       });
     });
 
-    it('passes token from route param', async () => {
+    it('passes token from request body', async () => {
       acceptInviteUseCase.execute.mockResolvedValue({});
 
-      await controller.acceptInvite('different-token', mockUser);
+      await controller.acceptInvite({ token: 'different-token' }, mockUser);
 
       expect(acceptInviteUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({ token: 'different-token' }),
@@ -45,7 +47,7 @@ describe('InvitationAcceptController', () => {
       const otherUser: AuthUser = { id: 'user-99', email: 'other@test.com' };
       acceptInviteUseCase.execute.mockResolvedValue({});
 
-      await controller.acceptInvite('token-abc', otherUser);
+      await controller.acceptInvite({ token: 'token-abc' }, otherUser);
 
       expect(acceptInviteUseCase.execute).toHaveBeenCalledWith({
         token: 'token-abc',

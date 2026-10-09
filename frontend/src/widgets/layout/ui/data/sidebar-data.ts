@@ -1,6 +1,9 @@
+import { type ReactNode } from 'react'
 import {
   Calendar,
   ClipboardList,
+  Compass,
+  Library,
   Settings,
   ShieldCheck,
   UsersRound,
@@ -8,7 +11,10 @@ import {
 import { ROUTES } from '@/shared/config'
 import { type SidebarData } from '../types'
 
-export const getSidebarData = (slug?: string): SidebarData => ({
+export const getSidebarData = (
+  slug?: string,
+  dueBadge?: ReactNode
+): SidebarData => ({
   navGroups: [
     {
       title: 'General',
@@ -32,6 +38,23 @@ export const getSidebarData = (slug?: string): SidebarData => ({
               },
             ]
           : []),
+      ],
+    },
+
+    {
+      title: 'Vocabulary',
+      items: [
+        {
+          title: 'My Decks',
+          badge: dueBadge,
+          url: ROUTES.vocabDecks,
+          icon: Library,
+        },
+        {
+          title: 'Catalog',
+          url: ROUTES.vocabCatalog,
+          icon: Compass,
+        },
       ],
     },
 

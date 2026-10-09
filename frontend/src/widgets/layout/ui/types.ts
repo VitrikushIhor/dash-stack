@@ -1,6 +1,6 @@
 type BaseNavItem = {
   title: string
-  badge?: string
+  badge?: React.ReactNode
   icon?: React.ElementType
 }
 

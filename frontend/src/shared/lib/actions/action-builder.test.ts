@@ -14,6 +14,7 @@ describe('createAction', () => {
     })
 
     const result = await action({ name: 'Alice' })
+
     expect(result).toEqual({
       success: true,
       data: { greeting: 'Hello, Alice!' },
@@ -30,6 +31,7 @@ describe('createAction', () => {
     })
 
     const result = await action({ name: 'A' })
+
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error).toBe('Validation failed')
@@ -53,6 +55,7 @@ describe('createAction', () => {
     })
 
     const result = await action({ id: '123' })
+
     expect(result).toEqual({
       success: false,
       error: 'Invalid request',
@@ -70,6 +73,7 @@ describe('createAction', () => {
     })
 
     const result = await action({ id: '123' })
+
     expect(result).toEqual({
       success: false,
       error: 'Something went wrong',
@@ -82,6 +86,7 @@ describe('createAction', () => {
     })
 
     const result = await action()
+
     expect(result).toEqual({
       success: true,
       data: { status: 'ok' },

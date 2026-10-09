@@ -1,7 +1,7 @@
 import { type FileWithServerData } from '@/shared/api'
 import { type LabelColor } from '@/entities/label'
 import { type CreateTaskDto, type UpdateTaskDto } from '@/entities/task'
-import { type TaskFormValues } from './create-task-schema'
+import { type TaskFormValues } from './task-form.schema'
 import { ManageTaskMode } from './types'
 
 function serializeDate(
@@ -10,6 +10,7 @@ function serializeDate(
 ): string | null | undefined {
   if (value === undefined) return undefined
   if (value === null) return mode === ManageTaskMode.EDIT ? null : undefined
+
   return value.toISOString()
 }
 

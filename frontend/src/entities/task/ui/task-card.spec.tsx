@@ -105,6 +105,7 @@ describe('TaskCardKanban', () => {
 
       // Check if there is an element with text-red-600 class
       const overdueElement = container.querySelector('.text-red-600')
+
       expect(overdueElement).not.toBeNull()
     } finally {
       vi.useRealTimers()

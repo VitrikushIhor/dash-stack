@@ -22,6 +22,7 @@ export function LandingNavbarContainer({
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
+
     return () => {
       window.removeEventListener('scroll', onScroll)
       if (throttleRef.current !== null) clearTimeout(throttleRef.current)

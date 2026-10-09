@@ -24,6 +24,7 @@ export function useTaskBoard(tasks: Task[], slug?: string) {
   const [dragState, setDragState] = useState<Record<string, Task[]> | null>(
     null
   )
+
   const dragStartColumnsRef = useRef<Record<string, Task[]> | null>(null)
   const [, startTransition] = useTransition()
 

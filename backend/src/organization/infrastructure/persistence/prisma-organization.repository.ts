@@ -118,8 +118,20 @@ export class PrismaOrganizationRepository implements OrganizationRepositoryPort 
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.organization.delete({
-      where: { id },
+    await this.prisma.$transaction(async (tx) => {
+      // Block new task inserts and finish existing attachment writes before quarantine.
+      await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "Organization" WHERE "id" = ${id} FOR UPDATE
+      `;
+      await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "tasks" WHERE "organizationId" = ${id}
+        ORDER BY "id" FOR UPDATE
+      `;
+      await tx.storedFile.updateMany({
+        where: { task: { organizationId: id }, deletionPendingAt: null },
+        data: { deletionPendingAt: new Date() },
+      });
+      await tx.organization.delete({ where: { id } });
     });
   }
 

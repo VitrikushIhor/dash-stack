@@ -18,6 +18,17 @@ services:
       timeout: 5s
       retries: 5
 
+  # Local SMTP inbox for development only. Messages never leave this container.
+  mailpit:
+    image: axllent/mailpit:v1.31.2
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+
   # ============================================
   # BACKEND (NestJS) - Development with hot-reload
   # ============================================
@@ -32,6 +43,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -41,6 +54,8 @@ services:
       # Override DATABASE_URL to point to the Postgres container (not localhost)
       DATABASE_URL: postgresql://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-topsecret}@postgres:5432/${POSTGRES_DB:-test}?schema=${DB_SCHEMA:-public}&sslmode=disable
       ENABLE_LOGS: true
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
 
   # ============================================
   # FRONTEND (Next.js) - Development with hot-reload

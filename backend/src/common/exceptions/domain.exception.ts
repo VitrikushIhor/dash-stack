@@ -5,6 +5,8 @@ export enum DomainErrorCode {
   FORBIDDEN = 'FORBIDDEN',
   UNAUTHORIZED = 'UNAUTHORIZED',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
+  UPSTREAM_SERVICE_FAILURE = 'UPSTREAM_SERVICE_FAILURE',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 export class DomainException extends Error {
@@ -50,5 +52,17 @@ export class UnauthorizedException extends DomainException {
 export class InternalErrorException extends DomainException {
   constructor(message: string) {
     super(message, DomainErrorCode.INTERNAL_ERROR);
+  }
+}
+
+export class UpstreamServiceException extends DomainException {
+  constructor(message: string) {
+    super(message, DomainErrorCode.UPSTREAM_SERVICE_FAILURE);
+  }
+}
+
+export class ServiceUnavailableException extends DomainException {
+  constructor(message: string) {
+    super(message, DomainErrorCode.SERVICE_UNAVAILABLE);
   }
 }

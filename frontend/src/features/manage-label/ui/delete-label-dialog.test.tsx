@@ -7,6 +7,7 @@ import { useLabelSearchParams } from '../model/label-search-params'
 import { DeleteLabelDialog } from './delete-label-dialog'
 
 const mockRefresh = vi.fn()
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     refresh: mockRefresh,
@@ -62,6 +63,7 @@ describe('DeleteLabelDialog', () => {
   it('does not render when delete-label is not set', () => {
     render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
     const dialog = screen.queryByRole('alertdialog')
+
     expect(dialog).not.toBeInTheDocument()
   })
 
@@ -89,6 +91,7 @@ describe('DeleteLabelDialog', () => {
     render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i })
+
     await user.click(cancelButton)
 
     expect(mockSetParams).toHaveBeenCalledWith({ 'delete-label': null })
@@ -103,9 +106,11 @@ describe('DeleteLabelDialog', () => {
     ])
 
     let capturedOnSuccess: ((data: boolean) => void) | undefined
+
     vi.mocked(useAction).mockImplementation((_action, options) => {
       capturedOnSuccess = options?.onSuccess as
         ((data: boolean) => void) | undefined
+
       return {
         execute: mockExecute,
         isPending: false,
@@ -119,6 +124,7 @@ describe('DeleteLabelDialog', () => {
     render(<DeleteLabelDialog slug='org-1' labels={mockLabels} />)
 
     const confirmButton = screen.getByRole('button', { name: /delete/i })
+
     await user.click(confirmButton)
 
     await waitFor(() => {

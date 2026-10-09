@@ -1,17 +1,12 @@
 import { useRouter } from 'next/navigation'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { OrgRole } from '@/entities/organization'
 import { sendInviteAction } from '../api/actions/send-invite.action'
-import { useInviteMemberModalStore } from '../model/use-invite-member-modal-store'
 import { InviteMemberDialog } from './invite-member-dialog'
-
-// Mock the state store to control dialog visibility
-vi.mock('../model/use-invite-member-modal-store', () => ({
-  useInviteMemberModalStore: vi.fn(),
-}))
 
 // Mock the server action
 vi.mock('../api/actions/send-invite.action', () => ({
@@ -29,6 +24,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     handleServerError: vi.fn(),
@@ -36,18 +32,10 @@ vi.mock('@/shared/api', async (importOriginal) => {
 })
 
 describe('InviteMemberDialog', () => {
-  const mockClose = vi.fn()
   const mockRefresh = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
-
-    vi.mocked(useInviteMemberModalStore).mockReturnValue({
-      isOpen: true,
-      slug: 'org-1',
-      close: mockClose,
-      open: vi.fn(),
-    })
 
     vi.mocked(useRouter).mockReturnValue({
       refresh: mockRefresh,
@@ -59,8 +47,22 @@ describe('InviteMemberDialog', () => {
     })
   })
 
+  const renderDialog = (
+    searchParams = '?invite-member=true',
+    onUrlUpdate?: (event: UrlUpdateEvent) => void
+  ) =>
+    render(
+      <NuqsTestingAdapter
+        searchParams={searchParams}
+        onUrlUpdate={onUrlUpdate}
+        hasMemory
+      >
+        <InviteMemberDialog slug='org-1' />
+      </NuqsTestingAdapter>
+    )
+
   it('renders correctly when open', () => {
-    render(<InviteMemberDialog />)
+    renderDialog()
     expect(screen.getByText('Invite Member')).toBeInTheDocument()
     expect(
       screen.getByText('Send an invitation to join your organization.')
@@ -73,24 +75,19 @@ describe('InviteMemberDialog', () => {
   })
 
   it('does not render when closed', () => {
-    vi.mocked(useInviteMemberModalStore).mockReturnValue({
-      isOpen: false,
-      slug: 'org-1',
-      close: mockClose,
-      open: vi.fn(),
-    })
-
-    render(<InviteMemberDialog />)
+    renderDialog('')
     expect(screen.queryByText('Invite Member')).not.toBeInTheDocument()
   })
 
   it('shows validation errors if submitted empty', async () => {
     const user = userEvent.setup()
-    render(<InviteMemberDialog />)
+
+    renderDialog()
 
     const submitButton = screen.getByRole('button', {
       name: /send invitation/i,
     })
+
     await user.click(submitButton)
 
     // Zod validation should kick in for the email field
@@ -108,7 +105,6 @@ describe('InviteMemberDialog', () => {
         email: 'test@example.com',
         role: OrgRole.MEMBER,
         orgId: 'org-1',
-        token: 'token-1',
         invitedBy: 'admin-1',
         expiresAt: '2026-12-31T00:00:00.000Z',
         createdAt: '2026-12-01T00:00:00.000Z',
@@ -116,29 +112,39 @@ describe('InviteMemberDialog', () => {
     })
     const user = userEvent.setup()
 
-    render(<InviteMemberDialog />)
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    renderDialog('?page=2&invite-member=true', onUrlUpdate)
 
     // Fill out the form
     const emailInput = screen.getByPlaceholderText('user@example.com')
+
     await user.type(emailInput, 'test@example.com')
 
     // Submit
     const submitButton = screen.getByRole('button', {
       name: /send invitation/i,
     })
+
     await user.click(submitButton)
 
     // Verify action called with correct data
     await waitFor(() => {
-      expect(sendInviteAction).toHaveBeenCalledWith('org-1', {
-        email: 'test@example.com',
-        role: 'MEMBER', // default role in the form
+      expect(sendInviteAction).toHaveBeenCalledWith({
+        slug: 'org-1',
+        dto: {
+          email: 'test@example.com',
+          role: 'MEMBER', // default role in the form
+        },
       })
     })
 
     // Verify side effects
     expect(toast.success).toHaveBeenCalledWith('Invitation sent successfully')
-    expect(mockClose).toHaveBeenCalledTimes(1)
+    expect(onUrlUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryString: '?page=2',
+      })
+    )
     expect(mockRefresh).toHaveBeenCalledTimes(1)
   })
 })

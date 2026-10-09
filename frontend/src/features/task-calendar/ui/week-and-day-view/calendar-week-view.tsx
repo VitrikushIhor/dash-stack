@@ -1,24 +1,15 @@
 import { format } from 'date-fns'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { type Task } from '@/entities/task'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
 import { useTimelineLayout } from '../../model/use-calendar-layouts'
 import { TaskBlock } from './task-block'
 
-interface IProps {
-  singleDayTasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
-
 export function CalendarWeekView({
-  singleDayTasks,
+  tasks,
   selectedDate,
   onTaskClick,
-}: IProps) {
-  const { weekDays, eventsByDay } = useTimelineLayout(
-    singleDayTasks,
-    selectedDate
-  )
+}: CalendarViewProps) {
+  const { weekDays, eventsByDay } = useTimelineLayout(tasks, selectedDate)
 
   return (
     <>

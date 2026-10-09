@@ -5,6 +5,7 @@ import { SignIn } from './sign-in'
 
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     SignInForm: ({ redirectTo }: { redirectTo?: string }) => (
@@ -29,14 +30,17 @@ describe('SignIn Page View', () => {
     render(<SignIn />)
 
     const signUpLink = screen.getByRole('link', { name: /sign up/i })
+
     expect(signUpLink).toBeInTheDocument()
     expect(signUpLink).toHaveAttribute('href', ROUTES.signUp)
 
     const termsLink = screen.getByRole('link', { name: /terms of service/i })
+
     expect(termsLink).toBeInTheDocument()
     expect(termsLink).toHaveAttribute('href', '/terms')
 
     const privacyLink = screen.getByRole('link', { name: /privacy policy/i })
+
     expect(privacyLink).toBeInTheDocument()
     expect(privacyLink).toHaveAttribute('href', '/privacy')
   })
@@ -45,6 +49,7 @@ describe('SignIn Page View', () => {
     render(<SignIn redirectTo='/task' />)
 
     const formElement = screen.getByTestId('sign-in-form')
+
     expect(formElement).toBeInTheDocument()
     expect(formElement).toHaveAttribute('data-redirect-to', '/task')
   })

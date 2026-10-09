@@ -41,11 +41,12 @@ describe('Delete Tasks Use Cases', () => {
       updateMany: jest.fn(),
     };
     taskFileStorage = {
+      prepareDeletion: jest.fn(),
       deleteMany: jest.fn(),
     };
     findTaskByIdUseCase = {
       execute: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<FindTaskByIdUseCase>;
   });
 
   describe('DeleteTaskUseCase', () => {
@@ -58,7 +59,7 @@ describe('Delete Tasks Use Cases', () => {
     it('should delete a task and its attachments if they exist', async () => {
       const task = mockTask({ attachments: ['file-1.png', 'file-2.pdf'] });
       findTaskByIdUseCase.execute.mockResolvedValue(task);
-      taskRepository.delete.mockResolvedValue(undefined);
+      taskRepository.delete.mockResolvedValue(['file-1.png', 'file-2.pdf']);
       taskFileStorage.deleteMany.mockResolvedValue(undefined);
 
       await useCase.execute('task-1', 'org-1');
@@ -71,7 +72,7 @@ describe('Delete Tasks Use Cases', () => {
     it('should delete a task but not call storage if there are no attachments', async () => {
       const task = mockTask({ attachments: [] });
       findTaskByIdUseCase.execute.mockResolvedValue(task);
-      taskRepository.delete.mockResolvedValue(undefined);
+      taskRepository.delete.mockResolvedValue([]);
 
       await useCase.execute('task-1', 'org-1');
 
@@ -85,16 +86,17 @@ describe('Delete Tasks Use Cases', () => {
     let useCase: DeleteManyTasksUseCase;
 
     beforeEach(() => {
-      useCase = new DeleteManyTasksUseCase(taskRepository);
+      useCase = new DeleteManyTasksUseCase(taskRepository, taskFileStorage);
     });
 
     it('should delete multiple tasks and return count', async () => {
-      taskRepository.deleteMany.mockResolvedValue({ count: 5 });
+      taskRepository.deleteMany.mockResolvedValue({ count: 5, keys: ['file-1.png'] });
 
       const result = await useCase.execute('org-1', ['task-1', 'task-2']);
 
       expect(result).toEqual({ count: 5 });
       expect(taskRepository.deleteMany).toHaveBeenCalledWith('org-1', ['task-1', 'task-2']);
+      expect(taskFileStorage.deleteMany).toHaveBeenCalledWith(['file-1.png']);
     });
   });
 });

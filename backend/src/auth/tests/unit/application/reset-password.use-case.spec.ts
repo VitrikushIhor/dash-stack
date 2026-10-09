@@ -1,78 +1,107 @@
+import { PasswordHasherPort } from '../../../../../src/auth/application/ports/outgoing/password-hasher.port';
+import { PasswordResetTransactionPort } from '../../../../../src/auth/application/ports/outgoing/password-reset-transaction.port';
+import { OneTimeTokenPort } from '../../../../../src/auth/application/ports/outgoing/one-time-token.port';
+import { VerificationTokenRepositoryPort } from '../../../../../src/auth/application/ports/outgoing/verification-token.repository.port';
 import { ResetPasswordUseCase } from '../../../../../src/auth/application/use-cases/commands/reset-password.use-case';
-import { BadRequestException } from '../../../../../src/common/exceptions/domain.exception';
 import { AuthTokenType } from '../../../../../src/auth/domain/enums/token-type.enum';
+import { BadRequestException } from '../../../../../src/common/exceptions/domain.exception';
 
 describe('ResetPasswordUseCase', () => {
   let useCase: ResetPasswordUseCase;
-  let verificationTokenRepoMock: any;
-  let userRepoMock: any;
-  let refreshTokenRepoMock: any;
-  let passwordHasherMock: any;
+  let verificationTokenRepo: jest.Mocked<VerificationTokenRepositoryPort>;
+  let passwordResetTransaction: jest.Mocked<PasswordResetTransactionPort>;
+  let passwordHasher: jest.Mocked<PasswordHasherPort>;
+  let oneTimeToken: jest.Mocked<OneTimeTokenPort>;
+
+  const validResetToken = {
+    id: 'token-1',
+    email: 'test@example.com',
+    token: 'valid-token',
+    type: AuthTokenType.PASSWORD_RESET,
+    expires: new Date(Date.now() + 10_000),
+  };
 
   beforeEach(() => {
-    verificationTokenRepoMock = {
+    verificationTokenRepo = {
       findByToken: jest.fn(),
+      create: jest.fn(),
+      issueLatest: jest.fn(),
       deleteById: jest.fn(),
+      deleteManyByEmailAndType: jest.fn(),
     };
-    userRepoMock = {
-      updatePassword: jest.fn(),
-      findByEmail: jest.fn(),
+    passwordResetTransaction = {
+      complete: jest.fn(),
     };
-    refreshTokenRepoMock = {
-      deleteAllByUserId: jest.fn(),
-    };
-    passwordHasherMock = {
+    passwordHasher = {
       hashPassword: jest.fn(),
+      validatePassword: jest.fn(),
+    };
+    oneTimeToken = {
+      create: jest.fn(),
+      hash: jest.fn().mockReturnValue('token-hash'),
     };
 
     useCase = new ResetPasswordUseCase(
-      verificationTokenRepoMock,
-      userRepoMock,
-      refreshTokenRepoMock,
-      passwordHasherMock,
+      verificationTokenRepo,
+      passwordResetTransaction,
+      passwordHasher,
+      oneTimeToken,
     );
   });
 
-  it('should successfully reset password and invalidate refresh tokens', async () => {
-    verificationTokenRepoMock.findByToken.mockResolvedValue({
-      id: 'token-1',
-      email: 'test@example.com',
-      type: AuthTokenType.PASSWORD_RESET,
-      expires: new Date(Date.now() + 10000), // future
-    });
-    passwordHasherMock.hashPassword.mockResolvedValue('new_hash');
-    userRepoMock.findByEmail.mockResolvedValue({ id: 'user-1' });
+  it('should_reset_password_and_revoke_all_sessions_when_token_is_valid', async () => {
+    verificationTokenRepo.findByToken.mockResolvedValue(validResetToken);
+    passwordHasher.hashPassword.mockResolvedValue('new_hash');
+    passwordResetTransaction.complete.mockResolvedValue(true);
 
     await useCase.execute({ token: 'valid-token', newPassword: 'new-pwd' });
 
-    expect(passwordHasherMock.hashPassword).toHaveBeenCalledWith('new-pwd');
-    expect(userRepoMock.updatePassword).toHaveBeenCalledWith('test@example.com', 'new_hash');
-    expect(verificationTokenRepoMock.deleteById).toHaveBeenCalledWith('token-1');
-    expect(refreshTokenRepoMock.deleteAllByUserId).toHaveBeenCalledWith('user-1');
+    expect(passwordHasher.hashPassword).toHaveBeenCalledWith('new-pwd');
+    expect(passwordResetTransaction.complete).toHaveBeenCalledWith({
+      tokenId: 'token-1',
+      tokenHash: 'token-hash',
+      email: 'test@example.com',
+      hashedPassword: 'new_hash',
+      now: expect.any(Date),
+    });
   });
 
-  it('should throw BadRequestException for invalid token', async () => {
-    verificationTokenRepoMock.findByToken.mockResolvedValue(null);
+  it('should_reject_password_reset_when_token_is_unknown', async () => {
+    verificationTokenRepo.findByToken.mockResolvedValue(null);
+
     await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
       BadRequestException,
     );
   });
 
-  it('should throw BadRequestException if token type is wrong', async () => {
-    verificationTokenRepoMock.findByToken.mockResolvedValue({
+  it('should_reject_password_reset_when_token_type_is_wrong', async () => {
+    verificationTokenRepo.findByToken.mockResolvedValue({
+      ...validResetToken,
       type: AuthTokenType.EMAIL_VERIFICATION,
     });
+
     await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
       BadRequestException,
     );
   });
 
-  it('should throw BadRequestException if token is expired', async () => {
-    verificationTokenRepoMock.findByToken.mockResolvedValue({
-      type: AuthTokenType.PASSWORD_RESET,
-      expires: new Date(Date.now() - 10000), // past
+  it('should_reject_password_reset_when_token_is_expired', async () => {
+    verificationTokenRepo.findByToken.mockResolvedValue({
+      ...validResetToken,
+      expires: new Date(Date.now() - 10_000),
     });
+
     await expect(useCase.execute({ token: 'bad', newPassword: 'pwd' })).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('should_reject_password_reset_when_token_was_consumed_concurrently', async () => {
+    verificationTokenRepo.findByToken.mockResolvedValue(validResetToken);
+    passwordHasher.hashPassword.mockResolvedValue('new_hash');
+    passwordResetTransaction.complete.mockResolvedValue(false);
+
+    await expect(useCase.execute({ token: 'valid-token', newPassword: 'new-pwd' })).rejects.toThrow(
       BadRequestException,
     );
   });

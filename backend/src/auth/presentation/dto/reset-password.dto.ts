@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsBcryptPassword } from '../validators/is-bcrypt-password.decorator';
 
 export class ResetPasswordDto {
   @ApiProperty({
@@ -17,5 +18,6 @@ export class ResetPasswordDto {
   })
   @IsString()
   @MinLength(8)
+  @IsBcryptPassword()
   password: string;
 }

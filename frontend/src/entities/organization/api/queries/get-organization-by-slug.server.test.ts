@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ApiError } from '@/shared/api'
 import { OrgRole } from '@/shared/model'
 import { organizationServerApi } from '../organization-api.server'
 import { getOrganizationBySlug } from './get-organization-by-slug.server'
+import { getOrganization } from './get-organization.server'
 
 vi.mock('../organization-api.server', () => ({
   organizationServerApi: {
@@ -12,6 +14,10 @@ vi.mock('../organization-api.server', () => ({
 describe('getOrganizationBySlug', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('should_share_the_same_query_contract_with_getOrganization', () => {
+    expect(getOrganization).toBe(getOrganizationBySlug)
   })
 
   it('returns organization data when slug matches and API succeeds', async () => {
@@ -28,23 +34,20 @@ describe('getOrganizationBySlug', () => {
 
     const result = await getOrganizationBySlug('acme-corp')
 
-    expect(result).toEqual({
-      data: mockOrgDetail,
-      error: null,
-    })
+    expect(result).toEqual({ ok: true, data: mockOrgDetail })
     expect(organizationServerApi.getBySlug).toHaveBeenCalledWith('acme-corp')
   })
 
   it('returns error when organization details query fails (e.g. 403 or 404)', async () => {
     vi.mocked(organizationServerApi.getBySlug).mockRejectedValue(
-      new Error('Organization not found or access denied')
+      new ApiError(404, 'Organization not found')
     )
 
     const result = await getOrganizationBySlug('unknown-org')
 
     expect(result).toEqual({
-      data: null,
-      error: 'Organization not found or access denied',
+      ok: false,
+      error: { code: 'NOT_FOUND', message: 'Organization not found' },
     })
     expect(organizationServerApi.getBySlug).toHaveBeenCalledWith('unknown-org')
   })
@@ -57,8 +60,8 @@ describe('getOrganizationBySlug', () => {
     const result = await getOrganizationBySlug('acme-corp')
 
     expect(result).toEqual({
-      data: null,
-      error: 'Network error',
+      ok: false,
+      error: { code: 'UNKNOWN', message: 'Network error' },
     })
   })
 })

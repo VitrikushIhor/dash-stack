@@ -2,7 +2,6 @@ import { useRouter } from 'next/navigation'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { handleServerError } from '@/shared/api'
 import { revokeInviteAction } from '../api/actions/revoke-invite.action'
 import { useRevokeInvite } from './use-revoke-invite'
 
@@ -17,17 +16,10 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('sonner', () => ({
   toast: {
+    error: vi.fn(),
     success: vi.fn(),
   },
 }))
-
-vi.mock('@/shared/api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/shared/api')>()
-  return {
-    ...actual,
-    handleServerError: vi.fn(),
-  }
-})
 
 describe('useRevokeInvite', () => {
   const mockRefresh = vi.fn()
@@ -66,17 +58,21 @@ describe('useRevokeInvite', () => {
 
     // Behavior verification:
     // 1. Called the API action
-    expect(revokeInviteAction).toHaveBeenCalledWith('org-1', 'invite-1')
+    expect(revokeInviteAction).toHaveBeenCalledWith({
+      slug: 'org-1',
+      invitationId: 'invite-1',
+    })
     // 2. Showed a success toast
     expect(toast.success).toHaveBeenCalledWith('Invitation revoked')
     // 3. Refreshed the page router
     expect(mockRefresh).toHaveBeenCalledTimes(1)
-    // 4. Did not call the error handler
-    expect(handleServerError).not.toHaveBeenCalled()
+    // 4. Did not show an error toast
+    expect(toast.error).not.toHaveBeenCalled()
   })
 
   it('handles server errors correctly without crashing', async () => {
     const errorResponse = { success: false as const, error: 'Failed to revoke' }
+
     vi.mocked(revokeInviteAction).mockResolvedValue(errorResponse)
 
     const { result } = renderHook(() => useRevokeInvite())
@@ -91,9 +87,12 @@ describe('useRevokeInvite', () => {
 
     // Behavior verification:
     // 1. Called the API action
-    expect(revokeInviteAction).toHaveBeenCalledWith('org-1', 'invite-1')
+    expect(revokeInviteAction).toHaveBeenCalledWith({
+      slug: 'org-1',
+      invitationId: 'invite-1',
+    })
     // 2. Handled the server error
-    expect(handleServerError).toHaveBeenCalledWith('Failed to revoke')
+    expect(toast.error).toHaveBeenCalledWith('Failed to revoke')
     // 3. Did NOT show success toast
     expect(toast.success).not.toHaveBeenCalled()
     // 4. Did NOT refresh the page

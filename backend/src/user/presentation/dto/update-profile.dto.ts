@@ -7,14 +7,17 @@ import {
   IsUrl,
   MinLength,
   MaxLength,
-  IsEmail,
+  IsEmpty,
 } from 'class-validator';
 
 export class UpdateProfileDto {
-  @ApiPropertyOptional({ example: 'john.doe@example.com' })
+  @ApiPropertyOptional({
+    description: 'Email changes require a separate verification flow.',
+    deprecated: true,
+  })
   @IsOptional()
-  @IsEmail()
-  email?: string;
+  @IsEmpty({ message: 'Email cannot be changed through profile updates.' })
+  email?: unknown;
 
   @ApiPropertyOptional({ example: 'John' })
   @IsOptional()

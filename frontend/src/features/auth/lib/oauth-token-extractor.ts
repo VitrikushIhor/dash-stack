@@ -1,6 +1,6 @@
 import { OAUTH_PARAMS } from '@/shared/config'
 
-export interface OAuthCallbackParams {
+interface OAuthCallbackParams {
   code?: string | null
   token?: string | null
   error?: string | null

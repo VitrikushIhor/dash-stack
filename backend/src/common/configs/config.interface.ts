@@ -42,6 +42,7 @@ export interface EmailConfig {
 export interface StorageConfig {
   provider: string;
   s3Bucket: string;
+  privateS3Bucket: string;
   s3Region: string;
   accessKeyId: string;
   secretAccessKey: string;

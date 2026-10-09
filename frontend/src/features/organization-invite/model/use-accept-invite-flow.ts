@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/shared/config'
+import { useAction } from '@/shared/lib'
 import { acceptInviteAction } from '../api/actions/accept-invite.action'
 
 export type AcceptInviteFlowStatus = 'loading' | 'success' | 'error'
@@ -11,28 +12,28 @@ const REDIRECT_DELAY_MS = 2000
 
 export function useAcceptInviteFlow(token: string | null) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
   const [status, setStatus] = useState<AcceptInviteFlowStatus>(
     token ? 'loading' : 'error'
   )
+
   const [errorMessage, setErrorMessage] = useState(
     !token ? 'No invitation token provided' : ''
   )
+
   const hasTriedRef = useRef<string | null>(null)
+  const { execute, isPending } = useAction(acceptInviteAction, {
+    onSuccess: () => setStatus('success'),
+    onError: (message) => {
+      setStatus('error')
+      setErrorMessage(message || 'Unknown error occurred')
+    },
+  })
 
   const fetchInvite = useCallback(() => {
     if (!token) return
 
-    startTransition(async () => {
-      const result = await acceptInviteAction(token)
-      if (!result.success) {
-        setStatus('error')
-        setErrorMessage(result.error ?? 'Unknown error occurred')
-        return
-      }
-      setStatus('success')
-    })
-  }, [token])
+    void execute(token)
+  }, [execute, token])
 
   useEffect(() => {
     if (!token || hasTriedRef.current === token) return
@@ -45,6 +46,7 @@ export function useAcceptInviteFlow(token: string | null) {
     const timeoutId = setTimeout(() => {
       router.replace(ROUTES.organizations)
     }, REDIRECT_DELAY_MS)
+
     return () => clearTimeout(timeoutId)
   }, [status, router])
 
@@ -61,7 +63,7 @@ export function useAcceptInviteFlow(token: string | null) {
 
   return {
     status,
-    isLoading: status === 'loading',
+    isLoading: status === 'loading' || isPending,
     isSuccess: status === 'success',
     isFailed: status === 'error',
     errorMessage,

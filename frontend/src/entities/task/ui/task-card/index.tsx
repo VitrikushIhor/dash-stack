@@ -10,6 +10,7 @@ export const TaskCard = ({ viewMode, ...props }: TaskCardWrapperProps) => {
   if (viewMode === 'list') {
     return <TaskCardList {...props} />
   }
+
   return <TaskCardKanban {...props} />
 }
 

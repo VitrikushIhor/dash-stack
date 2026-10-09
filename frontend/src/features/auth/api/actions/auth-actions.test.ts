@@ -1,11 +1,7 @@
 import { cookies } from 'next/headers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { serverApi } from '@/shared/api/server'
-import {
-  COOKIE_CONFIG,
-  clearAuthCookies,
-  setAuthCookies,
-} from '@/shared/lib/session-cookies'
+import { COOKIE_CONFIG, clearAuthCookies } from '@/shared/lib/session-cookies'
+import { authServerApi } from '../auth-api.server'
 import { forgotPasswordAction } from './forgot-password.action'
 import { logoutAction } from './logout.action'
 import { oauthExchangeAction } from './oauth-exchange.action'
@@ -16,29 +12,35 @@ import { verifyEmailAction } from './verify-email.action'
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
+  headers: vi
+    .fn()
+    .mockResolvedValue(new Headers({ 'user-agent': 'Browser test agent' })),
 }))
 
-vi.mock('@/shared/api/server', () => ({
-  serverApi: {
-    post: vi.fn(),
+vi.mock('../auth-api.server', () => ({
+  authServerApi: {
+    login: vi.fn(),
+    signup: vi.fn(),
+    verifyEmail: vi.fn(),
+    logout: vi.fn(),
+    forgotPassword: vi.fn(),
+    resetPassword: vi.fn(),
+    oauthExchange: vi.fn(),
   },
 }))
 
 vi.mock('@/shared/lib/session-cookies', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@/shared/lib/session-cookies')>()
+
   return {
     ...actual,
-    setAuthCookies: vi.fn(),
     clearAuthCookies: vi.fn(),
   }
 })
 
 describe('Auth Server Actions', () => {
-  const mockTokens = {
-    accessToken: 'mock-access-token',
-    refreshToken: 'mock-refresh-token',
-  }
+  const authenticated = { authenticated: true as const }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -46,7 +48,7 @@ describe('Auth Server Actions', () => {
 
   describe('signInAction', () => {
     it('calls serverApi.post with valid credentials, sets cookies, and returns success ActionState', async () => {
-      vi.mocked(serverApi.post).mockResolvedValueOnce(mockTokens)
+      vi.mocked(authServerApi.login).mockResolvedValueOnce(authenticated)
 
       const credentials = {
         email: 'user@example.com',
@@ -54,13 +56,13 @@ describe('Auth Server Actions', () => {
       }
       const result = await signInAction(credentials)
 
-      expect(serverApi.post).toHaveBeenCalledWith('/auth/login', credentials, {
-        skipAuth: true,
-      })
-      expect(setAuthCookies).toHaveBeenCalledWith(mockTokens)
+      expect(authServerApi.login).toHaveBeenCalledWith(
+        credentials,
+        'Browser test agent'
+      )
       expect(result).toEqual({
         success: true,
-        data: mockTokens,
+        data: { authenticated: true },
       })
     })
 
@@ -74,14 +76,15 @@ describe('Auth Server Actions', () => {
       if (!result.success) {
         expect(result.error).toBe('Validation failed')
       }
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.login).not.toHaveBeenCalled()
     })
   })
 
   describe('signUpAction', () => {
     it('calls serverApi.post with sign up data and returns success ActionState', async () => {
       const response = { message: 'User registered' }
-      vi.mocked(serverApi.post).mockResolvedValueOnce(response)
+
+      vi.mocked(authServerApi.signup).mockResolvedValueOnce(response)
 
       const input = {
         email: 'newuser@example.com',
@@ -90,8 +93,9 @@ describe('Auth Server Actions', () => {
       }
       const result = await signUpAction(input)
 
-      expect(serverApi.post).toHaveBeenCalledWith('/auth/signup', input, {
-        skipAuth: true,
+      expect(authServerApi.signup).toHaveBeenCalledWith({
+        email: input.email,
+        password: input.password,
       })
       expect(result).toEqual({
         success: true,
@@ -111,34 +115,32 @@ describe('Auth Server Actions', () => {
         expect(result.error).toBe('Validation failed')
         expect(result.validationMessages).toContain("Passwords don't match.")
       }
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.signup).not.toHaveBeenCalled()
     })
   })
 
   describe('verifyEmailAction', () => {
     it('calls serverApi.post with token, sets cookies, and returns success ActionState', async () => {
-      vi.mocked(serverApi.post).mockResolvedValueOnce(mockTokens)
+      vi.mocked(authServerApi.verifyEmail).mockResolvedValueOnce(authenticated)
 
       const result = await verifyEmailAction({
         token: 'verification-token-123',
       })
 
-      expect(serverApi.post).toHaveBeenCalledWith(
-        '/auth/verify-email',
-        { token: 'verification-token-123' },
-        { skipAuth: true }
+      expect(authServerApi.verifyEmail).toHaveBeenCalledWith(
+        'verification-token-123'
       )
-      expect(setAuthCookies).toHaveBeenCalledWith(mockTokens)
       expect(result).toEqual({
         success: true,
-        data: mockTokens,
+        data: { authenticated: true },
       })
     })
 
     it('returns validation failure when token is empty', async () => {
       const result = await verifyEmailAction({ token: '' })
+
       expect(result.success).toBe(false)
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.verifyEmail).not.toHaveBeenCalled()
     })
   })
 
@@ -147,17 +149,20 @@ describe('Auth Server Actions', () => {
       const mockGet = vi
         .fn()
         .mockReturnValue({ value: 'existing-refresh-token' })
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
-      vi.mocked(serverApi.post).mockResolvedValueOnce({ message: 'Logged out' })
+      vi.mocked(authServerApi.logout).mockResolvedValueOnce({
+        message: 'Logged out',
+      })
 
       const result = await logoutAction()
 
       expect(mockGet).toHaveBeenCalledWith(COOKIE_CONFIG.REFRESH_TOKEN.name)
-      expect(serverApi.post).toHaveBeenCalledWith('/auth/logout', {
-        refreshToken: 'existing-refresh-token',
-      })
+      expect(authServerApi.logout).toHaveBeenCalledWith(
+        'existing-refresh-token'
+      )
       expect(clearAuthCookies).toHaveBeenCalled()
       expect(result).toEqual({
         success: true,
@@ -165,14 +170,15 @@ describe('Auth Server Actions', () => {
       })
     })
 
-    it('clears cookies and returns success ActionState even if logout endpoint throws', async () => {
+    it('clears local cookies and reports failure when server revocation fails', async () => {
       const mockGet = vi
         .fn()
         .mockReturnValue({ value: 'existing-refresh-token' })
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
-      vi.mocked(serverApi.post).mockRejectedValueOnce(
+      vi.mocked(authServerApi.logout).mockRejectedValueOnce(
         new Error('Network error')
       )
 
@@ -180,20 +186,21 @@ describe('Auth Server Actions', () => {
 
       expect(clearAuthCookies).toHaveBeenCalled()
       expect(result).toEqual({
-        success: true,
-        data: { message: 'Logged out successfully' },
+        success: false,
+        error: 'Network error',
       })
     })
 
     it('clears cookies without calling backend if no refresh token exists', async () => {
       const mockGet = vi.fn().mockReturnValue(undefined)
+
       vi.mocked(cookies).mockResolvedValueOnce({
         get: mockGet,
       } as unknown as Awaited<ReturnType<typeof cookies>>)
 
       const result = await logoutAction()
 
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.logout).not.toHaveBeenCalled()
       expect(clearAuthCookies).toHaveBeenCalled()
       expect(result).toEqual({
         success: true,
@@ -205,14 +212,13 @@ describe('Auth Server Actions', () => {
   describe('forgotPasswordAction', () => {
     it('calls serverApi.post with valid email and returns success ActionState', async () => {
       const response = { message: 'Reset email sent' }
-      vi.mocked(serverApi.post).mockResolvedValueOnce(response)
+
+      vi.mocked(authServerApi.forgotPassword).mockResolvedValueOnce(response)
 
       const result = await forgotPasswordAction({ email: 'user@example.com' })
 
-      expect(serverApi.post).toHaveBeenCalledWith(
-        '/auth/forgot-password',
-        { email: 'user@example.com' },
-        { skipAuth: true }
+      expect(authServerApi.forgotPassword).toHaveBeenCalledWith(
+        'user@example.com'
       )
       expect(result).toEqual({
         success: true,
@@ -222,15 +228,17 @@ describe('Auth Server Actions', () => {
 
     it('returns validation failure for empty email', async () => {
       const result = await forgotPasswordAction({ email: '' })
+
       expect(result.success).toBe(false)
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.forgotPassword).not.toHaveBeenCalled()
     })
   })
 
   describe('resetPasswordAction', () => {
     it('calls serverApi.post with token and valid password, and returns success ActionState', async () => {
       const response = { message: 'Password updated' }
-      vi.mocked(serverApi.post).mockResolvedValueOnce(response)
+
+      vi.mocked(authServerApi.resetPassword).mockResolvedValueOnce(response)
 
       const result = await resetPasswordAction({
         token: 'reset-token-abc',
@@ -238,11 +246,10 @@ describe('Auth Server Actions', () => {
         confirmPassword: 'new-password-123',
       })
 
-      expect(serverApi.post).toHaveBeenCalledWith(
-        '/auth/reset-password',
-        { token: 'reset-token-abc', password: 'new-password-123' },
-        { skipAuth: true }
-      )
+      expect(authServerApi.resetPassword).toHaveBeenCalledWith({
+        token: 'reset-token-abc',
+        password: 'new-password-123',
+      })
       expect(result).toEqual({
         success: true,
         data: response,
@@ -257,34 +264,34 @@ describe('Auth Server Actions', () => {
       })
 
       expect(result.success).toBe(false)
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.resetPassword).not.toHaveBeenCalled()
     })
   })
 
   describe('oauthExchangeAction', () => {
     it('calls serverApi.post with token, sets auth cookies, and returns success ActionState', async () => {
-      vi.mocked(serverApi.post).mockResolvedValueOnce(mockTokens)
+      vi.mocked(authServerApi.oauthExchange).mockResolvedValueOnce(
+        authenticated
+      )
 
       const result = await oauthExchangeAction({
         token: 'oauth-exchange-code-xyz',
       })
 
-      expect(serverApi.post).toHaveBeenCalledWith(
-        '/auth/oauth/exchange',
-        { token: 'oauth-exchange-code-xyz' },
-        { skipAuth: true }
+      expect(authServerApi.oauthExchange).toHaveBeenCalledWith(
+        'oauth-exchange-code-xyz'
       )
-      expect(setAuthCookies).toHaveBeenCalledWith(mockTokens)
       expect(result).toEqual({
         success: true,
-        data: mockTokens,
+        data: { authenticated: true },
       })
     })
 
     it('returns validation failure when token is empty', async () => {
       const result = await oauthExchangeAction({ token: '' })
+
       expect(result.success).toBe(false)
-      expect(serverApi.post).not.toHaveBeenCalled()
+      expect(authServerApi.oauthExchange).not.toHaveBeenCalled()
     })
   })
 })

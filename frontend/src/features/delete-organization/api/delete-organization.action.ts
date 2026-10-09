@@ -15,6 +15,7 @@ export async function deleteOrganizationAction(
 
     revalidateTag(SERVER_CACHE_TAGS.organizations)
     revalidateTag(SERVER_CACHE_TAGS.orgDetail(validSlug))
+
     return { success: true, data: res }
   } catch (error) {
     if (error instanceof ApiError) {
@@ -24,6 +25,7 @@ export async function deleteOrganizationAction(
         validationMessages: error.validationMessages,
       }
     }
+
     return { success: false, error: getErrorMessage(error) }
   }
 }

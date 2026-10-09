@@ -1,9 +1,9 @@
 import { EmailConfig } from './../common/configs/config.interface';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
-export interface SendMailOptions {
+interface SendMailOptions {
   to: string;
   subject: string;
   html: string;
@@ -11,6 +11,7 @@ export interface SendMailOptions {
 
 @Injectable()
 export class EmailService {
+  private readonly logger = new Logger(EmailService.name);
   private readonly transporter: nodemailer.Transporter;
   private readonly emailConfig: EmailConfig;
 
@@ -35,8 +36,8 @@ export class EmailService {
         subject: options.subject,
         html: options.html,
       });
-    } catch (error) {
-      console.error('Email send error:', error);
+    } catch {
+      this.logger.error('Email delivery failed');
       throw new InternalServerErrorException('Failed to send email');
     }
   }

@@ -39,20 +39,27 @@ describe('UpdateProfileForm', () => {
     expect(screen.getByLabelText(/email address/i)).toHaveValue(
       'john.doe@example.com'
     )
+    expect(screen.getByLabelText(/email address/i)).toBeDisabled()
+    expect(
+      screen.getByText(/email changes require verification/i)
+    ).toBeInTheDocument()
     expect(screen.getByLabelText(/bio/i)).toHaveValue('Software engineer')
   })
 
   it('submits updated profile data when user changes input and clicks save', async () => {
     const user = userEvent.setup()
+
     mockUpdateProfile.mockResolvedValue(true)
 
     render(<UpdateProfileForm user={mockUser} />)
 
     const firstNameInput = screen.getByLabelText(/first name/i)
+
     await user.clear(firstNameInput)
     await user.type(firstNameInput, 'Johnny')
 
     const saveBtn = screen.getByRole('button', { name: /update profile/i })
+
     await user.click(saveBtn)
 
     expect(mockUpdateProfile).toHaveBeenCalledWith(
@@ -60,7 +67,6 @@ describe('UpdateProfileForm', () => {
       expect.objectContaining({
         firstName: 'Johnny',
         lastName: 'Doe',
-        email: 'john.doe@example.com',
       }),
       expect.any(Object)
     )
@@ -75,6 +81,7 @@ describe('UpdateProfileForm', () => {
     render(<UpdateProfileForm user={mockUser} />)
 
     const saveBtn = screen.getByRole('button', { name: /saving\.\.\./i })
+
     expect(saveBtn).toBeDisabled()
   })
 })

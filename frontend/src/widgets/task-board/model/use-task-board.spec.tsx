@@ -39,6 +39,7 @@ describe('useTaskBoard', () => {
 
   it('initializes with grouped tasks', () => {
     const { result } = renderHook(() => useTaskBoard(mockTasks))
+
     expect(result.current.displayColumns[TaskStatusEnum.PLANNED]).toHaveLength(
       1
     )
@@ -100,6 +101,7 @@ describe('useTaskBoard', () => {
     const actionPromise = new Promise((resolve) => {
       resolveAction = resolve
     })
+
     vi.mocked(updateTaskAction).mockReturnValue(
       actionPromise as unknown as ReturnType<typeof updateTaskAction>
     )

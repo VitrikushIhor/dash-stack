@@ -60,6 +60,7 @@ export function DataTableJiraFilter<TData>({
   const totalActiveFilters = filters.reduce((acc, filter) => {
     const column = table.getColumn(filter.columnId)
     const filterValue = column?.getFilterValue() as string[] | undefined
+
     return acc + (filterValue?.length ?? 0)
   }, 0)
 
@@ -127,6 +128,7 @@ export function DataTableJiraFilter<TData>({
                   <CommandGroup>
                     {activeFilter.options.map((option) => {
                       const isSelected = selectedValues.has(option.value)
+
                       return (
                         <CommandItem
                           key={option.value}
@@ -137,6 +139,7 @@ export function DataTableJiraFilter<TData>({
                               selectedValues.add(option.value)
                             }
                             const filterValues = Array.from(selectedValues)
+
                             activeColumn.setFilterValue(
                               filterValues.length ? filterValues : undefined
                             )

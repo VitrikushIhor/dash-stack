@@ -19,6 +19,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     handleServerError: vi.fn(),
@@ -51,6 +52,7 @@ describe('useDeleteOrganization', () => {
     )
 
     let success = false
+
     await act(async () => {
       success = await result.current.deleteOrganization('org-999')
     })
@@ -73,6 +75,7 @@ describe('useDeleteOrganization', () => {
     const { result } = renderHook(() => useDeleteOrganization())
 
     let success = false
+
     await act(async () => {
       success = await result.current.deleteOrganization('org-999')
     })

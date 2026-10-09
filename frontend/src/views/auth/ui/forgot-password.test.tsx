@@ -6,6 +6,7 @@ import { ForgotPassword } from './forgot-password'
 // Mock ForgotPasswordForm to isolate ForgotPassword view component behavior
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     ForgotPasswordForm: () => (
@@ -28,6 +29,7 @@ describe('ForgotPassword Page View', () => {
     render(<ForgotPassword />)
 
     const signUpLink = screen.getByRole('link', { name: /sign up/i })
+
     expect(signUpLink).toBeInTheDocument()
     expect(signUpLink).toHaveAttribute('href', ROUTES.signUp)
   })

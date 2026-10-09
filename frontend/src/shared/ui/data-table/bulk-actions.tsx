@@ -47,6 +47,7 @@ export function DataTableBulkActions<TData>({
 
       // Clear announcement after a delay
       const timer = setTimeout(() => setAnnouncement(''), 3000)
+
       return () => clearTimeout(timer)
     }
   }, [selectedCount, entityName])
@@ -57,6 +58,7 @@ export function DataTableBulkActions<TData>({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const buttons = toolbarRef.current?.querySelectorAll('button')
+
     if (!buttons) return
 
     const currentIndex = Array.from(buttons).findIndex(
@@ -67,6 +69,7 @@ export function DataTableBulkActions<TData>({
       case 'ArrowRight': {
         event.preventDefault()
         const nextIndex = (currentIndex + 1) % buttons.length
+
         buttons[nextIndex]?.focus()
         break
       }
@@ -74,6 +77,7 @@ export function DataTableBulkActions<TData>({
         event.preventDefault()
         const prevIndex =
           currentIndex === 0 ? buttons.length - 1 : currentIndex - 1
+
         buttons[prevIndex]?.focus()
         break
       }

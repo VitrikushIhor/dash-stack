@@ -22,6 +22,7 @@ describe('LandingNavbarContainer', () => {
     )
 
     const header = screen.getByRole('banner') // <header> element
+
     expect(header).toHaveClass('bg-transparent')
     expect(header).not.toHaveClass('bg-background/90')
   })

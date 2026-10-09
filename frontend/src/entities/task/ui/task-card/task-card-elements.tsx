@@ -9,6 +9,7 @@ export const TaskDate = ({
   overdue: boolean
 }) => {
   if (!date) return <div />
+
   return (
     <div
       className={cn(
@@ -30,6 +31,7 @@ export const TaskProgress = ({
   total: number
 }) => {
   if (total === 0) return null
+
   return (
     <div className='text-muted-foreground flex items-center gap-1.5 text-xs'>
       <ListTodo className='h-4 w-4' />
@@ -42,6 +44,7 @@ export const TaskProgress = ({
 
 export const TaskAttachments = ({ count }: { count: number }) => {
   if (count === 0) return null
+
   return (
     <div className='text-muted-foreground flex items-center gap-1.5 text-xs'>
       <Paperclip className='h-3 w-3' />

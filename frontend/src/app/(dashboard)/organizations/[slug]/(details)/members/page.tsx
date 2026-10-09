@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import {
   getOrganizationBySlug,
   getOrganizationMembers,
@@ -13,19 +13,25 @@ interface PageProps {
 
 export default async function OrganizationMembersPage({ params }: PageProps) {
   const { slug } = await params
-  const orgResult = await getOrganizationBySlug(slug)
+  const [orgResult, membersResult] = await Promise.all([
+    getOrganizationBySlug(slug),
+    getOrganizationMembers(slug),
+  ])
 
-  if (!orgResult.data) {
-    notFound()
+  if (!orgResult.ok) {
+    return <PageErrorHandler error={orgResult.error} withContainer={false} />
   }
 
-  const membersResult = await getOrganizationMembers(slug)
+  if (!membersResult.ok) {
+    return (
+      <PageErrorHandler error={membersResult.error} withContainer={false} />
+    )
+  }
 
   return (
     <MembersTabContent
       organization={orgResult.data}
-      initialMembers={membersResult.data ?? []}
-      initialError={membersResult.error}
+      initialMembers={membersResult.data}
     />
   )
 }

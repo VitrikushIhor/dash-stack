@@ -15,9 +15,19 @@ import { TaskModule } from './task/task.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './user/user.module';
 import { LabelModule } from './label/label.module';
+import { VocabModule } from './vocab/vocab.module';
 import config from './common/configs/config';
+import { validateAuthEnvironment } from './common/configs/auth-environment.validator';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
+import { APP_GUARD } from '@nestjs/core';
+import { CsrfOriginGuard } from './common/guards/csrf-origin.guard';
+import {
+  createHttpRequestId,
+  serializeHttpRequest,
+  serializeHttpResponse,
+} from './common/configs/http-log-serializers';
+import { databasePoolConfig } from './common/configs/database-pool-config';
 
 @Module({
   imports: [
@@ -25,10 +35,11 @@ import { join } from 'node:path';
       isGlobal: true,
       load: [config],
       envFilePath: '.env',
+      validate: validateAuthEnvironment,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(__dirname, '..', 'uploads', 'images'),
+      serveRoot: '/uploads/images',
       serveStaticOptions: {
         setHeaders: (res) => {
           res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -39,21 +50,7 @@ import { join } from 'node:path';
       isGlobal: true,
       useFactory: (configService: ConfigService) => {
         const connectionString = configService.get('DATABASE_URL');
-        const poolConfig: any = { connectionString };
-
-        // Parse schema from URL and set it as search_path in Pool options
-        try {
-          if (connectionString) {
-            const url = new URL(connectionString);
-            const schema = url.searchParams.get('schema');
-            if (schema) {
-              poolConfig.options = `-c search_path=${schema}`;
-              console.log(`[AppModule] Configured Postgres search_path to: ${schema}`);
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to parse DATABASE_URL configuration', e);
-        }
+        const poolConfig = databasePoolConfig(connectionString);
 
         const pool = new Pool(poolConfig);
         const adapter = new PrismaPg(pool);
@@ -78,19 +75,16 @@ import { join } from 'node:path';
           pinoHttp: {
             level: isProduction || enableLogs ? 'info' : 'silent',
             autoLogging: isProduction || enableLogs, // Explicitly disable autoLogging
+            genReqId: createHttpRequestId,
             customProps: () => ({
               context: 'HTTP',
             }),
+            serializers: { req: serializeHttpRequest, res: serializeHttpResponse },
             redact: ['req.headers.authorization', 'req.body.password', 'req.body.newPassword'],
-            transport: {
-              target: 'pino-pretty',
-              options: {
-                singleLine: true,
-              },
-            },
+            transport: isProduction
+              ? undefined
+              : { target: 'pino-pretty', options: { singleLine: true } },
           },
-          // Attempt to fix /api/* warning by using named wildcard
-          forRoutes: ['/api/*path'],
         };
       },
     }),
@@ -110,10 +104,12 @@ import { join } from 'node:path';
     StorageModule,
     UserModule,
     LabelModule,
+    VocabModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    { provide: APP_GUARD, useClass: CsrfOriginGuard },
     // {
     //   provide: APP_GUARD,
     //   useClass: ThrottlerGuard,

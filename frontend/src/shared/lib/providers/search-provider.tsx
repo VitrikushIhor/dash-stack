@@ -23,7 +23,9 @@ export function SearchProvider({ children }: SearchProviderProps) {
         setOpen((open) => !open)
       }
     }
+
     document.addEventListener('keydown', down)
+
     return () => document.removeEventListener('keydown', down)
   }, [])
 

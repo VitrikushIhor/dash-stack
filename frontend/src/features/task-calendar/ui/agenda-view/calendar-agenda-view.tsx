@@ -1,46 +1,22 @@
 import { useMemo } from 'react'
-import { format, isSameMonth, parseISO, startOfDay } from 'date-fns'
+import { format, isSameMonth } from 'date-fns'
 import { CalendarX2 } from 'lucide-react'
 import { ScrollArea } from '@/shared/ui/core/scroll-area'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { type CalendarViewProps } from '../../model/calendar-view-props'
+import { useCalendarTaskIndex } from '../../model/use-calendar-task-index'
 import { AgendaDayGroup } from './agenda-day-group'
-
-interface IProps {
-  tasks: Task[]
-  selectedDate: Date
-  onTaskClick?: (taskId: string) => void
-}
 
 export function CalendarAgendaView({
   tasks,
   selectedDate,
   onTaskClick,
-}: IProps) {
-  const eventsByDay = useMemo(() => {
-    const allDates = new Map<string, { date: Date; tasks: Task[] }>()
-
-    tasks.forEach((task) => {
-      const anchor = getTaskCalendarAnchor(task)
-      if (!anchor) return
-      const eventDate = parseISO(anchor)
-      if (!isSameMonth(eventDate, selectedDate)) return
-
-      const dateKey = format(eventDate, 'yyyy-MM-dd')
-
-      if (!allDates.has(dateKey)) {
-        allDates.set(dateKey, {
-          date: startOfDay(eventDate),
-          tasks: [],
-        })
-      }
-
-      allDates.get(dateKey)?.tasks.push(task)
-    })
-
-    return Array.from(allDates.values()).sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
-    )
-  }, [tasks, selectedDate])
+}: CalendarViewProps) {
+  const index = useCalendarTaskIndex(tasks)
+  const eventsByDay = useMemo(
+    () =>
+      [...index.values()].filter((day) => isSameMonth(day.date, selectedDate)),
+    [index, selectedDate]
+  )
 
   const hasAnyEvents = eventsByDay.length > 0
 

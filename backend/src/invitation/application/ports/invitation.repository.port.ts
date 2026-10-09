@@ -9,6 +9,11 @@ export interface CreateInvitationData {
   expiresAt: Date;
 }
 
+export interface CreatedInvitation {
+  invitation: PendingInvitationReadModel;
+  token: string;
+}
+
 export interface InvitationRepositoryPort {
   findMembershipByEmailAndOrg(email: string, orgId: string): Promise<unknown | null>;
 
@@ -20,11 +25,17 @@ export interface InvitationRepositoryPort {
 
   findById(id: string): Promise<PendingInvitationReadModel | null>;
 
-  create(data: CreateInvitationData): Promise<PendingInvitationReadModel>;
+  create(data: CreateInvitationData): Promise<CreatedInvitation>;
 
-  accept(invitationId: string, userId: string, orgId: string, role: OrgRole): Promise<unknown>;
+  accept(
+    invitationId: string,
+    userId: string,
+    userEmail: string,
+    orgId: string,
+    role: OrgRole,
+  ): Promise<unknown>;
 
   listPending(orgId: string): Promise<PendingInvitationReadModel[]>;
 
-  delete(id: string): Promise<void>;
+  delete(id: string, orgId: string): Promise<void>;
 }

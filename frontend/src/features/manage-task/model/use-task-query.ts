@@ -15,9 +15,11 @@ export function useTaskQuery(
       slug && id
         ? async () => {
             const res = await getTaskAction({ slug, id })
+
             if (!res.success) {
               throw new Error(res.error)
             }
+
             return res.data
           }
         : skipToken,

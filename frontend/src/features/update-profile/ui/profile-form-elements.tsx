@@ -15,10 +15,14 @@ import {
 import { Input } from '@/shared/ui/core/input'
 import { Textarea } from '@/shared/ui/core/textarea'
 import { DatePicker } from '@/shared/ui/date-picker'
-import type { UpdateProfileFormValues } from '../model/update-profile.schema'
+import {
+  AvatarValueKind,
+  type UpdateProfileFormValues,
+} from '../model/update-profile.schema'
 
 interface ProfileFormElementsProps {
   form: UseFormReturn<UpdateProfileFormValues>
+  email: string
   fields: Record<'id', string>[]
   append: (value: { value: string }) => void
   remove: (index: number) => void
@@ -26,6 +30,7 @@ interface ProfileFormElementsProps {
 
 export function ProfileFormElements({
   form,
+  email,
   fields,
   append,
   remove,
@@ -47,17 +52,21 @@ export function ProfileFormElements({
                 <FormControl>
                   <AvatarUpload
                     value={
-                      field.value.kind === 'file' ? field.value.value : null
+                      field.value.kind === AvatarValueKind.FILE
+                        ? field.value.value
+                        : null
                     }
                     defaultPreview={
-                      field.value.kind === 'key'
+                      field.value.kind === AvatarValueKind.KEY
                         ? getFileUrl(field.value.value)
                         : undefined
                     }
                     onValueChange={(f) => {
                       form.clearErrors('avatar')
                       field.onChange(
-                        f ? { kind: 'file', value: f } : { kind: 'none' }
+                        f
+                          ? { kind: AvatarValueKind.FILE, value: f }
+                          : { kind: AvatarValueKind.NONE }
                       )
                     }}
                     onFileReject={(_, message) => {
@@ -124,26 +133,21 @@ export function ProfileFormElements({
           </h3>
 
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='email'
-                      placeholder='john.doe@example.com'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Your primary email for notifications.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+              <FormLabel htmlFor='profile-email'>Email Address</FormLabel>
+              <FormControl>
+                <Input
+                  id='profile-email'
+                  type='email'
+                  value={email}
+                  disabled
+                  readOnly
+                />
+              </FormControl>
+              <FormDescription>
+                Email changes require verification and are not available here.
+              </FormDescription>
+            </FormItem>
 
             <FormField
               control={form.control}

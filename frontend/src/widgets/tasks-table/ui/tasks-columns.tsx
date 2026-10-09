@@ -115,7 +115,9 @@ export const tasksColumns: ColumnDef<Task>[] = [
     filterFn: (row, columnId, filterValue: string[]) => {
       if (!filterValue || filterValue.length === 0) return true
       const label = row.getValue<TaskLabel | null>(columnId)
+
       if (!label) return false
+
       return filterValue.includes(label.name)
     },
   },
@@ -164,6 +166,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => {
       const attachments = row.original.attachments ?? []
+
       if (attachments.length === 0) {
         return (
           <TablePlaceholder
@@ -172,6 +175,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
           />
         )
       }
+
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <Paperclip className='h-4 w-4' aria-hidden='true' />
@@ -199,6 +203,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
           />
         )
       }
+
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <ListTodo className='text-muted-foreground h-4 w-4' />
@@ -227,6 +232,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
           />
         )
       }
+
       return (
         <div className='flex w-[100px] items-center gap-2'>
           <Calendar

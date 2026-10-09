@@ -24,11 +24,13 @@ const LABEL_COLOR_MAP: Record<string, TEventColor> = {
 
 export const getTaskColor = (task: Task): TEventColor => {
   const label = task.label
+
   return (label ? LABEL_COLOR_MAP[label.color] : 'blue') ?? 'blue'
 }
 
 export const getTaskUser = (task: Task): IUser => {
   const assignee = task.assignees?.[0]
+
   return assignee
     ? {
         id: assignee.userId,

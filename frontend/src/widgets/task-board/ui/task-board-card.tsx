@@ -29,6 +29,7 @@ export const TaskBoardCard = memo(
 
     const handlePointerDown = (task: React.PointerEvent) => {
       const target = task.target as HTMLElement
+
       if (
         target.closest('button') ||
         target.closest('[role="menuitem"]') ||

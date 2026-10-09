@@ -19,7 +19,7 @@ import {
 } from '@tanstack/react-table'
 import { dateFilterFn, dateRangeFilterFn } from '@/shared/ui/data-table'
 import { type Task } from '@/entities/task'
-import { useTasksTableSearchParams } from '@/features/task-filters'
+import { useTaskFiltersController } from '@/features/task-filters'
 import {
   mapColumnFiltersToSearchParams,
   mapSearchParamsToColumnFilters,
@@ -44,7 +44,12 @@ export function useTasksTableState({
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  const [searchParams, setSearchParams] = useTasksTableSearchParams()
+  const {
+    filters: searchParams,
+    setFilters,
+    setSearch,
+    setPagination,
+  } = useTaskFiltersController()
 
   const columnFilters: ColumnFiltersState = useMemo(
     () => mapSearchParamsToColumnFilters(searchParams),
@@ -64,8 +69,7 @@ export function useTasksTableState({
       typeof updater === 'function' ? updater(columnFilters) : updater
     const mapped = mapColumnFiltersToSearchParams(next)
 
-    setSearchParams({
-      page: 1,
+    setFilters({
       status: mapped.status,
       labels: mapped.labels,
       members: mapped.members,
@@ -76,18 +80,14 @@ export function useTasksTableState({
   const onGlobalFilterChange: OnChangeFn<string> = (updater) => {
     const next =
       typeof updater === 'function' ? updater(searchParams.filter) : updater
-    setSearchParams({
-      filter: next ? next.trim() : null,
-      page: 1,
-    })
+
+    setSearch(next ? next.trim() : '')
   }
 
   const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
     const next = typeof updater === 'function' ? updater(pagination) : updater
-    setSearchParams({
-      page: next.pageIndex + 1,
-      perPage: next.pageSize === DEFAULT_PAGE_SIZE ? null : next.pageSize,
-    })
+
+    setPagination(next.pageIndex + 1, next.pageSize)
   }
 
   const table = useReactTable({
@@ -128,11 +128,12 @@ export function useTasksTableState({
 
   // Optionally ensure that page is bounded to pageCount
   const actualPageCount = table.getPageCount()
+
   useEffect(() => {
     if (actualPageCount > 0 && searchParams.page > actualPageCount) {
-      setSearchParams({ page: Math.max(1, actualPageCount) })
+      setPagination(Math.max(1, actualPageCount))
     }
-  }, [actualPageCount, searchParams.page, setSearchParams])
+  }, [actualPageCount, searchParams.page, setPagination])
 
   return table
 }

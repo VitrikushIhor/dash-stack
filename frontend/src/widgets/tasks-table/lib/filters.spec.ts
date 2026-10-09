@@ -15,6 +15,7 @@ describe('tasks-table filters', () => {
 
     it('parses valid numeric timestamps', () => {
       const timestamp = new Date('2024-01-01T00:00:00Z').getTime()
+
       expect(parseDateSafe(String(timestamp))).toBe('2024-01-01T00:00:00.000Z')
     })
 
@@ -37,6 +38,7 @@ describe('tasks-table filters', () => {
         members: [],
         dueDate: [],
       })
+
       expect(filters).toEqual([])
     })
 
@@ -76,6 +78,7 @@ describe('tasks-table filters', () => {
   describe('mapColumnFiltersToSearchParams', () => {
     it('returns null for empty filters', () => {
       const params = mapColumnFiltersToSearchParams([])
+
       expect(params).toEqual({
         status: null,
         labels: null,
@@ -119,6 +122,7 @@ describe('tasks-table filters', () => {
       ]
 
       const params = mapColumnFiltersToSearchParams(filters)
+
       expect(params.dueDate).toEqual([String(validDate.getTime())])
     })
   })

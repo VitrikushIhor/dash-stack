@@ -26,6 +26,7 @@ describe('calendar navigation helpers', () => {
   describe('formatCalendarDate', () => {
     it('formats date to yyyy-MM-dd', () => {
       const date = new Date(2026, 7, 11) // Aug 11, 2026
+
       expect(formatCalendarDate(date)).toBe('2026-08-11')
     })
   })
@@ -39,6 +40,7 @@ describe('calendar navigation helpers', () => {
 
     it('returns month view URL with date query', () => {
       const date = new Date(2026, 7, 11)
+
       expect(getCalendarViewUrl('test-org', 'month', date)).toBe(
         '/organizations/test-org/calendar?date=2026-08-11'
       )
@@ -46,6 +48,7 @@ describe('calendar navigation helpers', () => {
 
     it('returns specific view URL with date query', () => {
       const date = new Date(2026, 7, 11)
+
       expect(getCalendarViewUrl('test-org', 'day', date)).toBe(
         '/organizations/test-org/calendar/day?date=2026-08-11'
       )

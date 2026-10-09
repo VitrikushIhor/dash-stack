@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   UnauthorizedException,
-  BadRequestException,
   ForbiddenException,
 } from '../../../../common/exceptions/domain.exception';
 import { UserRepositoryPort } from '../../ports/outgoing/user.repository.port';
@@ -28,12 +27,9 @@ export class LoginUseCase {
     const email = new Email(command.email);
     const user = await this.userRepo.findByEmailWithPassword(email.value);
 
-    if (!user) {
+    if (!user?.password) {
+      await this.passwordHasher.hashPassword(command.password);
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
-    }
-
-    if (!user.password) {
-      throw new BadRequestException(AUTH_ERRORS.SOCIAL_LOGIN_ONLY);
     }
 
     const passwordValid = await this.passwordHasher.validatePassword(
@@ -49,6 +45,8 @@ export class LoginUseCase {
       throw new ForbiddenException(AUTH_ERRORS.EMAIL_NOT_VERIFIED);
     }
 
-    return this.tokenGenerator.generateTokens(user.id);
+    return command.userAgent
+      ? this.tokenGenerator.generateTokens(user.id, command.userAgent)
+      : this.tokenGenerator.generateTokens(user.id);
   }
 }

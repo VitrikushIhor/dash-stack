@@ -9,6 +9,7 @@ export function useEmitterEvent<
 >(emitter: EventEmitter<T>, event: K, handler: (payload: T[K]) => void) {
   useEffect(() => {
     const unsubscribe = emitter.on(event, handler)
+
     return () => unsubscribe()
   }, [emitter, event, handler])
 }

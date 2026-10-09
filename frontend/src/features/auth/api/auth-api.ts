@@ -1,14 +1,15 @@
 import { type HttpClient } from '@/shared/api'
 import type {
-  AuthTokens,
+  AuthenticatedActionResult,
   SignInInput,
   SignUpInput,
 } from '../model/types/auth.types'
 
 export function createAuthApi(client: HttpClient) {
   return {
-    login: (data: SignInInput) =>
-      client.post<AuthTokens, SignInInput>('/auth/login', data, {
+    login: (data: SignInInput, userAgent?: string) =>
+      client.post<AuthenticatedActionResult, SignInInput>('/auth/login', data, {
+        headers: userAgent ? { 'User-Agent': userAgent } : undefined,
         skipAuth: true,
       }),
 
@@ -18,7 +19,7 @@ export function createAuthApi(client: HttpClient) {
       }),
 
     verifyEmail: (token: string) =>
-      client.post<AuthTokens, { token: string }>(
+      client.post<AuthenticatedActionResult, { token: string }>(
         '/auth/verify-email',
         { token },
         { skipAuth: true }
@@ -45,7 +46,7 @@ export function createAuthApi(client: HttpClient) {
       ),
 
     oauthExchange: (token: string) =>
-      client.post<AuthTokens, { token: string }>(
+      client.post<AuthenticatedActionResult, { token: string }>(
         '/auth/oauth/exchange',
         { token },
         { skipAuth: true }

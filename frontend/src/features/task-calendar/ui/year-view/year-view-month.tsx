@@ -1,23 +1,19 @@
 import { useMemo } from 'react'
-import {
-  format,
-  getDaysInMonth,
-  isSameDay,
-  parseISO,
-  startOfMonth,
-} from 'date-fns'
-import { type Task, getTaskCalendarAnchor } from '@/entities/task'
+import { format, getDaysInMonth, startOfMonth } from 'date-fns'
 import { SHORT_WEEK_DAYS } from '../../lib/constants'
 import { useCalendarNavigation } from '../../lib/navigation'
+import {
+  type CalendarTaskIndex,
+  getCalendarDayTasks,
+} from '../../model/calendar-task-index'
 import { YearViewDayCell } from './year-view-day-cell'
 
 interface IProps {
-  selectedDate: Date
   month: Date
-  tasks: Task[]
+  taskIndex: CalendarTaskIndex
 }
 
-export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
+export function YearViewMonth({ month, taskIndex }: IProps) {
   const { navigateToMonth } = useCalendarNavigation()
 
   const monthName = format(month, 'MMMM')
@@ -27,7 +23,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
     const firstDay = startOfMonth(month).getDay()
 
     const days = Array.from({ length: totalDays }, (_, i) => i + 1)
-    const blanks = Array(firstDay).fill(null)
+    const blanks = Array.from({ length: firstDay }, () => null)
 
     return [...blanks, ...days]
   }, [month])
@@ -36,6 +32,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
 
   const handleClick = () => {
     const firstDay = new Date(month.getFullYear(), month.getMonth(), 1)
+
     navigateToMonth(firstDay)
   }
 
@@ -67,10 +64,7 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
               return <div key={`blank-${index}`} className='h-10' />
 
             const date = new Date(month.getFullYear(), month.getMonth(), day)
-            const dayEvents = tasks.filter((task) => {
-              const anchor = getTaskCalendarAnchor(task)
-              return anchor && isSameDay(parseISO(anchor), date)
-            })
+            const dayEvents = getCalendarDayTasks(taskIndex, date)
 
             return (
               <YearViewDayCell
@@ -78,7 +72,6 @@ export function YearViewMonth({ month, tasks, selectedDate }: IProps) {
                 day={day}
                 date={date}
                 tasks={dayEvents}
-                selectedDate={selectedDate}
               />
             )
           })}

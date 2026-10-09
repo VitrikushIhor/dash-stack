@@ -13,17 +13,20 @@ export async function MemberDetailPage({
   slug,
   userId,
 }: MemberDetailPageProps) {
-  const { data, error } = await getMember({ slug, userId })
+  const result = await getMember({ slug, userId })
 
-  if (error) {
+  if (!result.ok) {
     return (
       <Main>
-        <WidgetErrorState title='Failed to load member' description={error} />
+        <WidgetErrorState
+          title='Failed to load member'
+          description={result.error.message}
+        />
       </Main>
     )
   }
 
-  if (!data) {
+  if (!result.data) {
     return (
       <Main>
         <MemberNotFoundState slug={slug} />
@@ -33,7 +36,7 @@ export async function MemberDetailPage({
 
   return (
     <Main>
-      <MemberDetailView membership={data} slug={slug} />
+      <MemberDetailView membership={result.data} slug={slug} />
     </Main>
   )
 }

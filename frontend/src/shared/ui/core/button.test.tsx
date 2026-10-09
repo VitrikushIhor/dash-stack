@@ -14,6 +14,7 @@ describe('Button', () => {
   it('should apply default variant styles', () => {
     render(<Button>Default</Button>)
     const button = screen.getByRole('button')
+
     expect(button).toHaveAttribute('data-slot', 'button')
   })
 
@@ -24,6 +25,7 @@ describe('Button', () => {
 
   it('should call onClick when clicked', async () => {
     const handleClick = vi.fn()
+
     render(<Button onClick={handleClick}>Click</Button>)
 
     await userEvent.click(screen.getByRole('button'))
@@ -32,6 +34,7 @@ describe('Button', () => {
 
   it('should render with different variants', () => {
     const { rerender } = render(<Button variant='destructive'>Delete</Button>)
+
     expect(screen.getByRole('button')).toBeInTheDocument()
 
     rerender(<Button variant='outline'>Outline</Button>)
@@ -43,6 +46,7 @@ describe('Button', () => {
 
   it('should render with different sizes', () => {
     const { rerender } = render(<Button size='sm'>Small</Button>)
+
     expect(screen.getByRole('button')).toBeInTheDocument()
 
     rerender(<Button size='lg'>Large</Button>)

@@ -3,9 +3,14 @@
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ROUTES } from '@/shared/config'
 import { useAction } from '@/shared/lib'
+import {
+  AUTH_SESSION_EVENT_KIND,
+  publishAuthSessionEvent,
+} from '@/shared/lib/auth-session-events'
 import { sanitizeRedirectUrl } from '@/shared/lib/utils'
 import { signInAction } from '../../api/actions/sign-in.action'
 import {
@@ -20,6 +25,7 @@ interface UseSignInFormProps {
 
 export function useSignInForm(options?: UseSignInFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const form = useForm<TSignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -28,12 +34,15 @@ export function useSignInForm(options?: UseSignInFormProps) {
 
   const { execute: signIn, isPending } = useAction(signInAction, {
     onSuccess: () => {
+      queryClient.clear()
+      publishAuthSessionEvent(AUTH_SESSION_EVENT_KIND.SIGNED_IN)
       toast.success(`Welcome back, ${form.getValues('email')}!`)
 
       const targetPath = sanitizeRedirectUrl(
         options?.redirectTo,
-        ROUTES.organizations
+        ROUTES.vocabDecks
       )
+
       router.replace(targetPath)
     },
   })

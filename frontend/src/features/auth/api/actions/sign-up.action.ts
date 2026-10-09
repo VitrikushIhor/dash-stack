@@ -7,6 +7,6 @@ import { authServerApi } from '../auth-api.server'
 export const signUpAction = createAction(
   signUpSchema,
   async (dto): Promise<{ message: string }> => {
-    return authServerApi.signup(dto)
+    return authServerApi.signup({ email: dto.email, password: dto.password })
   }
 )

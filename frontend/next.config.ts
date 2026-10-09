@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: resolve(__dirname, '../'),
   experimental: {
     authInterrupts: true,
+    serverActions: {
+      bodySizeLimit: '5mb',
+    },
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',
@@ -44,6 +47,14 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
         port: '8000',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.unsplash.com',
       },
       ...(env.AWS_CLOUDFRONT_DOMAIN
         ? [

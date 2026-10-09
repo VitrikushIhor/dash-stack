@@ -11,6 +11,7 @@ export function useReveal() {
     ) {
       return true
     }
+
     return false
   })
 
@@ -18,6 +19,7 @@ export function useReveal() {
     if (visible) return
 
     const el = ref.current
+
     if (!el) return
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -28,7 +30,9 @@ export function useReveal() {
       },
       { threshold: 0.12 }
     )
+
     observer.observe(el)
+
     return () => observer.disconnect()
   }, [visible])
 

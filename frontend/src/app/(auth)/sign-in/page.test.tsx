@@ -16,9 +16,11 @@ describe('SignInRoute App Page', () => {
     const searchParamsPromise = Promise.resolve({ redirect: ROUTES.settings })
 
     const pageElement = await SignInRoute({ searchParams: searchParamsPromise })
+
     render(pageElement)
 
     const view = screen.getByTestId('sign-in-view')
+
     expect(view).toBeInTheDocument()
     expect(view).toHaveAttribute('data-redirect-to', ROUTES.settings)
   })
@@ -27,9 +29,11 @@ describe('SignInRoute App Page', () => {
     const searchParamsPromise = Promise.resolve({})
 
     const pageElement = await SignInRoute({ searchParams: searchParamsPromise })
+
     render(pageElement)
 
     const view = screen.getByTestId('sign-in-view')
+
     expect(view).toBeInTheDocument()
     expect(view).not.toHaveAttribute('data-redirect-to')
   })

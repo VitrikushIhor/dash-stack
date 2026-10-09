@@ -6,6 +6,7 @@ import { ThemeSwitch } from './theme-switch'
 
 function ThemeConsumer() {
   const { theme } = useTheme()
+
   return <div data-testid='current-theme'>{theme}</div>
 }
 
@@ -33,12 +34,15 @@ describe('ThemeSwitch', () => {
     )
 
     const trigger = screen.getByRole('button', { name: /toggle theme/i })
+
     await user.click(trigger)
 
     const systemOption = screen.getByRole('menuitemradio', { name: 'System' })
+
     expect(systemOption).toHaveAttribute('aria-checked', 'true')
 
     const darkOption = screen.getByRole('menuitemradio', { name: 'Dark' })
+
     expect(darkOption).toBeInTheDocument()
     expect(darkOption).toHaveAttribute('aria-checked', 'false')
 

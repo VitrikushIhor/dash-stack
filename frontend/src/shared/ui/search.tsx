@@ -14,6 +14,7 @@ export function Search({
   placeholder = 'Search',
 }: SearchProps) {
   const { setOpen } = useSearch()
+
   return (
     <Button
       variant='outline'

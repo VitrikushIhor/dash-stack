@@ -12,9 +12,11 @@ import { FindAllTasksUnpaginatedUseCase } from './application/use-cases/find-all
 import { TaskController } from './presentation/task.controller';
 import { TaskAssigneeValidatorService } from './application/services/task-assignee-validator.service';
 import { OrganizationModule } from '../organization/organization.module';
+import { LabelModule } from '../label/label.module';
+import { TaskLabelValidatorService } from './application/services/task-label-validator.service';
 
 @Module({
-  imports: [OrganizationModule],
+  imports: [OrganizationModule, LabelModule],
   controllers: [TaskController],
   providers: [
     CreateTaskUseCase,
@@ -26,6 +28,7 @@ import { OrganizationModule } from '../organization/organization.module';
     FindAllTasksUseCase,
     FindAllTasksUnpaginatedUseCase,
     TaskAssigneeValidatorService,
+    TaskLabelValidatorService,
     PrismaTaskRepository,
     {
       provide: 'TaskRepositoryPort',

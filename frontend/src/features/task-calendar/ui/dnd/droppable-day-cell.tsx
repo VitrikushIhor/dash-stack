@@ -1,5 +1,6 @@
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/shared/lib/utils'
+import { type CalendarDayDropData } from '../../model/calendar-task-move'
 import { type ICalendarCell } from '../../model/types'
 
 interface DroppableDayCellProps {
@@ -13,7 +14,7 @@ export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
     data: {
       type: 'day',
       date: cell.date,
-    },
+    } satisfies CalendarDayDropData,
   })
 
   return (

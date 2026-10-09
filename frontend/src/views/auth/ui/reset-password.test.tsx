@@ -5,6 +5,7 @@ import { ResetPassword } from './reset-password'
 
 vi.mock('@/features/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/auth')>()
+
   return {
     ...actual,
     ResetPasswordForm: ({ token }: { token: string }) => (
@@ -23,6 +24,7 @@ describe('ResetPassword Page View', () => {
     ).toBeInTheDocument()
 
     const link = screen.getByRole('link', { name: /request new link/i })
+
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', ROUTES.forgotPassword)
   })

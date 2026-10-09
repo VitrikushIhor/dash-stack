@@ -23,9 +23,16 @@ export class MeController {
 
   @Patch()
   async updateProfile(@Request() req, @Body() dto: UpdateProfileDto) {
+    const { firstName, lastName, dob, bio, urls, avatar } = dto;
+
     return this.updateCurrentUserUseCase.execute({
       userId: req.user.id,
-      ...dto,
+      firstName,
+      lastName,
+      dob,
+      bio,
+      urls,
+      avatar,
     });
   }
 

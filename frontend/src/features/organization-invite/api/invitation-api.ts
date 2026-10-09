@@ -18,5 +18,7 @@ export const createInvitationApi = (client: HttpClient) => ({
     ),
 
   acceptInvite: (token: string) =>
-    client.post<Membership>(`/invitations/${token}/accept`),
+    client.post<Membership, { token: string }>('/invitations/accept', {
+      token,
+    }),
 })

@@ -11,6 +11,7 @@ describe('DirectionScript', () => {
   it('renders a script tag with the correct ID', () => {
     const { container } = render(<DirectionScript />)
     const scriptEl = container.querySelector('#direction-preference')
+
     expect(scriptEl).not.toBeNull()
     expect(scriptEl?.getAttribute('id')).toBe('direction-preference')
   })

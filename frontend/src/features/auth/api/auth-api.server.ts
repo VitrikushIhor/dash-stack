@@ -1,5 +1,8 @@
 import 'server-only'
-import { serverApi } from '@/shared/api/server'
+import { createServerApiClient } from '@/shared/api/server'
+import { persistAuthCookies } from '@/shared/api/session/persist-auth-cookies'
 import { createAuthApi } from './auth-api'
 
-export const authServerApi = createAuthApi(serverApi)
+const authServerHttpClient = createServerApiClient(persistAuthCookies)
+
+export const authServerApi = createAuthApi(authServerHttpClient)

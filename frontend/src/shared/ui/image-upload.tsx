@@ -48,10 +48,12 @@ export function ImageUpload({
   React.useEffect(() => {
     if (!value) {
       setPreview(defaultPreview ?? null)
+
       return
     }
 
     const objectUrl = URL.createObjectURL(value)
+
     setPreview(objectUrl)
 
     return () => URL.revokeObjectURL(objectUrl)
@@ -62,6 +64,7 @@ export function ImageUpload({
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       onFileReject?.(file, 'Unsupported image format')
+
       return
     }
 
@@ -70,6 +73,7 @@ export function ImageUpload({
         file,
         `File size must be less than ${maxSize / 1024 / 1024}MB`
       )
+
       return
     }
 
@@ -78,6 +82,7 @@ export function ImageUpload({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+
     validateAndSetFile(file ?? null)
   }
 
@@ -115,6 +120,7 @@ export function ImageUpload({
     if (disabled) return
 
     const file = e.dataTransfer.files[0]
+
     validateAndSetFile(file)
   }
 

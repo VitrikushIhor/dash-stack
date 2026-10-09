@@ -1,10 +1,9 @@
 export class UpdateCurrentUserCommand {
   userId: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  dob?: string;
-  bio?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  dob?: string | null;
+  bio?: string | null;
   urls?: string[];
-  avatar?: string;
+  avatar?: string | null;
 }

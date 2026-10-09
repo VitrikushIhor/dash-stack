@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BadRequestException } from '../../../../common/exceptions/domain.exception';
 import { VerificationTokenRepositoryPort } from '../../ports/outgoing/verification-token.repository.port';
-import { UserRepositoryPort } from '../../ports/outgoing/user.repository.port';
-import { RefreshTokenRepositoryPort } from '../../ports/outgoing/refresh-token.repository.port';
 import { PasswordHasherPort } from '../../ports/outgoing/password-hasher.port';
+import { PasswordResetTransactionPort } from '../../ports/outgoing/password-reset-transaction.port';
+import { OneTimeTokenPort } from '../../ports/outgoing/one-time-token.port';
 import { TokenExpiryPolicy } from '../../../domain/policies/token-expiry.policy';
 import { AUTH_ERRORS } from '../../../domain/constants/auth-errors';
 import { AuthTokenType } from '../../../domain/enums/token-type.enum';
@@ -15,16 +15,17 @@ export class ResetPasswordUseCase {
   constructor(
     @Inject('VerificationTokenRepositoryPort')
     private readonly verificationTokenRepo: VerificationTokenRepositoryPort,
-    @Inject('UserRepositoryPort')
-    private readonly userRepo: UserRepositoryPort,
-    @Inject('RefreshTokenRepositoryPort')
-    private readonly refreshTokenRepo: RefreshTokenRepositoryPort,
+    @Inject('PasswordResetTransactionPort')
+    private readonly passwordResetTransaction: PasswordResetTransactionPort,
     @Inject('PasswordHasherPort')
     private readonly passwordHasher: PasswordHasherPort,
+    @Inject('OneTimeTokenPort')
+    private readonly oneTimeToken: OneTimeTokenPort,
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<{ message: string }> {
-    const resetToken = await this.verificationTokenRepo.findByToken(command.token);
+    const tokenHash = this.oneTimeToken.hash(command.token);
+    const resetToken = await this.verificationTokenRepo.findByToken(tokenHash);
 
     if (!resetToken) {
       throw new BadRequestException(AUTH_ERRORS.INVALID_RESET_TOKEN);
@@ -38,12 +39,16 @@ export class ResetPasswordUseCase {
 
     const hashedPassword = await this.passwordHasher.hashPassword(command.newPassword);
 
-    await this.userRepo.updatePassword(resetToken.email, hashedPassword);
-    await this.verificationTokenRepo.deleteById(resetToken.id);
+    const completed = await this.passwordResetTransaction.complete({
+      tokenId: resetToken.id,
+      tokenHash,
+      email: resetToken.email,
+      hashedPassword,
+      now: new Date(),
+    });
 
-    const user = await this.userRepo.findByEmail(resetToken.email);
-    if (user) {
-      await this.refreshTokenRepo.deleteAllByUserId(user.id);
+    if (!completed) {
+      throw new BadRequestException(AUTH_ERRORS.INVALID_RESET_TOKEN);
     }
 
     return { message: AUTH_ERRORS.RESET_PASSWORD_SUCCESS };

@@ -1,13 +1,23 @@
+import { WidgetErrorState } from '@/shared/ui/feedback'
 import { getUserOrganizations } from '@/entities/organization/server'
 import { NoOrganizationFallback } from './no-organization-fallback'
 import { TeamSwitcherUI } from './team-switcher-ui'
 
 export async function TeamSwitcher() {
-  const { data: memberships } = await getUserOrganizations()
+  const result = await getUserOrganizations()
 
-  if (!memberships?.length) return <NoOrganizationFallback />
+  if (!result.ok) {
+    return (
+      <WidgetErrorState
+        title='Failed to load organizations'
+        description={result.error.message}
+      />
+    )
+  }
 
-  const activeOrg = memberships[0].organization
+  if (!result.data.length) return <NoOrganizationFallback />
 
-  return <TeamSwitcherUI activeOrg={activeOrg} memberships={memberships} />
+  const activeOrg = result.data[0].organization
+
+  return <TeamSwitcherUI activeOrg={activeOrg} memberships={result.data} />
 }

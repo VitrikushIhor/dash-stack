@@ -11,7 +11,6 @@ const mockInvitation = (
   role: OrgRole.MEMBER,
   orgId: 'org-1',
   invitedBy: 'admin-1',
-  token: 'token-abc',
   expiresAt: new Date(Date.now() + 86400000),
   acceptedAt: null,
   createdAt: new Date(),

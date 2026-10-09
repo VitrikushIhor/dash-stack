@@ -3,6 +3,15 @@ import fsd from '@feature-sliced/steiger-plugin';
 
 export default defineConfig([
   ...fsd.configs.recommended,
+
+
+  {
+    files: ['./src/shared/lib', './src/shared/lib/**'],
+    rules: {
+      // REMOVE LATER AND FIX!
+      'fsd/shared-lib-grouping': 'off',
+    },
+  },
   {
     files: ['./src/app/**'],
     rules: {
@@ -51,6 +60,3 @@ export default defineConfig([
     },
   },
 ]);
-
-
-

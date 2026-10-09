@@ -9,7 +9,6 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -18,10 +17,18 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@common/*": ["src/common/*"],
-      "@task/*": ["src/task/*"],
-      "@organization/*": ["src/organization/*"],
-      "@auth/*": ["src/auth/*"]
-    }
+      "@auth/*": ["./src/auth/*"],
+      "@common/*": ["./src/common/*"],
+      "@email/*": ["./src/email/*"],
+      "@health/*": ["./src/health/*"],
+      "@invitation/*": ["./src/invitation/*"],
+      "@label/*": ["./src/label/*"],
+      "@organization/*": ["./src/organization/*"],
+      "@storage/*": ["./src/storage/*"],
+      "@task/*": ["./src/task/*"],
+      "@user/*": ["./src/user/*"],
+      "@vocab/*": ["./src/vocab/*"]
+    },
+    "types": ["node", "jest"]
   }
 }

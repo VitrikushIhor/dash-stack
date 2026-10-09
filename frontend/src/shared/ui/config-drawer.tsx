@@ -175,6 +175,7 @@ function RadioGroupItem({
 
 function ThemeConfig() {
   const { defaultTheme, theme, setTheme, resetTheme } = useTheme()
+
   return (
     <div>
       <SectionTitle
@@ -218,6 +219,7 @@ function ThemeConfig() {
 
 function SidebarConfig() {
   const { defaultVariant, variant, setVariant } = useLayout()
+
   return (
     <div className='max-md:hidden'>
       <SectionTitle
@@ -280,6 +282,7 @@ function LayoutConfig() {
         onValueChange={(v) => {
           if (v === 'default') {
             setOpen(true)
+
             return
           }
           setOpen(false)
@@ -318,6 +321,7 @@ function LayoutConfig() {
 
 function DirConfig() {
   const { defaultDir, dir, setDir } = useDirection()
+
   return (
     <div>
       <SectionTitle

@@ -28,9 +28,11 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
     let hasCleanup = false
     const cleanups = refs.map((ref) => {
       const cleanup = setRef(ref, node)
+
       if (!hasCleanup && typeof cleanup === 'function') {
         hasCleanup = true
       }
+
       return cleanup
     })
 
@@ -42,6 +44,7 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
       return () => {
         for (let i = 0; i < cleanups.length; i++) {
           const cleanup = cleanups[i]
+
           if (typeof cleanup === 'function') {
             cleanup()
           } else {

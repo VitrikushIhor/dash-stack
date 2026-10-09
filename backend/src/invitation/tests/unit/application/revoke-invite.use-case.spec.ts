@@ -12,7 +12,6 @@ const mockInvitation = (
   role: OrgRole.MEMBER,
   orgId: 'org-1',
   invitedBy: 'admin-1',
-  token: 'token-abc',
   expiresAt: new Date(Date.now() + 86400000),
   acceptedAt: null,
   createdAt: new Date(),
@@ -45,7 +44,7 @@ describe('RevokeInviteUseCase', () => {
     await useCase.execute('inv-1', 'org-1');
 
     expect(repository.findById).toHaveBeenCalledWith('inv-1');
-    expect(repository.delete).toHaveBeenCalledWith('inv-1');
+    expect(repository.delete).toHaveBeenCalledWith('inv-1', 'org-1');
   });
 
   it('should throw InvitationNotInOrgException when invitation is null', async () => {

@@ -68,10 +68,7 @@ export function MembersTabContent({
         </div>
 
         {canManage && (
-          <Button
-            className='gap-2'
-            onClick={() => openInvite(organization.slug)}
-          >
+          <Button className='gap-2' onClick={openInvite}>
             <Plus className='h-4 w-4' />
             Invite Member
           </Button>
@@ -80,7 +77,7 @@ export function MembersTabContent({
 
       <DataTable table={table} />
 
-      <InviteMemberDialog />
+      {canManage && <InviteMemberDialog slug={organization.slug} />}
     </div>
   )
 }

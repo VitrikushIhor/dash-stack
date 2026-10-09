@@ -33,13 +33,12 @@ export interface UserRepositoryPort {
   updateProfile(
     userId: string,
     data: {
-      email?: string;
-      firstName?: string;
-      lastName?: string;
-      dob?: Date;
-      bio?: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      dob?: Date | null;
+      bio?: string | null;
       urls?: string[];
-      avatar?: string;
+      avatar?: string | null;
     },
   ): Promise<UserSummary>;
 }

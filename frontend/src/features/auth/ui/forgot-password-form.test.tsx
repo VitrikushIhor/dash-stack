@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@/shared/lib/test'
 import { ForgotPasswordForm } from './forgot-password-form'
 
 const mockForgotPasswordAction = vi.fn()
+
 vi.mock('../api/actions/forgot-password.action', () => ({
   forgotPasswordAction: (...args: unknown[]) =>
     mockForgotPasswordAction(...args),
@@ -25,6 +26,7 @@ describe('ForgotPasswordForm Component', () => {
 
   it('displays validation error on empty submission', async () => {
     const user = userEvent.setup()
+
     render(<ForgotPasswordForm />)
 
     await user.click(screen.getByRole('button', { name: /continue/i }))
@@ -37,6 +39,7 @@ describe('ForgotPasswordForm Component', () => {
 
   it('submits form with valid email and displays check email confirmation view', async () => {
     const user = userEvent.setup()
+
     mockForgotPasswordAction.mockResolvedValueOnce({ success: true })
 
     render(<ForgotPasswordForm />)

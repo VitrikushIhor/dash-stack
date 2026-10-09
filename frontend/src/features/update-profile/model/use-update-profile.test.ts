@@ -14,8 +14,10 @@ vi.mock('sonner', () => ({
 }))
 
 const mockMutateAsync = vi.fn()
+
 vi.mock('@/shared/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/api')>()
+
   return {
     ...actual,
     useUploadImage: () => ({
@@ -62,13 +64,13 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(
         baseUser,
         {
           firstName: 'Alice Updated',
           lastName: 'Smith',
-          email: 'alice@example.com',
           bio: 'New bio',
           dob: new Date(1995, 4, 15),
           avatar: { kind: 'key', value: 'avatars/old.webp' },
@@ -92,13 +94,13 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(
         baseUser,
         {
           firstName: 'Alice',
           lastName: 'Smith',
-          email: 'alice@example.com',
           bio: 'Old bio',
           dob: new Date(1995, 4, 15),
           avatar: { kind: 'key', value: 'avatars/old.webp' },
@@ -128,11 +130,11 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice',
         lastName: 'Smith',
-        email: 'alice@example.com',
         bio: 'Old bio',
         dob: new Date(1995, 4, 15),
         avatar: { kind: 'file', value: fakeFile },
@@ -156,11 +158,11 @@ describe('useUpdateProfile', () => {
     const { result } = renderHook(() => useUpdateProfile())
 
     let success = false
+
     await act(async () => {
       success = await result.current.updateProfile(baseUser, {
         firstName: 'Alice New',
         lastName: 'Smith',
-        email: 'alice@example.com',
         bio: 'Old bio',
         avatar: { kind: 'none' },
         urls: [{ value: 'https://old.com' }],

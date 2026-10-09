@@ -8,6 +8,7 @@ describe('Browser Cookies Utility (cookies.ts)', () => {
     originalDocumentCookie = document.cookie
 
     let mockCookie = ''
+
     Object.defineProperty(document, 'cookie', {
       get: () => mockCookie,
       set: (val: string) => {
@@ -38,6 +39,7 @@ describe('Browser Cookies Utility (cookies.ts)', () => {
 
     it('returns undefined in SSR environment (typeof document === undefined)', () => {
       const originalDocument = global.document
+
       // @ts-expect-error - Simulating SSR
       delete global.document
 
@@ -60,6 +62,7 @@ describe('Browser Cookies Utility (cookies.ts)', () => {
 
     it('does nothing in SSR environment', () => {
       const originalDocument = global.document
+
       // @ts-expect-error - Simulating SSR
       delete global.document
 
@@ -77,6 +80,7 @@ describe('Browser Cookies Utility (cookies.ts)', () => {
 
     it('does nothing in SSR environment', () => {
       const originalDocument = global.document
+
       // @ts-expect-error - Simulating SSR
       delete global.document
 

@@ -10,7 +10,9 @@ export const updateProfileAction = createAction(
   UpdateUserDtoSchema,
   async (dto) => {
     const res = await userServerApi.updateMe(dto)
+
     revalidatePath(ROUTES.home, 'layout')
+
     return res
   }
 )

@@ -9,6 +9,7 @@ import {
   InvitationAlreadySentException,
 } from '../../../domain/exceptions/invitation-conflict.exception';
 import { OrgNotFoundException } from '../../../domain/exceptions/invitation-not-found.exception';
+import { ForbiddenException } from '../../../../common/exceptions/domain.exception';
 
 const mockInvitation = (
   overrides?: Partial<PendingInvitationReadModel>,
@@ -18,7 +19,6 @@ const mockInvitation = (
   role: OrgRole.MEMBER,
   orgId: 'org-1',
   invitedBy: 'admin-1',
-  token: 'token-abc',
   expiresAt: new Date(Date.now() + 7 * 86400000),
   acceptedAt: null,
   createdAt: new Date(),
@@ -59,7 +59,7 @@ describe('SendInviteUseCase', () => {
     repository.findMembershipByEmailAndOrg.mockResolvedValue(null);
     repository.findPendingByEmailAndOrg.mockResolvedValue(null);
     repository.findOrgById.mockResolvedValue({ name: 'My Org' });
-    repository.create.mockResolvedValue(invitation);
+    repository.create.mockResolvedValue({ invitation, token: 'raw-token' });
     mailer.sendInviteEmail.mockResolvedValue(undefined);
 
     const result = await useCase.execute('org-1', 'admin-1', command);
@@ -78,10 +78,31 @@ describe('SendInviteUseCase', () => {
         expiresAt: expect.any(Date),
       }),
     );
-    expect(mailer.sendInviteEmail).toHaveBeenCalledWith(
-      'user@example.com',
-      invitation.token,
-      'My Org',
+    expect(mailer.sendInviteEmail).toHaveBeenCalledWith('user@example.com', 'raw-token', 'My Org');
+  });
+
+  it('should_remove_pending_invitation_when_email_delivery_fails', async () => {
+    repository.findMembershipByEmailAndOrg.mockResolvedValue(null);
+    repository.findPendingByEmailAndOrg.mockResolvedValue(null);
+    repository.findOrgById.mockResolvedValue({ name: 'My Org' });
+    repository.create.mockResolvedValue({ invitation: mockInvitation(), token: 'raw-token' });
+    mailer.sendInviteEmail.mockRejectedValue(new Error('SMTP unavailable'));
+    repository.delete.mockResolvedValue(undefined);
+
+    await expect(useCase.execute('org-1', 'admin-1', command)).rejects.toThrow('SMTP unavailable');
+    expect(repository.delete).toHaveBeenCalledWith('inv-1', 'org-1');
+  });
+
+  it('should_report_partial_failure_when_delivery_and_cleanup_both_fail', async () => {
+    repository.findMembershipByEmailAndOrg.mockResolvedValue(null);
+    repository.findPendingByEmailAndOrg.mockResolvedValue(null);
+    repository.findOrgById.mockResolvedValue({ name: 'My Org' });
+    repository.create.mockResolvedValue({ invitation: mockInvitation(), token: 'raw-token' });
+    mailer.sendInviteEmail.mockRejectedValue(new Error('SMTP unavailable'));
+    repository.delete.mockRejectedValue(new Error('Database unavailable'));
+
+    await expect(useCase.execute('org-1', 'admin-1', command)).rejects.toThrow(
+      'Invitation delivery failed and pending invitation cleanup failed',
     );
   });
 
@@ -89,7 +110,7 @@ describe('SendInviteUseCase', () => {
     repository.findMembershipByEmailAndOrg.mockResolvedValue(null);
     repository.findPendingByEmailAndOrg.mockResolvedValue(null);
     repository.findOrgById.mockResolvedValue({ name: 'Org' });
-    repository.create.mockResolvedValue(mockInvitation());
+    repository.create.mockResolvedValue({ invitation: mockInvitation(), token: 'raw-token' });
 
     await useCase.execute('org-1', 'admin-1', command);
 
@@ -97,6 +118,19 @@ describe('SendInviteUseCase', () => {
       'user@example.com',
       'org-1',
     );
+  });
+
+  it('should_reject_invitation_when_requested_role_is_owner', async () => {
+    await expect(
+      useCase.execute('org-1', 'admin-1', {
+        email: 'owner@example.com',
+        role: OrgRole.OWNER,
+      }),
+    ).rejects.toThrow(ForbiddenException);
+
+    expect(repository.findMembershipByEmailAndOrg).not.toHaveBeenCalled();
+    expect(repository.create).not.toHaveBeenCalled();
+    expect(mailer.sendInviteEmail).not.toHaveBeenCalled();
   });
 
   it('should throw AlreadyMemberException if user is already a member', async () => {
@@ -139,7 +173,7 @@ describe('SendInviteUseCase', () => {
     repository.findMembershipByEmailAndOrg.mockResolvedValue(null);
     repository.findPendingByEmailAndOrg.mockResolvedValue(null);
     repository.findOrgById.mockResolvedValue({ name: 'Org' });
-    repository.create.mockResolvedValue(mockInvitation());
+    repository.create.mockResolvedValue({ invitation: mockInvitation(), token: 'raw-token' });
 
     const before = new Date();
     await useCase.execute('org-1', 'admin-1', command);

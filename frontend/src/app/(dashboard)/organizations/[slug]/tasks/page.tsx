@@ -1,3 +1,4 @@
+import { PageErrorHandler } from '@/shared/ui/error-state'
 import { TaskKanbanPageView } from '@/views/task'
 import { fetchTaskViewData } from '@/views/task/server'
 
@@ -15,5 +16,9 @@ export default async function OrganizationTaskKanbanPage({
   const { slug } = await params
   const data = await fetchTaskViewData(slug, searchParams)
 
-  return <TaskKanbanPageView slug={data.slug} tasks={data.tasks} />
+  if (!data.result.ok) {
+    return <PageErrorHandler error={data.result.error} withContainer={false} />
+  }
+
+  return <TaskKanbanPageView slug={data.slug} tasks={data.result.data.data} />
 }

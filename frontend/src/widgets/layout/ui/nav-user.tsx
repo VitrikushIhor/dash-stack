@@ -27,7 +27,7 @@ import { useLogout } from '@/features/auth'
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { data: user } = useCurrentUser()
-  const logoutMutation = useLogout()
+  const { handleLogout, isPending } = useLogout()
 
   const displayName = getUserDisplayName(
     user?.firstName,
@@ -36,10 +36,6 @@ export function NavUser() {
   )
   const initials = getUserInitials(user?.firstName, user?.lastName, user?.email)
   const avatarUrl = getFileUrl(user?.avatar) ?? undefined
-
-  const handleLogout = () => {
-    logoutMutation.mutate()
-  }
 
   return (
     <SidebarMenu>
@@ -58,7 +54,7 @@ export function NavUser() {
             avatarUrl={avatarUrl}
             initials={initials}
             onLogout={handleLogout}
-            isLoggingOut={logoutMutation.isPending}
+            isLoggingOut={isPending}
           />
         </DropdownMenu>
       </SidebarMenuItem>

@@ -30,9 +30,11 @@ export const useCreateOrganization = () => {
           values.logo || undefined,
           uploadImage.mutateAsync
         )
+
         logoUrl = resolvedLogoUrl || undefined
       } catch (err) {
         handleServerError(err)
+
         return false
       }
 
@@ -48,11 +50,13 @@ export const useCreateOrganization = () => {
             ? orgResult.validationMessages
             : orgResult.error
         )
+
         return false
       }
 
       toast.success(`Organization ${values.name} created successfully!`)
       options?.onSuccess?.(orgResult.data)
+
       return true
     } finally {
       setIsSubmitting(false)

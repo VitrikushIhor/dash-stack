@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/shared/api'
 import { ROUTES } from '@/shared/config'
+import { UpdateUserDtoSchema } from '@/entities/user'
 import { userServerApi } from '@/entities/user/server'
 import { updateProfileAction } from './update-profile.action'
 
@@ -31,12 +32,12 @@ describe('updateProfileAction', () => {
       avatar: 'avatars/avatar.webp',
       urls: ['https://example.com'],
     }
+
     vi.mocked(userServerApi.updateMe).mockResolvedValue(mockUpdatedUser)
 
     const result = await updateProfileAction({
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
       bio: 'Hello world',
       dob: '1990-01-01',
       avatar: 'avatars/avatar.webp',
@@ -50,7 +51,6 @@ describe('updateProfileAction', () => {
     expect(userServerApi.updateMe).toHaveBeenCalledWith({
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
       bio: 'Hello world',
       dob: '1990-01-01',
       avatar: 'avatars/avatar.webp',
@@ -70,12 +70,12 @@ describe('updateProfileAction', () => {
       avatar: null,
       urls: [],
     }
+
     vi.mocked(userServerApi.updateMe).mockResolvedValue(mockUpdatedUser)
 
     const result = await updateProfileAction({
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
       bio: null,
       dob: null,
       avatar: null,
@@ -86,7 +86,6 @@ describe('updateProfileAction', () => {
     expect(userServerApi.updateMe).toHaveBeenCalledWith({
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
       bio: null,
       dob: null,
       avatar: null,
@@ -94,15 +93,12 @@ describe('updateProfileAction', () => {
     })
   })
 
-  it('fails validation when email is invalid', async () => {
-    const result = await updateProfileAction({
-      email: 'not-an-email',
+  it('rejects email changes', async () => {
+    const result = UpdateUserDtoSchema.safeParse({
+      email: 'changed@example.com',
     })
 
     expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(result.error).toBe('Validation failed')
-    }
     expect(userServerApi.updateMe).not.toHaveBeenCalled()
   })
 
@@ -112,7 +108,7 @@ describe('updateProfileAction', () => {
     )
 
     const result = await updateProfileAction({
-      email: 'taken@example.com',
+      firstName: 'Changed',
     })
 
     expect(result.success).toBe(false)

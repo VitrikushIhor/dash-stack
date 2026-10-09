@@ -13,14 +13,7 @@ export const BaseOrgSchema = z.object({
 
 export const OrganizationIdSchema = z.string().cuid('Invalid organization ID')
 export const OrganizationUserIdSchema = z.string().cuid('Invalid user ID')
-export const OrganizationSlugSchema = z
-  .string()
-  .min(1, 'Slug is required')
-  .max(100)
-  .regex(
-    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-    'Slug must contain only lowercase letters, numbers, and hyphens'
-  )
+export { OrganizationSlugSchema } from '@/shared/model'
 
 export const UpdateOrganizationDtoSchema = z.object({
   name: z.string().min(2).max(50).optional(),
@@ -34,7 +27,9 @@ export const CreateOrganizationDtoSchema = z.object({
   logo: z.string().url().optional(),
 })
 
-export const InvitationTokenSchema = z.string().min(1, 'Token is required')
+export const InvitationTokenSchema = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{43}$/, 'Invalid invitation token')
 export const InvitationIdSchema = z.string().cuid('Invalid invitation ID')
 
 export const SendInviteDtoSchema = z.object({

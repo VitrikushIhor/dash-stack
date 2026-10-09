@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Organization } from '@/entities/organization'
@@ -29,6 +30,21 @@ export const useUpdateOrganizationForm = (
     },
   })
 
+  useEffect(() => {
+    form.reset({
+      name: organization.name,
+      description: organization.description ?? '',
+      logo: organization.logo ?? '',
+      logoFile: undefined,
+    })
+  }, [
+    form,
+    organization.description,
+    organization.id,
+    organization.logo,
+    organization.name,
+  ])
+
   const onSubmit = async (values: UpdateOrgFormValues) => {
     await updateOrganization(organization, values, {
       onSuccess: options.onSuccess,
@@ -39,6 +55,6 @@ export const useUpdateOrganizationForm = (
     form,
     onSubmit: form.handleSubmit(onSubmit),
     isPending,
-    isDirty: !form.formState.isDirty,
+    isDirty: form.formState.isDirty,
   }
 }

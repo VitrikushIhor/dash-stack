@@ -50,13 +50,10 @@ describe('AcceptInviteCard Component', () => {
 
     renderComponent(<AcceptInviteCard token='valid-invite-token' />)
 
-    await waitFor(() => {
-      expect(mockAcceptInviteAction).toHaveBeenCalledWith('valid-invite-token')
-    })
-
     expect(
-      screen.getByText('Your invitation has been accepted!')
+      await screen.findByText('Your invitation has been accepted!')
     ).toBeInTheDocument()
+    expect(mockAcceptInviteAction).toHaveBeenCalledWith('valid-invite-token')
     expect(
       screen.getByText(/you have joined the organization/i)
     ).toBeInTheDocument()
@@ -91,6 +88,7 @@ describe('AcceptInviteCard Component', () => {
 
   it('allows retrying when clicking try again button', async () => {
     const user = userEvent.setup()
+
     mockAcceptInviteAction
       .mockResolvedValueOnce({ success: false, error: 'Network error' })
       .mockResolvedValueOnce({ success: true, data: { id: 'membership-1' } })
@@ -115,6 +113,7 @@ describe('AcceptInviteCard Component', () => {
 
   it('navigates to sign-in when clicking back button on missing token', async () => {
     const user = userEvent.setup()
+
     renderComponent(<AcceptInviteCard />)
 
     await user.click(screen.getByRole('button', { name: /back to sign in/i }))
@@ -124,6 +123,7 @@ describe('AcceptInviteCard Component', () => {
 
   it('navigates to organizations when clicking continue on success', async () => {
     const user = userEvent.setup()
+
     mockAcceptInviteAction.mockResolvedValueOnce({
       success: true,
       data: { id: 'membership-1' },

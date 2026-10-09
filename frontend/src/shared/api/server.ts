@@ -1,1 +1,1 @@
-export { serverApi } from './server-api-client'
+export { serverApi, createServerApiClient } from './http/server-api-client'

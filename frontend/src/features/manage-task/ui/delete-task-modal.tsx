@@ -1,66 +1,70 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
-import { useAction } from '@/shared/lib'
-import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
-import { useTaskSearchParams } from '../model/task-search-params'
-import { useTaskQuery } from '../model/use-task-query'
-import { deleteTaskAction } from '../server'
+import { getErrorMessage } from '@/shared/api'
+import { Skeleton } from '@/shared/ui/core/skeleton'
+import { WidgetErrorState } from '@/shared/ui/feedback'
+import { UrlConfirmDialog } from '@/shared/ui/url-confirm-dialog'
+import { useDeleteTaskModal } from '../model/use-delete-task-modal'
 
 interface DeleteTaskModalProps {
   slug: string
 }
 
 export const DeleteTaskModal = ({ slug }: DeleteTaskModalProps) => {
-  const [{ 'delete-task': deleteId }, setParams] = useTaskSearchParams()
+  const {
+    isOpen,
+    selectedTask,
+    isFetching,
+    isError,
+    error,
+    refetch,
+    handleDelete,
+  } = useDeleteTaskModal(slug)
 
-  const isOpen = !!deleteId
-
-  const { data: fetchedTask, isLoading } = useTaskQuery(slug, deleteId)
-  const selectedTask = deleteId ? (fetchedTask ?? null) : null
-
-  const close = () => {
-    setParams({
-      'delete-task': null,
-    })
-  }
-
-  const { execute: executeDelete } = useAction(deleteTaskAction, {
-    successMessage: 'Task deleted successfully',
-    onSuccess: () => close(),
-  })
-
-  const handleDelete = async () => {
-    if (!selectedTask) return
-    await executeDelete({ slug, id: selectedTask.id })
-  }
+  const isShowErrorState = !isFetching && (isError || !selectedTask?.title)
 
   return (
-    <ConfirmDialog
+    <UrlConfirmDialog.Root
+      queryKey='delete-task'
       destructive
-      open={isOpen}
-      onOpenChange={(open) => !open && close()}
+      enabled={isOpen}
+      disabled={isFetching || isError || !selectedTask?.title}
       handleConfirm={handleDelete}
       className='max-w-md'
-      title={
-        isLoading
-          ? 'Loading task...'
-          : `Delete this task: ${selectedTask?.title} ?`
-      }
-      desc={
-        isLoading ? (
-          <div className='flex items-center justify-center p-8'>
-            <Loader2 className='text-primary h-8 w-8 animate-spin' />
-          </div>
-        ) : (
-          <>
-            Are you sure you want to delete{' '}
-            <strong>{selectedTask?.title}</strong>? <br />
-            This action cannot be undone.
-          </>
-        )
-      }
       confirmText='Delete'
-    />
+    >
+      <UrlConfirmDialog.Header>
+        <UrlConfirmDialog.Title>Delete task</UrlConfirmDialog.Title>
+        <UrlConfirmDialog.Description>
+          {isFetching && (
+            <div className='space-y-3 py-2' aria-busy='true'>
+              <Skeleton className='h-4 w-4/5' />
+              <Skeleton className='h-4 w-2/3' />
+            </div>
+          )}
+          {isShowErrorState ? (
+            <WidgetErrorState
+              size='compact'
+              title='Could not load task'
+              description={getErrorMessage(
+                error ?? 'This task is unavailable. It may have been deleted.'
+              )}
+              onRetry={() => void refetch()}
+              className='rounded-md p-2'
+            />
+          ) : (
+            !isFetching &&
+            selectedTask?.title && (
+              <>
+                Are you sure you want to delete{' '}
+                <strong>{selectedTask.title}</strong>?
+                <br />
+                This action cannot be undone.
+              </>
+            )
+          )}
+        </UrlConfirmDialog.Description>
+      </UrlConfirmDialog.Header>
+    </UrlConfirmDialog.Root>
   )
 }
