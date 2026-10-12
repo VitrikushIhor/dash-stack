@@ -1,18 +1,18 @@
 # Learning — Schema and Dependency Proposal
 
 - Date: 2026-10-09
-- Updated: 2026-10-12 (lifecycle decisions; package research remains dated 2026-10-09)
+- Updated: 2026-10-12 (lifecycle decisions; submit-only design package; core package peer metadata rechecked 2026-10-12)
 - Status: Proposed for review; no schema, migration, dependency, or infrastructure changes applied
 - Product baseline: [Feature specification](FEATURE-SPEC-learning.md)
 - Architecture: [ADR-0010](../../adr/0010-learning-tests-and-topics.md)
 - Delivery sequence: [Implementation plan](IMPLEMENTATION-PLAN-learning.md)
 - Payload proposal: [Question, answer and result contracts](QUESTION-CONTRACTS-learning.md)
 - Lifecycle proposal: [State and operation authorization](STATE-AND-ACCESS-learning.md)
-- Repository inspected: `dev`, `07a6253c`; existing staged documentation is preserved
+- Repository inspected: `docs/learning-contracts`; existing documentation changes preserved
 
 ## 1. Review boundary
 
-This is a concrete relational design and a proposed package list. Table/column names below are proposed database names; they are not existing APIs. The final Prisma definitions and additive SQL migrations require separate review. The specification now fixes authenticated retention at 14 days for unfinished attempts and 3 days for completed results, guest use until page closure, first-administrator assignment through seed, and content/image limits. O-01–O-10 tracks remaining details; nullable expiry fields do not imply unlimited retention.
+This is a concrete relational design and a proposed package list. Table/column names below are proposed database names; they are not existing APIs. The final Prisma definitions and additive SQL migrations require separate review. The specification now fixes authenticated retention at three days for completed results, with no server unfinished attempts, guest use until page closure, first-administrator assignment through seed, and content/image limits. O-01–O-10 tracks remaining details; nullable expiry fields do not imply unlimited retention.
 
 Preserve current NestJS/Prisma/PostgreSQL, authentication, organization roles, REST routes, and Vocabulary models. Add fixed platform permissions independently. Do not bootstrap privileged users from public registration or infer platform rights from an organization role.
 
@@ -37,7 +37,7 @@ Preserve current NestJS/Prisma/PostgreSQL, authentication, organization roles, R
 | `visibility`                             | `PRIVATE`, `UNLISTED`, or `PUBLIC`, default `PRIVATE`                  |
 | `current_version_id`                     | `text?`, same-topic version FK                                         |
 | `access_revision`                        | `integer`, default 0; changed by visibility/block/delete operations    |
-| `published_at`                           | `timestamptz?`, ordering projection maintained on publication          |
+| `published_at`                           | `timestamptz?`, first publication time, never renewed by editing       |
 | `created_at`, `updated_at`, `deleted_at` | Timestamps; only deletion is nullable among creation/update timestamps |
 
 ### `learning_tests`
@@ -52,7 +52,7 @@ Preserve current NestJS/Prisma/PostgreSQL, authentication, organization roles, R
 | `lineage_id`                             | `text`, unique FK to retained lineage node                                               |
 | `access_revision`                        | `integer`, default 0                                                                     |
 | `page_open_count`                        | `bigint`, default 0, nonnegative; serialize as decimal string if exposed through GraphQL |
-| `published_at`                           | `timestamptz?`                                                                           |
+| `published_at`                           | `timestamptz?`, first publication time                                                   |
 | `created_at`, `updated_at`, `deleted_at` | As above                                                                                 |
 
 Required checks: a live resource has an owner; `topic_id IS NULL` exactly when `visibility IS NOT NULL`. Add `UNIQUE(id, owner_user_id)` to topic and test identities where needed by compound ownership FKs. A test's `(topic_id, owner_user_id)` references `(learning_topics.id, owner_user_id)`; a separate simple topic FK ensures topic existence even after owner anonymization. No ownership transfers are introduced in v1.
@@ -65,9 +65,11 @@ Keep a minimal identity tombstone while versions, moderation, or attempts need i
 
 Use separate draft and version tables so editing cannot accidentally update a publication. All editable text below defaults to empty valid draft data; publication applies stricter rules.
 
+Author editor changes reach draft storage only through explicit “Save draft”; they are not periodically autosaved. Preserve optimistic revisions despite manual saving: concurrent tabs can still submit stale snapshots. Publication consumes a saved revision without an implicit content-save step. Topic/exercise revision coordination and learner persistence is submit-only. Copying a draft reads its selected saved server revision, never unsubmitted local edits.
+
 | Table                             | Columns and keys                                                                                                                                                                                                 |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `learning_test_drafts`            | `test_id` PK/FK, `revision integer`, `title text`, `description jsonb`, `schema_version integer`, `updated_at`                                                                                                   |
+| `learning_test_drafts`            | `test_id` PK/FK, `revision integer`, `title text`, `description text`, `schema_version integer`, `updated_at`                                                                                                    |
 | `learning_test_draft_groups`      | `(test_id, group_key)` PK, `position integer`, `title text`, `instruction jsonb`, `material jsonb`; FK to draft                                                                                                  |
 | `learning_test_draft_questions`   | `(test_id, question_key)` PK, `group_key`, `position`, `kind text`, `prompt jsonb`, `configuration jsonb`, `solution jsonb`, `explanation jsonb`; compound FK to its group                                       |
 | `learning_test_versions`          | `id` PK, `test_id` FK, `version_number integer`, `title`, `description`, `schema_version`, `scoring_version integer`, `max_points integer`, `created_at`; unique `(test_id, version_number)` and `(test_id, id)` |
@@ -78,7 +80,7 @@ A question without visible grouping uses a default group with optional empty mat
 
 Question kinds: `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT`, `GAPS`, `MATCHING`. `GAPS` contains typed per-gap modes. Partial/incomplete `solution` values are valid only in drafts.
 
-The question contract proposal specifies the discriminated configuration/solution shapes and publication refinements. Matching uses equal left/right collections and a bijective solution without extra choices. Pin normalization/evaluation through `scoring_version`; text preserves internal whitespace/punctuation/apostrophe distinctions, and results retain exact points with a whole-number percentage display. Remaining Unicode and publication validation choices must be resolved before implementing the decoders/evaluators.
+The question contract proposal specifies the discriminated configuration/solution shapes and publication refinements. Matching uses equal left/right collections and a bijective solution without extra choices. Pin NFC/trim/lowercase/NFC normalization through `scoring_version`; preserve internal whitespace/punctuation/apostrophe distinctions and exact points with a whole-number percentage display. Publication rejects normalized duplicate accepted text answers and requires at least two choice options, two matching pairs and one gap in a gap question. Incomplete drafts remain saveable. These bounded JSON semantic rules belong in publication validation, not a new uniqueness constraint across independent questions. Publication also rejects identical visible options within each choice list while draft saves preserve them. Visible-text label equivalence and matching-side duplicate rejection are agreed; concrete document extraction and transport validation are proposed below.
 
 The `configuration` column contains learner-visible structure; `solution` contains keys. For matching, configuration holds independent left/right elements, while solution holds mappings. For gaps, prompt nodes reference gap IDs and configuration holds input modes/options; acceptable answers belong in solution. Validation ensures IDs are unique and references remain within the question. Column separation reduces accidental disclosure but does not replace allowlisted player projection.
 
@@ -90,7 +92,7 @@ Do not create one table per option type in v1: bounded options are read and vers
 
 | Table                              | Columns and keys                                                                                                                                                        |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `learning_topic_drafts`            | `topic_id` PK/FK, `revision integer`, `title text`, `description jsonb`, `materials jsonb`, `schema_version integer`, `updated_at`                                      |
+| `learning_topic_drafts`            | `topic_id` PK/FK, `revision integer`, `title text`, `description text`, `materials jsonb`, `schema_version integer`, `updated_at`                                       |
 | `learning_topic_draft_exercises`   | `topic_id` FK to draft, `test_id` unique, `position`; PK `(topic_id, test_id)`                                                                                          |
 | `learning_topic_versions`          | `id` PK, `topic_id` FK, `version_number`, `title`, `description`, `materials`, `schema_version`, `created_at`; unique `(topic_id, version_number)` and `(topic_id, id)` |
 | `learning_topic_version_exercises` | `topic_version_id`, `test_id`, `test_version_id`, `position`; PK `(topic_version_id, test_id)`; compound FK `(test_id, test_version_id)` to test version                |
@@ -121,39 +123,21 @@ The current pointer is null at creation. Insert a version before setting its poi
 
 ## 6. Attempts and operation receipts
 
-### `learning_guest_sessions`
+### `learning_guest_sessions` (superseded by section-14 opening capability)
 
-`id text PK`, `credential_hash text UNIQUE`, `created_at`, `last_activity_at`, `expires_at`, `revoked_at?`. Generate credentials using platform crypto and keep only a hash. This is a guest capability for the current open Learning page, not a new user account or a recoverable browser profile. Do not persist a recovery credential. Close, reload or leaving the test resets answers/results; sign-in warns without transferring the attempt. Browser-close notifications cannot guarantee immediate backend deletion. Apply the agreed 24-hour inactivity deadline (`expires_at = last_activity_at + 24 hours`), deny expired capabilities on access and clean their retained data. Exact qualifying activity, delivery and cleanup cadence remain O-02. The authenticated 14-day/3-day windows do not enable guest recovery. Never log or expose credential hashes.
+Guest capability representation is a pending transport/storage proposal. It binds one open page to an authorized immutable version without storing pre-submit answers or an attempt. Never persist a recovery credential, expose credential hashes or restore closed/reloaded pages. The opening binding has a fixed 24-hour deadline; guest completed-result expiry is 24 hours from submission.
 
 ### `learning_test_attempts`
 
-`id text PK`, `test_id`, `test_version_id`, `user_id? FK`, `guest_session_id? FK`, `status text`, `revision integer`, `answers jsonb`, `presentation jsonb`, `result jsonb?`, `started_at`, `updated_at`, `last_activity_at`, `submitted_at?`, `expires_at`.
+`id text PK`, `test_id`, `test_version_id`, `user_id?`, `guest_opening_id?`, `answers jsonb`, `presentation jsonb`, `result jsonb`, `submitted_at`, `expires_at`.
 
-- Exactly one principal: registered user or guest session, enforced with `CHECK`.
-- Composite `(test_id, test_version_id)` FK ensures the version belongs to the test.
-- Status: `ACTIVE`, `SUBMITTED`, `SUPERSEDED`, `EXPIRED`; access denial is derived from current policy, not a new destructive state. `EXPIRED` can serve as a minimal tombstone while answers/results are cleared under the cleanup policy.
-- `presentation` fixes option ordering for this attempt; no answer-key mappings appear there.
-- `answers` is bounded, schema-validated and keyed by question/gap/option identity in the chosen version.
-- `result` is written once during submission and replayed safely; it is not a public result-history API.
-- For authenticated `ACTIVE` attempts, `expires_at = last_activity_at + 14 days`. For authenticated `SUBMITTED` attempts, `expires_at = submitted_at + 3 days`. Require the corresponding dates, and do not extend completed expiry on reads/retries. Define the qualifying user-activity signal under O-01; `updated_at` alone is unsuitable because background maintenance can update a row without user activity.
-- Enforce expiry on read/save/submit even before cleanup. Under the same start/restart transaction, retire an expired active row before creating its replacement. Clear expired answers/results without deleting versions or assets still retained by other valid references. Guest deadlines follow the 24-hour inactivity policy; session/attempt deadline coordination and the qualifying activity signal must be specified together so neither record can grant access after expiry. Cleanup includes guest receipts containing protected outcomes and cannot be bypassed by replay.
-- User/guest principal deletion uses explicit retention workflow and restrictive FKs for this proposal. Do not `SET NULL` and accidentally turn a registered attempt into a guest attempt. Account deletion must erase or anonymize attempt data under O-01 before deleting the principal; this is a deployment gate.
-
-Enforce one active authenticated attempt per test with an SQL partial unique index:
-
-```sql
-CREATE UNIQUE INDEX learning_attempt_one_active_user_test
-  ON learning_test_attempts (user_id, test_id)
-  WHERE status = 'ACTIVE' AND user_id IS NOT NULL;
-```
-
-There is no volatile `now()` predicate in the index. Expired/superseded state changes occur through an explicit transition; an expired `ACTIVE` row cannot strand the user until a scheduled cleanup. Restart and submit are transactional, preventing concurrent submit/restart from overwriting completed results. Uniqueness applies across devices.
+Create this row only during successful submission; answers/result are validated and committed atomically with the operation receipt. Exactly one user/guest principal and version-to-test membership remain enforced. No ACTIVE/SUPERSEDED statuses, answer revision, last-activity fields or partial unique active-user/test index. Multiple tabs may create independent completed attempts. Authenticated expiry is submission plus three days, never renewed by reads/retries. Guest principal/capability representation remains an O-02 proposal; guest results expire 24 hours from submission. Pre-submit version authorization must retain the bound immutable version/media safely without an attempt row; binding lifetime is 24 hours from opening; reference representation remains a design gate. Account deletion uses the agreed immediate denial/hourly erasure policy.
 
 ### `learning_operation_receipts`
 
-`id text PK`, `user_id? FK`, `guest_session_id? FK`, `operation_name text`, `operation_id text`, `payload_hash text`, `outcome jsonb`, `created_at`, `expires_at?`. Exactly one principal, with separate unique constraints for `(user_id, operation_name, operation_id)` and `(guest_session_id, operation_name, operation_id)`.
+`id text PK`, `principal_key text`, `operation_name text`, `operation_id text`, `payload_hash text`, `outcome jsonb`, `created_at`, `expires_at`. Unique `(principal_key, operation_name, operation_id)`; use opaque user/opening identities, not profile fields. Receipt storage never grants authorization; replay rechecks the current principal and target.
 
-Store minimal versioned outcomes/IDs rather than an unrestricted copy of private content. A receipt is committed with its business mutation. Replaying it still checks current session, role, resource access, blocking, deletion and result expiry before returning protected data. Otherwise an old success receipt would bypass immediate revocation or keep an expired result available. A different payload with the same operation key conflicts. Authenticated submission receipts must support reliable replay within the agreed three-day result window, without extending or duplicating result retention. Minimal deduplication tombstone lifetimes and other operation receipt lifetimes remain O-01; they must not retain expired answer/result bodies.
+Store minimal versioned outcomes/IDs rather than an unrestricted copy of private content. A receipt is committed with its business mutation. Replaying it still checks current session, role, resource access, blocking, deletion and result expiry before returning protected data. Otherwise an old success receipt would bypass immediate revocation or keep an expired result available. A different payload with the same operation key conflicts. Submission mutation receipts allow replay for 12 hours from commit; authenticated result retrieval remains available separately for three days. Expired commands are rejected without re-execution through the agreed ticket mechanism. Receipts never duplicate answer/result bodies.
 
 ## 7. Provenance and copying consistency
 
@@ -185,7 +169,7 @@ States: `UPLOADING`, `READY`, `DELETING`; failed/abandoned uploads follow a clea
 
 Uses are at content-container granularity: repeated use of one image in several questions requires one retention link for that container. Captions and placement belong to the rich-text document, not to the shared asset. The server derives uses from validated documents and rejects unauthorized asset attachments; do not trust a client-supplied retention list.
 
-To collect an asset, lock it, recheck there are no live uses and no valid upload lease, set `DELETING`, then commit. Reference creators lock the same asset and accept only `READY`; they cannot attach a deletion-claimed object. Physical deletion happens after commit with a retryable outcome. On failure, keep deletion state rather than reopening it for attachment. A crashed collector can resume. An unreferenced-upload lease is bounded by the later approved policy.
+To collect an asset, lock it, recheck there are no live uses and no valid upload lease, set `DELETING`, then commit. Reference creators lock the same asset and accept only `READY`; they cannot attach a deletion-claimed object. Physical deletion happens after commit with a retryable outcome. On failure, keep deletion state rather than reopening it for attachment. A crashed collector can resume. Section 14 proposes a 24-hour unreferenced-upload lease for approval.
 
 Delivery authenticates a specific currently authorized use and returns protected bytes. A shared asset cannot authorize access merely because a caller knows its ID. Public topic publication does not make every future private use permanently public. Image upload uses a dedicated authenticated HTTP/storage endpoint and returns an asset ID to GraphQL; no multipart-GraphQL package is proposed.
 
@@ -195,7 +179,7 @@ Delivery authenticates a specific currently authorized use and returns protected
 
 `user_id text PK/FK`, `role text CHECK (MODERATOR|SENIOR_MODERATOR|PLATFORM_ADMIN)`, `assigned_by_user_id? FK SET NULL`, `assigned_at`, `revision integer`. One effective graded role per user; absence means no platform privileges. A fixed permission map grants lower-grade capabilities explicitly. No role arrays or generic permission-editor schema in v1.
 
-Read role state freshly for privileged operations. Revocation must not wait for an access token to expire. Role assignment and audit must commit atomically. The first platform administrator is explicitly assigned through seed to a configured account. Organization ownership and ordinary demo-data seeding do not confer that role. Make bootstrap idempotent and prevent ordinary reruns from silently restoring revoked privileges. Account selection, rerun/revocation safeguards, last-admin protection and self-role changes remain O-03; no seed is run by this proposal.
+Read role state freshly for privileged operations. Revocation must not wait for an access token to expire. Role assignment and audit must commit atomically. The first platform administrator is explicitly assigned through seed to a configured account. Organization ownership and ordinary demo-data seeding do not confer that role. Make bootstrap idempotent and prevent ordinary reruns from silently restoring revoked privileges. Apply agreed existing-account ID bootstrap, one-time rerun safeguards, immediate revocation, one-role assignment and last-active-admin protection; no seed is run by this proposal.
 
 ### `learning_moderation_cases`
 
@@ -207,37 +191,37 @@ Test restrictions: `(case_id, lineage_id)` PK/FKs, `applied_at`, `lifted_at?`, `
 
 Topic restrictions: `(case_id, topic_id)` PK/FKs, the same lifecycle fields. Topic identity tombstones remain while cases need them. Effective test access denies any active own restriction or active parent-topic restriction. One case may have many targets; lifting a target does not clear another case. Case closure requires no active target restrictions.
 
-Lineage-wide action can include private descendants without granting a senior moderator their content. The exact safe count/metadata preview is an O-07 gate. Both author APIs and media delivery deny blocked content. Only an authorized moderation review pathway may retrieve it; administrators must provide a reason for private content review.
+Lineage-wide action can include private descendants without granting a senior moderator their content. Preview uses the agreed total counts and authorized published metadata; hidden/private-unpublished targets expose only aggregate counts. Both author APIs and media delivery deny blocked content. Only an authorized moderation review pathway may retrieve it; administrators must provide a reason for private content review.
 
 ### `platform_audit_events`
 
 `id PK`, `actor_user_id? FK SET NULL`, `action text`, `target_kind text`, `target_id text`, `reason text`, `request_id text`, `occurred_at`, `details jsonb` with a strict allowlist. Audit target identity is intentionally an immutable event value rather than a cascading content FK. This preserves evidence after a target is removed; it is not used to authorize resource loading.
 
-Record private review authorization, block/unblock/delete, and role changes. Do not retain names, emails, tokens, private document bodies or learner answers in `details`. Subject identifiers and retention require O-07/O-08 decisions. A denied privileged action must not accidentally return content if its audit write fails.
+Record private review authorization, block/unblock/delete, and role changes. Do not retain names, emails, tokens, private document bodies or learner answers in `details`. Apply agreed one-year immutable administrator-only audit retention and opaque account-deletion identifiers. A denied privileged action must not accidentally return content if its audit write fails.
 
 ## 10. Constraints, access paths, and deletion order
 
 PostgreSQL supports partial unique indexes and composite FKs. Cross-table conditions must not be hidden inside `CHECK` expressions: use actual FKs or transactionally verified invariants. Custom database features require reviewed SQL where the installed Prisma version cannot express them. See [PostgreSQL constraints](https://www.postgresql.org/docs/15/ddl-constraints.html) and [Prisma custom database features](https://www.prisma.io/docs/orm/v7/prisma-schema/data-model/unsupported-database-features).
 
-| Access path                  | Proposed supporting index                                                                                                                    |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Owner library                | Tests/topics `(owner_user_id, updated_at DESC, id)`                                                                                          |
-| Public catalog               | Partial index on `(published_at DESC, id)` for public, published, nondeleted standalone tests/topics; restriction checks remain required     |
-| Exercise composition         | Unique `(parent_id, position)` for each draft/version composition                                                                            |
-| Resource/version association | Unique `(test_id, id)` or `(topic_id, id)` on versions                                                                                       |
-| Latest active attempt        | Partial unique user/test index plus `(guest_session_id, test_id)` for guest lookups                                                          |
-| Attempt retention            | `(expires_at, id)` plus status filtering and indexed version FK; deadlines use `last_activity_at` or `submitted_at`, not maintenance updates |
-| Descendant discovery         | `(parent_id, id)` and `(root_id, id)`                                                                                                        |
-| Effective restrictions       | Partial `(lineage_id)` / `(topic_id)` where `lifted_at IS NULL`; separate case-target keys                                                   |
-| Media cleanup                | `(state, created_at, id)` plus `asset_id` and parent indexes on uses                                                                         |
-| Receipt expiry               | `(expires_at, id)`                                                                                                                           |
-| Moderation audit             | `(occurred_at, id)`, `(actor_user_id, occurred_at)` and `(target_kind, target_id, occurred_at)`                                              |
+| Access path                  | Proposed supporting index                                                                                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Owner library                | Tests/topics `(owner_user_id, updated_at DESC, id)`                                                                                      |
+| Public catalog               | Partial index on `(published_at DESC, id)` for public, published, nondeleted standalone tests/topics; restriction checks remain required |
+| Exercise composition         | Unique `(parent_id, position)` for each draft/version composition                                                                        |
+| Resource/version association | Unique `(test_id, id)` or `(topic_id, id)` on versions                                                                                   |
+| Latest submitted result      | Principal/test/submission-time index for latest authorized result; no active uniqueness                                                  |
+| Attempt retention            | `(expires_at, id)` and indexed version FK; deadlines use `submitted_at`, not maintenance updates                                         |
+| Descendant discovery         | `(parent_id, id)` and `(root_id, id)`                                                                                                    |
+| Effective restrictions       | Partial `(lineage_id)` / `(topic_id)` where `lifted_at IS NULL`; separate case-target keys                                               |
+| Media cleanup                | `(state, created_at, id)` plus `asset_id` and parent indexes on uses                                                                     |
+| Receipt expiry               | `(expires_at, id)`                                                                                                                       |
+| Moderation audit             | `(occurred_at, id)`, `(actor_user_id, occurred_at)` and `(target_kind, target_id, occurred_at)`                                          |
 
-Do not add broad JSONB GIN indexes until a concrete query uses JSON predicates. Catalog filter indexes follow the still-open metadata contract. PostgreSQL does not automatically index every referencing FK; include the required reference/deletion lookup indexes in migration review.
+Do not add broad JSONB GIN indexes until a concrete query uses JSON predicates. Catalog indexes follow agreed level/newest/views/title access paths; add only indexes justified by those queries. PostgreSQL does not automatically index every referencing FK; include the required reference/deletion lookup indexes in migration review.
 
-Apply the agreed configuration limits to all write/copy/duplicate paths: 100 questions and 20 groups per test; 10 options per choice question/selectable gap; 20 gaps or matching pairs per question; 50 exercises per topic. Validate each image input at no more than 5 MiB (5,242,880 bytes), with JPEG/PNG/WebP content. These are configurable application-boundary limits, not cross-row `CHECK` subqueries. Check aggregate counts under the parent's mutation lock so concurrent additions cannot exceed the limit. Additional text/pixel-count/image-count/request limits remain O-04.
+Apply the agreed configuration limits to all write/copy/duplicate paths: 100 questions and 20 groups per test; 10 options per choice question/selectable gap; 20 gaps or matching pairs per question; 50 exercises per topic. Validate each image input at no more than 5 MiB (5,242,880 bytes), with JPEG/PNG/WebP content. These are configurable application-boundary limits, not cross-row `CHECK` subqueries. Check aggregate counts under the parent's mutation lock so concurrent additions cannot exceed the limit. Apply all approved text, dimensions, insertion and request limits from specification section 8.
 
-Physical cleanup must first establish no live current pointer, active/retained attempt, or retained topic version needs a test version. Remove eligible topic-version exercise links before test versions; remove child questions/groups and media uses with their eligible container. Only then can unreferenced assets be claimed for deletion. Provenance and audit follow their own approved retention, not content cascades.
+Physical cleanup must first establish no live current pointer, unexpired opening binding/retained result, or retained topic version needs a test version. Remove eligible topic-version exercise links before test versions; remove child questions/groups and media uses with their eligible container. Only then can unreferenced assets be claimed for deletion. Provenance and audit follow their own approved retention, not content cascades.
 
 Topic deletion's keep/delete choice operates on all owned membership, including unpublished and pending-removal copies. A former exercise already detached by a completed publication is no longer a current member and is not deleted again. Publication/removal locks prevent it escaping or joining the deletion set midway. Independent copies elsewhere are unaffected. Logical deletion denies access immediately even when retained evidence prevents physical cleanup.
 
@@ -247,7 +231,7 @@ Blocked-topic deletion needs no moderator approval or new review. Kept exercises
 
 ## 11. Dependency proposal and evidence
 
-Registry metadata and official documentation were checked on 2026-10-09. Version compatibility below is based on declared peer ranges and the inspected repository, not an installation/build proof. Pin initial candidates exactly when approved, retain the lockfile, and recheck advisories and transitive licenses before installation. No package was installed for this proposal.
+Initial registry research was 2026-10-09. On 2026-10-12 rechecked exact peer/license metadata for Nest GraphQL/Apollo 13.4.5, Apollo Server 5.5.1, Express integration 1.1.2, GraphQL 16.14.2, Tiptap React/StarterKit 3.31.4 and Codegen client preset 6.2.2. Other listed package versions retain their earlier research date. Version compatibility below is based on declared peer ranges and the inspected repository, not an installation/build proof. Pin initial candidates exactly when approved, retain the lockfile, and recheck advisories and transitive licenses before installation. No package was installed for this proposal.
 
 The installed local tree currently resolves Nest common/platform-express `11.2.1`, Prisma client `7.9.1`, React `19.x`, and Zod `4.4.3`; package manifests express ranges. Node is `22.12.0`; container definitions use Node 22 and PostgreSQL 15. Reverify the target deployment rather than treating a local resolution as a production guarantee.
 
@@ -302,7 +286,7 @@ Server packages add zero intended browser bytes. Codegen packages run during dev
 
 1. Add new platform authority/audit and Learning identity/lineage/content tables, nullable current-version pointers, and ownership constraints. Implement the agreed first-administrator seed only after explicit account selection and bootstrap safeguards are defined; do not grant roles implicitly as a side effect of DDL or ordinary demo seeding. Seed execution is a separate authorized action. Integrate account deletion prerequisites before enabling the new FKs in a writable environment.
 2. Add topic composition and exact-version FKs, then the protected-media tables and referential constraints. Use new protected storage namespaces; changes to bucket policies or deployment are separate approval items.
-3. Add guest sessions, attempts, operation receipts and partial unique indexes with the agreed retention fields. Add moderation cases/targets and lookup indexes before exposing copy/publication endpoints.
+3. Add opening bindings, completed attempts, operation receipts and their uniqueness/expiry indexes with the agreed retention fields. Add moderation cases/targets and lookup indexes before exposing copy/publication endpoints.
 4. Validate every forward/reversal script on an isolated database and verify Prisma schema drift handling for custom checks, deferred constraints and partial indexes. Test with the actual installed Prisma version; do not assume a preview feature is available or enabled.
 
 New-table DDL can use ordinary transactional index creation before serving traffic. Do not request concurrent index creation by default for empty new tables. Use explicit bounded lock/statement timeouts in deployment procedures. Production data cleanup, migration execution and seed changes need approval.
@@ -311,7 +295,7 @@ Before data exists, reversal removes dependent new FKs/tables in reverse order a
 
 ## 13. Review outcome and next approval
 
-Authenticated retention windows (14/3 days), guest reset on close/reload/leave, sign-in warning/no transfer, 24-hour guest inactivity expiry, first-administrator seed and content/image limits are agreed. Source selection/public topic exercise copying and blocked-topic deletion without new review are also agreed. Remaining cleanup/receipt policy, activity signals/capability delivery, bootstrap safeguards, payload bounds, restriction propagation, private moderation preview and deleted-author attribution still require finalization before the dependent migration/API.
+Authenticated three-day result retention and submit-only creation, guest reset on close/reload/leave, sign-in warning/no transfer, 24-hour guest opening-binding expiry, first-administrator seed and content/image limits are agreed. Source selection/public topic exercise copying and blocked-topic deletion without new review are also agreed. Product policy is agreed; section 14 consolidates the engineering mechanisms and budgets for review before the dependent migration/API.
 
 Requested design approval, before producing a migration/package change:
 
@@ -320,3 +304,44 @@ Requested design approval, before producing a migration/package change:
 - The related Express type alignment and backend Zod addition; conditional DataLoader only where batching is needed.
 
 After agreement, prepare exact Prisma declarations and SQL in a reviewable migration proposal, plus a precise manifest/lockfile change set. Creating/applying migrations, modifying dependencies, changing infra, or assigning roles remains separately authorized work. No dependencies have been installed and no database has been contacted for this document.
+
+## 14. Consolidated implementation proposal — 2026-10-12
+
+This section supersedes older active-attempt/activity-renewal proposals. Product decisions are agreed; the concrete mechanisms and numeric engineering budgets below are proposed for approval, not installed or executed.
+
+### A. Opening binding, submission and replay
+
+- Add `learning_test_openings`: `id`, `test_id`, `test_version_id` (compound membership FK), `user_id?`, `guest_secret_hash?`, `presentation_seed`, `created_at`, `expires_at`, `submitted_attempt_id?`. Exactly one principal mode. No answers, result, mutable answer revision or ACTIVE status. Expiry is opening +24 hours. Index expiry and version FK; the row temporarily retains that version/media. Guest secret is 32 random bytes from platform crypto, hashed in storage and held only in page memory; deliver it only in an uncached same-origin response, never URL/log/browser storage. Authenticated openings bind the existing session's user. Role/session/access checks remain current on every operation.
+- `openLearningTest` is a mutation because it establishes the opening lease; catalog/prefetch reads never create it or count a view. Pass a page-opening operation identity to deduplicate retries. Return allowlisted content, presentation and expiry. A lightweight internal opening lease is not a saved learner attempt and cannot restore answers. Independent tabs receive independent leases.
+- `submitLearningTest` accepts opening capability, operation ticket and full answer snapshot. Lock/recheck opening, principal, current test/topic access, expiry and version membership; validate/evaluate and create completed attempt plus receipt atomically. Bind one completion to an opening with a unique opening FK; changed payload on replay conflicts. A new retake requires a new opening. If submission fails, no completed row exists and client inputs remain local. Current ordinary republication does not change the bound version.
+- Completed attempts retain required answers/result/presentation only after submit: user +3 days, guest +24 hours. Successful submit returns a separate page-bound guest result capability so expiry of the opening does not prematurely expire the submitted result. Result and media endpoints validate the relevant capability, principal, retention and current access. No credential recovery or user-answer transfer on sign-in.
+- Issue bounded server-authenticated operation tickets using platform crypto; bind principal, operation and nonce with a server-issued admission deadline. Admission window is 12 hours. A committed receipt lasts 12 hours from commit; an authorized replay can use the receipt during that window even if admission has ended. If no receipt exists and the ticket is expired, reject without re-execution. Client clocks/UUID timestamps are not trusted. Store hashes/referenced outcome identifiers only, not duplicate answer bodies. Clean expired receipts hourly. Define ticket version/key rotation without a new signing library; environment configuration is a separately reviewable change.
+- Preserve an expired-result distinction with a short opaque result locator authenticated to the original principal; after result cleanup it reveals no scores/content. A new result locator cannot restore erased data. Final locator encoding must not expose profile data.
+
+### B. Document contract and bounds
+
+Application-owned `schemaVersion: 1` document nodes: root, paragraph, text, hard break, heading (levels 1–3), ordered/bullet list, list item, blockquote, figure (authorized asset ID plus plain-text caption), and inline gap (ID only). Marks: bold, italic, underline and HTTP(S) link. Field-specific allowlists enforce the agreed editor restrictions; labels permit text and three style marks only. Gaps occur only in eligible prompt paragraphs/list paragraphs, never headings/links/captions/other gaps. No arbitrary editor JSON attributes, HTML, styles, external image URLs or solution-bearing metadata.
+
+Proposed defensive limits: depth 12; 10,000 nodes per rich document; list nesting 3; 2,048 characters per link URL; 2,000 characters per image caption/alt description; 20 accepted alternatives per typed answer/gap. Apply existing 1 MiB/document and 10 MiB/full draft-save request caps as well as visible-text limits. Answer-submit request cap 2 MiB accommodates bounded 100 questions ×20 gaps ×500-character inputs; reject overflow without partial writes. Count graphemes across joined inline text, not per formatting span; block/hard-break boundaries add one newline. Images add no text; captions count as visible text. Gap numbering is generated presentation, not author text. Use the same versioned extraction on client/server. Duplicate-label comparison uses NFC, edge trim and collapse of ordinary U+0020 space runs, preserving case/punctuation.
+
+### C. GraphQL and repository boundaries
+
+Keep existing REST. Code-first Nest GraphQL 13/Apollo 5/GraphQL 16 remains the proposed compatible set; use existing frontend fetch/session handling and TanStack Query, with generated string operations and runtime Zod decoding. Use distinct author/player/result/moderation DTOs and field-level projections; no unrestricted JSON scalar for arbitrary question/document payloads. Typed nested DTOs validate at the transport boundary and application-owned discriminated decoders validate stored JSON. Domain services depend on repository/storage/clock ports rather than GraphQL/Prisma/editor types.
+
+Proposed API budgets: one operation per request, no HTTP batch arrays, maximum query depth 8, weighted cost 1,000 (list multipliers include bounded page sizes), operation timeout 15 seconds, upload timeout 30 seconds. Draft mutations allow the agreed 10 MiB payload; ordinary reads/submit obey lower per-operation bounds. Lists default 20/max50 with deterministic ID tie-breakers; literal case-insensitive substring search uses escaped ORM parameters. No fuzzy/full-text/trigram dependency initially. Platform role account picker is paginated and administrator-only.
+
+Reuse existing throttler through a GraphQL-aware adapter: proposed guest openings 30/minute/IP, submits 30/minute/IP; authenticated openings/submits 60/minute/user; upload 10/minute/user. Return explicit retry information and preserve local inputs. These are request safety limits, not limits on total retakes. Shared-IP impact must be checked before release; do not silently add active-session count caps. In-memory limits are only single-process protection; a multi-instance deployment needs an approved shared enforcement design before claiming global limits.
+
+### D. Protected images and cleanup
+
+Current source already has a private attachment controller/provider path; existing image paths remain public. Extend authorized storage through a dedicated Learning adapter and namespace rather than assuming all existing storage is public or modifying unrelated attachment behavior. Upload one image via authenticated same-origin multipart REST (outside GraphQL); validate decoded image/bytes/dimensions through installed Sharp, reject animation/multiple frames in v1, normalize orientation and strip metadata. Store privately and return an owned asset ID. No new image-processing dependency. Private S3/local deployment routing must be verified before release; no bucket/infra modification is authorized here.
+
+Serve Learning images through authorized same-origin delivery with no-store; guest access uses page capability, never a persistent public asset URL. Use fetch/blob presentation for guest images so the secret need not enter a URL; revoke blob URLs on disposal. Do not use public CDN URLs or unauthenticated static routes for Learning assets. Lock assets during reference creation/deletion claims. Proposed unreferenced-upload lease: 24 hours from upload; cleanup hourly only when no draft/version/opening/result/evidence/copy reference retains the asset. Logical block/deletion denies future reads immediately; cleanup cannot retract already delivered bytes.
+
+### E. Moderation and approval scope
+
+Keep fixed single platform roles, one-time account-ID bootstrap and atomic last-active-admin protection. Staff never read unpublished content. Individual/lineage restrictions are independent case targets; when deleting a blocked topic with kept exercises, propagate existing case targets transactionally before detachment without a new review. Lock lineage roots, sorted topics/tests/openings, then assets consistently. Reject stale impact confirmation; if any selected target is the actor's own content, reject self-moderation rather than secretly omitting targets or revealing hidden bodies. Evidence and audit follow agreed 30-day post-case/one-year policies; profile fields are erased on account deletion while required opaque IDs remain.
+
+No new queue/scheduler dependency: propose an hourly idempotent maintenance command following existing maintenance patterns. Scheduling it in deployment is a separate infrastructure approval. Existing retained references—not guessed age alone—decide content/file eligibility.
+
+Approval covers the proposed document budgets, opening/receipt representation, media flow and dependency family. Actual Prisma/schema/migration files, package installation, lockfile changes, seed execution, infrastructure and deployment require their applicable explicit authorization. No database or runtime code changed for this package.

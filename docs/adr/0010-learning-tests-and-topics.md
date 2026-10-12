@@ -25,7 +25,7 @@ Add a Learning module with domain, application, infrastructure, and GraphQL pres
 
 Resolvers validate/map inputs and invoke authorized use cases. Domain errors map to transport errors at the boundary. Separate GraphQL editor/player/result types; do not expose ORM entities or an unrestricted question JSON scalar. Question types use discriminated internal contracts, with type-specific evaluation strategies.
 
-The question contract proposal makes those boundaries concrete for all five v1 kinds, including mixed gap modes and one-to-one matching. Keep scoring unit identity separate from question identity: choice/text contribute one unit, gaps and matching contribute one unit per gap/left element. Reject malformed answers before evaluation; omissions remain valid zero-point units. Exact points are canonical; displayed percentages are whole numbers. Remaining normalization, document and transport details are explicit O-10 work.
+The question contract proposal makes those boundaries concrete for all five v1 kinds, including mixed gap modes and one-to-one matching. Keep scoring unit identity separate from question identity: choice/text contribute one unit, gaps and matching contribute one unit per gap/left element. Reject malformed answers before evaluation; omissions remain valid zero-point units. Pin the agreed NFC/trim/lowercase/NFC normalizer to the scoring version. Publication rejects normalized duplicate accepted alternatives and enforces the agreed two-option/two-pair/one-gap minima while incomplete drafts remain saveable. Exact points are canonical; displayed percentages are whole numbers. Identical visible options within a choice list also block publication while remaining saveable in drafts. Rich-label comparison, matching-side duplicate policy, document and transport details remain O-10 work.
 
 Adapt request-context extraction, session verification, CSRF protection, and error filters for GraphQL. Preserve REST behavior with regression tests. Reuse existing session refresh infrastructure in a same-origin frontend GraphQL path; finalize its route and authentication error contract before coding. A transport error must not silently become a guest session.
 
@@ -57,9 +57,11 @@ These are conceptual responsibilities, not a promise of one SQL table per row. T
 
 Use relational ownership, ordering, version links, access, and attempt identity. Type-specific question configuration and rich-text documents may use schema-versioned JSONB with runtime/semantic validation. Do not store an entire unvalidated test as an opaque blob. Draft schemas allow incomplete author input; publication schemas enforce playable content.
 
+Author drafts are saved explicitly through “Save draft”, superseding the earlier autosave proposal. Keep unsaved editor state local to the tab and warn before discarding it. Publishing is separate and consumes an already-saved server draft; dirty/saving/conflicted editors must save or resolve the conflict first. Optimistic revisions remain necessary across tabs/devices. A stale save retains local input and offers a warned reload; no automatic merge or force overwrite is added. Learner answers remain local and are persisted only on whole-test submission.
+
 Store visibility separately from moderation restrictions and deletion. For an embedded test, effective visibility comes from its topic. Parent membership, desired draft composition, and membership in the current publication are distinct. A new draft-only exercise cannot become publicly readable simply because its topic is public.
 
-Visibility changes are immediate and never publish drafts. Ordinary user access requires the relevant publication, current access eligibility, absence of effective blocks, and absence of logical deletion. Reading an old version is permitted only for an authorized use such as an active attempt or moderation; possession of a version ID grants no authority.
+Visibility changes are immediate and never publish drafts. Ordinary user access requires the relevant publication, current access eligibility, absence of effective blocks, and absence of logical deletion. Reading an old version is permitted only for an authorized use such as an authorized open-page version binding, retained result or moderation; possession of a version ID grants no authority.
 
 ### 3. Publish a topic as one coherent transaction
 
@@ -78,13 +80,13 @@ Use `expectedRevision` and a principal/operation-scoped `operationId` for retria
 
 ### 4. Retain snapshots for attempts, but reevaluate permissions
 
-Authenticated users have at most one active attempt per test, enforced at the database level. A test version determines content and scoring for that attempt. Start again atomically supersedes the previous active attempt; submit atomically stores its terminal result. Concurrent start, restart, autosave, and submit must not create two active attempts or mutate completed answers.
+Create a completed attempt only on successful whole-test submission. Before submission, answers exist only in the current tab: no server answer saves, active-attempt rows, cross-device recovery or learner-save conflicts. Each tab is independent. Opening returns an authorized server-verifiable binding to the displayed immutable content/scoring version without creating an attempt. Submit all current answers and that binding; recheck current access and atomically validate, evaluate, persist the completed attempt/result and minimal operation receipt. Failed submission preserves local answers and creates no partial attempt. Warn before leaving with unsubmitted answers; closing/reloading loses them. Local “Start again” confirms clearing local inputs rather than superseding server state. Retain authenticated results for three days from submission, without renewal on reads/retries. Repeat of the same submit operation cannot create another completion. The former 14-day unfinished retention and one-active-attempt constraints are superseded.
 
 Reevaluate access on reads, saves, and submission. A detached exercise becomes private, so another user's saved attempt becomes inaccessible even though its version is retained. Ordinary content updates allow continuation against the previous version. Authorization failure retains answers unless an explicitly agreed deletion/retention policy applies.
 
-Guest attempts need a server-issued session/capability and version binding, not an arbitrary public attempt ID. Guests use only the current open page: close, reload or leaving the test resets answers/results. Sign-in warns about losing the attempt and never transfers answers. Do not persist a recovery credential. Guest server data expires after 24 hours without activity, with expiry enforced before cleanup; browser-close notifications cannot guarantee immediate deletion. Capability delivery, activity signal and cleanup cadence remain open. Player payloads expose no keys; matching returns independent choice collections rather than correct pair mappings. Keep randomized choice identity/order stable within an attempt. Evaluate only identifiers from its version.
+Guest attempts need a server-issued session/capability and version binding, not an arbitrary public attempt ID. Guests use only the current open page: close, reload or leaving the test resets answers/results. Sign-in warns about losing the attempt and never transfers answers. Do not persist a recovery credential. The guest opening binding expires 24 hours from opening, with expiry enforced before cleanup; browser-close notifications cannot guarantee immediate deletion. Capability delivery, capability delivery remains proposed; hourly cleanup is agreed. Player payloads expose no keys; matching returns independent choice collections rather than correct pair mappings. Keep randomized choice identity/order stable within an attempt. Evaluate only identifiers from its version.
 
-Pin scoring behavior as well as content. Authenticated unfinished attempts expire **14 days after last activity**; completed results expire **3 days after submission**, without renewal on replay. Enforce expiry on access even if cleanup has not run. Atomically retire expired active attempts before starting a replacement so the uniqueness constraint does not strand the user. Retain versions/media only while other valid references still require them. Technical tombstones may retain minimal operation identity under the later receipt policy but must not keep expired answers/results retrievable. Completion storage does not add a history screen. Define the user-activity signal and cleanup cadence under O-01; background polling must not reset inactivity.
+Pin content/scoring through an authorized version binding issued on opening without an attempt row. Authenticated completed results expire three days after submission. No unfinished attempt retention or active uniqueness applies. Cleanup is hourly and receipts last 12 hours. Opening bindings last 24 hours without renewal; Guest completed results expire 24 hours from submission. The schema proposal section 14 supplies version-reference representation for review.
 
 ### 5. Copy content independently; preserve only provenance links
 
@@ -128,19 +130,19 @@ Evaluate role assignments with an explicit freshness/revocation policy instead o
 
 Before generating a schema, define typed editor/player/result projections and input variants for every question type. Proposed operation groups:
 
-| Group          | Operations                                                                              |
-| -------------- | --------------------------------------------------------------------------------------- |
-| Read           | Paginated catalog/library, published test/topic, owner draft, active attempt            |
-| Author         | Create test/topic/exercise, save draft, preview, copy into topic, remove draft exercise |
-| Publish/access | Publish test/topic, immediate visibility change                                         |
-| Lifecycle      | Delete standalone test, delete topic with exercise choice                               |
-| Attempt        | Start, continue, restart, save answers, submit                                          |
-| Moderation     | Safe impact preview, block single/lineage/topic, unblock case, administrative delete    |
-| Platform roles | Assign/revoke fixed roles through administrator-only operations                         |
+| Group          | Operations                                                                                |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| Read           | Paginated catalog/library, published test/topic, owner draft, authorized submitted result |
+| Author         | Create test/topic/exercise, save draft, preview, copy into topic, remove draft exercise   |
+| Publish/access | Publish test/topic, immediate visibility change                                           |
+| Lifecycle      | Delete standalone test, delete topic with exercise choice                                 |
+| Attempt        | Issue version binding, submit full local snapshot, retrieve authorized result             |
+| Moderation     | Safe impact preview, block single/lineage/topic, unblock case, administrative delete      |
+| Platform roles | Assign/revoke fixed roles through administrator-only operations                           |
 
 Names and complete SDL are proposals, not existing APIs. Inputs bind owner identity to authenticated context, not a trusted client-supplied owner ID. Errors expose stable codes and safe field/question details. Avoid leaking private resource existence where the caller lacks access.
 
-Required constraints include version-to-resource membership, one draft per resource, ordered composition integrity, valid topic/test ownership, and at most one authenticated active attempt per test. Use database constraints where possible, with semantic validation for JSON payload references and typed media references. Partial indexes or custom SQL must be included in the migration proposal where the ORM schema cannot express the invariant.
+Required constraints include version-to-resource membership, one draft per resource, ordered composition integrity, valid topic/test ownership, and one completed outcome per submit operation. Use database constraints where possible, with semantic validation for JSON payload references and typed media references. Partial indexes or custom SQL must be included in the migration proposal where the ORM schema cannot express the invariant.
 
 ## Alternatives considered
 
@@ -160,11 +162,11 @@ Required constraints include version-to-resource membership, one draft per resou
 
 More records and explicit transitions are required than for mutable CRUD, but publications, attempts, and copies have independent lifetimes. Storage cleanup and moderation become coordinated workflows. GraphQL adapters need specific authorization, error mapping, query bounds, and frontend session handling; domain rules remain transport-independent.
 
-Immutable versions do not imply infinite retention. The agreed authenticated windows are 14 days for unfinished attempts and 3 days for completed results; guest server expiry is 24 hours of inactivity without recovery after close/reload/leave. The first administrator is seed-assigned. Enforce agreed content/image limits at all mutation boundaries. Source-picker product rules are resolved. Remaining cleanup/receipt policy, capability delivery, activity signals, bootstrap safeguards, additional payload bounds and moderation implementation/review details remain explicit gates. No migration/package/infra change is authorized by this proposed ADR.
+Immutable versions do not imply infinite retention. The agreed authenticated windows are three days for completed results, with no unfinished attempt storage; guest server expiry is 24 hours from opening without recovery after close/reload/leave. The first administrator is seed-assigned. Enforce agreed content/image limits at all mutation boundaries. Source-picker product rules are resolved. Product policies are agreed; the consolidated schema proposal supplies capability delivery, replay enforcement, document budgets and moderation coordination for review. No migration/package/infra change is authorized by this proposed ADR.
 
 ## Validation required
 
-Use the specification's AC-01 through AC-20 and phase gates in the implementation plan. Unit tests verify scoring and policy transitions. PostgreSQL integration verifies constraints, rollback and races, including expiry versus resume/start/submit. API tests verify per-operation access, limits and absence of answer-key leakage. Browser checks cover guest/auth flows, drafts/publication, resume, guest page closure, deletion choices and role restrictions. Seed tests cover targeted bootstrap and safe reruns. REST session/CSRF/storage regressions must be checked separately.
+Use the specification's AC-01 through AC-20 and phase gates in the implementation plan. Unit tests verify scoring and policy transitions. PostgreSQL integration verifies constraints, rollback and races, including binding/result expiry versus submit/replay. API tests verify per-operation access, limits and absence of answer-key leakage. Browser checks cover guest/auth flows, drafts/publication, local-answer loss on reload, guest page closure, deletion choices and role restrictions. Seed tests cover targeted bootstrap and safe reruns. REST session/CSRF/storage regressions must be checked separately.
 
 ## Repository evidence
 

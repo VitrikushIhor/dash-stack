@@ -29,9 +29,9 @@ In: every v1 requirement in the specification, including images, all question ty
 
 Apply the resolved O-09 source/removal choices, finish O-10 and define exact draft/publication/player/result schemas. Map each mutation to caller permissions, expected revisions, repeat behavior, current-access checks, and error codes. Define ownership versus current/draft composition and the visibility/deletion/blocking precedence table. Include new, never-published, pending-removal and detached exercises.
 
-The question contract proposal supplies draft payloads, learner answer shapes, publication invariants, per-unit result fields and examples for all five kinds. The lifecycle contract adds ordinary/privileged access matrices, composition and attempt transitions, denial precedence, replay/concurrency rules and SA-01–26 verification scenarios. Never-published exercise keep/delete, own unpublished draft copying and metadata-only deletion of eligible blocked tests are confirmed. Finalize the remaining question/document/transport and lifecycle choices explicitly listed in those documents. These are partial phase-1 artifacts, not a completed phase or executable Learning validation.
+The question contract proposal supplies draft payloads, learner answer shapes, publication invariants, per-unit result fields and examples for all five kinds. The lifecycle contract adds ordinary/privileged access matrices, composition and attempt transitions, denial precedence, replay/concurrency rules and SA-01–29 verification scenarios. Never-published exercise keep/delete, own unpublished draft copying and metadata-only deletion of eligible blocked tests are confirmed. Finalize the remaining question/document/transport and lifecycle choices explicitly listed in those documents. These are partial phase-1 artifacts, not a completed phase or executable Learning validation.
 
-Specify revision coordination for topic/exercise edits, one-active-attempt behavior, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply authenticated retention (14 days since last activity / 3 days since submission) and guest page-only behavior with a 24-hour inactivity expiry. Resolve remaining O-01/O-02 activity/capability/cleanup details before implementing storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
+Specify revision coordination for topic/exercise edits, submit-only attempt creation, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply authenticated result retention (three days since submission) and guest page-only behavior with a 24-hour fixed opening-binding expiry. Resolve remaining O-01/O-02 activity/capability/cleanup details before implementing storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
 
 Exit evidence: explicit invariants, input/output examples for every question type, state matrix, and a mapping from FR-LEARN-001–013 and AC-01–20 to planned checks. Record unresolved policy gates rather than inventing defaults.
 
@@ -51,15 +51,17 @@ Exit evidence: API tests for guest, authenticated, expired/revoked session, forb
 
 ## 4. Deliver the first complete standalone test flow
 
-Start with single choice while retaining the designed question contract. Implement owner draft autosave, conflict handling, validation, immutable publication, immediate visibility change, authenticated resume/restart and server submission. Implement the approved guest capability/session path. Return allowlisted player content and persist idempotent result replay.
+Start with single choice while retaining the designed question contract. Implement explicit owner draft saving, dirty-state/navigation warnings, conflict handling, validation, immutable publication, immediate visibility change, local-only learner inputs and submit-only completed-attempt creation. Implement the approved guest capability/session path. Return allowlisted player content and persist idempotent result replay. Author publication is a separate action over a saved draft; block it while dirty/saving/conflicted. Reject stale draft saves, retain tab-local edits and warn before loading the latest draft. Do not add automatic merge, force overwrite or persistent local recovery. No learner answer-save endpoint or active-attempt storage is introduced.
 
-Exit evidence: unit evaluation/policy tests, PostgreSQL uniqueness/rollback/concurrency tests, and a browser flow from creation to guest/auth completion. Verify access revocation between load and submit, publication while an older attempt exists, repeat submission, and cross-device stale saves. Test exact 14-day/3-day expiry boundaries with an injected clock, no extension by polling/replay, replacement of expired active attempts, and guest non-restoration after page closure. This phase is an intermediate slice, not the v1 release.
+Exit evidence: unit evaluation/policy tests, PostgreSQL uniqueness/rollback/concurrency tests, and a browser flow from creation to guest/auth completion. Verify access revocation between load and submit, publication while an older attempt exists, repeat submission, and independent-tab submission and same-operation retry deduplication. Test exact three-day result expiry with an injected clock, no extension by reads/replay, no pre-submit attempt/answer writes, and guest non-restoration after page closure. This phase is an intermediate slice, not the v1 release.
 
-Also verify guest reset on reload/leave/back navigation, a warning before sign-in with no transfer of answers, and the 24-hour inactivity boundary even if cleanup has not run. Retained server data must never become a closed-page recovery mechanism.
+Also verify guest reset on reload/leave/back navigation, a warning before sign-in with no transfer of answers, and the 24-hour fixed opening-binding boundary even if cleanup has not run. Retained server data must never become a closed-page recovery mechanism.
 
 ## 5. Complete the builder and evaluation types
 
 Add multiple choice, text answers, mixed typed/select gaps and matching with accepted scoring. Add groups, shared text, formatting, explanations, duplication, reorder with keyboard alternatives, and preview. Preserve stable editor identifiers and remap them when duplicating. Handle invalid drafts without claiming saved/published success incorrectly.
+
+Implement the pinned NFC/trim/lowercase/NFC normalizer for text questions and typed gaps, including canonical-equivalence and negative punctuation/spacing/accent cases. Preserve duplicate accepted answers during explicit draft saving but show publication errors until corrected. Enforce publication minima of two choice options, two matching pairs and one gap; test below-minimum drafts separately from publication rejection. Reject identical visible choices at publication while preserving drafts and permitting the same label across questions. Enforce agreed visible-text comparison and duplicate rejection independently within each matching side.
 
 Exit evidence: behavior tests for scoring edge cases and type-specific player projection; browser checks for mixed gaps, matching, reorder, preview, conflict UX, and whole-test feedback. Author explanations must not leak through preview/player data to unauthorized users.
 
@@ -69,7 +71,7 @@ Add Materials/Exercises pages and owner composition. Copy independently with dur
 
 Own published tests offer publication (default) or draft as source; another author's public source offers publication only. Add independent copying from public topic exercise pages into an owned destination topic. Verify selected source snapshot/membership and reject stale selection instead of substituting a newer publication or draft.
 
-Use protected media delivery, authorization at attachment time, bounded/validated uploads and safe cleanup. Preserve required files after source/account deletion. Enforce the approved 5 MiB JPEG/PNG/WebP input limit and resource counts from specification section 8; resolve remaining image-dimension/count and total-payload bounds before enabling upload. Keep uploaded bytes outside publication database transactions.
+Use protected media delivery, authorization at attachment time, bounded/validated uploads and safe cleanup. Preserve required files after source/account deletion. Enforce the approved 5 MiB JPEG/PNG/WebP input limit and resource counts from specification section 8; enforce agreed dimensions, image insertion counts and full-request bounds before enabling upload. Keep uploaded bytes outside publication database transactions.
 
 Exit evidence: AC-01–08 and AC-15; transaction rollback, original deletion, missing/invalid media, direct private-media requests, concurrent copy/cleanup and save/publication. Old attempts retain old content only while current authorization permits access.
 
@@ -85,30 +87,30 @@ Exit evidence: role matrix API tests, stale privilege/revocation checks, owner b
 
 ## 8. Complete discovery and release verification
 
-Add paginated Tests/Topics catalogs and owner libraries without embedded duplicate cards. Finalize permitted search/filter metadata and page-opening count semantics. Ensure private, blocked and deleted resources do not leak through lists, totals, errors or media access. Reuse shared loading/error/empty states and keep public routes independent of organizations.
+Add paginated Tests/Topics catalogs and owner libraries without embedded duplicate cards. Implement agreed title/short-description search, optional English A1–C2/no-level filtering, and newest/most-views/title sorting with first-publication default ordering. Implement independent topic/test opening counters with agreed retry/exclusion rules; finalize bounded pagination and stable transport ordering. Ensure private, blocked and deleted resources do not leak through lists, totals, errors or media access. Reuse shared loading/error/empty states and keep public routes independent of organizations.
 
-Run typecheck, lint, FSD checks, focused/full unit suites, database integration and critical real-browser scenarios. Check production builds separately. Assess bounded queries, moderation impact pagination, autosave payload limits and media cleanup eligibility under expected load. Verify migrations/rollback in an isolated environment only after approval.
+Run typecheck, lint, FSD checks, focused/full unit suites, database integration and critical real-browser scenarios. Check production builds separately. Assess bounded queries, moderation impact pagination, draft/submit payload limits and media cleanup eligibility under expected load. Verify migrations/rollback in an isolated environment only after approval.
 
 Exit evidence: every v1 acceptance criterion has a result; unresolved security/data-lifecycle gates block release. Record NOT RUN and remaining failures honestly. Commit/push/deployment require their own applicable authorization.
 
 ## Verification matrix
 
-| Level                   | Responsibility                                                                               |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| Domain unit             | Question validation/scoring, access precedence, lifecycle transitions                        |
-| Application unit        | Use-case authorization, orchestration, typed boundary mocks                                  |
-| PostgreSQL integration  | FK/uniqueness invariants, transaction rollback, concurrency, receipts and lineage            |
-| GraphQL/API integration | Inputs, guest capabilities, roles, errors, key/private-content leakage                       |
-| Storage integration     | Protected reads, copy survival, failed upload/cleanup, reference races                       |
-| Browser/e2e             | Critical author/player flows, resume, visibility, delete choices, moderator restrictions     |
-| Static/build            | Backend/frontend typecheck/lint, frontend FSD, formatting, production builds                 |
-| Migration/release       | Approved incremental migration/rollback, operational readiness and separate release evidence |
+| Level                   | Responsibility                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| Domain unit             | Question validation/scoring, access precedence, lifecycle transitions                                |
+| Application unit        | Use-case authorization, orchestration, typed boundary mocks                                          |
+| PostgreSQL integration  | FK/uniqueness invariants, transaction rollback, concurrency, receipts and lineage                    |
+| GraphQL/API integration | Inputs, guest capabilities, roles, errors, key/private-content leakage                               |
+| Storage integration     | Protected reads, copy survival, failed upload/cleanup, reference races                               |
+| Browser/e2e             | Critical author/player flows, local-only answers, visibility, delete choices, moderator restrictions |
+| Static/build            | Backend/frontend typecheck/lint, frontend FSD, formatting, production builds                         |
+| Migration/release       | Approved incremental migration/rollback, operational readiness and separate release evidence         |
 
 Typed tests use boundary ports/adapters, behavior-based assertions, AAA and `should_X_when_Y` naming. Do not weaken checks to make a phase pass. Avoid introducing tests that merely duplicate implementation details.
 
 ## Open policy gates
 
-The specification's decision register is canonical. O-09 product choices are resolved. Authenticated 14/3-day retention, guest reset/sign-in behavior and 24-hour inactivity expiry, seed bootstrap, listed limits, removal choices and blocked-test/topic deletion rules are agreed. Remaining cleanup/receipt lifetimes, activity/capability details, bootstrap safeguards, dependency/editor approval, payload limits, counting semantics, restriction propagation/review scope and deleted-author attribution remain open. Revisit the proposed ADR when resolving a policy changes the architecture.
+The specification's decision register is canonical. O-09 product choices are resolved. Authenticated three-day result retention and submit-only persistence, guest reset/sign-in behavior and 24-hour fixed opening-binding expiry, seed bootstrap, listed limits, removal choices and blocked-test/topic deletion rules are agreed. Product policy is agreed. The consolidated schema/dependency proposal section 14 now supplies concrete opening bindings, receipt enforcement, document/request budgets, protected media and moderation coordination for review; these engineering proposals require approval and future implementation evidence. Revisit the proposed ADR when resolving a policy changes the architecture.
 
 ## Current evidence
 
