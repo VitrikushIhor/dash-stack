@@ -2,11 +2,12 @@
 
 - Status: Proposed — product baseline agreed; concrete schema, packages, and open policies pending
 - Date: 2026-10-07
-- Updated: 2026-10-09
+- Updated: 2026-10-12
 - Scope: New Learning Tests/Topics module and necessary platform integrations
 - Specification: [Learning v1](../specs/learning/FEATURE-SPEC-learning.md)
 - Delivery: [Implementation plan](../specs/learning/IMPLEMENTATION-PLAN-learning.md)
 - Payload proposal: [Question, answer and result contracts](../specs/learning/QUESTION-CONTRACTS-learning.md)
+- Lifecycle proposal: [State and operation authorization](../specs/learning/STATE-AND-ACCESS-learning.md)
 
 ## Context
 
@@ -81,13 +82,17 @@ Authenticated users have at most one active attempt per test, enforced at the da
 
 Reevaluate access on reads, saves, and submission. A detached exercise becomes private, so another user's saved attempt becomes inaccessible even though its version is retained. Ordinary content updates allow continuation against the previous version. Authorization failure retains answers unless an explicitly agreed deletion/retention policy applies.
 
-Guest attempts need a server-issued session/capability and version binding, not an arbitrary public attempt ID. Guests use only the current open page, without restoration after closure. Do not persist a recovery credential for that purpose. Browser-close notifications cannot guarantee server-side deletion; use bounded technical expiry and cleanup. Its duration and exact reload/navigation handling remain open, without changing the agreed no-recovery-after-close behavior. Player payloads expose no keys; matching returns independent choice collections rather than correct pair mappings. Keep randomized choice identity/order stable within an attempt. Evaluate only identifiers from its version.
+Guest attempts need a server-issued session/capability and version binding, not an arbitrary public attempt ID. Guests use only the current open page: close, reload or leaving the test resets answers/results. Sign-in warns about losing the attempt and never transfers answers. Do not persist a recovery credential. Guest server data expires after 24 hours without activity, with expiry enforced before cleanup; browser-close notifications cannot guarantee immediate deletion. Capability delivery, activity signal and cleanup cadence remain open. Player payloads expose no keys; matching returns independent choice collections rather than correct pair mappings. Keep randomized choice identity/order stable within an attempt. Evaluate only identifiers from its version.
 
 Pin scoring behavior as well as content. Authenticated unfinished attempts expire **14 days after last activity**; completed results expire **3 days after submission**, without renewal on replay. Enforce expiry on access even if cleanup has not run. Atomically retire expired active attempts before starting a replacement so the uniqueness constraint does not strand the user. Retain versions/media only while other valid references still require them. Technical tombstones may retain minimal operation identity under the later receipt policy but must not keep expired answers/results retrievable. Completion storage does not add a history screen. Define the user-activity signal and cleanup cadence under O-01; background polling must not reset inactivity.
 
 ### 5. Copy content independently; preserve only provenance links
 
 Copying materializes a new owned test/draft, remaps internal question/option/gap identifiers consistently, and creates independent media references. Source lineage is provenance and moderation metadata, not a content-loading dependency. Do not cascade source deletion into descendants.
+
+The owner may copy their own unpublished draft snapshot, including incomplete content; publication validation still applies to the copy. A removed never-published exercise offers immediate private detachment or logical deletion, with the topic revision and never-published precondition checked together. Already-published exercise removal remains publication-controlled.
+
+For an already-published own source, offer publication (default) or current draft. Other authors' public sources expose only the current publication for copying. An exercise page within an accessible public topic offers independent copying into the caller's own topic, using the exercise version referenced by that topic's current publication. Bind the command to the selected snapshot and recheck access/membership; do not silently substitute a draft or newer version.
 
 Retain a minimal non-content lineage identity after ordinary source/account deletion, with author display handled by the agreed personal-data policy. A chain of immediate source links is the initial conceptual model; the concrete descendant-query/index strategy must support bounded impact review without N+1 traversal. An individual request cannot expand an arbitrary graph without limits.
 
@@ -107,7 +112,7 @@ An ordinary direct delete of a currently published exercise is rejected. Removin
 
 Topic deletion is a distinct command with an explicit keep-exercises/delete-exercises choice. Apply it to the complete owned membership set, including draft-only/pending-removal copies, with consistent access invalidation. Explain that originals and independent external copies survive. Account deletion similarly removes own content from access without recursively deleting other owners' copies.
 
-Logical access removal precedes physical cleanup. Permanent administrative deletion respects the approved evidence/retention policy while denying access immediately; no claim is made that every byte can be deleted in one database transaction. Blocked owners cannot use ordinary edit/copy/export endpoints to recover content. Metadata-only deletion/account actions need a separately specified authorization contract (O-07).
+Logical access removal precedes physical cleanup. Permanent administrative deletion respects the approved evidence/retention policy while denying access immediately; no claim is made that every byte can be deleted in one database transaction. Blocked owners cannot use ordinary edit/copy/export endpoints to recover content. They may logically delete an eligible blocked test through a metadata-only command that retains restrictions/evidence and preserves the current-publication deletion guard. Blocked topics may likewise be deleted without moderator approval or a new review: kept exercises become private while retaining effective inherited and own restrictions. Propagate inherited restriction targets under existing case identities atomically with detachment; the concrete adapter contract remains to be reviewed. Account transitions and deleted-evidence access still require O-07/O-08 policy.
 
 ### 8. Use fixed platform roles with operation permissions
 
@@ -155,7 +160,7 @@ Required constraints include version-to-resource membership, one draft per resou
 
 More records and explicit transitions are required than for mutable CRUD, but publications, attempts, and copies have independent lifetimes. Storage cleanup and moderation become coordinated workflows. GraphQL adapters need specific authorization, error mapping, query bounds, and frontend session handling; domain rules remain transport-independent.
 
-Immutable versions do not imply infinite retention. The agreed authenticated windows are 14 days for unfinished attempts and 3 days for completed results. Guests do not recover attempts after page closure; the first administrator is seed-assigned. Enforce the specification's agreed content/image limits through centralized configuration at all mutation boundaries. Remaining cleanup/receipt policy, guest technical expiry, bootstrap safeguards, additional payload bounds, mixed-visibility moderation details, and unpublished exercise edge cases remain explicit gates. No migration/package/infra change is authorized by this proposed ADR.
+Immutable versions do not imply infinite retention. The agreed authenticated windows are 14 days for unfinished attempts and 3 days for completed results; guest server expiry is 24 hours of inactivity without recovery after close/reload/leave. The first administrator is seed-assigned. Enforce agreed content/image limits at all mutation boundaries. Source-picker product rules are resolved. Remaining cleanup/receipt policy, capability delivery, activity signals, bootstrap safeguards, additional payload bounds and moderation implementation/review details remain explicit gates. No migration/package/infra change is authorized by this proposed ADR.
 
 ## Validation required
 

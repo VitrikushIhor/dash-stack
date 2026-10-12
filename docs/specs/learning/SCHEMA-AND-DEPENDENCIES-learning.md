@@ -1,11 +1,13 @@
 # Learning — Schema and Dependency Proposal
 
 - Date: 2026-10-09
+- Updated: 2026-10-12 (lifecycle decisions; package research remains dated 2026-10-09)
 - Status: Proposed for review; no schema, migration, dependency, or infrastructure changes applied
 - Product baseline: [Feature specification](FEATURE-SPEC-learning.md)
 - Architecture: [ADR-0010](../../adr/0010-learning-tests-and-topics.md)
 - Delivery sequence: [Implementation plan](IMPLEMENTATION-PLAN-learning.md)
 - Payload proposal: [Question, answer and result contracts](QUESTION-CONTRACTS-learning.md)
+- Lifecycle proposal: [State and operation authorization](STATE-AND-ACCESS-learning.md)
 - Repository inspected: `dev`, `07a6253c`; existing staged documentation is preserved
 
 ## 1. Review boundary
@@ -121,7 +123,7 @@ The current pointer is null at creation. Insert a version before setting its poi
 
 ### `learning_guest_sessions`
 
-`id text PK`, `credential_hash text UNIQUE`, `created_at`, `expires_at`, `revoked_at?`. Generate credentials using platform crypto and keep only a hash. This is a guest capability for the current open Learning page, not a new user account or a recoverable browser profile. Do not persist a recovery credential that restores the attempt after page closure. Browser-close notifications cannot guarantee immediate backend deletion; bounded server expiry cleans abandoned guest state. Its numeric duration, capability delivery and reload/navigation details remain O-02. The authenticated 14-day/3-day windows do not enable guest recovery. Never log or expose credential hashes.
+`id text PK`, `credential_hash text UNIQUE`, `created_at`, `last_activity_at`, `expires_at`, `revoked_at?`. Generate credentials using platform crypto and keep only a hash. This is a guest capability for the current open Learning page, not a new user account or a recoverable browser profile. Do not persist a recovery credential. Close, reload or leaving the test resets answers/results; sign-in warns without transferring the attempt. Browser-close notifications cannot guarantee immediate backend deletion. Apply the agreed 24-hour inactivity deadline (`expires_at = last_activity_at + 24 hours`), deny expired capabilities on access and clean their retained data. Exact qualifying activity, delivery and cleanup cadence remain O-02. The authenticated 14-day/3-day windows do not enable guest recovery. Never log or expose credential hashes.
 
 ### `learning_test_attempts`
 
@@ -134,7 +136,7 @@ The current pointer is null at creation. Insert a version before setting its poi
 - `answers` is bounded, schema-validated and keyed by question/gap/option identity in the chosen version.
 - `result` is written once during submission and replayed safely; it is not a public result-history API.
 - For authenticated `ACTIVE` attempts, `expires_at = last_activity_at + 14 days`. For authenticated `SUBMITTED` attempts, `expires_at = submitted_at + 3 days`. Require the corresponding dates, and do not extend completed expiry on reads/retries. Define the qualifying user-activity signal under O-01; `updated_at` alone is unsuitable because background maintenance can update a row without user activity.
-- Enforce expiry on read/save/submit even before cleanup. Under the same start/restart transaction, retire an expired active row before creating its replacement. Clear expired answers/results without deleting versions or assets still retained by other valid references. Guest `expires_at` uses the separate technical policy pending O-02.
+- Enforce expiry on read/save/submit even before cleanup. Under the same start/restart transaction, retire an expired active row before creating its replacement. Clear expired answers/results without deleting versions or assets still retained by other valid references. Guest deadlines follow the 24-hour inactivity policy; session/attempt deadline coordination and the qualifying activity signal must be specified together so neither record can grant access after expiry. Cleanup includes guest receipts containing protected outcomes and cannot be bypassed by replay.
 - User/guest principal deletion uses explicit retention workflow and restrictive FKs for this proposal. Do not `SET NULL` and accidentally turn a registered attempt into a guest attempt. Account deletion must erase or anonymize attempt data under O-01 before deleting the principal; this is a deployment gate.
 
 Enforce one active authenticated attempt per test with an SQL partial unique index:
@@ -164,6 +166,10 @@ Use a recursive PostgreSQL query over indexed parent links for descendant discov
 Proposed race protocol: copy and lineage-block mutations first lock the lineage root row. Copies check current source authorization and all effective restrictions, create the new node/resource/media references, increment root `tree_revision`, and commit. A moderation preview returns revision plus safe scope information; confirmation rejects a changed revision and requires a refreshed preview. A successful block and copy cannot interleave into an unblocked escaped descendant. This serializes rare tree mutations while leaving ordinary reads outside the root lock.
 
 An individual block also participates in the copy consistency protocol. Topic access/blocks must be checked under the relevant topic/test locks when copying embedded resources. Lock order is root (when needed), topics, tests, attempts, assets; sort IDs within a category. Other operations cannot acquire these in reverse order. Exact SQL and race tests are required before approval of the migration/adapter implementation.
+
+Own unpublished-draft copies use an explicitly selected draft revision rather than requiring a source publication. Copy one coherent snapshot and remap all child IDs/references; incomplete author content is valid draft data, not publishable content. Keep lineage independent of any optional source version so unpublished sources have valid provenance too.
+
+For a published own source, choose publication (default) or draft explicitly; other authors' public sources permit publication only. A public topic exercise copy resolves the selected test version through the current topic-version membership. Carry the selected draft revision or publication/version identity in the proposed command and reject stale source selection rather than silently copying different content. Recheck source visibility, parent restrictions, membership and destination ownership in the coordinated copy transaction.
 
 ## 8. Media with typed uses
 
@@ -235,6 +241,10 @@ Physical cleanup must first establish no live current pointer, active/retained a
 
 Topic deletion's keep/delete choice operates on all owned membership, including unpublished and pending-removal copies. A former exercise already detached by a completed publication is no longer a current member and is not deleted again. Publication/removal locks prevent it escaping or joining the deletion set midway. Independent copies elsewhere are unaffected. Logical deletion denies access immediately even when retained evidence prevents physical cleanup.
 
+Never-published exercise removal also has an explicit keep/delete choice: detach as private standalone or logically delete the owned copy while removing its draft membership atomically. Lock/recheck topic revision and publication membership so a concurrent first publication cannot be bypassed. An owner may logically delete an eligible blocked test through a metadata-only operation; keep its restriction targets/lineage and required evidence. Do not use that command to directly delete a currently published embedded exercise.
+
+Blocked-topic deletion needs no moderator approval or new review. Kept exercises become private and retain all effective inherited/own blocks. Proposed storage realization: preserve each inherited active case as an exercise restriction target before clearing `topic_id`, inside the same transaction. Reuse the original case identity, retain its topic tombstone and audit propagation; do not create a new review case. A later case closure must account for retained exercise targets. Coordinate deletion with block/unblock and preserve independent cases. Final constraints/adapter sequencing and deleted-evidence review remain O-07 work; no actual schema change is made here.
+
 ## 11. Dependency proposal and evidence
 
 Registry metadata and official documentation were checked on 2026-10-09. Version compatibility below is based on declared peer ranges and the inspected repository, not an installation/build proof. Pin initial candidates exactly when approved, retain the lockfile, and recheck advisories and transitive licenses before installation. No package was installed for this proposal.
@@ -301,7 +311,7 @@ Before data exists, reversal removes dependent new FKs/tables in reverse order a
 
 ## 13. Review outcome and next approval
 
-Authenticated retention windows (14/3 days), guest use until page closure, first-administrator assignment through seed, and the specified content/image limits are now explicitly agreed. Remaining cleanup/receipt policy, guest technical expiry, bootstrap safeguards, additional payload bounds, private moderation preview and deleted-author attribution are still open. Review those details before the dependent migration/API is finalized.
+Authenticated retention windows (14/3 days), guest reset on close/reload/leave, sign-in warning/no transfer, 24-hour guest inactivity expiry, first-administrator seed and content/image limits are agreed. Source selection/public topic exercise copying and blocked-topic deletion without new review are also agreed. Remaining cleanup/receipt policy, activity signals/capability delivery, bootstrap safeguards, payload bounds, restriction propagation, private moderation preview and deleted-author attribution still require finalization before the dependent migration/API.
 
 Requested design approval, before producing a migration/package change:
 

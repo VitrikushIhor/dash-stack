@@ -1,11 +1,13 @@
 # Learning — Question, Answer and Result Contracts
 
 - Date: 2026-10-09
+- Updated: 2026-10-12 (lifecycle cross-references)
 - Status: Contract proposal; agreed product rules distinguished from remaining decisions
 - Implementation: Documentation only; no runtime types, GraphQL schema or database changes
 - Product baseline: [Feature specification](FEATURE-SPEC-learning.md)
 - Architecture: [ADR-0010](../../adr/0010-learning-tests-and-topics.md)
 - Persistence proposal: [Schema and dependencies](SCHEMA-AND-DEPENDENCIES-learning.md)
+- Lifecycle proposal: [State and operation authorization](STATE-AND-ACCESS-learning.md)
 
 ## 1. Scope and confirmed rules
 
@@ -301,6 +303,6 @@ O-10 is partially resolved: exact visible text behavior, whole percentages and s
 1. Unicode normalization and normalized duplicate-answer policy from section 7.
 2. Publication minima and indistinguishable labels: proposed minimum two choice options/two matching pairs; reject visually equivalent duplicate labels within a choice list or either matching side. The definition of equivalence for rich labels needs its own bounded validation rule. No such new restrictions are claimed as already agreed.
 3. The rich-document node/mark schema and bounds (O-04/O-05), including exact gap-node placement and non-text label validation.
-4. GraphQL inputs/outputs, error mapping and UI conflict handling for full answer snapshots, plus remaining lifecycle policies in O-01/O-02/O-09.
+4. GraphQL inputs/outputs, error mapping and UI conflict handling for full answer snapshots, plus remaining activity/capability/cleanup policies in O-01/O-02. O-09 copy/removal product choices are resolved in the lifecycle contract.
 
-The [implementation plan](IMPLEMENTATION-PLAN-learning.md) phase 1 remains open. Next prepare its state/operation authorization matrix; do not treat this question contract as completion of all lifecycle design. Prisma, migrations, dependencies and runtime implementation remain separate work.
+The [implementation plan](IMPLEMENTATION-PLAN-learning.md) phase 1 remains open. Its [state/operation authorization matrix](STATE-AND-ACCESS-learning.md) now complements this question contract; resolve the remaining choices in both before dependent implementation. Prisma, migrations, dependencies and runtime implementation remain separate work.

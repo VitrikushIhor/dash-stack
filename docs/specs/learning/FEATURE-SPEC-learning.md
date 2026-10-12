@@ -1,12 +1,13 @@
 # Learning Tests and Topics — Feature Specification
 
-- Version: v0.3
-- Updated: 2026-10-09
+- Version: v0.5
+- Updated: 2026-10-12
 - Status: Agreed product baseline; implementation details remain open
 - Implementation: Not started
 - Architecture: [ADR-0010](../../adr/0010-learning-tests-and-topics.md)
 - Delivery: [Implementation plan](IMPLEMENTATION-PLAN-learning.md)
 - Question contracts: [Author, player, answers and results](QUESTION-CONTRACTS-learning.md)
+- Lifecycle contract: [States and operation authorization](STATE-AND-ACCESS-learning.md)
 
 ## 1. Purpose and scope
 
@@ -94,7 +95,9 @@ Adding an existing test to a topic always creates an independent copy, including
 
 Copy questions, materials, answer keys, explanations, scoring configuration, and references sufficient to retain all required files independently. Do not copy attempts, results, or view counts. Record attribution and source provenance. Source changes, visibility changes, deletion, or source account deletion do not change the copy.
 
-Copying another author's unpublished or private content is not authorized. Source eligibility for the owner's unpublished drafts and copying exercises directly from public topic pages are open UI/API details (O-09).
+An owner may copy their own unpublished test into a topic using its current draft snapshot, including incomplete content. For their own published test, offer an explicit choice between the current published version (default) and the current draft. The independent copy remains editable, but cannot be published until valid. Another author's public test can be copied only from its current published version; their draft/private content is never a source.
+
+Provide “Add to my topic” on an exercise page of an accessible public topic. A registered caller selects their own writable destination topic and receives an independent exercise copy. Use the version referenced by the current source topic publication, not its unpublished exercise draft. Recheck source/destination access and the selected snapshot during copying. These source-selection rules close O-09; exact picker layout and transport names remain implementation details.
 
 Acceptance:
 
@@ -136,7 +139,7 @@ Recheck current access on attempt reads, answer saves, submissions, copy operati
 
 An individual test used in a current topic publication cannot be permanently deleted before its removal is published. Topic/account deletion and privileged deletion are separate coordinated operations, not an accidental cascade through this guard.
 
-For an exercise never published, immediate detachment into a private standalone test is an engineering proposal pending confirmation (O-09); it must not become an unreachable orphan.
+For an exercise never published, offer a choice: immediately keep it as a private standalone test or logically delete the owned copy. Both choices remove it from the topic draft without changing the visitor publication or its source/independent copies. Recheck the never-published state together with the topic revision so concurrent publication cannot turn this into deletion of a published exercise.
 
 ### FR-LEARN-008 — Topic and account deletion
 
@@ -156,6 +159,8 @@ Suggested confirmation copy:
 > Оригінальні тести та незалежні копії, які створили інші користувачі, залишаться незмінними. Їхні копії ваших матеріалів також збережуться.
 
 Defaulting the dialog to keep exercises is the proposed safe UI default, not a restriction on the owner's choice.
+
+A blocked topic can also be deleted immediately by its owner through a metadata-only action, without moderator approval or a new automatic review. Keep the same keep/delete exercise choice. Kept exercises become private standalone tests but retain all effective blocks inherited from the deleted topic as well as their own blocks. Deleted exercises remain inaccessible with required restrictions/evidence retained. Deletion must not expose blocked content or affect independent copies outside the topic.
 
 Deleting an account removes that account's own tests/topics from access, but not independent copies owned by others. Logical removal, physical cleanup, and retained moderation evidence are distinct. Retention and deleted-author display rules remain open (O-01, O-08).
 
@@ -197,9 +202,9 @@ The exact activity signal, cleanup cadence, receipt lifetimes, superseded-attemp
 
 ### FR-LEARN-011 — Guests
 
-Guests may take accessible published tests and see results **only within the current open page**, without restoring a session after the page is closed. The authenticated 14-day/3-day retention windows do not grant guest restoration. No personal history or cross-device restoration is provided.
+Guests may take accessible published tests and see results **only within the current open page**. Closing, reloading or leaving the test discards the current guest answers/result; returning starts fresh. Signing in does not transfer guest answers to the account. Warn about losing the guest attempt before initiating sign-in. The authenticated 14-day/3-day retention windows do not grant guest restoration. No personal history or cross-device restoration is provided.
 
-Guest authorization must protect each attempt; a freely supplied attempt ID is not enough. The server must bind evaluation to the version actually started and handle repeated submissions safely while the page is open. Browser-close events are not a reliable server cleanup signal: use a bounded technical expiry for abandoned guest data rather than promising immediate physical deletion on close. That expiry duration, capability storage and reload/navigation semantics remain O-02 details; they must not introduce persistent recovery after closure.
+Guest authorization must protect each attempt; a freely supplied attempt ID is not enough. The server must bind evaluation to the version actually started and handle repeated submissions safely while the page is open. Guest server data expires after **24 hours without activity** and is removed by cleanup; that retention does not enable recovery after reload, leaving or closure. Enforce expiry on access even before cleanup runs. Browser-close events are not a reliable server cleanup signal, so do not promise immediate physical deletion on close. Capability delivery, qualifying activity, cleanup cadence and resource bounds remain O-02 implementation details; polling must not keep abandoned data alive.
 
 ## 7. Platform moderation
 
@@ -232,6 +237,8 @@ Authorized moderation access is a separate operation and permission; ownership a
 Support blocking just one test or that test and its descendant copies. Show impact before confirmation. Topic blocking denies access through that topic; it does not implicitly authorize a test-lineage cascade beyond the requested operation.
 
 Block and permanent deletion are separate administrative actions. Retain blocked content for authorized review until a permitted deletion/retention policy applies. Owners cannot edit blocked drafts to repair them; an authorized moderator must restore access first. Unblocking one case must not cancel another independent block. Restoring an original does not automatically restore separately blocked copies.
+
+An owner may logically delete an eligible blocked test through a metadata-only action: remove it from their library and ordinary access without reading its content or erasing active restrictions/required moderation evidence. The existing guard for currently published embedded exercises still applies. This is distinct from administrator-only permanent deletion, and later unblocking does not undo deletion. Blocked-topic deletion follows FR-LEARN-008 without moderator approval; the atomic preservation of inherited restrictions and authorized review of deleted evidence still need their O-07 implementation contract.
 
 Seed-based bootstrap is agreed. Its safeguards, role revocation/session behavior, and audit retention must be settled before moderation is enabled (O-03, O-07).
 
@@ -293,22 +300,22 @@ These are required future checks, not evidence that implementation already passe
 | AC-19 | A save/copy/duplicate/upload reaches or exceeds an agreed limit          | The maximum is accepted when otherwise valid; overflow is rejected on the server without partial writes or silent truncation                                                           |
 | AC-20 | Bootstrap seed runs or reruns for an explicitly selected account         | Initial platform administrator assignment is controlled and idempotent; organization owners/demo accounts are not implicitly promoted and revoked privileges are not silently restored |
 
-## 10. Open decisions and implementation gates
+## 10. Decision register and remaining implementation gates
 
-Open items are not approved defaults. Resolve each before its dependent implementation or release check; do not silently add product behavior.
+Resolved entries remain for traceability. Open items are not approved defaults; resolve each before its dependent implementation or release check and do not silently add product behavior.
 
-| ID   | Decision                                                                                                                                                                                                                             | Gate                          |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| O-01 | 14-day unfinished / 3-day completed retention agreed; define activity signal, cleanup cadence, superseded attempts, result revisit UI, other receipt lifetimes and deleted-content cleanup                                           | Attempt lifecycle and cleanup |
-| O-02 | Guest use until page closure agreed; define bounded server cleanup expiry, capability storage, reload/navigation behavior and resource bounds without closed-page recovery                                                           | Guest API                     |
-| O-03 | First administrator via seed agreed; define account selection, idempotent bootstrap/revocation safeguards, later role management and last-admin protection                                                                           | Role management               |
-| O-04 | Counts and image size/formats agreed in section 8; define remaining text/document, image dimension/count, total request and catalog/filter bounds                                                                                    | Validation and catalog        |
-| O-05 | GraphQL server integration, code generation, rich-text editor, upload transport; dependency justification                                                                                                                            | Dependency/schema approval    |
-| O-06 | View-count repeat semantics, prefetch/bot treatment, topic counter                                                                                                                                                                   | Analytics counter             |
-| O-07 | Moderation impact preview, private descendants, role freshness, restore/delete semantics and evidence retention                                                                                                                      | Moderation                    |
-| O-08 | Attribution after source account deletion and retained personal-data policy                                                                                                                                                          | Account deletion              |
-| O-09 | Never-published exercise detachment; own draft source selection; discovery/copying of embedded exercises                                                                                                                             | Copy/remove UX                |
-| O-10 | [Question contracts proposed](QUESTION-CONTRACTS-learning.md); text differences, whole percentages and one-to-one matching agreed; finalize Unicode/duplicate policy, publication minima, document/transport schemas and conflict UX | Builder/scoring contracts     |
+| ID   | Decision                                                                                                                                                                                                                                                      | Gate                                      |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| O-01 | 14-day unfinished / 3-day completed retention agreed; define activity signal, cleanup cadence, superseded attempts, result revisit UI, other receipt lifetimes and deleted-content cleanup                                                                    | Attempt lifecycle and cleanup             |
+| O-02 | Guest reset on close/reload/leave, sign-in warning with no answer transfer and 24-hour inactivity expiry agreed; finalize capability delivery, activity signal, cleanup cadence and resource bounds                                                           | Guest API                                 |
+| O-03 | First administrator via seed agreed; define account selection, idempotent bootstrap/revocation safeguards, later role management and last-admin protection                                                                                                    | Role management                           |
+| O-04 | Counts and image size/formats agreed in section 8; define remaining text/document, image dimension/count, total request and catalog/filter bounds                                                                                                             | Validation and catalog                    |
+| O-05 | GraphQL server integration, code generation, rich-text editor, upload transport; dependency justification                                                                                                                                                     | Dependency/schema approval                |
+| O-06 | View-count repeat semantics, prefetch/bot treatment, topic counter                                                                                                                                                                                            | Analytics counter                         |
+| O-07 | Blocked-test/topic owner deletion without moderator approval agreed; kept exercises retain blocks without new review; finalize restriction preservation, blocked-composition publication, review scope, private impact, role freshness and evidence retention | Moderation                                |
+| O-08 | Attribution after source account deletion and retained personal-data policy                                                                                                                                                                                   | Account deletion                          |
+| O-09 | Resolved: never-published removal keep/delete; own draft or publication source (publication default); other authors' published public sources only; copying from public topic exercise pages                                                                  | Copy/remove UX — product decisions closed |
+| O-10 | [Question contracts proposed](QUESTION-CONTRACTS-learning.md); text differences, whole percentages and one-to-one matching agreed; finalize Unicode/duplicate policy, publication minima, document/transport schemas and conflict UX                          | Builder/scoring contracts                 |
 
 ## 11. Change and evidence policy
 

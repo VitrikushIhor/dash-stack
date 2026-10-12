@@ -1,11 +1,12 @@
 # Learning Tests and Topics — Implementation Plan
 
 - Created: 2026-10-07
-- Updated: 2026-10-09
+- Updated: 2026-10-12
 - Status: Proposed; implementation not started
 - Product baseline: [Feature specification](FEATURE-SPEC-learning.md)
 - Architecture proposal: [ADR-0010](../../adr/0010-learning-tests-and-topics.md)
 - Question contract proposal: [Five types, answers and results](QUESTION-CONTRACTS-learning.md)
+- Lifecycle contract proposal: [State and access matrix](STATE-AND-ACCESS-learning.md)
 
 ## Approach and scope
 
@@ -26,11 +27,11 @@ In: every v1 requirement in the specification, including images, all question ty
 
 ## 1. Finalize state transitions and contracts
 
-Resolve O-09/O-10 and define exact draft/publication/player/result schemas. Map each mutation to caller permissions, expected revisions, repeat behavior, current-access checks, and error codes. Define ownership versus current/draft composition and the visibility/deletion/blocking precedence table. Include new, never-published, pending-removal and detached exercises.
+Apply the resolved O-09 source/removal choices, finish O-10 and define exact draft/publication/player/result schemas. Map each mutation to caller permissions, expected revisions, repeat behavior, current-access checks, and error codes. Define ownership versus current/draft composition and the visibility/deletion/blocking precedence table. Include new, never-published, pending-removal and detached exercises.
 
-The question contract proposal now supplies draft payloads, learner answer shapes, publication invariants, per-unit result fields and examples for all five kinds. Text differences, whole-percentage display and one-to-one matching are confirmed. Finalize its explicitly remaining Unicode, duplicate/minimum, document and transport decisions; review full-snapshot save/submit semantics. This is partial phase-1 evidence, not a completed phase or executable Learning validation. The next design artifact is the lifecycle state/operation authorization matrix.
+The question contract proposal supplies draft payloads, learner answer shapes, publication invariants, per-unit result fields and examples for all five kinds. The lifecycle contract adds ordinary/privileged access matrices, composition and attempt transitions, denial precedence, replay/concurrency rules and SA-01–26 verification scenarios. Never-published exercise keep/delete, own unpublished draft copying and metadata-only deletion of eligible blocked tests are confirmed. Finalize the remaining question/document/transport and lifecycle choices explicitly listed in those documents. These are partial phase-1 artifacts, not a completed phase or executable Learning validation.
 
-Specify revision coordination for topic/exercise edits, one-active-attempt behavior, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply the agreed authenticated retention (14 days since last activity / 3 days since submission) and guest page-only behavior. Resolve remaining O-01/O-02 technical expiry/cleanup details before implementing their storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
+Specify revision coordination for topic/exercise edits, one-active-attempt behavior, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply authenticated retention (14 days since last activity / 3 days since submission) and guest page-only behavior with a 24-hour inactivity expiry. Resolve remaining O-01/O-02 activity/capability/cleanup details before implementing storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
 
 Exit evidence: explicit invariants, input/output examples for every question type, state matrix, and a mapping from FR-LEARN-001–013 and AC-01–20 to planned checks. Record unresolved policy gates rather than inventing defaults.
 
@@ -54,6 +55,8 @@ Start with single choice while retaining the designed question contract. Impleme
 
 Exit evidence: unit evaluation/policy tests, PostgreSQL uniqueness/rollback/concurrency tests, and a browser flow from creation to guest/auth completion. Verify access revocation between load and submit, publication while an older attempt exists, repeat submission, and cross-device stale saves. Test exact 14-day/3-day expiry boundaries with an injected clock, no extension by polling/replay, replacement of expired active attempts, and guest non-restoration after page closure. This phase is an intermediate slice, not the v1 release.
 
+Also verify guest reset on reload/leave/back navigation, a warning before sign-in with no transfer of answers, and the 24-hour inactivity boundary even if cleanup has not run. Retained server data must never become a closed-page recovery mechanism.
+
 ## 5. Complete the builder and evaluation types
 
 Add multiple choice, text answers, mixed typed/select gaps and matching with accepted scoring. Add groups, shared text, formatting, explanations, duplication, reorder with keyboard alternatives, and preview. Preserve stable editor identifiers and remap them when duplicating. Handle invalid drafts without claiming saved/published success incorrectly.
@@ -62,7 +65,9 @@ Exit evidence: behavior tests for scoring edge cases and type-specific player pr
 
 ## 6. Deliver topics, copies, and protected media
 
-Add Materials/Exercises pages and owner composition. Copy independently with durable provenance and media references. Publish materials, ordering and exercise versions atomically. Implement pending removal and private detachment, including the agreed draft-only behavior. Block direct publication/deletion of a currently published embedded test outside its authorized workflow.
+Add Materials/Exercises pages and owner composition. Copy independently with durable provenance and media references, including the owner's incomplete unpublished draft. Publish materials, ordering and exercise versions atomically. Implement pending removal/private detachment for published exercises and explicit keep/delete for never-published removal, including publication races. Block direct publication/deletion of a currently published embedded test outside its authorized workflow.
+
+Own published tests offer publication (default) or draft as source; another author's public source offers publication only. Add independent copying from public topic exercise pages into an owned destination topic. Verify selected source snapshot/membership and reject stale selection instead of substituting a newer publication or draft.
 
 Use protected media delivery, authorization at attachment time, bounded/validated uploads and safe cleanup. Preserve required files after source/account deletion. Enforce the approved 5 MiB JPEG/PNG/WebP input limit and resource counts from specification section 8; resolve remaining image-dimension/count and total-payload bounds before enabling upload. Keep uploaded bytes outside publication database transactions.
 
@@ -73,6 +78,8 @@ Exit evidence: AC-01–08 and AC-15; transaction rollback, original deletion, mi
 Implement explicitly targeted, idempotent first-administrator assignment through seed after its account-selection/revocation safeguards are approved. Do not run a seed or promote an account as part of documentation work. Resolve later role assignment/revocation controls and last-admin protection before enabling privileged endpoints. Implement fixed role-to-permission checks and audit, including reasoned private-content review. Add impact preview, individual and lineage blocking, independent case unblocking, and administrator-only permanent deletion. Blocked owners cannot read, edit, preview, copy or publish content.
 
 Implement topic deletion with keep/delete exercise choice and explicit notice about independent copies. Account deletion invalidates own resource access while preserving external copies/provenance/media as allowed by policy. Coordinate moderation, copy creation, role changes and cleanup; do not rely on source-account cascades.
+
+Implement metadata-only owner deletion of eligible blocked tests without returning their content or clearing restrictions/evidence. Preserve the published-exercise deletion guard. Allow blocked-topic deletion with keep/delete choice without moderator approval or a new review. Kept exercises become private and retain inherited/own restrictions atomically; finalize case-target propagation and deleted-evidence review. Test deletion racing with unblock and multiple active cases; neither deletion nor restriction lifting implicitly restores access through the other state.
 
 Exit evidence: role matrix API tests, stale privilege/revocation checks, owner bypass attempts, private descendant redaction, block/copy race, independent block recovery, and both topic deletion choices including draft-only/pending-removal exercises. PostgreSQL and storage integration checks prove surviving copies remain intact. No moderation feature is assumed complete solely because its UI hides an action.
 
@@ -101,7 +108,7 @@ Typed tests use boundary ports/adapters, behavior-based assertions, AAA and `sho
 
 ## Open policy gates
 
-The specification's O-01–O-10 is the canonical list. Authenticated retention windows, guest page-only behavior, seed-based bootstrap, and the listed content/image limits are agreed. Remaining cleanup/receipt lifetimes, guest technical expiry, bootstrap safeguards, dependency/editor approval, additional payload limits, counting semantics, private moderation impact, deleted-author attribution and unpublished-copy behavior remain open. Revisit the proposed ADR when resolving a policy changes the architecture.
+The specification's decision register is canonical. O-09 product choices are resolved. Authenticated 14/3-day retention, guest reset/sign-in behavior and 24-hour inactivity expiry, seed bootstrap, listed limits, removal choices and blocked-test/topic deletion rules are agreed. Remaining cleanup/receipt lifetimes, activity/capability details, bootstrap safeguards, dependency/editor approval, payload limits, counting semantics, restriction propagation/review scope and deleted-author attribution remain open. Revisit the proposed ADR when resolving a policy changes the architecture.
 
 ## Current evidence
 
