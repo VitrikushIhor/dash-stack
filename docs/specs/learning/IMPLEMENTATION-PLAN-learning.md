@@ -14,6 +14,8 @@ Deliver the agreed module in complete, testable increments. First finalize contr
 
 In: every v1 requirement in the specification, including images, all question types, platform roles, and deletion choices. Out: courses, organizations, personal history/progress UI, audio, AI, REST migration, and a configurable role builder. An intermediate working slice is not completion of v1.
 
+The [implementation handoff](IMPLEMENTATION-HANDOFF-learning.md) defines the exact first backend/schema approval scope, deferred frontend environment prerequisite and remaining engineering checks.
+
 ## Execution checklist
 
 - [ ] 1. Finalize state transitions and typed contracts.
@@ -31,13 +33,15 @@ Apply the resolved O-09 source/removal choices, finish O-10 and define exact dra
 
 The question contract proposal supplies draft payloads, learner answer shapes, publication invariants, per-unit result fields and examples for all five kinds. The lifecycle contract adds ordinary/privileged access matrices, composition and attempt transitions, denial precedence, replay/concurrency rules and SA-01–29 verification scenarios. Never-published exercise keep/delete, own unpublished draft copying and metadata-only deletion of eligible blocked tests are confirmed. Finalize the remaining question/document/transport and lifecycle choices explicitly listed in those documents. These are partial phase-1 artifacts, not a completed phase or executable Learning validation.
 
-Specify revision coordination for topic/exercise edits, submit-only attempt creation, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply authenticated result retention (three days since submission) and guest page-only behavior with a 24-hour fixed opening-binding expiry. Resolve remaining O-01/O-02 activity/capability/cleanup details before implementing storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
+Specify revision coordination for topic/exercise edits, submit-only attempt creation, frozen scoring, guest authorization, and the copy/block and reference/cleanup consistency protocols. Apply authenticated result retention (three days since submission) and guest page-only behavior with a 24-hour fixed opening-binding expiry. Implement the agreed signed-ticket/HMAC retry protocol and verify its admission, receipt, key-rotation and cleanup boundaries before implementing storage lifecycle. Identify moderation-specific gates without assuming access for an existing organization administrator.
 
 Exit evidence: explicit invariants, input/output examples for every question type, state matrix, and a mapping from FR-LEARN-001–013 and AC-01–20 to planned checks. Record unresolved policy gates rather than inventing defaults.
 
 ## 2. Obtain approval for concrete changes
 
-Prepare a reviewable Prisma/SQL proposal with relation ownership, deletion behavior, operation receipts, provenance, media uses, role assignments, audit and moderation records. Include a database-enforced active-attempt invariant and version/resource membership. Explain incremental migration, rollback, data/backfill impact, and generated-client changes.
+Review the [concrete Prisma/SQL proposal](proposals/README.md), including the separate SQL-managed constraints and empty-only reversal. Datamodel validation does not replace PostgreSQL execution and concurrency checks.
+
+Prepare a reviewable Prisma/SQL proposal with relation ownership, deletion behavior, operation receipts, provenance, media uses, role assignments, audit and moderation records. Include database-enforced one-completed-attempt-per-opening, opening/principal binding and version/resource membership. No active-attempt row or uniqueness rule is introduced. Explain incremental migration, rollback, data/backfill impact, and generated-client changes.
 
 Compare required GraphQL integration, generated client types, and rich-text editor packages. For every proposed dependency record purpose, existing/platform alternatives, client bundle impact, maintenance, license, and compatibility. Do not add Redis, queues, search infrastructure, or replace Prisma without a demonstrated need and separate authorization.
 
@@ -61,6 +65,8 @@ Also verify guest reset on reload/leave/back navigation, a warning before sign-i
 
 Add multiple choice, text answers, mixed typed/select gaps and matching with accepted scoring. Add groups, shared text, formatting, explanations, duplication, reorder with keyboard alternatives, and preview. Preserve stable editor identifiers and remap them when duplicating. Handle invalid drafts without claiming saved/published success incorrectly.
 
+Preserve author order for groups, questions, choice/selectable-gap options and matching's left side. Shuffle only matching's right side; verify that opening retries and submitted results retain the original presentation and that learner projections expose no pair-mapping hints.
+
 Implement the pinned NFC/trim/lowercase/NFC normalizer for text questions and typed gaps, including canonical-equivalence and negative punctuation/spacing/accent cases. Preserve duplicate accepted answers during explicit draft saving but show publication errors until corrected. Enforce publication minima of two choice options, two matching pairs and one gap; test below-minimum drafts separately from publication rejection. Reject identical visible choices at publication while preserving drafts and permitting the same label across questions. Enforce agreed visible-text comparison and duplicate rejection independently within each matching side.
 
 Exit evidence: behavior tests for scoring edge cases and type-specific player projection; browser checks for mixed gaps, matching, reorder, preview, conflict UX, and whole-test feedback. Author explanations must not leak through preview/player data to unauthorized users.
@@ -81,7 +87,7 @@ Implement explicitly targeted, idempotent first-administrator assignment through
 
 Implement topic deletion with keep/delete exercise choice and explicit notice about independent copies. Account deletion invalidates own resource access while preserving external copies/provenance/media as allowed by policy. Coordinate moderation, copy creation, role changes and cleanup; do not rely on source-account cascades.
 
-Implement metadata-only owner deletion of eligible blocked tests without returning their content or clearing restrictions/evidence. Preserve the published-exercise deletion guard. Allow blocked-topic deletion with keep/delete choice without moderator approval or a new review. Kept exercises become private and retain inherited/own restrictions atomically; finalize case-target propagation and deleted-evidence review. Test deletion racing with unblock and multiple active cases; neither deletion nor restriction lifting implicitly restores access through the other state.
+Implement metadata-only owner deletion of eligible blocked tests without returning their content or clearing restrictions/evidence. Preserve the published-exercise deletion guard. Allow blocked-topic deletion with keep/delete choice without moderator approval or a new review. Kept exercises become private; add active topic case IDs to each kept exercise lineage before detachment, so lifting that case clears only its propagated targets and leaves independent test cases active. Test deletion racing with unblock and multiple active cases; neither deletion nor restriction lifting implicitly restores access through the other state.
 
 Exit evidence: role matrix API tests, stale privilege/revocation checks, owner bypass attempts, private descendant redaction, block/copy race, independent block recovery, and both topic deletion choices including draft-only/pending-removal exercises. PostgreSQL and storage integration checks prove surviving copies remain intact. No moderation feature is assumed complete solely because its UI hides an action.
 
@@ -108,7 +114,7 @@ Exit evidence: every v1 acceptance criterion has a result; unresolved security/d
 
 Typed tests use boundary ports/adapters, behavior-based assertions, AAA and `should_X_when_Y` naming. Do not weaken checks to make a phase pass. Avoid introducing tests that merely duplicate implementation details.
 
-## Open policy gates
+## Remaining engineering and approval gates
 
 The specification's decision register is canonical. O-09 product choices are resolved. Authenticated three-day result retention and submit-only persistence, guest reset/sign-in behavior and 24-hour fixed opening-binding expiry, seed bootstrap, listed limits, removal choices and blocked-test/topic deletion rules are agreed. Product policy is agreed. The consolidated schema/dependency proposal section 14 now supplies concrete opening bindings, receipt enforcement, document/request budgets, protected media and moderation coordination for review; these engineering proposals require approval and future implementation evidence. Revisit the proposed ADR when resolving a policy changes the architecture.
 
