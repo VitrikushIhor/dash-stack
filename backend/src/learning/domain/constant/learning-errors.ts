@@ -1,0 +1,31 @@
+export const LEARNING_ERRORS = {
+  NOT_FOUND: 'Learning not found',
+  INVALID_ANSWER: 'Learning answer is invalid',
+  INCONSISTENT_QUESTION: 'Learning question is inconsistent',
+  INVALID_SINGLE_CHOICE_ANSWER: 'Invalid single choice answer',
+  INVALID_SINGLE_CHOICE_DRAFT: 'Invalid single choice draft',
+  INVALID_PARSE_DOCUMENT: 'Invalid parse document schema',
+  DOCUMENT_NODE_LIMIT_EXCEEDED: 'Learning document has too many nodes',
+  DOCUMENT_SIZE_LIMIT_EXCEEDED: 'Learning document exceeds the serialized size limit',
+  EMPTY_SCORE_CONTRIBUTIONS: "Learning array can't be empty!",
+  INVALID_MAX_POINTS: (maxPoints: number) =>
+    `Incorrect data: maxPoints must be greater than zero. Received: ${maxPoints}`,
+  EARNED_POINTS_BOUNDARIES: (earnedPoints: number, maxPoints: number) =>
+    `Incorrect data: earnedPoints (${earnedPoints}) must be within the boundaries of 0 to maxPoints (${maxPoints}),`,
+  INVALID_SCORE_POINTS: (earnedPoints: number, maxPoints: number) =>
+    `Invalid data: points must be safe integers. Received: earnedPoints=${earnedPoints}, maxPoints=${maxPoints}`,
+  PROMPT_CANNOT_BE_EMPTY: 'Prompt cannot be empty',
+  PROMPT_TEXT_LIMIT_EXCEEDED: 'Question prompt exceeds the visible text limit',
+  OPTION_LABEL_TEXT_LIMIT_EXCEEDED: 'Choice option label exceeds the visible text limit',
+  EXPLANATION_TEXT_LIMIT_EXCEEDED: 'Question explanation exceeds the visible text limit',
+  OPTIONS_MUST_BE_BETWEEN_2_AND_10: 'Options must be between 2 and 10',
+  OPTION_LABEL_CANNOT_BE_EMPTY: 'Option label cannot be empty',
+  OPTION_LABELS_MUST_BE_UNIQUE: 'Option labels must be unique',
+  OPTION_IDS_MUST_BE_UNIQUE: 'Option ids must be unique',
+  OPTION_ID_CANNOT_BE_EMPTY: 'Option id cannot be empty',
+  CORRECT_OPTION_ID_MUST_BE_ONE_OF_THE_OPTIONS: 'Correct option id must be one of the options',
+  CORRECT_OPTION_ID_CANNOT_BE_EMPTY: 'Correct option id cannot be empty',
+  CORRECT_OPTION_ID_MUST_BE_UNIQUE: 'Correct option id must be unique',
+  CORRECT_OPTION_ID_MUST_BE_VALID: 'Correct option id must be valid',
+  CORRECT_OPTION_ID_IS_REQUIRED: 'Correct option id is required',
+} as const;
