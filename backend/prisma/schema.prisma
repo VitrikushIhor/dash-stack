@@ -7,29 +7,40 @@ datasource db {
 }
 
 model User {
-  id                     String               @id @default(cuid())
-  createdAt              DateTime             @default(now())
-  updatedAt              DateTime             @updatedAt
-  email                  String               @unique
-  password               String?
-  avatar                 String?
-  emailVerified          DateTime?
-  firstName              String?
-  lastName               String?
-  dob                    DateTime?
-  bio                    String?
-  urls                   String[]             @default([])
-  accounts               Account[]
-  memberships            Membership[]
-  authSessions           AuthSession[]
-  decks                  Deck[]               @relation("UserDecks")
-  vocabProgress          VocabProgress[]      @relation("UserVocabProgress")
-  deckLeaderboardEntries DeckLeaderboard[]    @relation("UserDeckLeaderboard")
-  matchSessions          MatchSession[]
-  vocabStudyAttempts     VocabStudyAttempt[]
-  vocabImportReceipts    VocabImportReceipt[]
-  deckEditorReceipts     DeckEditorReceipt[]
-  storedFiles            StoredFile[]
+  id                              String                     @id @default(cuid())
+  createdAt                       DateTime                   @default(now())
+  updatedAt                       DateTime                   @updatedAt
+  email                           String                     @unique
+  password                        String?
+  avatar                          String?
+  emailVerified                   DateTime?
+  firstName                       String?
+  lastName                        String?
+  dob                             DateTime?
+  bio                             String?
+  urls                            String[]                   @default([])
+  accounts                        Account[]
+  memberships                     Membership[]
+  authSessions                    AuthSession[]
+  decks                           Deck[]                     @relation("UserDecks")
+  vocabProgress                   VocabProgress[]            @relation("UserVocabProgress")
+  deckLeaderboardEntries          DeckLeaderboard[]          @relation("UserDeckLeaderboard")
+  matchSessions                   MatchSession[]
+  vocabStudyAttempts              VocabStudyAttempt[]
+  vocabImportReceipts             VocabImportReceipt[]
+  deckEditorReceipts              DeckEditorReceipt[]
+  storedFiles                     StoredFile[]
+  learningTopics                  LearningTopic[]            @relation("LearningTopicOwner")
+  learningTests                   LearningTest[]             @relation("LearningTestOwner")
+  learningOpenings                LearningOpening[]          @relation("LearningOpeningUser")
+  learningAttempts                LearningAttempt[]          @relation("LearningAttemptUser")
+  uploadedLearningAssets          LearningAsset[]            @relation("LearningAssetUploader")
+  platformRoleAssignment          PlatformRoleAssignment?    @relation("PlatformRoleAssignmentUser")
+  assignedPlatformRoles           PlatformRoleAssignment[]   @relation("PlatformRoleAssignmentActor")
+  openedLearningModerationCases   LearningModerationCase[]   @relation("LearningModerationCaseActor")
+  liftedLearningTestRestrictions  LearningTestRestriction[]  @relation("LearningTestRestrictionActor")
+  liftedLearningTopicRestrictions LearningTopicRestriction[] @relation("LearningTopicRestrictionActor")
+  platformAuditEvents             PlatformAuditEvent[]       @relation("PlatformAuditEventActor")
 }
 
 model AuthSession {
@@ -516,4 +527,462 @@ enum VocabProgressStatus {
   KNOWN
   MASTERED
   FORGOTTEN
+}
+
+model LearningLineage {
+  id              String                    @id @default(cuid())
+  parentId        String?                   @map("parent_id")
+  rootId          String                    @map("root_id")
+  treeRevision    Int                       @default(0) @map("tree_revision")
+  createdAt       DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  parent          LearningLineage?          @relation("LearningLineageParent", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  children        LearningLineage[]         @relation("LearningLineageParent")
+  root            LearningLineage           @relation("LearningLineageRoot", fields: [rootId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  descendants     LearningLineage[]         @relation("LearningLineageRoot")
+  test            LearningTest?             @relation("LearningTestLineage")
+  moderationCases LearningModerationCase[]  @relation("LearningModerationCaseLineage")
+  restrictions    LearningTestRestriction[] @relation("LearningLineageRestrictions")
+
+  @@unique([id, rootId])
+  @@index([parentId, id])
+  @@index([rootId, id])
+  @@map("learning_test_lineage")
+}
+
+model LearningTopic {
+  id               String                     @id @default(cuid())
+  ownerUserId      String?                    @map("owner_user_id")
+  visibility       String                     @default("PRIVATE")
+  currentVersionId String?                    @map("current_version_id")
+  accessRevision   Int                        @default(0) @map("access_revision")
+  pageOpenCount    BigInt                     @default(0) @map("page_open_count")
+  publishedAt      DateTime?                  @map("published_at") @db.Timestamptz(3)
+  createdAt        DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt        DateTime?                  @map("deleted_at") @db.Timestamptz(3)
+  owner            User?                      @relation("LearningTopicOwner", fields: [ownerUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  tests            LearningTest[]             @relation("LearningTopicTests")
+  draft            LearningTopicDraft?        @relation("LearningTopicDraft")
+  versions         LearningTopicVersion[]     @relation("LearningTopicVersions")
+  moderationCases  LearningModerationCase[]   @relation("LearningModerationCaseTopic")
+  restrictions     LearningTopicRestriction[] @relation("LearningTopicRestrictions")
+
+  @@unique([id, ownerUserId])
+  @@index([ownerUserId, updatedAt, id])
+  @@index([publishedAt, id])
+  @@map("learning_topics")
+}
+
+model LearningTest {
+  id                 String                      @id @default(cuid())
+  ownerUserId        String?                     @map("owner_user_id")
+  visibility         String?
+  currentVersionId   String?                     @map("current_version_id")
+  accessRevision     Int                         @default(0) @map("access_revision")
+  pageOpenCount      BigInt                      @default(0) @map("page_open_count")
+  publishedAt        DateTime?                   @map("published_at") @db.Timestamptz(3)
+  createdAt          DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt          DateTime?                   @map("deleted_at") @db.Timestamptz(3)
+  topicId            String?                     @map("topic_id")
+  lineageId          String                      @unique @map("lineage_id")
+  topic              LearningTopic?              @relation("LearningTopicTests", fields: [topicId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  lineage            LearningLineage             @relation("LearningTestLineage", fields: [lineageId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  owner              User?                       @relation("LearningTestOwner", fields: [ownerUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  draft              LearningTestDraft?          @relation("LearningTestDraft")
+  versions           LearningTestVersion[]       @relation("LearningTestVersions")
+  topicDraftExercise LearningTopicDraftExercise? @relation("LearningTopicDraftExerciseTest")
+  openings           LearningOpening[]           @relation("LearningTestOpenings")
+  attempts           LearningAttempt[]           @relation("LearningTestAttempts")
+
+  @@unique([id, ownerUserId])
+  @@unique([topicId, id])
+  @@index([ownerUserId, updatedAt, id])
+  @@index([publishedAt, id])
+  @@map("learning_tests")
+}
+
+model LearningTestDraft {
+  testId        String                   @id @map("test_id")
+  revision      Int                      @default(0)
+  title         String                   @default("")
+  description   String                   @default("")
+  englishLevel  String?                  @map("english_level")
+  schemaVersion Int                      @default(1) @map("schema_version")
+  updatedAt     DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+  test          LearningTest             @relation("LearningTestDraft", fields: [testId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  groups        LearningTestDraftGroup[] @relation("LearningTestDraftGroups")
+  mediaUses     LearningMediaUse[]       @relation("LearningTestDraftMediaUses")
+
+  @@map("learning_test_drafts")
+}
+
+model LearningTestVersion {
+  id                 String                         @id @default(cuid())
+  testId             String                         @map("test_id")
+  versionNumber      Int                            @map("version_number")
+  title              String                         @default("")
+  description        String                         @default("")
+  englishLevel       String?                        @map("english_level")
+  schemaVersion      Int                            @default(1) @map("schema_version")
+  createdAt          DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  scoringVersion     Int                            @map("scoring_version")
+  maxPoints          Int                            @map("max_points")
+  test               LearningTest                   @relation("LearningTestVersions", fields: [testId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  groups             LearningTestVersionGroup[]     @relation("LearningTestVersionGroups")
+  topicExercises     LearningTopicVersionExercise[] @relation("LearningTopicExerciseTestVersion")
+  openings           LearningOpening[]              @relation("LearningTestVersionOpenings")
+  attempts           LearningAttempt[]              @relation("LearningTestVersionAttempts")
+  mediaUses          LearningMediaUse[]             @relation("LearningTestVersionMediaUses")
+  moderationEvidence LearningEvidence[]             @relation("LearningTestVersionEvidence")
+
+  @@unique([testId, versionNumber])
+  @@unique([testId, id])
+  @@index([testId])
+  @@map("learning_test_versions")
+}
+
+model LearningTopicDraft {
+  topicId       String                       @id @map("topic_id")
+  revision      Int                          @default(0)
+  title         String                       @default("")
+  description   String                       @default("")
+  englishLevel  String?                      @map("english_level")
+  schemaVersion Int                          @default(1) @map("schema_version")
+  materials     Json
+  updatedAt     DateTime                     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  topic         LearningTopic                @relation("LearningTopicDraft", fields: [topicId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  exercises     LearningTopicDraftExercise[] @relation("LearningTopicDraftExercises")
+  mediaUses     LearningMediaUse[]           @relation("LearningTopicDraftMediaUses")
+
+  @@map("learning_topic_drafts")
+}
+
+model LearningTopicVersion {
+  id                 String                         @id @default(cuid())
+  topicId            String                         @map("topic_id")
+  versionNumber      Int                            @map("version_number")
+  title              String                         @default("")
+  description        String                         @default("")
+  englishLevel       String?                        @map("english_level")
+  schemaVersion      Int                            @default(1) @map("schema_version")
+  materials          Json
+  createdAt          DateTime                       @default(now()) @map("created_at") @db.Timestamptz(3)
+  topic              LearningTopic                  @relation("LearningTopicVersions", fields: [topicId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  exercises          LearningTopicVersionExercise[] @relation("LearningTopicVersionExercises")
+  mediaUses          LearningMediaUse[]             @relation("LearningTopicVersionMediaUses")
+  moderationEvidence LearningEvidence[]             @relation("LearningTopicVersionEvidence")
+
+  @@unique([topicId, versionNumber])
+  @@unique([topicId, id])
+  @@index([topicId])
+  @@map("learning_topic_versions")
+}
+
+model LearningTestDraftGroup {
+  testId      String                      @map("test_id")
+  groupKey    String                      @map("group_key")
+  position    Int
+  title       String                      @default("")
+  instruction Json
+  material    Json
+  draft       LearningTestDraft           @relation("LearningTestDraftGroups", fields: [testId], references: [testId], onDelete: Restrict, onUpdate: NoAction)
+  questions   LearningTestDraftQuestion[] @relation("LearningTestDraftGroupQuestions")
+
+  @@id([testId, groupKey])
+  @@unique([testId, position])
+  @@map("learning_test_draft_groups")
+}
+
+model LearningTestDraftQuestion {
+  testId        String                 @map("test_id")
+  questionKey   String                 @map("question_key")
+  groupKey      String                 @map("group_key")
+  position      Int
+  kind          String
+  prompt        Json
+  configuration Json
+  solution      Json
+  explanation   Json
+  group         LearningTestDraftGroup @relation("LearningTestDraftGroupQuestions", fields: [testId, groupKey], references: [testId, groupKey], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([testId, questionKey])
+  @@unique([testId, groupKey, position])
+  @@map("learning_test_draft_questions")
+}
+
+model LearningTestVersionGroup {
+  versionId   String                        @map("version_id")
+  groupKey    String                        @map("group_key")
+  position    Int
+  title       String                        @default("")
+  instruction Json
+  material    Json
+  version     LearningTestVersion           @relation("LearningTestVersionGroups", fields: [versionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  questions   LearningTestVersionQuestion[] @relation("LearningTestVersionGroupQuestions")
+
+  @@id([versionId, groupKey])
+  @@unique([versionId, position])
+  @@map("learning_test_version_groups")
+}
+
+model LearningTestVersionQuestion {
+  versionId     String                   @map("version_id")
+  questionKey   String                   @map("question_key")
+  groupKey      String                   @map("group_key")
+  position      Int
+  kind          String
+  prompt        Json
+  configuration Json
+  solution      Json
+  explanation   Json
+  maxPoints     Int                      @map("max_points")
+  group         LearningTestVersionGroup @relation("LearningTestVersionGroupQuestions", fields: [versionId, groupKey], references: [versionId, groupKey], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([versionId, questionKey])
+  @@unique([versionId, groupKey, position])
+  @@map("learning_test_version_questions")
+}
+
+model LearningTopicDraftExercise {
+  topicId    String             @map("topic_id")
+  testId     String             @unique @map("test_id")
+  position   Int
+  topicDraft LearningTopicDraft @relation("LearningTopicDraftExercises", fields: [topicId], references: [topicId], onDelete: Restrict, onUpdate: NoAction)
+  test       LearningTest       @relation("LearningTopicDraftExerciseTest", fields: [testId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([topicId, testId])
+  @@unique([topicId, position])
+  @@map("learning_topic_draft_exercises")
+}
+
+model LearningTopicVersionExercise {
+  topicVersionId String               @map("topic_version_id")
+  testId         String               @map("test_id")
+  testVersionId  String               @map("test_version_id")
+  position       Int
+  topicVersion   LearningTopicVersion @relation("LearningTopicVersionExercises", fields: [topicVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  testVersion    LearningTestVersion  @relation("LearningTopicExerciseTestVersion", fields: [testVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([topicVersionId, testId])
+  @@unique([topicVersionId, position])
+  @@index([testVersionId])
+  @@map("learning_topic_version_exercises")
+}
+
+model LearningOpening {
+  id               String              @id @default(cuid())
+  testId           String              @map("test_id")
+  testVersionId    String              @map("test_version_id")
+  userId           String?             @map("user_id")
+  principalKind    String              @map("principal_kind")
+  principalKey     String              @map("principal_key")
+  guestSecretHash  String?             @unique @map("guest_secret_hash")
+  presentationSeed String              @map("presentation_seed")
+  createdAt        DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt        DateTime            @map("expires_at") @db.Timestamptz(3)
+  revokedAt        DateTime?           @map("revoked_at") @db.Timestamptz(3)
+  test             LearningTest        @relation("LearningTestOpenings", fields: [testId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  testVersion      LearningTestVersion @relation("LearningTestVersionOpenings", fields: [testVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  user             User?               @relation("LearningOpeningUser", fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  attempt          LearningAttempt?    @relation("LearningOpeningAttempt")
+
+  @@unique([id, testId, testVersionId], map: "learning_opening_identity_unique")
+  @@unique([id, principalKind, principalKey], map: "learning_opening_principal_identity_key")
+  @@index([expiresAt, id])
+  @@index([testVersionId])
+  @@map("learning_test_openings")
+}
+
+model LearningAttempt {
+  id                    String              @id @default(cuid())
+  openingId             String              @unique @map("opening_id")
+  testId                String              @map("test_id")
+  testVersionId         String              @map("test_version_id")
+  userId                String?             @map("user_id")
+  principalKind         String              @map("principal_kind")
+  principalKey          String              @map("principal_key")
+  guestResultSecretHash String?             @unique @map("guest_result_secret_hash")
+  answers               Json
+  presentation          Json
+  result                Json
+  submittedAt           DateTime            @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  expiresAt             DateTime            @map("expires_at") @db.Timestamptz(3)
+  erasedAt              DateTime?           @map("erased_at") @db.Timestamptz(3)
+  opening               LearningOpening     @relation("LearningOpeningAttempt", fields: [openingId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  test                  LearningTest        @relation("LearningTestAttempts", fields: [testId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  testVersion           LearningTestVersion @relation("LearningTestVersionAttempts", fields: [testVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  user                  User?               @relation("LearningAttemptUser", fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([userId, testId, submittedAt, id])
+  @@index([expiresAt, id])
+  @@index([testVersionId])
+  @@map("learning_test_attempts")
+}
+
+model LearningReceipt {
+  id            String   @id @default(cuid())
+  principalKey  String   @map("principal_key")
+  operationName String   @map("operation_name")
+  operationId   String   @map("operation_id")
+  payloadHash   String   @map("payload_hash")
+  outcome       Json
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt     DateTime @map("expires_at") @db.Timestamptz(3)
+
+  @@unique([principalKey, operationName, operationId])
+  @@index([expiresAt, id])
+  @@map("learning_operation_receipts")
+}
+
+model LearningAsset {
+  id                String             @id @default(cuid())
+  storageKey        String             @unique @map("storage_key")
+  uploaderUserId    String?            @map("uploader_user_id")
+  mimeType          String             @map("mime_type")
+  byteSize          BigInt             @map("byte_size")
+  width             Int
+  height            Int
+  state             String
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletionClaimedAt DateTime?          @map("deletion_claimed_at") @db.Timestamptz(3)
+  leaseExpiresAt    DateTime           @map("lease_expires_at") @db.Timestamptz(3)
+  uploader          User?              @relation("LearningAssetUploader", fields: [uploaderUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  uses              LearningMediaUse[] @relation("LearningAssetUses")
+
+  @@index([state, leaseExpiresAt, id])
+  @@map("learning_media_assets")
+}
+
+model LearningMediaUse {
+  id             String                @id @default(cuid())
+  assetId        String                @map("asset_id")
+  testDraftId    String?               @map("test_draft_id")
+  testVersionId  String?               @map("test_version_id")
+  topicDraftId   String?               @map("topic_draft_id")
+  topicVersionId String?               @map("topic_version_id")
+  asset          LearningAsset         @relation("LearningAssetUses", fields: [assetId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  testDraft      LearningTestDraft?    @relation("LearningTestDraftMediaUses", fields: [testDraftId], references: [testId], onDelete: Restrict, onUpdate: NoAction)
+  testVersion    LearningTestVersion?  @relation("LearningTestVersionMediaUses", fields: [testVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  topicDraft     LearningTopicDraft?   @relation("LearningTopicDraftMediaUses", fields: [topicDraftId], references: [topicId], onDelete: Restrict, onUpdate: NoAction)
+  topicVersion   LearningTopicVersion? @relation("LearningTopicVersionMediaUses", fields: [topicVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([assetId, testDraftId])
+  @@unique([assetId, testVersionId])
+  @@unique([assetId, topicDraftId])
+  @@unique([assetId, topicVersionId])
+  @@index([testDraftId])
+  @@index([testVersionId])
+  @@index([topicDraftId])
+  @@index([topicVersionId])
+  @@map("learning_media_uses")
+}
+
+model PlatformRoleAssignment {
+  userId           String   @id @map("user_id")
+  role             String
+  assignedByUserId String?  @map("assigned_by_user_id")
+  assignedAt       DateTime @default(now()) @map("assigned_at") @db.Timestamptz(3)
+  revision         Int      @default(0)
+  user             User     @relation("PlatformRoleAssignmentUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  assignedBy       User?    @relation("PlatformRoleAssignmentActor", fields: [assignedByUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@map("platform_role_assignments")
+}
+
+model PlatformBootstrap {
+  key                String   @id
+  selectedAccountKey String   @map("selected_account_key")
+  completedAt        DateTime @default(now()) @map("completed_at") @db.Timestamptz(3)
+
+  @@map("platform_bootstrap")
+}
+
+model LearningModerationCase {
+  id                String                     @id @default(cuid())
+  scope             String
+  rootLineageId     String?                    @map("root_lineage_id")
+  topicId           String?                    @map("topic_id")
+  reason            String
+  openedByUserId    String?                    @map("opened_by_user_id")
+  openedAt          DateTime                   @default(now()) @map("opened_at") @db.Timestamptz(3)
+  scopeRevision     Int?                       @map("scope_revision")
+  state             String                     @default("OPEN")
+  closedAt          DateTime?                  @map("closed_at") @db.Timestamptz(3)
+  evidenceExpiresAt DateTime?                  @map("evidence_expires_at") @db.Timestamptz(3)
+  rootLineage       LearningLineage?           @relation("LearningModerationCaseLineage", fields: [rootLineageId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  topic             LearningTopic?             @relation("LearningModerationCaseTopic", fields: [topicId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  openedBy          User?                      @relation("LearningModerationCaseActor", fields: [openedByUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  testRestrictions  LearningTestRestriction[]  @relation("LearningModerationCaseTestRestrictions")
+  topicRestrictions LearningTopicRestriction[] @relation("LearningModerationCaseTopicRestrictions")
+  evidence          LearningEvidence[]         @relation("LearningModerationCaseEvidence")
+
+  @@index([state, evidenceExpiresAt, id])
+  @@map("learning_moderation_cases")
+}
+
+model LearningTestRestriction {
+  caseId         String                 @map("case_id")
+  lineageId      String                 @map("lineage_id")
+  appliedAt      DateTime               @default(now()) @map("applied_at") @db.Timestamptz(3)
+  liftedAt       DateTime?              @map("lifted_at") @db.Timestamptz(3)
+  liftedByUserId String?                @map("lifted_by_user_id")
+  liftReason     String?                @map("lift_reason")
+  moderationCase LearningModerationCase @relation("LearningModerationCaseTestRestrictions", fields: [caseId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  lineage        LearningLineage        @relation("LearningLineageRestrictions", fields: [lineageId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  liftedBy       User?                  @relation("LearningTestRestrictionActor", fields: [liftedByUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@id([caseId, lineageId])
+  @@index([lineageId, liftedAt])
+  @@map("learning_test_restrictions")
+}
+
+model LearningTopicRestriction {
+  caseId         String                 @map("case_id")
+  topicId        String                 @map("topic_id")
+  appliedAt      DateTime               @default(now()) @map("applied_at") @db.Timestamptz(3)
+  liftedAt       DateTime?              @map("lifted_at") @db.Timestamptz(3)
+  liftedByUserId String?                @map("lifted_by_user_id")
+  liftReason     String?                @map("lift_reason")
+  moderationCase LearningModerationCase @relation("LearningModerationCaseTopicRestrictions", fields: [caseId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  topic          LearningTopic          @relation("LearningTopicRestrictions", fields: [topicId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  liftedBy       User?                  @relation("LearningTopicRestrictionActor", fields: [liftedByUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@id([caseId, topicId])
+  @@index([topicId, liftedAt])
+  @@map("learning_topic_restrictions")
+}
+
+model PlatformAuditEvent {
+  id          String   @id @default(cuid())
+  actorUserId String?  @map("actor_user_id")
+  actorKey    String   @map("actor_key")
+  action      String
+  targetKind  String   @map("target_kind")
+  targetId    String   @map("target_id")
+  reason      String
+  requestId   String   @map("request_id")
+  occurredAt  DateTime @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  expiresAt   DateTime @map("expires_at") @db.Timestamptz(3)
+  details     Json
+  actor       User?    @relation("PlatformAuditEventActor", fields: [actorUserId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([expiresAt, id])
+  @@index([targetKind, targetId, occurredAt])
+  @@map("platform_audit_events")
+}
+
+model LearningEvidence {
+  id             String                 @id @default(cuid())
+  caseId         String                 @map("case_id")
+  testVersionId  String?                @map("test_version_id")
+  topicVersionId String?                @map("topic_version_id")
+  retainedAt     DateTime               @default(now()) @map("retained_at") @db.Timestamptz(3)
+  moderationCase LearningModerationCase @relation("LearningModerationCaseEvidence", fields: [caseId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  testVersion    LearningTestVersion?   @relation("LearningTestVersionEvidence", fields: [testVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  topicVersion   LearningTopicVersion?  @relation("LearningTopicVersionEvidence", fields: [topicVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@index([testVersionId])
+  @@index([topicVersionId])
+  @@map("learning_moderation_evidence")
 }
