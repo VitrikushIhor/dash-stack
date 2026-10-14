@@ -1,0 +1,4 @@
+export const DOCUMENT_LIMITS = {
+  MAX_SERIALIZED_SIZE_BYTES: 1_048_576, // 1 MiB (UTF-8)
+  MAX_NODES: 10_000,
+} as const;
